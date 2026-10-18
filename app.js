@@ -16,7 +16,20 @@ async function enter(){try{me=await api("/me")}catch(e){token="";localStorage.re
 async function refresh(){try{[notices,tasks]=await Promise.all([api("/notices"),api("/tasks")]);renderHome();renderNotices();renderTasks()}catch(e){toast(e.message)}}
 function date(s){if(!s)return"未设置截止日期";let d=new Date(s);return isNaN(d) ? s : d.toLocaleDateString("zh-CN")}
 function renderHome(){$("statNotices").textContent=notices.length;$("statPending").textContent=tasks.filter(t=>t.status==="pending").length;$("statDone").textContent=tasks.filter(t=>t.status==="completed").length;$("recent").innerHTML=notices.slice(0,4).map(n=>`<div class="notice-row"><span class="bullet"></span><div><h4>${esc(n.title)}</h4><p>${esc(n.body)}</p><div class="meta">${esc(n.category)} · ${date(n.created_at)} ${n.deadline?"· 截止："+esc(n.deadline):""}</div></div></div>`).join("")||'<div class="empty">暂无通知公告</div>'}
-function renderNotices(){let q=($("search").value||"").toLowerCase(),cat=$("category").value;let list=notices.filter(n=>(!cat||n.category===cat)&&(!q||(n.title+n.body).toLowerCase().includes(q)));$("noticeCards").innerHTML=list.map(n=>`<article class="notice-card"><div class="notice-top"><span class="tag">${esc(n.category)}</span><button class="outline" data-add="${n.id}">＋ 加入待办</button></div><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p><div class="meta">发布人：${esc(n.publisher)} · ${date(n.created_at)} · 适用对象：${esc(n.audience)} ${n.deadline?"· 截止："+esc(n.deadline):""}</div></article>`).join("")||'<div class="panel">没有找到符合条件的通知。</div>';document.querySelectorAll("[data-add]").forEach(b=>b.onclick=async()=>{try{let d=await api("/tasks/from-notice/"+b.dataset.add,{method:"POST"});toast(d.message);tasks=await api("/tasks");renderTasks();renderHome()}catch(e){toast(e.message)}})}
+function renderNotices(){
+  let q=($("search").value||"").toLowerCase(),cat=$("category").value;
+  let list=notices.filter(n=>(!cat||n.category===cat)&&(!q||(n.title+n.body).toLowerCase().includes(q)));
+  const admin=me?.role==="admin";
+  $("noticeCards").innerHTML=list.map(n=>`<article class="notice-card"><div class="notice-top"><span class="tag">${esc(n.category)}</span><div class="notice-actions"><button class="outline" data-add="${n.id}">＋ 加入待办</button>${admin?`<button class="danger" data-delete-notice="${n.id}">删除通知</button>`:""}</div></div><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p><div class="meta">发布人：${esc(n.publisher)} · ${date(n.created_at)} · 适用对象：${esc(n.audience)} ${n.deadline?"· 截止："+esc(n.deadline):""}</div></article>`).join("")||'<div class="panel">没有找到符合条件的通知。</div>';
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=async()=>{try{let d=await api("/tasks/from-notice/"+b.dataset.add,{method:"POST"});toast(d.message);tasks=await api("/tasks");renderTasks();renderHome()}catch(e){toast(e.message)}});
+  document.querySelectorAll("[data-delete-notice]").forEach(b=>b.onclick=async()=>{
+    if(me?.role!=="admin")return toast("仅管理员可以删除通知");
+    if(!confirm("确定删除这条通知吗？相关待办也会一并删除，此操作不可撤销。"))return;
+    b.disabled=true;
+    try{const d=await api("/notices/"+b.dataset.deleteNotice,{method:"DELETE"});toast(d.message||"通知删除成功");await refresh()}
+    catch(e){toast(e.message);b.disabled=false}
+  });
+}
 $("search").oninput=renderNotices;$("category").onchange=renderNotices;$("taskFilter").onchange=renderTasks;
 function renderTasks(){let f=$("taskFilter").value,list=tasks.filter(t=>f==="all"||t.status===f),p=tasks.filter(t=>t.status==="pending").length,d=tasks.length-p;$("taskTotal").textContent=tasks.length;$("taskOpen").textContent=p;$("taskDone").textContent=d;$("taskList").innerHTML=list.map(t=>`<div class="taskrow ${t.status==="completed"?"done":""}"><input type="checkbox" data-task="${t.id}" ${t.status==="completed"?"checked":""}><div class="tasktext"><b>${esc(t.title)}</b><small>${t.due_date?"截止日期："+esc(t.due_date):"未设置截止日期"} · ${date(t.created_at)}</small></div><span class="tag">${t.status==="completed"?"已完成":"待处理"}</span></div>`).join("")||'<div class="empty">暂无待办。可以在通知公告中将通知加入待办。</div>';document.querySelectorAll("[data-task]").forEach(c=>c.onchange=async()=>{try{await api("/tasks/"+c.dataset.task,{method:"PATCH",body:JSON.stringify({status:c.checked?"completed":"pending"})});tasks=await api("/tasks");renderTasks();renderHome()}catch(e){toast(e.message)}})}
 $("newNotice").onclick=()=>$("dialog").showModal();$("closeDialog").onclick=()=>$("dialog").close();$("cancelDialog").onclick=()=>$("dialog").close();
@@ -56,7 +69,25 @@ $("aiThinking")?.addEventListener("change",()=>{$("aiEffort").disabled=!$("aiThi
 document.querySelectorAll(".suggestions button").forEach(b=>b.onclick=()=>$("question").value=b.textContent);
 (async()=>{try{await api("/health");if(token)await enter()}catch{} })();
 
-async function loadUsers(){try{let list=await api("/users");let q=($("userSearch").value||"").toLowerCase();list=list.filter(u=>(u.username+u.display_name+u.role).toLowerCase().includes(q));$("userList").innerHTML=list.map(u=>`<div class="taskrow"><span class="tag">${u.role==="admin"?"管理员":"学生"}</span><div class="tasktext"><b>${esc(u.display_name)}</b><small>用户名：${esc(u.username)} · 注册：${date(u.created_at)}</small></div><select data-role="${u.id}" ${u.id===me.id?"disabled":""}><option value="student" ${u.role==="student"?"selected":""}>学生</option><option value="admin" ${u.role==="admin"?"selected":""}>管理员</option></select></div>`).join("")||'<p class="muted">暂无用户。</p>';document.querySelectorAll("[data-role]").forEach(sel=>sel.onchange=async()=>{try{await api("/users/"+sel.dataset.role,{method:"PATCH",body:JSON.stringify({role:sel.value})});toast("角色已更新");loadUsers()}catch(e){toast(e.message);loadUsers()}})}catch(e){toast(e.message)}}
+async function loadUsers(){
+  try{
+    if(me?.role!=="admin"){toast("仅管理员可以管理用户");return}
+    let list=await api("/users");
+    let q=($("userSearch").value||"").toLowerCase();
+    list=list.filter(u=>(u.username+u.display_name+u.role).toLowerCase().includes(q));
+    $("userList").innerHTML=list.map(u=>`<div class="taskrow user-row"><span class="tag">${u.role==="admin"?"管理员":"学生"}</span><div class="tasktext"><b>${esc(u.display_name)}</b><small>用户名：${esc(u.username)} · 注册：${date(u.created_at)}</small></div><select data-role="${u.id}" ${u.id===me.id?"disabled":""}><option value="student" ${u.role==="student"?"selected":""}>学生</option><option value="admin" ${u.role==="admin"?"selected":""}>管理员</option></select>${u.id===me.id?'<span class="muted">当前账号</span>':`<button class="danger" data-delete-user="${u.id}">删除用户</button>`}</div>`).join("")||'<p class="muted">暂无用户。</p>';
+    document.querySelectorAll("[data-role]").forEach(sel=>sel.onchange=async()=>{try{await api("/users/"+sel.dataset.role,{method:"PATCH",body:JSON.stringify({role:sel.value})});toast("角色已更新");loadUsers()}catch(e){toast(e.message);loadUsers()}});
+    document.querySelectorAll("[data-delete-user]").forEach(b=>b.onclick=async()=>{
+      const id=Number(b.dataset.deleteUser);
+      if(id===Number(me.id))return toast("不能删除当前登录的账号");
+      const row=b.closest(".user-row"),name=row?.querySelector(".tasktext b")?.textContent||"该用户";
+      if(!confirm(`确定删除用户“${name}”吗？该用户的待办也会删除，此操作不可撤销。`))return;
+      b.disabled=true;
+      try{const d=await api("/users/"+id,{method:"DELETE"});toast(d.message||"用户删除成功");await loadUsers();await loadStats()}
+      catch(e){toast(e.message);b.disabled=false}
+    });
+  }catch(e){toast(e.message)}
+}
 async function loadStats(){try{let s=await api("/stats");$("aNotices").textContent=s.notice_count;$("aStudents").textContent=s.student_count;$("aCompletion").textContent=s.completion_rate+"%";$("statsDetails").innerHTML=`<div class="notice-row"><span class="bullet"></span><div><h4>账号总数</h4><p>${s.user_count}</p></div></div><div class="notice-row"><span class="bullet"></span><div><h4>任务总数</h4><p>${s.task_count}</p></div></div><div class="notice-row"><span class="bullet"></span><div><h4>待处理任务</h4><p>${s.pending_count}</p></div></div><div class="notice-row"><span class="bullet"></span><div><h4>已完成任务</h4><p>${s.completed_count}</p></div></div>`}catch(e){toast(e.message)}}
 $("userSearch")?.addEventListener("input",()=>loadUsers());$("reloadUsers")?.addEventListener("click",loadUsers);$("reloadStats")?.addEventListener("click",loadStats);
 

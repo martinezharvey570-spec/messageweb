@@ -1,3 +1,4 @@
+// app.js patched for explicit web_search payload; build marker: 2026-10-18-websearch-fix
 // Change to "/api" for same-origin deployment, or to "https://your-backend.example/api".
 // Local default. For same-origin production deployment, change to "/api".
 const API=(window.XZ_CONFIG&&window.XZ_CONFIG.API_BASE)||"/api";let token=localStorage.getItem("xz_token")||"",me=null,notices=[],tasks=[],mode="login",timer;
@@ -22,7 +23,35 @@ $("newNotice").onclick=()=>$("dialog").showModal();$("closeDialog").onclick=()=>
 $("noticeForm").onsubmit=async e=>{e.preventDefault();try{await api("/notices",{method:"POST",body:JSON.stringify({title:$("nTitle").value.trim(),category:$("nCategory").value,audience:$("nAudience").value,deadline:$("nDeadline").value,body:$("nBody").value.trim(),create_tasks:$("nTasks").checked})});$("dialog").close();$("noticeForm").reset();$("nAudience").value="全体学生";toast("通知发布成功");await refresh()}catch(e){toast(e.message)}};
 async function checkAI(){try{let d=await api("/health");$("aiStatus").textContent=d.ai_configured?"文理智办已连接":"等待配置 DeepSeek API";$("aiStatus").classList.toggle("ready",d.ai_configured)}catch{$("aiStatus").textContent="无法连接服务"}}
 function message(s,who="",sources=[]){let d=document.createElement("div");d.className="bubble "+who;d.textContent=s;$("messages").appendChild(d);if(sources&&sources.length){let src=document.createElement("div");src.className="ai-sources";let title=document.createElement("b");title.textContent="联网来源";src.appendChild(title);sources.forEach((item,i)=>{let row=document.createElement("div"),a=document.createElement("a");a.href=item.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=`${i+1}. ${item.title||item.url}`;row.appendChild(a);src.appendChild(row)});$("messages").appendChild(src)}$("messages").scrollTop=$("messages").scrollHeight}
-$("askForm").onsubmit=async e=>{e.preventDefault();let q=$("question").value.trim();if(!q)return;$("question").value="";message(q,"user");let b=$("askForm").querySelector("button");b.disabled=true;try{let d=await api("/ai/ask",{method:"POST",body:JSON.stringify({question:q,model:$("aiModel")?.value||"deepseek-flash",thinking:$("aiThinking")?.checked!==false,reasoning_effort:$("aiEffort")?.value||"high",web_search:$("aiWebSearch")?.checked===true})});message(d.answer,"",d.sources||[])}catch(e){message(e.message)}finally{b.disabled=false}};
+// AI request handler — keep the search checkbox state explicit in every request.
+$("askForm").onsubmit=async e=>{
+  e.preventDefault();
+  const q=$("question").value.trim();
+  if(!q)return;
+  $("question").value="";
+  message(q,"user");
+  const b=$("askForm").querySelector("button");
+  b.disabled=true;
+  try{
+    const searchToggle=$("aiWebSearch");
+    const webSearch=Boolean(searchToggle && searchToggle.checked);
+    const payload={
+      question:q,
+      model:$("aiModel")?.value||"deepseek-flash",
+      thinking:$("aiThinking")?.checked!==false,
+      reasoning_effort:$("aiEffort")?.value||"high",
+      web_search:webSearch
+    };
+    // Useful for verifying the actual request in Chrome DevTools; contains no secrets.
+    console.debug("[文理智办] request options",{model:payload.model,web_search:payload.web_search});
+    const d=await api("/ai/ask",{method:"POST",cache:"no-store",body:JSON.stringify(payload)});
+    message(d.answer,"",d.sources||[]);
+    if(webSearch && !(d.sources&&d.sources.length)){
+      console.warn("[文理智办] 联网搜索已请求，但响应未返回 sources；请检查 Worker 搜索调用及错误处理。");
+    }
+  }catch(e){message(e.message)}
+  finally{b.disabled=false}
+};
 $("aiThinking")?.addEventListener("change",()=>{$("aiEffort").disabled=!$("aiThinking").checked});
 document.querySelectorAll(".suggestions button").forEach(b=>b.onclick=()=>$("question").value=b.textContent);
 (async()=>{try{await api("/health");if(token)await enter()}catch{} })();

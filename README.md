@@ -1,78 +1,80 @@
-# 校务智理 v2｜Cloudflare 在线版
+# 校务智理 v2.1 · 文理智办（Cloudflare Pages + Workers + D1 + R2）
 
-本版本以 Cloudflare Pages（前端）+ Workers（API）+ D1（共享数据库）为目标架构，保留原生 HTML/CSS/JS，尽量减少框架和构建步骤。
+本版本在原有校务智理登录、通知、待办、用户管理和统计功能上，增加 DeepSeek API 服务端代理和校园文件知识库。
 
-## 这一版的功能
+## 已实现
+- 前端 AI 助手改名为「文理智办」，提供模型选择：`deepseek-flash`、`deepseek-v4-pro`。
+- Worker 服务端代理 DeepSeek `/chat/completions`；API Key 不发送到浏览器。
+- D1 保存用户、通知、待办、文件元数据和知识库文本片段。
+- R2 保存上传的原始文件。
+- 管理员可上传共享资料；登录学生可上传个人资料。
+- 文件访问规则：所有登录用户可检索管理员共享文件；用户只能检索自己的个人文件。共享文件只有管理员能删除；个人文件所有者可删除。
+- 上传文本文件后切分片段，按问题关键词检索最多 5 个片段，附入模型上下文，并向前端显示参考文件。
+- 当前知识库文件格式：TXT、MD、CSV、JSON、DOCX、PDF；单文件上限 10 MiB。DOCX/PDF 使用后端解析器提取文本。
+- 响应式页面适配桌面与手机。
 
-### 学生
-- 注册、登录、退出登录（令牌有效期 12 小时）
-- 查看所有共享通知公告、按类别/关键词筛选
-- 将通知加入自己的待办；标记待办完成/待处理
-- 使用 AI 校务助手（配置模型服务后启用）
+## 当前限制（请注意）
+- PDF/DOCX 已加入文本提取：普通文本型 PDF 与 DOCX 可解析；扫描图片型 PDF 暂不包含 OCR，需要先 OCR 转成可检索文本。单文件上限为 10 MiB。
+- 检索采用轻量关键词匹配，不是向量语义检索；大型知识库可后续接入向量数据库/Embedding。
+- 尚未实现用量计费、全局速率限制、审计日志、病毒扫描、文件版本管理和学校统一身份认证。
+- AI 回答不能替代学校正式规定；不要上传成绩、身份证号、学号等敏感个人资料。
+- 模型 ID 按当前官方 API 文档配置；官方模型会调整，必要时请更新 Worker 的 `models` 白名单和前端选项。
 
-### 管理员
-- 发布校园通知，可为当前所有学生生成待办
-- 查看注册用户及角色
-- 修改其他用户角色（学生/管理员；不能修改自己的角色）
-- 查看系统统计：用户数、通知数、任务数、完成率
+## 1. Cloudflare D1
+1. 在 Cloudflare Dashboard → Storage & databases → D1 创建数据库，例如 `xiaowu-zhili-db`。
+2. 打开数据库 Console，把 `cloudflare/schema.sql` 全部执行一次。已有数据库可重复执行，其中使用 `IF NOT EXISTS` 的建表语句不会重建原表。
+3. 在 `cloudflare/wrangler.toml` 中把 `database_id` 替换为真实 D1 ID。
 
-### 安全与适配
-- 学生/管理员权限由后端 Worker 检查，不能只靠前端隐藏按钮
-- 密码使用 PBKDF2-HMAC-SHA256 派生并保存盐值和哈希，不保存明文密码
-- D1 存储共享数据，不依赖浏览器本地数据库
-- 手机/桌面响应式界面
-- AI 密钥仅从 Worker 环境变量读取，不放入前端
+## 2. Cloudflare R2
+1. 在 Dashboard → R2 创建 bucket：`xiaowu-zhili-files`（也可以使用别的名称）。
+2. 如果名称不同，修改 `cloudflare/wrangler.toml` 的 `bucket_name`。
+3. Worker 绑定名称必须是 `FILES`；D1 绑定名称必须是 `DB`。
 
-## Cloudflare 三件套部署
+## 3. 部署 Worker
+Worker 项目根目录应是 `cloudflare/`，入口文件为 `worker.js`，配置文件为 `wrangler.toml`。可以用 Wrangler CLI 部署：
 
-### A. 创建 D1 数据库
-1. 登录 Cloudflare Dashboard，打开 **Workers & Pages → D1 SQL Database**。
-2. 创建数据库 `xiaowu-zhili-db`。
-3. 打开数据库的 Console，执行 `cloudflare/schema.sql` 全部 SQL。
-4. 在数据库设置中记录 database ID。
+```bash
+cd cloudflare
+npx wrangler deploy
+```
 
-### B. 部署 API Worker
-1. 在本机安装 Node.js LTS 和 Wrangler CLI：`npm install -g wrangler`。
-2. 登录 Cloudflare：`wrangler login`。
-3. 进入 `cloudflare` 文件夹，编辑 `wrangler.toml`，把 `database_id` 替换成刚才真实的 ID。
-4. 部署：`wrangler deploy`。首次部署前确保 D1 schema 已执行。
-5. 在 Cloudflare Worker 的 Settings → Variables and Secrets 设置：
-   - `JWT_SECRET`：随机生成的长密钥，建议至少 32 字节随机值。
-   - `ADMIN_USERNAME`：管理员用户名，例如 `campusadmin`。
-   - `ADMIN_PASSWORD`：强管理员初始密码。
-   - `ADMIN_DISPLAY_NAME`：例如 `校务智理管理员`。
-   - `ALLOWED_ORIGINS`：Pages 的实际网址，例如 `https://your-project.pages.dev`。如有自定义域名，用逗号分隔加入。
-6. 重新部署或确认配置已生效。首次 API 请求会创建管理员账号和两条演示通知。管理员账号创建后，更改 `ADMIN_PASSWORD` 不会自动重置数据库内的密码；请用后续管理员管理功能/维护 SQL 进行密码重置（当前 UI 不提供重置密码功能）。
+也可以在 Cloudflare Dashboard 创建 Worker 后粘贴 `worker.js`，再在 Settings → Bindings 里绑定 D1（变量名 `DB`）与 R2（变量名 `FILES`）。Dashboard 手动部署时，仍需将 `schema.sql` 先导入 D1。
 
-### C. 部署前端 Pages
-1. 在 Cloudflare Pages 创建项目，把 `frontend` 文件夹作为静态站点根目录上传/连接 Git 仓库。
-2. 不需要构建命令；输出目录就是 `frontend`。
-3. 打开 `frontend/config.js`，将 `API_BASE` 设置为已部署 Worker 的完整 API 地址，例如：
-   `https://xiaowu-zhili-api.<你的子域>.workers.dev/api`
-4. 重新部署 Pages。把 Pages 的网址加入 Worker 的 `ALLOWED_ORIGINS`。
+## 4. Worker Secrets / Variables
+在 Worker → Settings → Variables and Secrets 添加：
 
-### D. 可选：启用真实 AI
-Worker Settings → Variables and Secrets 中添加：
-- `AI_BASE_URL`：模型供应商的 OpenAI 兼容 API 根地址（通常是 `https://供应商域名/v1`，具体以供应商文档为准）
-- `AI_API_KEY`：私密 Secret
-- `AI_MODEL`：供应商支持的模型 ID
+**Secrets**
+- `DEEPSEEK_API_KEY`：从 DeepSeek 官方开放平台创建的 API Key。
+- `JWT_SECRET`：使用随机生成的长字符串，不要与 API Key 相同。
+- `ADMIN_PASSWORD`：首次初始化管理员密码，设置后不要公开。
 
-确认 Worker 的运行环境可以访问该供应商。未配置时，AI 页面会明确提示未配置，而不会假装已经调用了 AI。不要把密钥写进 `frontend/config.js`。不要发送真实学生隐私数据给模型服务。
+**普通 Variables**
+- `ADMIN_USERNAME`：例如 `admin`。
+- `ADMIN_DISPLAY_NAME`：例如 `系统管理员`。
+- `AI_BASE_URL`：`https://api.deepseek.com`。
+- `AI_MODEL`：默认模型 ID，例如 `deepseek-flash`。
+- `ALLOWED_ORIGINS`：填 Pages 网站的完整来源，如 `https://你的项目.pages.dev`；多个来源用逗号分隔，不建议生产环境使用 `*`。
 
-## 本地/线上联调
-- 前端必须经 HTTP(S) 打开，不要直接双击 `index.html`。
-- 本地测试时，可将 `frontend/config.js` 的 `API_BASE` 指向已部署的 Worker API；或者用 Wrangler 启动 Worker 并配置 D1 本地/远端绑定。
-- Worker 的 CORS `ALLOWED_ORIGINS` 必须包含前端准确来源。
-- 首次部署后访问 `https://你的-worker/api/health` 检查服务状态。
+注意：如果 D1 中已经存在管理员，修改 `ADMIN_PASSWORD` 不会自动重置数据库中的旧密码。请先在全新部署时设置好密码。
 
-## 中国大陆可访问性说明
-Cloudflare 产品在不同网络、运营商和地区的可达性可能不同，不能保证 `workers.dev` 或 `pages.dev` 在中国大陆所有网络均稳定访问。部署后必须从校园网、手机流量和不同运营商实际测试。若需要稳定面向中国大陆用户，可考虑使用大陆可访问的云服务商托管前后端；大陆服务器/域名按要求办理备案。可保留同样的 API 结构，把 Worker 业务逻辑迁移到普通后端。
+## 5. 配置 Pages 前端
+- 将 `frontend/` 中的文件部署到 Cloudflare Pages。
+- 如果 Pages 和 Worker 是不同域名，编辑 `frontend/config.js`，把 `API_BASE` 改成 Worker 地址加 `/api`，例如 `https://你的-worker.workers.dev/api`。
+- 保存后重新部署 Pages。
+- Worker 的 `ALLOWED_ORIGINS` 必须包含 Pages 来源域名（只填 origin，不加 `/api`）。
 
-## 当前边界/安全提醒
-- 这是比赛 MVP，不是学校正式业务系统；尚未接学校统一身份认证、教务/学工系统或官方通知源。
-- 注册默认开放。公开比赛前建议加邀请码/审核，防止陌生人注册；当前没有找回密码/邮箱验证。
-- 用户角色修改能力仅管理员可用；管理员不应随意把不可信账号提升为管理员。
-- 当前通知删除 API 已实现但页面暂未提供删除按钮；没有通知编辑、审计日志、附件上传、站内消息推送。
-- AI 不会自动检索校内文件；回答不应作为学校正式答复。
-- D1/Workers 免费额度与平台策略会变化；按 Cloudflare 最新套餐与服务条款核实。
-- 上线前需要补充限流、登录失败保护、管理员操作审计、备份/恢复测试和隐私政策。
+## 6. 测试顺序
+1. 打开 `https://你的-worker.workers.dev/api/health`，确认返回 `ok: true`。
+2. 在 Pages 注册一个学生账号并登录。
+3. 管理员登录后上传 TXT/MD/CSV/JSON 文件，并选择共享范围。
+4. 学生打开「校园知识库」，应看到共享文件；学生上传的个人文件只应对本人显示。
+5. 打开「文理智办」，选模型并提问文件里确实有答案的问题。
+6. 检查回答下方的参考资料是否指向正确文件。
+
+## 官方模型信息
+本版本按 DeepSeek 当前官方模型列表预置 `deepseek-flash` 与 `deepseek-v4-pro` 两个模型 ID。请以官方 API 文档实时列表为准：
+- 模型列表： https://api-docs.deepseek.com/zh-cn/api/list-models/
+- 对话接口： https://api-docs.deepseek.com/zh-cn/api/create-chat-completion/
+- 首次调用： https://api-docs.deepseek.com/zh-cn/
+
+本源码仅提供接入能力，不包含 API 额度或密钥；需自行在官方平台开通 API 并配置 Secret。尚未替你部署到 Cloudflare，也没有使用真实 API Key 做在线请求测试。

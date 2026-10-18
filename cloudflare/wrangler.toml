@@ -1,8 +1,0 @@
-name = "xiaowu-zhili-api"
-main = "worker.js"
-compatibility_date = "2026-10-18"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "xiaowu-zhili-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"

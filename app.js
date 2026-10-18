@@ -9,7 +9,6 @@ function authMode(m){mode=m;$("loginTab").classList.toggle("selected",m==="login
 $("loginTab").onclick=()=>authMode("login");$("regTab").onclick=()=>authMode("register");
 $("authForm").onsubmit=async e=>{e.preventDefault();try{let body={username:$("username").value.trim(),password:$("password").value};if(mode==="register"){body.display_name=$("displayName").value.trim()}let d=await api(mode==="login"?"/auth/login":"/auth/register",{method:"POST",body:JSON.stringify(body)});token=d.token;localStorage.setItem("xz_token",token);await enter()}catch(e){toast(e.message)}};
 $("logout").onclick=()=>{token="";localStorage.removeItem("xz_token");$("app").classList.add("hide");$("auth").classList.remove("hide");authMode("login")};
-//汉堡菜单，兼容移动端触摸
 const menuBtn = $("menu");
 const sidebarEl = $("sidebar");
 function toggleSidebar(){
@@ -20,6 +19,15 @@ menuBtn.addEventListener("touchend",(e)=>{
   e.preventDefault();
   toggleSidebar();
 });
+//点击遮罩灰色区域关闭侧边栏
+document.addEventListener("click",(e)=>{
+  if(!sidebarEl.classList.contains("open")) return;
+  if(!sidebarEl.contains(e.target) && e.target!==menuBtn){
+    sidebarEl.classList.remove("open");
+  }
+})
+
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));
 
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
 function go(p){["home","notices","tasks","ai","users","analytics"].forEach(x=>$(`${x}Page`).classList.toggle("hide",x!==p));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===p));$("crumb").textContent=({home:"工作台总览",notices:"通知公告",tasks:"我的待办",ai:"文理智办",users:"用户管理",analytics:"数据统计"})[p];$("sidebar").classList.remove("open");if(p==="ai")checkAI();if(p==="users")loadUsers();if(p==="analytics")loadStats()}

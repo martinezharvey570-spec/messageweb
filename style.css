@@ -273,9 +273,17 @@ dialog::backdrop{background:#10182870}
   .cols{grid-template-columns:1fr}
   .cols>.panel:nth-child(2){display:none}
   .wrap{padding:22px 20px}
-  #sidebar{transform:translateX(-100%);transition:.2s;box-shadow:none}
-  #sidebar.open{transform:translateX(0);box-shadow:0 0 0 100vmax #10182855}
+  #sidebar{
+    transform:translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow:none;
+  }
+  #sidebar.open{
+    transform: translateX(0);
+    box-shadow: 0 0 0 100vmax rgba(16, 24, 40, 0.34);
+  }
   main{margin:0}
+
   header{height:66px;padding:0 13px;gap:10px}
   #menu{display:block;border:0;background:white;font-size:19px}
   .user>div{display:none}

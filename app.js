@@ -9,7 +9,18 @@ function authMode(m){mode=m;$("loginTab").classList.toggle("selected",m==="login
 $("loginTab").onclick=()=>authMode("login");$("regTab").onclick=()=>authMode("register");
 $("authForm").onsubmit=async e=>{e.preventDefault();try{let body={username:$("username").value.trim(),password:$("password").value};if(mode==="register"){body.display_name=$("displayName").value.trim()}let d=await api(mode==="login"?"/auth/login":"/auth/register",{method:"POST",body:JSON.stringify(body)});token=d.token;localStorage.setItem("xz_token",token);await enter()}catch(e){toast(e.message)}};
 $("logout").onclick=()=>{token="";localStorage.removeItem("xz_token");$("app").classList.add("hide");$("auth").classList.remove("hide");authMode("login")};
-$("menu").onclick=()=>$("sidebar").classList.toggle("open");
+//汉堡菜单，兼容移动端触摸
+const menuBtn = $("menu");
+const sidebarEl = $("sidebar");
+function toggleSidebar(){
+  sidebarEl.classList.toggle("open");
+}
+menuBtn.addEventListener("click",toggleSidebar);
+menuBtn.addEventListener("touchend",(e)=>{
+  e.preventDefault();
+  toggleSidebar();
+});
+
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
 function go(p){["home","notices","tasks","ai","users","analytics"].forEach(x=>$(`${x}Page`).classList.toggle("hide",x!==p));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===p));$("crumb").textContent=({home:"工作台总览",notices:"通知公告",tasks:"我的待办",ai:"文理智办",users:"用户管理",analytics:"数据统计"})[p];$("sidebar").classList.remove("open");if(p==="ai")checkAI();if(p==="users")loadUsers();if(p==="analytics")loadStats()}
 async function enter(){try{me=await api("/me")}catch(e){token="";localStorage.removeItem("xz_token");$("auth").classList.remove("hide");$("app").classList.add("hide");toast(e.message);return} $("auth").classList.add("hide");$("app").classList.remove("hide");$("userName").textContent=me.display_name;$("welcomeName").textContent=me.display_name;$("avatar").textContent=me.display_name.slice(0,1);$("userRole").textContent=me.role==="admin"?"系统管理员":"学生用户";$("newNotice").classList.toggle("hide",me.role!=="admin");let d=new Date();$("today").textContent=d.toLocaleDateString("zh-CN",{year:"numeric",month:"long",day:"numeric",weekday:"long"});$("dateBig").textContent=d.toLocaleDateString("zh-CN",{month:"2-digit",day:"2-digit"});document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hide",me.role!=="admin"));await refresh();go("home")}

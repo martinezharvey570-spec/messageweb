@@ -520,8 +520,11 @@ function formatMarkdownSafe(text) {
 }
 
 function message(s, who = "", sources = []) {
-  chatHistory.push({ role: who === "user" ? "学生" : "文理智办", content: s });
+  if (typeof chatHistory !== "undefined") {
+    chatHistory.push({ role: who === "user" ? "学生" : "文理智办", content: s });
+  }
 
+  // 核心改动：把 "user" 换成专属类名 "msg-user"，彻底避开任何系统类名冲突
   const roleClass = who === "user" ? "msg-user" : "msg-ai";
 
   const wrap = document.createElement("div");
@@ -532,12 +535,10 @@ function message(s, who = "", sources = []) {
   if (who === "user") {
     d.textContent = s;
   } else {
-    d.innerHTML = formatMarkdownSafe(s);
+    d.innerHTML = typeof formatMarkdownSafe === "function" ? formatMarkdownSafe(s) : esc(s);
   }
   wrap.appendChild(d);
 
-
-  // 为 AI 回复添加一键复制与追问按钮
   if (who !== "user") {
     const tools = document.createElement("div");
     tools.className = "bubble-tools";
@@ -577,6 +578,8 @@ function message(s, who = "", sources = []) {
     });
     $("messages").appendChild(src);
   }
+
+  // 自动平滑滚动到最新发送的内容
   $("messages").scrollTop = $("messages").scrollHeight;
 }
 

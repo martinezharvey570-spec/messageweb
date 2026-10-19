@@ -619,11 +619,27 @@ $("askForm").onsubmit = async e => {
   const q = $("question").value.trim();
   if (!q) return;
   $("question").value = "";
+
+  // 1. 上屏用户提问
   message(q, "user");
+
   const b = $("askForm").querySelector("button");
   const origText = b.textContent;
   b.disabled = true;
-  b.textContent = "思考中…";
+  b.textContent = "回答中…";
+
+  // 2. 预先在界面生成空的 AI 回复气泡
+  const wrap = document.createElement("div");
+  wrap.className = "bubble-wrap msg-ai";
+  const bubble = document.createElement("div");
+  bubble.className = "bubble msg-ai";
+  bubble.innerHTML = '<span class="muted">思考中…</span>';
+  wrap.appendChild(bubble);
+  $("messages").appendChild(wrap);
+  $("messages").scrollTop = $("messages").scrollHeight;
+
+  let fullAnswer = "";
+  let sources = [];
 
   try {
     const searchToggle = $("aiWebSearch");
@@ -635,17 +651,103 @@ $("askForm").onsubmit = async e => {
       reasoning_effort: $("aiEffort")?.value || "high",
       web_search: webSearch
     };
-    const d = await api("/ai/ask", {
+
+    // 发起流式请求
+    const res = await fetch(API + "/ai/ask", {
       method: "POST",
-      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: "Bearer " + token } : {})
+      },
       body: JSON.stringify(payload)
     });
-    message(d.answer, "", d.sources || []);
-  } catch (e) {
-    message(e.message);
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || "请求失败");
+    }
+
+    // 3. 逐字读取并实时渲染
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith("data:")) continue;
+
+        const dataStr = trimmed.replace(/^data:\s*/, "");
+        if (dataStr === "[DONE]") continue;
+
+        try {
+          const parsed = JSON.parse(dataStr);
+          if (parsed.type === "meta") {
+            sources = parsed.sources || [];
+          } else if (parsed.choices?.[0]?.delta?.content) {
+            fullAnswer += parsed.choices[0].delta.content;
+            bubble.innerHTML = typeof formatMarkdownSafe === "function" 
+              ? formatMarkdownSafe(fullAnswer) 
+              : esc(fullAnswer);
+            $("messages").scrollTop = $("messages").scrollHeight;
+          }
+        } catch {}
+      }
+    }
+
+    // 4. 传输完成：记录历史与复制按钮
+    if (typeof chatHistory !== "undefined") {
+      chatHistory.push({ role: "文理智办", content: fullAnswer });
+    }
+
+    const tools = document.createElement("div");
+    tools.className = "bubble-tools";
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.textContent = "📋 复制回答";
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(fullAnswer);
+        toast("回答已复制到剪贴板");
+      } catch {
+        toast("复制失败");
+      }
+    };
+    tools.appendChild(copyBtn);
+    wrap.appendChild(tools);
+
+    // 5. 附带联网来源卡片
+    if (sources && sources.length) {
+      const src = document.createElement("div");
+      src.className = "ai-sources";
+      const title = document.createElement("b");
+      title.textContent = "🌐 联网参考来源";
+      src.appendChild(title);
+      sources.forEach((item, i) => {
+        const row = document.createElement("div"),
+          a = document.createElement("a");
+        a.href = item.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = `${i + 1}. ${item.title || item.url}`;
+        row.appendChild(a);
+        src.appendChild(row);
+      });
+      wrap.appendChild(src);
+    }
+  } catch (err) {
+    bubble.innerHTML = `<span style="color:#d92d20">请求出错：${esc(err.message)}</span>`;
   } finally {
     b.disabled = false;
     b.textContent = origText;
+    $("messages").scrollTop = $("messages").scrollHeight;
   }
 };
 

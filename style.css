@@ -1998,3 +1998,48 @@ header .user > div {
     padding: 0 16px !important;
   }
 }
+/* ========================================================
+   跨浏览器（Safari / 微信 / 移动端浏览器）兼容性修复
+   ======================================================== */
+
+/* 1. 彻底解决 WebKit 宽度塌陷：锁死 100% 宽度，改用全平台通用的 Flex 布局 */
+.bubble-wrap {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+/* 用户消息：靠右侧对齐 */
+.bubble-wrap.msg-user,
+.bubble-wrap.user {
+  align-items: flex-end !important;
+}
+
+/* AI 消息：靠左侧对齐 */
+.bubble-wrap.msg-ai {
+  align-items: flex-start !important;
+}
+
+/* 2. 气泡本体加固：杜绝宽度被压成 0，保证文字必然显示 */
+.bubble {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  max-width: 85% !important;
+  min-width: 32px !important;
+  box-sizing: border-box !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.bubble.msg-user,
+.bubble.user {
+  background: linear-gradient(135deg, #2970ff 0%, #155eef 100%) !important;
+  color: #ffffff !important;
+}
+
+/* 3. 防止顶栏样式误伤聊天容器 */
+header .user > div {
+  display: none !important;
+}

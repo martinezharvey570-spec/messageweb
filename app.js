@@ -522,17 +522,20 @@ function formatMarkdownSafe(text) {
 function message(s, who = "", sources = []) {
   chatHistory.push({ role: who === "user" ? "学生" : "文理智办", content: s });
 
+  const roleClass = who === "user" ? "msg-user" : "msg-ai";
+
   const wrap = document.createElement("div");
-  wrap.className = "bubble-wrap " + who;
+  wrap.className = "bubble-wrap " + roleClass;
 
   const d = document.createElement("div");
-  d.className = "bubble " + who;
+  d.className = "bubble " + roleClass;
   if (who === "user") {
     d.textContent = s;
   } else {
     d.innerHTML = formatMarkdownSafe(s);
   }
   wrap.appendChild(d);
+
 
   // 为 AI 回复添加一键复制与追问按钮
   if (who !== "user") {

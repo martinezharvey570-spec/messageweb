@@ -1,5 +1,7 @@
-// app.js — 100% 兼容原有 API 接口，新增深色模式、AI 一键解读、复制、导出、批量完成等交互功能
+// app.js — 兼容流式/非流式双模式 + 轻量化本地对话保存 + 完整交互功能
 const API = (window.XZ_CONFIG && window.XZ_CONFIG.API_BASE) || "/api";
+const CHAT_CACHE_KEY = "xz_chat_cache_v1";
+
 let token = localStorage.getItem("xz_token") || "",
   me = null,
   notices = [],
@@ -25,6 +27,32 @@ function toast(s) {
   el.classList.add("show");
   clearTimeout(timer);
   timer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+// ====== 轻量化本地保存与恢复聊天记录 ======
+function saveChatToLocal() {
+  try {
+    // 仅保留最近 30 条对话，保证极致轻量不占空间
+    const slim = chatHistory.slice(-30);
+    localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify(slim));
+  } catch {}
+}
+
+function restoreChatFromLocal() {
+  try {
+    const raw = localStorage.getItem(CHAT_CACHE_KEY);
+    if (!raw) return;
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list) || !list.length) return;
+
+    chatHistory = [];
+    $("messages").innerHTML = "";
+    list.forEach(item => {
+      if (!item || !item.content) return;
+      const isUser = item.role === "学生" || item.role === "user";
+      message(item.content, isUser ? "user" : "ai", item.sources || [], true);
+    });
+  } catch {}
 }
 
 // 主题模式初始化与切换
@@ -217,6 +245,7 @@ async function enter() {
   document
     .querySelectorAll(".admin-only")
     .forEach(el => el.classList.toggle("hide", me.role !== "admin"));
+  restoreChatFromLocal();
   await refresh();
   go("home");
 }
@@ -284,7 +313,6 @@ function renderNotices() {
     cat = $("category").value;
   $("clearSearch")?.classList.toggle("hide", !q);
 
-  // 同步分类胶囊按钮高亮状态
   document.querySelectorAll("#catPills .pill-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
@@ -325,7 +353,6 @@ function renderNotices() {
       })
       .join("") || '<div class="panel empty">没有找到符合条件的通知公告。</div>';
 
-  // 加入待办
   document.querySelectorAll("[data-add]").forEach(b => {
     b.onclick = async () => {
       try {
@@ -341,7 +368,6 @@ function renderNotices() {
     };
   });
 
-  // 复制通知
   document.querySelectorAll("[data-copy-notice]").forEach(b => {
     b.onclick = async () => {
       const n = notices.find(item => String(item.id) === String(b.dataset.copyNotice));
@@ -356,7 +382,6 @@ function renderNotices() {
     };
   });
 
-  // AI 解读通知
   document.querySelectorAll("[data-ai-notice]").forEach(b => {
     b.onclick = () => {
       const n = notices.find(item => String(item.id) === String(b.dataset.aiNotice));
@@ -367,7 +392,6 @@ function renderNotices() {
     };
   });
 
-  // 删除通知
   document.querySelectorAll("[data-delete-notice]").forEach(b => {
     b.onclick = async () => {
       if (me?.role !== "admin") return toast("仅管理员可以删除通知");
@@ -401,7 +425,6 @@ document.querySelectorAll("#catPills .pill-btn").forEach(btn => {
 $("taskFilter").onchange = renderTasks;
 $("taskSearch")?.addEventListener("input", renderTasks);
 
-// 批量标为已完成（调用原有 PATCH /tasks/:id 接口）
 $("markAllDone")?.addEventListener("click", async () => {
   const pendingList = tasks.filter(t => t.status === "pending");
   if (!pendingList.length) return toast("当前没有待处理的任务");
@@ -519,75 +542,86 @@ function formatMarkdownSafe(text) {
   return safe;
 }
 
-function message(s, who = "", sources = []) {
-  if (typeof chatHistory !== "undefined") {
-    chatHistory.push({ role: who === "user" ? "学生" : "文理智办", content: s });
-  }
+function appendSourcesCard(parentEl, sources) {
+  if (!sources || !sources.length) return;
+  const src = document.createElement("div");
+  src.className = "ai-sources";
+  const title = document.createElement("b");
+  title.textContent = "🌐 联网参考来源";
+  src.appendChild(title);
+  sources.forEach((item, i) => {
+    const row = document.createElement("div"),
+      a = document.createElement("a");
+    a.href = item.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = `${i + 1}. ${item.title || item.url}`;
+    row.appendChild(a);
+    src.appendChild(row);
+  });
+  parentEl.appendChild(src);
+}
 
-  // 核心改动：把 "user" 换成专属类名 "msg-user"，彻底避开任何系统类名冲突
+function appendCopyTools(wrapEl, textGetter) {
+  const tools = document.createElement("div");
+  tools.className = "bubble-tools";
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.textContent = "📋 复制回答";
+  copyBtn.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(typeof textGetter === "function" ? textGetter() : textGetter);
+      toast("回答已复制到剪贴板");
+    } catch {
+      toast("复制失败");
+    }
+  };
+  tools.appendChild(copyBtn);
+  wrapEl.appendChild(tools);
+}
+
+function message(s, who = "", sources = [], isRestoring = false) {
+  const cleanText = String(s ?? "").trim();
+  if (!cleanText) return;
+
+  chatHistory.push({
+    role: who === "user" ? "学生" : "文理智办",
+    content: cleanText,
+    sources: sources || []
+  });
+  if (!isRestoring) saveChatToLocal();
+
   const roleClass = who === "user" ? "msg-user" : "msg-ai";
-
   const wrap = document.createElement("div");
   wrap.className = "bubble-wrap " + roleClass;
 
   const d = document.createElement("div");
   d.className = "bubble " + roleClass;
   if (who === "user") {
-    d.textContent = s;
+    d.textContent = cleanText;
   } else {
-    d.innerHTML = typeof formatMarkdownSafe === "function" ? formatMarkdownSafe(s) : esc(s);
+    d.innerHTML = formatMarkdownSafe(cleanText);
   }
   wrap.appendChild(d);
 
   if (who !== "user") {
-    const tools = document.createElement("div");
-    tools.className = "bubble-tools";
+    appendCopyTools(wrap, () => cleanText);
+  }
 
-    const copyBtn = document.createElement("button");
-    copyBtn.type = "button";
-    copyBtn.textContent = "📋 复制回答";
-    copyBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(s);
-        toast("回答已复制到剪贴板");
-      } catch {
-        toast("复制失败");
-      }
-    };
-    tools.appendChild(copyBtn);
-    wrap.appendChild(tools);
+  if (sources && sources.length) {
+    appendSourcesCard(wrap, sources);
   }
 
   $("messages").appendChild(wrap);
-
-  if (sources && sources.length) {
-    let src = document.createElement("div");
-    src.className = "ai-sources";
-    let title = document.createElement("b");
-    title.textContent = "🌐 联网参考来源";
-    src.appendChild(title);
-    sources.forEach((item, i) => {
-      let row = document.createElement("div"),
-        a = document.createElement("a");
-      a.href = item.url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = `${i + 1}. ${item.title || item.url}`;
-      row.appendChild(a);
-      src.appendChild(row);
-    });
-    $("messages").appendChild(src);
-  }
-
-  // 自动平滑滚动到最新发送的内容
   $("messages").scrollTop = $("messages").scrollHeight;
 }
 
-// 清空与导出对话按键
+// 清空与导出对话按键（同步清理本地存储）
 $("clearChat")?.addEventListener("click", () => {
   chatHistory = [];
+  localStorage.removeItem(CHAT_CACHE_KEY);
   $("messages").innerHTML =
-    '<div class="bubble">对话已清空。你可以继续向我咨询考试规定、缓考流程、毕业论文要求或困难认定等校务事项。</div>';
+    '<div class="bubble"><b>👋 对话已重置。</b><br>我是「文理智办」，请直接描述您的办事需求，我将为您提供材料清单、办理动线与官方依据。</div>';
   toast("对话记录已清空");
 });
 
@@ -614,13 +648,14 @@ $("question")?.addEventListener("keydown", e => {
   }
 });
 
+// AI 提问处理（自适应兼容流式 SSE 与普通 JSON，彻底防止空气泡）
 $("askForm").onsubmit = async e => {
   e.preventDefault();
   const q = $("question").value.trim();
   if (!q) return;
   $("question").value = "";
 
-  // 1. 上屏用户提问
+  // 1. 上屏用户提问并自动存盘
   message(q, "user");
 
   const b = $("askForm").querySelector("button");
@@ -628,12 +663,12 @@ $("askForm").onsubmit = async e => {
   b.disabled = true;
   b.textContent = "回答中…";
 
-  // 2. 预先在界面生成空的 AI 回复气泡
+  // 2. 预先创建 AI 回复占位气泡
   const wrap = document.createElement("div");
   wrap.className = "bubble-wrap msg-ai";
   const bubble = document.createElement("div");
   bubble.className = "bubble msg-ai";
-  bubble.innerHTML = '<span class="muted">思考中…</span>';
+  bubble.innerHTML = '<span class="muted">✳ 正在检索校规库并思考中…</span>';
   wrap.appendChild(bubble);
   $("messages").appendChild(wrap);
   $("messages").scrollTop = $("messages").scrollHeight;
@@ -652,9 +687,9 @@ $("askForm").onsubmit = async e => {
       web_search: webSearch
     };
 
-    // 发起流式请求
     const res = await fetch(API + "/ai/ask", {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: "Bearer " + token } : {})
@@ -664,86 +699,114 @@ $("askForm").onsubmit = async e => {
 
     if (!res.ok) {
       const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.detail || "请求失败");
+      throw new Error(errJson.detail || "请求失败（HTTP " + res.status + "）");
     }
 
-    // 3. 逐字读取并实时渲染
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
+    const contentType = (res.headers.get("content-type") || "").toLowerCase();
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    // 情况 A：如果后端返回的是传统非流式 JSON（例如未更新流式后端）
+    if (contentType.includes("application/json")) {
+      const d = await res.json();
+      fullAnswer = String(d.answer || d.choices?.[0]?.message?.content || "").trim();
+      sources = d.sources || [];
+      if (fullAnswer) {
+        bubble.innerHTML = formatMarkdownSafe(fullAnswer);
+      }
+    }
+    // 情况 B：如果后端返回的是流式 text/event-stream
+    else {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let rawFallback = "";
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop();
-
-      for (const line of lines) {
+      const processLine = line => {
         const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith("data:")) continue;
+        if (!trimmed || !trimmed.startsWith("data:")) return;
+        const dataStr = trimmed.replace(/^data:\s*/, "").trim();
+        if (dataStr === "[DONE]") return;
 
-        const dataStr = trimmed.replace(/^data:\s*/, "");
-        if (dataStr === "[DONE]") continue;
-
+        let parsed;
         try {
-          const parsed = JSON.parse(dataStr);
-          if (parsed.type === "meta") {
-            sources = parsed.sources || [];
-          } else if (parsed.choices?.[0]?.delta?.content) {
-            fullAnswer += parsed.choices[0].delta.content;
-            bubble.innerHTML = typeof formatMarkdownSafe === "function" 
-              ? formatMarkdownSafe(fullAnswer) 
-              : esc(fullAnswer);
+          parsed = JSON.parse(dataStr);
+        } catch {
+          return;
+        }
+
+        if (parsed.error) {
+          throw new Error(parsed.error);
+        }
+
+        if (parsed.type === "meta") {
+          sources = parsed.sources || [];
+          return;
+        }
+
+        const deltaReason = parsed.choices?.[0]?.delta?.reasoning_content || "";
+        const deltaContent =
+          parsed.choices?.[0]?.delta?.content ??
+          parsed.choices?.[0]?.message?.content ??
+          parsed.answer ??
+          "";
+
+        // 深度思考阶段提示，防止出现空白气泡
+        if (deltaReason && !fullAnswer.trim()) {
+          bubble.innerHTML = '<span class="muted">💭 正在深度思考并核对学校文件条款…</span>';
+        }
+
+        if (deltaContent) {
+          fullAnswer += deltaContent;
+          // 只有当积累了可见字符时才替换气泡文字，杜绝首包换行符导致的空气泡
+          if (fullAnswer.trim().length > 0) {
+            bubble.innerHTML = formatMarkdownSafe(fullAnswer);
             $("messages").scrollTop = $("messages").scrollHeight;
           }
+        }
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunkText = decoder.decode(value, { stream: true });
+        rawFallback += chunkText;
+        buffer += chunkText;
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+        for (const line of lines) {
+          processLine(line);
+        }
+      }
+      // 处理缓冲区最后残留的一行
+      if (buffer.trim()) {
+        processLine(buffer);
+      }
+
+      // 兜底：若流里实际上是一个普通 JSON 字符串
+      if (!fullAnswer.trim() && rawFallback.trim().startsWith("{")) {
+        try {
+          const d = JSON.parse(rawFallback.trim());
+          fullAnswer = String(d.answer || d.choices?.[0]?.message?.content || "").trim();
+          sources = d.sources || sources;
+          if (fullAnswer) bubble.innerHTML = formatMarkdownSafe(fullAnswer);
         } catch {}
       }
     }
 
-    // 4. 传输完成：记录历史与复制按钮
-    if (typeof chatHistory !== "undefined") {
-      chatHistory.push({ role: "文理智办", content: fullAnswer });
-    }
-
-    const tools = document.createElement("div");
-    tools.className = "bubble-tools";
-    const copyBtn = document.createElement("button");
-    copyBtn.type = "button";
-    copyBtn.textContent = "📋 复制回答";
-    copyBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(fullAnswer);
-        toast("回答已复制到剪贴板");
-      } catch {
-        toast("复制失败");
-      }
-    };
-    tools.appendChild(copyBtn);
-    wrap.appendChild(tools);
-
-    // 5. 附带联网来源卡片
-    if (sources && sources.length) {
-      const src = document.createElement("div");
-      src.className = "ai-sources";
-      const title = document.createElement("b");
-      title.textContent = "🌐 联网参考来源";
-      src.appendChild(title);
-      sources.forEach((item, i) => {
-        const row = document.createElement("div"),
-          a = document.createElement("a");
-        a.href = item.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.textContent = `${i + 1}. ${item.title || item.url}`;
-        row.appendChild(a);
-        src.appendChild(row);
-      });
-      wrap.appendChild(src);
+    // 3. 最终校验：防止任何极端情况下留下空气泡
+    fullAnswer = fullAnswer.trim();
+    if (!fullAnswer) {
+      fullAnswer = "模型未返回有效内容，请尝试取消勾选“深度思考”或重新发送问题。";
+      bubble.innerHTML = `<span class="muted">${esc(fullAnswer)}</span>`;
+    } else {
+      bubble.innerHTML = formatMarkdownSafe(fullAnswer);
+      // 存入历史并持久化到本地
+      chatHistory.push({ role: "文理智办", content: fullAnswer, sources: sources || [] });
+      saveChatToLocal();
+      appendCopyTools(wrap, () => fullAnswer);
+      appendSourcesCard(wrap, sources);
     }
   } catch (err) {
-    bubble.innerHTML = `<span style="color:#d92d20">请求出错：${esc(err.message)}</span>`;
+    bubble.innerHTML = `<span style="color:#d92d20">⚠️ 请求出错：${esc(err.message)}</span>`;
   } finally {
     b.disabled = false;
     b.textContent = origText;

@@ -20,7 +20,7 @@
       <p><span>✓</span> 个人待办事项全流程进度跟踪</p>
       <p><span>✳</span> 文理智办 AI 校务制度问答向导</p>
     </div>
-    <small>西安文理学院比赛演示版本 · 请以学校正式通知为准</small>
+    <small>西安文理学院比赛演示版本</small>
   </div>
   <form id="authForm" class="authbox">
     <div class="logo mobile">校</div>
@@ -229,13 +229,13 @@
               <select id="aiEffort">
                 <option value="low">低</option>
                 <option value="high" selected>高</option>
-                <option value="max">最大</option>
+                <option value="max">最高</option>
               </select>
             </label>
             <label class="ai-toggle"><input id="aiThinking" type="checkbox" checked> 深度思考</label>
             <label class="ai-toggle"><input id="aiWebSearch" type="checkbox"> 联网搜索</label>
           </div>
-          <small class="muted">提示：点击下方常见问题可快速填入输入框；电脑端按 Enter 发送，Shift + Enter 换行。</small>
+          <small class="muted">提示：点击下方常见问题可快速填入输入框；电脑端按 Enter 发送。</small>
           <div class="suggestions">
             <button type="button">期末考试因病如何申请缓考？</button>
             <button type="button">毕业论文中途想更换题目怎么办？</button>
@@ -244,9 +244,18 @@
             <button type="button">本科毕业论文查重率要求是多少？</button>
           </div>
 
-          <div id="messages" class="messages">
-            <div class="bubble">你好！我是“文理智办”校园智能办事助手。你可以向我咨询考试管理、缓考补考、毕业论文、实习考核、困难认定或学科竞赛等校务规定。</div>
-          </div>
+<div id="messages" class="messages">
+  <div class="bubble">
+    <b>👋 同学/评委老师好！我是「文理智办」高校智能办事助手。</b><br><br>
+    针对校园事务“规定难查、流程不清、材料易漏”等痛点，我基于学校官方规章与红头附件库，为您提供面向任务的全流程指引：<br><br>
+    📌 <b>【依据核验】</b>严格引证校内制度全称与条款，杜绝无据编造<br>
+    📋 <b>【材料清单】</b>精准拆解所需填写的附件样表与证明材料<br>
+    🧭 <b>【办事导航】</b>梳理“找谁审、去哪盖章、何时提交”的分步流程<br>
+    ⚠️ <b>【规则预警】</b>主动提示缺课红线、论文查重率、截止期限等关键条件<br><br>
+    💡 <i>您可以点击上方常见问题直接体验，或在下方输入框中描述您的办事需求。</i>
+  </div>
+</div>
+
           <form id="askForm" class="ask">
             <textarea id="question" rows="2" maxlength="3000" placeholder="自然语言描述你的办事需求（如：我想知道毕业论文开题需要交什么表）…"></textarea>
             <button class="primary" id="askSubmitBtn">发送 ↑</button>

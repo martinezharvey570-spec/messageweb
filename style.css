@@ -1938,3 +1938,63 @@ dialog::backdrop {
     text-align: center;
   }
 }
+/* ========================================================
+   文理智办：移动端消息显形与防遮挡终极修复补丁
+   ======================================================== */
+
+/* 1. 彻底解决“气泡被吞”：无论此前怎么设置，强制显示用户发送的气泡 */
+.bubble.user,
+.bubble.msg-user,
+.bubble-wrap.user,
+.bubble-wrap.msg-user {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.bubble.user,
+.bubble.msg-user {
+  justify-self: end !important;
+  background: linear-gradient(135deg, #2970ff 0%, #155eef 100%) !important;
+  color: #ffffff !important;
+  margin-left: auto !important;
+  max-width: 88% !important;
+}
+
+/* 仅隐藏顶栏右侧的文字，绝不影响聊天气泡 */
+header .user > div {
+  display: none !important;
+}
+
+/* 2. 彻底解决“被底部栏挡住”：为消息滚动区域扩充空间并增加底部安全垫 */
+.messages {
+  min-height: 280px !important;
+  max-height: 52vh !important;
+  padding-bottom: 30px !important; /* 预留充足安全距离，防止滑入底部 */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* 3. 手机端紧凑化处理：瘦身输入栏与选项栏，把屏幕高度还给聊天窗口 */
+@media (max-width: 1000px) {
+  .ai-options {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+  .suggestions {
+    margin: 6px 0 10px !important;
+  }
+  .ask {
+    padding-top: 10px !important;
+    gap: 8px !important;
+  }
+  .ask textarea {
+    min-height: 44px !important;
+    max-height: 90px !important;
+    padding: 8px 12px !important;
+  }
+  .ask button {
+    min-height: 44px !important;
+    padding: 0 16px !important;
+  }
+}

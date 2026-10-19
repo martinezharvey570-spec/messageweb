@@ -1417,14 +1417,17 @@ header p {
   box-shadow: var(--shadow-xs);
 }
 
-.bubble.user {
+.bubble.user,
+.bubble.msg-user {
   justify-self: end;
   background: linear-gradient(135deg, #2970ff 0%, var(--blue) 100%);
   border: 0;
-  color: #ffffff;
+  color: #ffffff !important;
   border-radius: 15px 4px 15px 15px;
   box-shadow: 0 3px 10px rgba(21, 94, 239, 0.22);
+  display: block !important;
 }
+
 
 .bubble-tools {
   display: flex;
@@ -1718,15 +1721,16 @@ dialog::backdrop {
     box-shadow: var(--shadow-xs);
   }
 
-  .user {
+  header .user {
     padding: 3px;
     border: 0;
     background: transparent;
   }
 
-  .user > div {
+  header .user > div {
     display: none;
   }
+
 
   .wrap {
     padding: 16px 14px 20px;

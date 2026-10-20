@@ -980,11 +980,10 @@ $("askForm").onsubmit = async e => {
   const renderStreamingBubble = (isStreaming = true) => {
     let html = "";
     if (fullReasoning.trim()) {
-      const openAttr = !fullAnswer.trim() && isStreaming ? "open" : "";
       const summaryLabel = !fullAnswer.trim() && isStreaming
-        ? "💭 正在深度思考并核对学校条款…"
+        ? "💭 正在深度思考并核对学校条款（点击展开）…"
         : "💭 已深度思考（点击查看推理过程）";
-      html += `<details class="ai-reasoning" ${openAttr}><summary>${summaryLabel}</summary><div class="ai-reasoning-body">${esc(fullReasoning.trim())}</div></details>`;
+      html += `<details class="ai-reasoning"><summary>${summaryLabel}</summary><div class="ai-reasoning-body">${esc(fullReasoning.trim())}</div></details>`;
     }
     if (fullAnswer.trim()) {
       html += formatMarkdownSafe(fullAnswer);

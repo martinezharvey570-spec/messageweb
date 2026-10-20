@@ -686,8 +686,19 @@ $("askForm").onsubmit = async e => {
   let fullAnswer = "";
   let sources = [];
   let sourcesLabel = "";
+  let streamedContent = false; // 是否已收到正文（决定网络中断时能否安全重试）
+  let retried = false;         // 是否已自动重试过一次
 
-  try {
+  const friendlyError = err => {
+    const msg = String((err && err.message) || err || "未知错误");
+    if (err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(msg)) {
+      return "网络连接中断（请求未能到达服务器，或数据传输被中断）。请检查网络后重试；"
+        + "若反复出现，可能是所在网络限制了长连接，可尝试切换网络（如手机热点）或暂时关闭“联网搜索”再试。";
+    }
+    return msg;
+  };
+
+  const runAsk = async () => {
     const searchToggle = $("aiWebSearch");
     const webSearch = Boolean(searchToggle && searchToggle.checked);
     const payload = {
@@ -774,6 +785,7 @@ $("askForm").onsubmit = async e => {
 
         if (deltaContent) {
           fullAnswer += deltaContent;
+          if (fullAnswer.trim()) streamedContent = true;
           // 只有当积累了可见字符时才替换气泡文字，杜绝首包换行符导致的空气泡
           if (fullAnswer.trim().length > 0) {
             bubble.innerHTML = formatMarkdownSafe(fullAnswer);
@@ -823,8 +835,25 @@ $("askForm").onsubmit = async e => {
       appendCopyTools(wrap, () => fullAnswer);
       appendSourcesCard(wrap, sources, sourcesLabel);
     }
+  };
+
+  try {
+    await runAsk();
   } catch (err) {
-    bubble.innerHTML = `<span style="color:#d92d20">⚠️ 请求出错：${esc(err.message)}</span>`;
+    // 网络层中断且尚未收到任何正文时，自动重试一次（避免临时断流直接报错）
+    const isNetworkErr = err instanceof TypeError
+      || /failed to fetch|networkerror|load failed/i.test(String(err.message || ""));
+    if (isNetworkErr && !streamedContent && !retried) {
+      retried = true;
+      bubble.innerHTML = '<span class="muted">↻ 网络中断，正在自动重试…</span>';
+      try {
+        await runAsk();
+      } catch (err2) {
+        bubble.innerHTML = `<span style="color:#d92d20">⚠️ 请求出错：${esc(friendlyError(err2))}</span>`;
+      }
+    } else {
+      bubble.innerHTML = `<span style="color:#d92d20">⚠️ 请求出错：${esc(friendlyError(err))}</span>`;
+    }
   } finally {
     b.disabled = false;
     b.textContent = origText;

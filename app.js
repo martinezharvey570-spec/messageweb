@@ -613,12 +613,10 @@ $("noticeForm").onsubmit = async e => {
 async function checkAI() {
   try {
     let d = await api("/health");
-    $("aiStatus").textContent = d.ai_configured
-      ? `● 在线${d.knowledge_files ? " · " + d.knowledge_files + " 份制度文件" : ""}`
-      : "等待配置 API";
+    $("aiStatus").textContent = d.ai_configured ? "在线" : "未配置";
     $("aiStatus").classList.toggle("ready", d.ai_configured);
   } catch {
-    $("aiStatus").textContent = "无法连接服务";
+    $("aiStatus").textContent = "离线";
   }
 }
 
@@ -796,7 +794,9 @@ function appendSourcesCard(parentEl, sources, label) {
     a.href = item.url;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
-    a.textContent = `${i + 1}. ${item.title || item.url}${item.date ? "（" + item.date + " 发布）" : ""}`;
+    const linkText = `${i + 1}. ${item.title || item.url}${item.date ? "（" + item.date + " 发布）" : ""}`;
+    a.textContent = linkText;
+    a.title = linkText;
     row.appendChild(a);
     src.appendChild(row);
   });

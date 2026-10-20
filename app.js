@@ -260,11 +260,7 @@ document.querySelectorAll("[data-quick-ai]").forEach(b => {
 });
 
 function scrollMessagesToBottom() {
-  const box = $("messages");
-  if (!box) return;
-  requestAnimationFrame(() => {
-    box.scrollTop = box.scrollHeight;
-  });
+  // 已按需求取消提问与流式生成时的强制滑到底部设定
 }
 
 function go(p) {
@@ -933,17 +929,6 @@ function autoResizeQuestion() {
 }
 
 $("question")?.addEventListener("input", autoResizeQuestion);
-$("question")?.addEventListener("focus", () => {
-  setTimeout(scrollMessagesToBottom, 220);
-});
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", () => {
-    if (document.body.classList.contains("on-ai-page")) {
-      scrollMessagesToBottom();
-    }
-  });
-}
 
 // 支持电脑端 Enter 快捷发送
 $("question")?.addEventListener("keydown", e => {

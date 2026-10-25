@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#155eef">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <title>校务智理｜西安文理学院校园事务与智能办事平台</title>
+  <link rel="stylesheet" href="style.css?v=20261025_v6">
+</head>
+<body>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- 登录与注册视图（电脑端双栏精修 + 移动端自适应卡片） -->
+<section id="auth" class="auth">
+  <div class="hero">
+    <div class="hero-glow hero-glow-1" aria-hidden="true"></div>
+    <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-top-row">
+        <div class="hero-badge">
+          <div class="logo">校</div>
+          <div>
+            <span>CAMPUS SERVICE PLATFORM</span>
+            <small class="hero-subbadge">西安文理学院 · 智慧校务协同</small>
+          </div>
+        </div>
+        <span class="contest-pill">🏆 中国大学生计算机设计大赛参赛作品</span>
+      </div>
+
+      <h1>校务智理</h1>
+      <p class="hero-lead">让校园通知更清晰，让办事流程更简单。基于学校正式制度文件库，把复杂的办事规定转化为一步步可执行的行动清单。</p>
+
+      <div class="hero-list">
+        <div class="hero-feature-card">
+          <span class="hero-f-icon">▤</span>
+          <div>
+            <b>通知公告智能解读</b>
+            <small>集中查阅校园通知，一键召唤 AI 提炼材料与时间节点</small>
+          </div>
+        </div>
+        <div class="hero-feature-card">
+          <span class="hero-f-icon">✓</span>
+          <div>
+            <b>个人待办全流程追踪</b>
+            <small>支持通知直转待办、AI 步骤导入与临期逾期智能预警</small>
+          </div>
+        </div>
+        <div class="hero-feature-card">
+          <span class="hero-f-icon">✳</span>
+          <div>
+            <b>文理智办 AI 制度向导</b>
+            <small>DeepSeek 双模型流式推理，严格引证校规条款与附件表</small>
+          </div>
+        </div>
+        <div class="hero-feature-card">
+          <span class="hero-f-icon">📖</span>
+          <div>
+            <b>160 份校规红头原文库</b>
+            <small>收录教务处与学工部正式文件及申请表模板，随时核验</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="metric-item"><b id="authStatDocs">160</b><span>份官方制度</span></div>
+        <div class="metric-divider"></div>
+        <div class="metric-item"><b id="authStatChunks">480+</b><span>知识切片</span></div>
+        <div class="metric-divider"></div>
+        <div class="metric-item"><b>2</b><span>大权威部门</span></div>
+        <div class="metric-divider"></div>
+        <div class="metric-item"><b>SSE</b><span>流式实时解答</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-side">
+    <div class="auth-side-topbar">
+      <span id="authServerBadge" class="pill">● 服务连接正常</span>
+      <button type="button" id="authThemeToggle" class="icon-btn" title="切换深色/浅色模式">🌙</button>
+    </div>
+
+    <form id="authForm" class="authbox">
+      <div class="authbox-head">
+        <div class="logo mobile">校</div>
+        <div class="tabs" role="tablist">
+          <button type="button" id="loginTab" class="selected" role="tab">账号登录</button>
+          <button type="button" id="regTab" role="tab">学生注册</button>
+        </div>
+        <h2 id="authTitle">欢迎回来</h2>
+        <p class="muted" id="authDesc">登录后查看校园通知、管理个人待办与咨询文理智办 AI</p>
+      </div>
+
+      <label id="nameWrap" class="hide">
+        <span>显示姓名</span>
+        <div class="input-group has-prefix">
+          <i class="input-prefix" aria-hidden="true">🪪</i>
+          <input id="displayName" maxlength="60" placeholder="请输入您的真实姓名或昵称">
+        </div>
+      </label>
+
+      <label>
+        <span>用户名 / 学工号</span>
+        <div class="input-group has-prefix">
+          <i class="input-prefix" aria-hidden="true">👤</i>
+          <input id="username" required minlength="3" maxlength="80" autocomplete="username" placeholder="请输入用户名（如 demo_student）">
+        </div>
+      </label>
+
+      <label>
+        <span>登录密码</span>
+        <div class="input-group has-prefix">
+          <i class="input-prefix" aria-hidden="true">🔒</i>
+          <input id="password" type="password" required minlength="8" maxlength="128" autocomplete="current-password" placeholder="请输入至少 8 位密码">
+          <button type="button" id="togglePwd" class="icon-inside" title="显示/隐藏密码">👁</button>
+        </div>
+      </label>
+
+      <button class="primary wide auth-submit-btn" id="authSubmit" type="submit">登录进入工作台 →</button>
+
+      <!-- 比赛评委与演示快捷体验通道 -->
+      <div class="demo-quick-box">
+        <div class="demo-quick-head">
+          <span>⚡ 比赛演示快捷体验</span>
+          <small>点击自动填入</small>
+        </div>
+        <div class="demo-quick-btns">
+          <button type="button" id="quickDemoStudent" class="demo-role-btn">
+            <span>🎓 演示学生端</span>
+            <small>一键登录体验</small>
+          </button>
+          <button type="button" id="quickDemoAdmin" class="demo-role-btn">
+            <span>🛡️ 系统管理员</span>
+            <small>填入管理员账号</small>
+          </button>
+        </div>
+      </div>
+
+      <p class="hint">🛡️ 账号数据由云端安全加密存储 · 请勿使用身份证号作为密码</p>
+    </form>
+  </div>
+</section>
+
+<!-- 登录后的主应用工作台 -->
+<div id="app" class="hide">
+  <aside id="sidebar">
+    <div class="sidebrand">
+      <div class="logo">校</div>
+      <div><b>校务智理</b><small>CAMPUS SERVICES</small></div>
+    </div>
+    <small class="navcaption">工作台导航</small>
+    <button class="nav active" data-page="home"><span>▦</span>总览工作台</button>
+    <button class="nav" data-page="notices"><span>▤</span>通知公告 <em id="navNoticeBadge" class="nav-badge subtle-badge hide">0</em></button>
+    <button class="nav" data-page="tasks"><span>✓</span>我的待办 <em id="navTaskBadge" class="nav-badge hide">0</em></button>
+    <button class="nav" data-page="ai"><span>✳</span>文理智办 AI</button>
+    <button class="nav" data-page="knowledge"><span>📖</span>校规制度库 <em class="nav-badge subtle-badge">160</em></button>
+    <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
+    <button class="nav admin-only hide" data-page="users"><span>♙</span>用户管理</button>
+    <button class="nav admin-only hide" data-page="analytics"><span>▥</span>数据统计</button>
+    <div class="sidebottom">
+      <p>🛡️ 信息安全提示<br><small>请勿在平台提交身份证、密码等敏感信息</small></p>
+      <button id="openProfileSide" type="button">⚙ 账号与密码设置</button>
+      <button id="logout" type="button">↪ 退出当前账号</button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="header-left">
+        <button id="menu" type="button" aria-label="打开导航菜单">☰</button>
+        <div class="header-titles">
+          <small>校园事务 / <b id="crumb">工作台总览</b></small>
+          <p id="today"></p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button type="button" id="quickRefresh" class="icon-btn" title="同步最新数据">↻</button>
+        <button type="button" id="themeToggle" class="icon-btn" title="切换深色/浅色模式">🌙</button>
+        <button type="button" id="userProfileBtn" class="user" title="点击修改个人资料与密码">
+          <span id="avatar">同</span>
+          <div><b id="userName">同学</b><small id="userRole">学生用户</small></div>
+        </button>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <!-- 首页总览 -->
+      <section id="homePage" class="page">
+        <div class="welcome">
+          <div class="welcome-main">
+            <small class="blue">CAMPUS WORKSPACE</small>
+            <h1>你好，<span id="welcomeName">同学</span> 👋</h1>
+            <p class="muted">欢迎进入校务智理，及时掌握校园事务动态、个人办理进度与 160 份官方校规指引。</p>
+          </div>
+          <div class="date"><small>今天日期</small><b id="dateBig">—</b></div>
+        </div>
+
+        <div class="stats stats-4">
+          <article class="clickable-card" data-goto="notices" title="点击查看全部通知">
+            <span>▤</span><small>通知公告</small><b id="statNotices">0</b>
+          </article>
+          <article class="clickable-card" data-goto-task="pending" title="点击查看待处理事项">
+            <span class="amber">◷</span><small>待办事项</small><b id="statPending">0</b>
+          </article>
+          <article class="clickable-card" data-goto-task="completed" title="点击查看已完成事项">
+            <span class="green">✓</span><small>已完成</small><b id="statDone">0</b>
+          </article>
+          <article class="clickable-card" data-goto="knowledge" title="点击查阅 160 份校规制度原文">
+            <span class="purple">📖</span><small>收录校规制度</small><b id="statKnowledge">160</b>
+          </article>
+        </div>
+
+        <div class="cols">
+          <article class="panel">
+            <div class="panelhead">
+              <div><h3>最新通知</h3><small>校园动态与近期办事提醒</small></div>
+              <button class="link" data-goto="notices">查看全部 →</button>
+            </div>
+            <div id="recent"></div>
+          </article>
+          <article class="panel">
+            <div class="panelhead">
+              <div><h3>快捷服务入口</h3><small>高频校园事务一站直达</small></div>
+            </div>
+            <button class="quick" data-goto="notices"><span>▤　浏览通知公告</span><i>→</i></button>
+            <button class="quick" data-goto="tasks"><span>✓　管理我的待办清单</span><i>→</i></button>
+            <button class="quick" data-goto="ai"><span>✳　咨询文理智办 AI 助手</span><i>→</i></button>
+            <button class="quick" data-goto="knowledge"><span>📖　检索 160 份学校规章制度库</span><i>→</i></button>
+            <div class="quick-tags">
+              <small class="muted">一键咨询高频事项：</small>
+              <div class="mini-chips">
+                <button type="button" data-quick-ai="期末考试因病如何申请缓考？">📝 缓考申请</button>
+                <button type="button" data-quick-ai="转专业需要满足什么条件？如果无法置换满20学分会降级吗？">🔄 转专业规定</button>
+                <button type="button" data-quick-ai="本科毕业论文查重率和AI生成内容检测占比要求是多少？">🎓 论文查重与AI规范</button>
+                <button type="button" data-quick-ai="申请家庭经济困难认定需要准备哪些材料？">🎗️ 困难认定</button>
+                <button type="button" data-quick-ai="参加中国大学生计算机设计大赛或通过英语四级可以置换多少学分？">🏆 竞赛与四级学分置换</button>
+                <button type="button" data-quick-ai="国家奖学金、国家励志奖学金和国家助学金可以兼得吗？">🏅 奖助学金兼得规则</button>
+              </div>
+            </div>
+            <div class="tip"><b>💡 温馨提示</b><p>点击通知卡片上的“✳ AI 解读”可自动提炼办事材料与步骤；AI 回答中的分步流程支持一键批量导入“我的待办”。</p></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 通知公告 -->
+      <section id="noticesPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>通知公告</h1><p class="muted">集中查看校园通知，支持收藏置顶、一键加入待办或召唤 AI 提炼要点。</p></div>
+          <button id="newNotice" class="primary hide">＋ 发布通知</button>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="search" placeholder="搜索通知标题、正文或发布人…">
+            <button type="button" id="clearSearch" class="clear-btn hide" title="清空搜索">×</button>
+          </div>
+          <select id="category">
+            <option value="">全部类别</option>
+            <option value="办事提醒">办事提醒</option>
+            <option value="教学事务">教学事务</option>
+            <option value="学生工作">学生工作</option>
+            <option value="校园通知">校园通知</option>
+          </select>
+        </div>
+        <div class="cat-pills" id="catPills">
+          <button type="button" class="pill-btn active" data-cat="">全部</button>
+          <button type="button" class="pill-btn" data-cat="__starred__">⭐ 已收藏 <span id="starCountBadge"></span></button>
+          <button type="button" class="pill-btn" data-cat="办事提醒">📌 办事提醒</button>
+          <button type="button" class="pill-btn" data-cat="教学事务">📚 教学事务</button>
+          <button type="button" class="pill-btn" data-cat="学生工作">🎓 学生工作</button>
+          <button type="button" class="pill-btn" data-cat="校园通知">📢 校园通知</button>
+        </div>
+        <div id="noticeCards" class="stack"></div>
+      </section>
+
+      <!-- 我的待办 -->
+      <section id="tasksPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>我的待办</h1><p class="muted">逐项跟进办理进度，支持自定义添加待办、AI 步骤一键导入与逾期提醒。</p></div>
+          <div class="notice-actions">
+            <button type="button" id="markAllDone" class="outline">✓ 全部标为已完成</button>
+            <button type="button" id="clearCompletedTasks" class="outline">🗑 清理已完成</button>
+          </div>
+        </div>
+        <div class="taskstats">
+          <div>全部任务<b id="taskTotal">0</b></div>
+          <div>待处理<b id="taskOpen">0</b></div>
+          <div>已完成<b id="taskDone">0</b></div>
+        </div>
+        <div class="progress-card panel">
+          <div class="progress-head">
+            <span>办理完成度</span>
+            <b id="taskPercent">0%</b>
+          </div>
+          <div class="progress-track"><div id="taskProgressBar" class="progress-fill"></div></div>
+        </div>
+
+        <!-- 新增：快速添加个人自定义待办 -->
+        <form id="addTaskForm" class="panel add-task-bar">
+          <div class="add-task-inputs">
+            <input id="newTaskTitle" required maxlength="200" placeholder="＋ 添加个人办事待办事项（例如：周五前向学院提交学分置换审批表）…">
+            <div class="add-task-date-wrap">
+              <span class="muted">截止日：</span>
+              <input id="newTaskDue" type="date" title="选填：设置截止日期">
+            </div>
+            <button type="submit" class="primary">添加待办</button>
+          </div>
+        </form>
+
+        <article class="panel">
+          <div class="panelhead">
+            <div><h3>任务清单</h3><small>勾选复选框即可切换完成状态，逾期或 3 天内临期事项会自动高亮提醒</small></div>
+            <div class="task-controls">
+              <input id="taskSearch" class="mini-input" placeholder="筛选待办名称…">
+              <select id="taskFilter">
+                <option value="all">全部任务</option>
+                <option value="pending">待处理</option>
+                <option value="completed">已完成</option>
+              </select>
+            </div>
+          </div>
+          <div id="taskList"></div>
+        </article>
+      </section>
+
+      <!-- 文理智办 AI -->
+      <section id="aiPage" class="page hide">
+        <div class="chat panel">
+          <!-- 紧凑型一体化 AI 顶栏 -->
+          <div class="chat-topbar">
+            <div class="chatintro">
+              <div class="aiicon">✳</div>
+              <div class="chatintro-text">
+                <div class="chatintro-title-row">
+                  <h1>文理智办</h1>
+                  <span id="aiStatus" class="pill">检查服务中</span>
+                </div>
+                <p class="muted">西安文理学院智能办事助手 · 基于 160 份红头文件库提供材料清单与流程指引</p>
+              </div>
+            </div>
+            <div class="chat-top-actions">
+              <button type="button" id="toggleAiConfig" class="outline config-toggle-btn" title="展开/收起模型参数">⚙ 参数</button>
+              <button type="button" data-goto="knowledge" class="outline" title="查阅 160 份校规制度库">📖 制度库</button>
+              <button type="button" id="exportChat" class="outline" title="导出对话记录">⬇ 导出</button>
+              <button type="button" id="clearChat" class="outline" title="清空当前对话">🗑 清空</button>
+            </div>
+          </div>
+
+          <!-- 可折叠/响应式 AI 参数配置条 -->
+          <div id="aiOptionsBar" class="ai-options">
+            <label class="ai-select-item">
+              <span>对话模型</span>
+              <select id="aiModel">
+                <option value="deepseek-flash">Flash（快速通用）</option>
+                <option value="deepseek-v4-pro">Pro（深度推理）</option>
+              </select>
+            </label>
+            <label class="ai-select-item">
+              <span>思考强度</span>
+              <select id="aiEffort">
+                <option value="low">低</option>
+                <option value="high" selected>高</option>
+                <option value="max">最高</option>
+              </select>
+            </label>
+            <label class="ai-toggle"><input id="aiThinking" type="checkbox" checked> <span>深度思考</span></label>
+            <label class="ai-toggle"><input id="aiWebSearch" type="checkbox"> <span>联网搜索</span></label>
+          </div>
+
+          <!-- 快捷提问胶囊栏（已修复电脑端滚轮、拖拽与左右按钮丝滑滑动） -->
+          <div class="suggestions-bar">
+            <span class="suggestions-label" title="可使用鼠标滚轮、按住拖拽或点击左右箭头滑动">💬 热门咨询：</span>
+            <button type="button" id="sugPrev" class="sug-nav-btn hide" aria-label="向左滑动热门问题" title="向左滑动">‹</button>
+            <div id="suggestionsTrack" class="suggestions">
+              <button type="button">期末考试因病如何申请缓考？</button>
+              <button type="button">转专业需要满足什么条件？什么情况会降级？</button>
+              <button type="button">本科毕业论文查重率和AI生成内容占比要求是多少？</button>
+              <button type="button">毕业论文中途想更换题目怎么办？</button>
+              <button type="button">申请家庭经济困难认定需要准备哪些材料？</button>
+              <button type="button">参加计算机设计大赛或过英语四级能置换多少学分？</button>
+              <button type="button">平时缺课或欠交作业多少会被取消考试资格？</button>
+              <button type="button">国家奖学金、国家励志奖学金和助学金能兼得吗？</button>
+              <button type="button">学士学位授予绩点要求是多少？不满2.0怎么补救？</button>
+              <button type="button">寒暑假留宿学生公寓需要怎么办理审批手续？</button>
+            </div>
+            <button type="button" id="sugNext" class="sug-nav-btn" aria-label="向右滑动热门问题" title="向右滑动">›</button>
+          </div>
+
+          <!-- 消息流区域 -->
+          <div id="messages" class="messages">
+            <div class="bubble-wrap msg-ai">
+              <div class="msg-meta">
+                <span class="msg-avatar ai">✳</span>
+                <span class="msg-sender">文理智办 AI</span>
+                <span class="msg-tag">官方制度库驱动</span>
+              </div>
+              <div class="bubble msg-ai welcome-bubble">
+                <div class="welcome-bubble-head">
+                  <b>👋 你好！我是「文理智办」校园智能办事助手</b>
+                  <p>针对校园事务“难查、不清、易漏”痛点，我基于学校 160 份正式文件库为您提供落地办事指引：</p>
+                </div>
+                <div class="welcome-grid">
+                  <div class="welcome-item">
+                    <span>📋</span>
+                    <div><b>备什么</b><small>梳理申报表与证明材料清单</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span>🧭</span>
+                    <div><b>怎么办</b><small>规划找谁审、去哪办动线</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span>📌</span>
+                    <div><b>依何据</b><small>严格引证校内规章条款</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span>⚠️</span>
+                    <div><b>避何坑</b><small>预警资格门槛与截止期限</small></div>
+                  </div>
+                </div>
+                <div class="welcome-foot">💡 请左右滑动点击上方热门问题，或在下方输入框直接描述您的办事需求。</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 悬浮回到底部按钮 -->
+          <button type="button" id="scrollBottomBtn" class="scroll-bottom-btn hide">↓ 查看最新内容</button>
+
+          <!-- 底部现代化输入舱 -->
+          <form id="askForm" class="ask">
+            <div class="ask-input-wrap">
+              <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题（如：因病怎么申请缓考？按 Enter 发送，Shift+Enter 换行）…"></textarea>
+              <button class="primary" id="askSubmitBtn" type="submit">
+                <span>发送</span> <i>↑</i>
+              </button>
+            </div>
+            <div class="ask-footer-hint">
+              <span>🛡️ 请勿输入身份证号、密码等个人敏感信息 · AI 建议仅供参考，正式规定以学校红头文件为准</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- 新增：校规制度库（160份学校正式文件与附件检索查阅） -->
+      <section id="knowledgePage" class="page hide">
+        <div class="pagehead">
+          <div>
+            <h1>校规制度库</h1>
+            <p class="muted">收录西安文理学院教务处、学生工作部 160 份正式制度文件与红头附件全文，支持按部门筛选、关键词检索与 AI 一键解读。</p>
+          </div>
+          <button type="button" class="outline" data-goto="ai">✳ 前往 AI 智能问答</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="knowledgeSearch" placeholder="搜索制度名称、条款关键词（如：缓考、转专业、学分置换、查重、奖学金）…">
+            <button type="button" id="clearKnowledgeSearch" class="clear-btn hide" title="清空搜索">×</button>
+          </div>
+          <select id="knowledgeDept">
+            <option value="">全部发布部门</option>
+            <option value="教务处">教务处</option>
+            <option value="学生工作部">学生工作部</option>
+          </select>
+          <button type="button" id="knowledgeSearchBtn" class="primary">检索制度</button>
+        </div>
+
+        <div class="cat-pills" id="knowledgePills">
+          <button type="button" class="pill-btn active" data-kdept="">全部 (160)</button>
+          <button type="button" class="pill-btn" data-kdept="教务处">📚 教务处规章与附件</button>
+          <button type="button" class="pill-btn" data-kdept="学生工作部">🎓 学生工作部规章与附件</button>
+          <button type="button" class="pill-btn" data-kq="考试">📝 考试与缓考补考</button>
+          <button type="button" class="pill-btn" data-kq="毕业论文">📄 毕业论文与AI规范</button>
+          <button type="button" class="pill-btn" data-kq="奖学金">🏅 奖助学金与资助</button>
+          <button type="button" class="pill-btn" data-kq="公寓">🏠 学生公寓管理</button>
+        </div>
+
+        <!-- 关键词精准命中的条款片段展示区 -->
+        <div id="knowledgeMatchedBox" class="panel hide" style="margin-bottom: 16px;">
+          <div class="panelhead">
+            <div><h3>🎯 精准命中的校规条款片段</h3><small>根据您的搜索词从 160 份文件中为您定位到以下核心条款</small></div>
+          </div>
+          <div id="knowledgeMatchedList" class="stack"></div>
+        </div>
+
+        <!-- 制度目录网格 -->
+        <div id="knowledgeGrid" class="knowledge-grid"></div>
+      </section>
+
+      <!-- 用户管理（管理员） -->
+      <section id="usersPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>用户管理</h1><p class="muted">管理员查看注册用户、调整角色权限或重置用户密码。</p></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="userSearch" placeholder="搜索用户名、显示姓名或角色…">
+          </div>
+        </div>
+        <article class="panel">
+          <div class="panelhead">
+            <div><h3>用户列表</h3><small>仅展示必要的账号资料，密码经 PBKDF2 加密存储。</small></div>
+            <button id="reloadUsers" class="outline">↻ 刷新列表</button>
+          </div>
+          <div id="userList"></div>
+        </article>
+      </section>
+
+      <!-- 数据统计（管理员） -->
+      <section id="analyticsPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>数据统计</h1><p class="muted">实时汇总当前平台运行指标与校务知识库覆盖情况。</p></div>
+          <button id="reloadStats" class="outline">↻ 刷新数据</button>
+        </div>
+        <div class="stats">
+          <article><span>▤</span><small>通知总数</small><b id="aNotices">0</b></article>
+          <article><span class="amber">♙</span><small>注册学生</small><b id="aStudents">0</b></article>
+          <article><span class="green">✓</span><small>任务完成率</small><b id="aCompletion">0%</b></article>
+        </div>
+        <article class="panel">
+          <h3>平台运行概览</h3>
+          <p class="muted">以下统计实时汇总自 Cloudflare D1 数据库与内置制度库。</p>
+          <div id="statsDetails"></div>
+        </article>
+      </section>
+
+      <footer id="appFooter">
+        <span>校务智理 · 文理智办 AI 赋能校园事务服务平台</span>
+        <span>西安文理学院参赛作品 · 正式规定请以学校红头文件为准</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- 手机端底部快捷导航栏（5 项核心高频入口） -->
+  <nav class="mobile-tabbar" aria-label="移动端底部导航">
+    <button type="button" class="tab-item active" data-page="home">
+      <i>▦</i><span>总览</span>
+    </button>
+    <button type="button" class="tab-item" data-page="notices">
+      <i>▤</i><span>通知</span>
+    </button>
+    <button type="button" class="tab-item" data-page="tasks">
+      <i>✓</i><span>待办</span>
+      <em id="mobTaskBadge" class="mob-badge hide">0</em>
+    </button>
+    <button type="button" class="tab-item" data-page="ai">
+      <i>✳</i><span>智办AI</span>
+    </button>
+    <button type="button" class="tab-item" data-page="knowledge">
+      <i>📖</i><span>制度库</span>
+    </button>
+  </nav>
+</div>
+
+<!-- 发布 / 编辑校园通知弹窗（管理员） -->
+<dialog id="dialog">
+  <form id="noticeForm">
+    <input type="hidden" id="nEditId" value="">
+    <div class="dialoghead">
+      <div><h2 id="dialogTitle">发布校园通知</h2><small>仅管理员可操作，请核对内容后提交。</small></div>
+      <button type="button" id="closeDialog">×</button>
+    </div>
+    <label>通知标题<input id="nTitle" required maxlength="200" placeholder="请输入通知标题"></label>
+    <div class="twocol">
+      <label>通知类别
+        <select id="nCategory">
+          <option>校园通知</option>
+          <option>办事提醒</option>
+          <option>教学事务</option>
+          <option>学生工作</option>
+        </select>
+      </label>
+      <label>适用对象<input id="nAudience" value="全体学生"></label>
+    </div>
+    <label>截止日期（选填）<input id="nDeadline" type="date" placeholder="例如：2026-11-01"></label>
+    <label>通知内容<textarea id="nBody" required rows="5" maxlength="12000" placeholder="请输入通知正文内容、办理要求或材料说明…"></textarea></label>
+    <label id="nTasksWrap" class="check"><input type="checkbox" id="nTasks" checked> 同时为现有学生账号自动生成待办事项（D1 批量极速派发）</label>
+    <div class="actions">
+      <button type="button" id="cancelDialog" class="secondary">取消</button>
+      <button class="primary" id="submitNoticeBtn">确认发布</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 校规制度原文阅读器弹窗 -->
+<dialog id="docDialog" class="wide-dialog">
+  <div class="dialoghead">
+    <div>
+      <div class="doc-dialog-badges">
+        <span id="docDialogDept" class="tag">教务处</span>
+        <span id="docDialogCategory" class="pill">教学运行管理</span>
+        <span id="docDialogDate" class="muted"></span>
+      </div>
+      <h2 id="docDialogTitle" style="margin-top:6px">制度文件标题</h2>
+    </div>
+    <button type="button" id="closeDocDialog">×</button>
+  </div>
+  <div id="docDialogBody" class="doc-reader-body"></div>
+  <div class="actions doc-dialog-actions">
+    <a id="docDialogUrl" href="https://jwc.xawl.edu.cn/" target="_blank" rel="noopener noreferrer" class="outline">🔗 学校官网原文链接</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" id="copyDocTextBtn" class="outline">📋 复制全文</button>
+      <button type="button" id="askAiDocBtn" class="primary">✳ 让 AI 解读此制度</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 个人资料与密码修改弹窗 -->
+<dialog id="profileDialog">
+  <form id="profileForm" style="display:grid;gap:16px">
+    <div class="dialoghead">
+      <div><h2>个人资料与密码设置</h2><small>修改您的显示姓名或更新登录密码</small></div>
+      <button type="button" id="closeProfileDialog">×</button>
+    </div>
+    <label>用户名（不可修改）<input id="profUsername" disabled></label>
+    <label>显示姓名 / 昵称<input id="profDisplayName" required maxlength="60" placeholder="请输入您的显示姓名"></label>
+    <label>当前密码（如需修改密码请填写）<input id="profCurrentPwd" type="password" autocomplete="current-password" placeholder="不修改密码请留空"></label>
+    <label>新密码（至少 8 位）<input id="profNewPwd" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="不修改密码请留空"></label>
+    <div class="actions">
+      <button type="button" id="cancelProfileDialog" class="secondary">取消</button>
+      <button type="submit" class="primary">保存修改</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="config.js?v=20261025_v6"></script>
+<script src="app.js?v=20261025_v6"></script>
+</body>
+</html>

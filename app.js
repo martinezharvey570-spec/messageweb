@@ -1949,7 +1949,7 @@ async function loadStats() {
     $("statsDetails").innerHTML = `
       <div class="notice-row"><span class="bullet"></span><div><h4>账号总数</h4><p>${s.user_count} 个（含学生 ${s.student_count} 人）</p></div></div>
       <div class="notice-row"><span class="bullet"></span><div><h4>任务总数</h4><p>${s.task_count} 项（待处理 ${s.pending_count} 项 · 已完成 ${s.completed_count} 项）</p></div></div>
-      <div class="notice-row"><span class="bullet"></span><div><h4>内置校规制度库</h4><p>${s.knowledge_files || 160} 份官方文件与附件（${s.knowledge_chunks || 486} 个检索知识切片）</p></div></div>`;
+      <div class="notice-row"><span class="bullet"></span><div><h4>内置校规制度库</h4><p>${160} 份官方文件与附件（${486} 个检索知识切片）</p></div></div>`;
   } catch (e) {
     toast(e.message);
   }

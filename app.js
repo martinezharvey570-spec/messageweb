@@ -394,101 +394,7 @@ function scrollMessagesToBottom(force = false) {
 
 function go(p) {
   ["home", "notices", "tasks", "ai", "knowledge", "users", "analytics"].forEach(x =>
-    $(`${x}Page`)?.classList.toggle("hide", x !== p)
-  );
-  document.body.classList.toggle("on-ai-page", p === "ai");
-  document.querySelectorAll(".nav").forEach(b =>
-    b.classList.toggle("active", b.dataset.page === p)
-  );
-  document.querySelectorAll(".tab-item").forEach(b =>
-    b.classList.toggle("active", b.dataset.page === p)
-  );
-  $("crumb").textContent = {
-    home: "工作台总览",
-    notices: "通知公告",
-    tasks: "我的待办",
-    ai: "文理智办",
-    knowledge: "校规制度库",
-    users: "用户管理",
-    analytics: "数据统计"
-  }[p] || "工作台总览";
-  sidebarEl.classList.remove("open");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  if (p === "ai") {
-    checkAI();
-    setTimeout(updateSugNavState, 60);
-  }
-  if (p === "knowledge") loadKnowledge();
-  if (p === "users") loadUsers();
-  if (p === "analytics") loadStats();
-}
-
-// 顶栏快速刷新按键
-$("quickRefresh")?.addEventListener("click", async () => {
-  await refresh();
-  toast("数据已同步更新");
-});
-
-async function enter() {
-  try {
-    me = await api("/me");
-  } catch (e) {
-    token = "";
-    try {
-      localStorage.removeItem("xz_token");
-    } catch {}
-    $("auth").classList.remove("hide");
-    $("app").classList.add("hide");
-    toast(e.message);
-    return;
-  }
-  $("auth").classList.add("hide");
-  $("app").classList.remove("hide");
-  $("userName").textContent = me.display_name;
-  $("welcomeName").textContent = me.display_name;
-  $("avatar").textContent = me.display_name.slice(0, 1);
-  $("userRole").textContent = me.role === "admin" ? "系统管理员" : "学生用户";
-  $("newNotice").classList.toggle("hide", me.role !== "admin");
-  let d = new Date();
-  $("today").textContent = d.toLocaleDateString("zh-CN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long"
-  });
-  $("dateBig").textContent = d.toLocaleDateString("zh-CN", {
-    month: "2-digit",
-    day: "2-digit"
-  });
-  document
-    .querySelectorAll(".admin-only")
-    .forEach(el => el.classList.toggle("hide", me.role !== "admin"));
-  restoreChatFromLocal();
-  await refresh();
-  go("home");
-}
-
-async function refresh() {
-  try {
-    [notices, tasks] = await Promise.all([api("/notices"), api("/tasks")]);
-    renderHome();
-    renderNotices();
-    renderTasks();
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-function date(s) {
-  if (!s) return "未设置截止日期";
-  let d = new Date(s);
-  return isNaN(d) ? s : d.toLocaleDateString("zh-CN");
-}
-
-// 智能计算截止日期标签（逾期 / 临期预警）
-function getDueStatusMarkup(dueDate, status) {
-  if (!dueDate) return `<span>未设置截止日期</span>`;
-  if (status === "completed") return `<span>⏰ 截止日期：${esc(dueDate)}</span>`;
+    $(`${x}Page`)?.classList.toggle("hide", x !== p) ); document.body.classList.toggle("on-ai-page", p === "ai"); document.querySelectorAll(".nav").forEach(b => b.classList.toggle("active", b.dataset.page === p) ); document.querySelectorAll(".tab-item").forEach(b => b.classList.toggle("active", b.dataset.page === p) ); $("crumb").textContent = { home: "工作台总览", notices: "通知公告", tasks: "我的待办", ai: "文理智办", knowledge: "校规制度库", users: "用户管理", analytics: "数据统计" }[p] \vert{}\vert{} "工作台总览"; sidebarEl.classList.remove("open"); window.scrollTo({ top: 0, behavior: "smooth" }); if (p === "ai") { checkAI(); setTimeout(updateSugNavState, 60); } if (p === "knowledge") loadKnowledge(); if (p === "users") loadUsers(); if (p === "analytics") loadStats(); }  // 顶栏快速刷新按键 $("quickRefresh")?.addEventListener("click", async () => { await refresh(); toast("数据已同步更新"); });  async function enter() { try { me = await api("/me"); } catch (e) { token = ""; try { localStorage.removeItem("xz_token"); } catch {} $("auth").classList.remove("hide"); $("app").classList.add("hide"); toast(e.message); return; } $("auth").classList.add("hide"); $("app").classList.remove("hide"); $("userName").textContent = me.display_name; $("welcomeName").textContent = me.display_name; $("avatar").textContent = me.display_name.slice(0, 1); $("userRole").textContent = me.role === "admin" ? "系统管理员" : "学生用户"; $("newNotice").classList.toggle("hide", me.role !== "admin"); let d = new Date(); $("today").textContent = d.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric", weekday: "long" }); $("dateBig").textContent = d.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" }); document .querySelectorAll(".admin-only") .forEach(el => el.classList.toggle("hide", me.role !== "admin")); restoreChatFromLocal(); await refresh(); go("home"); }  async function refresh() { try { [notices, tasks] = await Promise.all([api("/notices"), api("/tasks")]); renderHome(); renderNotices(); renderTasks(); } catch (e) { toast(e.message); } }  function date(s) { if (!s) return "未设置截止日期"; let d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString("zh-CN"); }  // 智能计算截止日期标签（逾期 / 临期预警） function getDueStatusMarkup(dueDate, status) { if (!dueDate) return `<span>未设置截止日期</span>`; if (status === "completed") return `<span>⏰ 截止日期：${esc(dueDate)}</span>`;
   const todayStr = new Date().toISOString().slice(0, 10);
   const diff = Math.ceil((new Date(dueDate) - new Date(todayStr)) / 86400000);
   if (!isNaN(diff)) {
@@ -496,10 +402,7 @@ function getDueStatusMarkup(dueDate, status) {
       return `<span class="due-tag overdue">⚠️ 已逾期 (${esc(dueDate)})</span>`;
     }
     if (diff <= 3) {
-      return `<span class="due-tag soon">🔥 剩 ${diff} 天截止 (${esc(dueDate)})</span>`;
-    }
-  }
-  return `<span>⏰ 截止日期：${esc(dueDate)}</span>`;
+      return `<span class="due-tag soon">🔥 剩 ${diff} 天截止 (${esc(dueDate)})</span>`; } } return `<span>⏰ 截止日期：${esc(dueDate)}</span>`;
 }
 
 function updateBadges(pendingCount) {
@@ -534,8 +437,7 @@ function renderHome() {
             <p>${esc(n.body)}</p>
             <div class="meta">
               <span class="tag">${esc(n.category)}</span>
-              <span>${date(n.created_at)}</span>
-              ${n.deadline ? `<span>⏰ 截止：${esc(n.deadline)}</span>` : ""}
+              <span>${date(n.created_at)}</span>${n.deadline ? `<span>⏰ 截止：${esc(n.deadline)}</span>` : ""}
             </div>
           </div>
         </div>`
@@ -580,8 +482,7 @@ function renderNotices() {
         return `<article class="notice-card ${isStarred ? "starred" : ""}">
           <div class="notice-top">
             <div class="notice-tags">
-              <span class="tag">${esc(n.category)}</span>
-              ${isStarred ? `<span class="tag star-tag">★ 已置顶收藏</span>` : ""}
+              <span class="tag">${esc(n.category)}</span>${isStarred ? `<span class="tag star-tag">★ 已置顶收藏</span>` : ""}
             </div>
             <div class="notice-actions">
               <button type="button" class="outline ${isStarred ? "starred-btn" : ""}" data-star-notice="${n.id}">
@@ -601,8 +502,7 @@ function renderNotices() {
           <div class="meta">
             <span>发布人：${esc(n.publisher)}</span>
             <span>发布于：${date(n.created_at)}</span>
-            <span>适用对象：${esc(n.audience)}</span>
-            ${n.deadline ? `<span>⏰ 截止：${esc(n.deadline)}</span>` : ""}
+            <span>适用对象：${esc(n.audience)}</span>${n.deadline ? `<span>⏰ 截止：${esc(n.deadline)}</span>` : ""}
           </div>
         </article>`;
       })
@@ -642,18 +542,7 @@ function renderNotices() {
     b.onclick = async () => {
       const n = notices.find(item => String(item.id) === String(b.dataset.copyNotice));
       if (!n) return;
-      const text = `【${n.category}】${n.title}\n${n.body}\n适用对象：${n.audience}${n.deadline ? "\n截止日期：" + n.deadline : ""}`;
-      const ok = await copyTextSafe(text);
-      toast(ok ? "通知内容已复制到剪贴板" : "复制失败，请手动长按复制");
-    };
-  });
-
-  document.querySelectorAll("[data-ai-notice]").forEach(b => {
-    b.onclick = () => {
-      const n = notices.find(item => String(item.id) === String(b.dataset.aiNotice));
-      if (!n) return;
-      go("ai");
-      $("question").value = `请帮我解读以下校园通知，并梳理出【所需材料】、【分步办理流程】和【重要时间节点】：\n标题：《${n.title}》\n内容：${n.body}${n.deadline ? "\n截止日期：" + n.deadline : ""}`;
+      const text = `【${n.category}】${n.title}\n${n.body}\n适用对象：${n.audience}${n.deadline ? "\n截止日期：" + n.deadline : ""}`; const ok = await copyTextSafe(text); toast(ok ? "通知内容已复制到剪贴板" : "复制失败，请手动长按复制"); }; });  document.querySelectorAll("[data-ai-notice]").forEach(b => { b.onclick = () => { const n = notices.find(item => String(item.id) === String(b.dataset.aiNotice)); if (!n) return; go("ai"); $("question").value = `请帮我解读以下校园通知，并梳理出【所需材料】、【分步办理流程】和【重要时间节点】：\n标题：《${n.title}》\n内容：${n.body}${n.deadline ? "\n截止日期：" + n.deadline : ""}`;
       autoResizeQuestion();
       $("askForm").requestSubmit();
     };
@@ -759,16 +648,7 @@ $("markAllDone")?.addEventListener("click", async () => {
     tasks = await api("/tasks");
     renderTasks();
     renderHome();
-    toast(`已将 ${pendingList.length} 项待办全部标为完成`);
-  } catch (e) {
-    toast(e.message);
-  }
-});
-
-$("clearCompletedTasks")?.addEventListener("click", async () => {
-  const doneList = tasks.filter(t => t.status === "completed");
-  if (!doneList.length) return toast("当前没有已完成的任务可清理");
-  if (!confirm(`确定清理全部 ${doneList.length} 项已完成的待办事项吗？`)) return;
+    toast(`已将 ${pendingList.length} 项待办全部标为完成`); } catch (e) { toast(e.message); } });  $("clearCompletedTasks")?.addEventListener("click", async () => { const doneList = tasks.filter(t => t.status === "completed"); if (!doneList.length) return toast("当前没有已完成的任务可清理"); if (!confirm(`确定清理全部 ${doneList.length} 项已完成的待办事项吗？`)) return;
   try {
     const res = await api("/tasks/completed", { method: "DELETE" });
     tasks = await api("/tasks");
@@ -1034,7 +914,7 @@ function renderKnowledgeGrid(docs, matchedChunks = [], q = "") {
             </div>
           </div>
           <h3>${esc(c.name)}</h3>
-          <p>${esc(String(c.content || "").slice(0, 360))}${String(c.content || "").length > 360 ? "…" : ""}</p>
+          <p>${esc(String(c.content \vert{}\vert{} "").slice(0, 360))}${String(c.content || "").length > 360 ? "…" : ""}</p>
         </article>`
       )
       .join("");
@@ -1057,7 +937,7 @@ function renderKnowledgeGrid(docs, matchedChunks = [], q = "") {
               <p>${esc(d.preview || "")}</p>
             </div>
             <div class="knowledge-card-foot">
-              <small class="muted">${esc(d.category || "规章制度")} · ${d.chunk_count || 1} 节</small>
+              <small class="muted">${esc(d.category \vert{}\vert{} "规章制度")} · ${d.chunk_count || 1} 节</small>
               <div style="display:flex;gap:6px">
                 <button type="button" class="outline" data-read-doc="${esc(d.title)}">📖 查看原文</button>
                 <button type="button" class="ai-btn" data-ask-doc="${esc(d.title)}">✳ 解读</button>
@@ -1075,31 +955,7 @@ function renderKnowledgeGrid(docs, matchedChunks = [], q = "") {
     btn.onclick = () => {
       const title = btn.dataset.askDoc;
       go("ai");
-      $("question").value = `请根据《${title}》为我梳理该制度的核心适用对象、关键规定、所需材料表单以及红线注意事项。`;
-      autoResizeQuestion();
-      $("askForm").requestSubmit();
-    };
-  });
-}
-
-async function loadKnowledge() {
-  const q = ($("knowledgeSearch")?.value || "").trim();
-  const dept = $("knowledgeDept")?.value || "";
-  $("clearKnowledgeSearch")?.classList.toggle("hide", !q);
-
-  // 若无关键词且已缓存完整制度目录，直接在前端零延迟过滤渲染
-  if (!q && allKnowledgeDocsCache) {
-    const filtered = dept ? allKnowledgeDocsCache.filter(d => d.dept === dept) : allKnowledgeDocsCache;
-    knowledgeDocs = filtered;
-    renderKnowledgeGrid(filtered, [], "");
-    return;
-  }
-
-  try {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (dept) params.set("dept", dept);
-    const qs = params.toString() ? `?${params.toString()}` : "";
+      $("question").value = `请根据《${title}》为我梳理该制度的核心适用对象、关键规定、所需材料表单以及红线注意事项。`; autoResizeQuestion(); $("askForm").requestSubmit(); }; }); }  async function loadKnowledge() { const q = ($("knowledgeSearch")?.value \vert{}\vert{} "").trim(); const dept = $("knowledgeDept")?.value \vert{}\vert{} ""; $("clearKnowledgeSearch")?.classList.toggle("hide", !q);  // 若无关键词且已缓存完整制度目录，直接在前端零延迟过滤渲染 if (!q && allKnowledgeDocsCache) { const filtered = dept ? allKnowledgeDocsCache.filter(d => d.dept === dept) : allKnowledgeDocsCache; knowledgeDocs = filtered; renderKnowledgeGrid(filtered, [], ""); return; }  try { const params = new URLSearchParams(); if (q) params.set("q", q); if (dept) params.set("dept", dept); const qs = params.toString() ? `?${params.toString()}` : "";
     const data = await api("/knowledge" + qs);
 
     knowledgeDocs = data.docs || [];
@@ -1123,28 +979,7 @@ async function openDocReader(docTitle) {
 
     $("docDialogDept").textContent = doc.dept || "学校部门";
     $("docDialogCategory").textContent = doc.category || "规章制度";
-    $("docDialogDate").textContent = doc.date ? `发布日期：${doc.date}` : "";
-    $("docDialogTitle").textContent = doc.title;
-    $("docDialogBody").textContent = fullText || "暂无正文内容";
-    $("docDialogUrl").href = doc.url || "https://jwc.xawl.edu.cn/";
-    $("docDialog")?.showModal();
-  } catch (e) {
-    toast(e.message || "未能加载该制度原文");
-  }
-}
-
-$("closeDocDialog")?.addEventListener("click", () => $("docDialog")?.close());
-$("copyDocTextBtn")?.addEventListener("click", async () => {
-  if (!currentDocViewing?.fullText) return;
-  const ok = await copyTextSafe(`《${currentDocViewing.title}》\n\n${currentDocViewing.fullText}`);
-  toast(ok ? "制度全文已复制到剪贴板" : "复制失败");
-});
-$("askAiDocBtn")?.addEventListener("click", () => {
-  if (!currentDocViewing?.title) return;
-  const title = currentDocViewing.title;
-  $("docDialog")?.close();
-  go("ai");
-  $("question").value = `请帮我详细解读《${title}》的核心办理要求、所需材料和关键注意事项。`;
+    $("docDialogDate").textContent = doc.date ? `发布日期：${doc.date}` : ""; $("docDialogTitle").textContent = doc.title; $("docDialogBody").textContent = fullText \vert{}\vert{} "暂无正文内容"; $("docDialogUrl").href = doc.url \vert{}\vert{} "https://jwc.xawl.edu.cn/"; $("docDialog")?.showModal(); } catch (e) { toast(e.message \vert{}\vert{} "未能加载该制度原文"); } }  $("closeDocDialog")?.addEventListener("click", () => $("docDialog")?.close()); $("copyDocTextBtn")?.addEventListener("click", async () => { if (!currentDocViewing?.fullText) return; const ok = await copyTextSafe(`《${currentDocViewing.title}》\n\n${currentDocViewing.fullText}`); toast(ok ? "制度全文已复制到剪贴板" : "复制失败"); }); $("askAiDocBtn")?.addEventListener("click", () => { if (!currentDocViewing?.title) return; const title = currentDocViewing.title; $("docDialog")?.close(); go("ai"); $("question").value = `请帮我详细解读《${title}》的核心办理要求、所需材料和关键注意事项。`;
   autoResizeQuestion();
   $("askForm").requestSubmit();
 });

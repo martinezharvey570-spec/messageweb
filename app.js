@@ -1,5 +1,5 @@
 // app.js — 校务智理（文理智办）前端核心逻辑
-// 涵盖：电脑端热门提问滚轮/拖拽/箭头滑动、移动端自适应体验、AI 回答步骤一键转待办、160份校规制度库检索与原文查阅、通知收藏置顶与二次编辑、个人资料与密码管理
+// 涵盖：原版简洁登录与演示账号一键登录、电脑端热门提问滚轮/拖拽/箭头滑动、移动端自适应体验、AI 回答步骤一键转待办、160份校规制度库检索与原文查阅、通知收藏置顶与二次编辑、个人资料与密码管理
 const API = (window.XZ_CONFIG && window.XZ_CONFIG.API_BASE) || "/api";
 const CHAT_CACHE_KEY = "xz_chat_cache_v1";
 const STAR_NOTICES_KEY = "xz_starred_notices_v1";
@@ -9,9 +9,11 @@ let token = localStorage.getItem("xz_token") || "",
   notices = [],
   tasks = [],
   knowledgeDocs = [],
+  allKnowledgeDocsCache = null,
   starredNoticeIds = new Set(),
   mode = "login",
   timer,
+  kSearchTimer,
   chatHistory = [],
   currentDocViewing = null;
 
@@ -81,32 +83,31 @@ function getWelcomeMarkup(isReset = false) {
     <div class="msg-meta">
       <span class="msg-avatar ai">✳</span>
       <span class="msg-sender">文理智办 AI</span>
-      <span class="msg-tag">官方制度库驱动</span>
     </div>
     <div class="bubble msg-ai welcome-bubble">
       <div class="welcome-bubble-head">
         <b>👋 ${isReset ? "对话已重置，随时为您服务！" : "你好！我是「文理智办」校园智能办事助手"}</b>
-        <p>针对校园事务“难查、不清、易漏”痛点，我基于学校 160 份正式文件库为您提供落地办事指引：</p>
+        <p>基于学校 160 份正式规章制度与附件模板，为您梳理清晰的办事指南：</p>
       </div>
       <div class="welcome-grid">
         <div class="welcome-item">
           <span>📋</span>
-          <div><b>备什么</b><small>梳理申报表与证明材料清单</small></div>
+          <div><b>材料清单</b><small>明确申请表与证明材料</small></div>
         </div>
         <div class="welcome-item">
           <span>🧭</span>
-          <div><b>怎么办</b><small>规划找谁审、去哪办动线</small></div>
+          <div><b>办理流程</b><small>理清找谁审、去哪办</small></div>
         </div>
         <div class="welcome-item">
           <span>📌</span>
-          <div><b>依何据</b><small>严格引证校内规章条款</small></div>
+          <div><b>制度依据</b><small>定位具体文件与条款</small></div>
         </div>
         <div class="welcome-item">
           <span>⚠️</span>
-          <div><b>避何坑</b><small>预警资格门槛与截止期限</small></div>
+          <div><b>关键提醒</b><small>预警门槛与时间节点</small></div>
         </div>
       </div>
-      <div class="welcome-foot">💡 请左右滑动点击上方热门问题，或在下方输入框直接描述您的办事需求。</div>
+      <div class="welcome-foot">💡 可直接点击上方热门提问，或在下方输入您的具体问题。</div>
     </div>
   </div>`;
 }
@@ -136,11 +137,10 @@ function restoreChatFromLocal() {
   } catch {}
 }
 
-// ====== 主题模式初始化与切换（登录页与工作台同步生效） ======
+// ====== 主题模式初始化与切换 ======
 function syncThemeButtons(isDark) {
   const icon = isDark ? "☀️" : "🌙";
   if ($("themeToggle")) $("themeToggle").textContent = icon;
-  if ($("authThemeToggle")) $("authThemeToggle").textContent = icon;
 }
 
 function initTheme() {
@@ -162,7 +162,6 @@ function handleToggleTheme() {
   toast(isDark ? "已切换至深色模式" : "已切换至浅色模式");
 }
 $("themeToggle")?.addEventListener("click", handleToggleTheme);
-$("authThemeToggle")?.addEventListener("click", handleToggleTheme);
 
 // 密码显示/隐藏按钮
 $("togglePwd")?.addEventListener("click", () => {
@@ -193,7 +192,7 @@ async function api(path, opt = {}) {
   return d;
 }
 
-// 登录/注册切换
+// 登录/注册切换（完全保持最初版本的简洁文案）
 function authMode(m) {
   mode = m;
   $("loginTab").classList.toggle("selected", m === "login");
@@ -203,9 +202,10 @@ function authMode(m) {
   $("authTitle").textContent = m === "login" ? "欢迎回来" : "创建学生账号";
   $("authDesc").textContent =
     m === "login"
-      ? "登录后查看校园通知、管理个人待办与咨询文理智办 AI"
-      : "注册后即可使用校园事务办理追踪与 AI 制度咨询服务";
-  $("authSubmit").textContent = m === "login" ? "登录进入工作台 →" : "注册并登录 →";
+      ? "登录后查看校园通知与个人待办"
+      : "注册学生账号后即可使用全部功能";
+  $("authSubmit").textContent = m === "login" ? "登录" : "注册并登录";
+  $("quickDemoStudent")?.classList.toggle("hide", m !== "login");
 }
 $("loginTab").onclick = () => authMode("login");
 $("regTab").onclick = () => authMode("register");
@@ -215,7 +215,7 @@ $("authForm").onsubmit = async e => {
   const submitBtn = $("authSubmit");
   const prevText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.textContent = "正在验证…";
+  submitBtn.textContent = "处理中…";
   try {
     let body = {
       username: $("username").value.trim(),
@@ -241,20 +241,12 @@ $("authForm").onsubmit = async e => {
   }
 };
 
-// 比赛演示快捷账号按钮
+// “登入演示账号”快捷按钮
 $("quickDemoStudent")?.addEventListener("click", () => {
   authMode("login");
   $("username").value = "demo_student";
   $("password").value = "demo123456";
   $("authForm").requestSubmit();
-});
-
-$("quickDemoAdmin")?.addEventListener("click", () => {
-  authMode("login");
-  $("username").value = "admin";
-  $("password").value = "";
-  $("password").focus();
-  toast("已填入管理员账号 admin，请输入管理员密码登录");
 });
 
 $("logout").onclick = () => {
@@ -328,6 +320,24 @@ document.addEventListener("click", e => {
   }
 });
 
+// 全局快捷键 Ctrl/Cmd + K 快速聚焦当前页面搜索框
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    if ($("auth") && !$("auth").classList.contains("hide")) return;
+    e.preventDefault();
+    if (!$("noticesPage")?.classList.contains("hide")) {
+      $("search")?.focus();
+    } else if (!$("tasksPage")?.classList.contains("hide")) {
+      $("taskSearch")?.focus();
+    } else if (!$("aiPage")?.classList.contains("hide")) {
+      $("question")?.focus();
+    } else {
+      go("knowledge");
+      setTimeout(() => $("knowledgeSearch")?.focus(), 40);
+    }
+  }
+});
+
 // 移动端 AI 参数折叠按钮
 $("toggleAiConfig")?.addEventListener("click", () => {
   const bar = $("aiOptionsBar");
@@ -366,7 +376,7 @@ function updateScrollBottomBtn() {
   const dist = msgEl.scrollHeight - msgEl.scrollTop - msgEl.clientHeight;
   btn.classList.toggle("hide", dist < 140);
 }
-$("messages")?.addEventListener("scroll", updateScrollBottomBtn);
+$("messages")?.addEventListener("scroll", updateScrollBottomBtn, { passive: true });
 $("scrollBottomBtn")?.addEventListener("click", () => {
   const msgEl = $("messages");
   if (msgEl) msgEl.scrollTo({ top: msgEl.scrollHeight, behavior: "smooth" });
@@ -495,7 +505,6 @@ function getDueStatusMarkup(dueDate, status) {
 function updateBadges(pendingCount) {
   const navBadge = $("navTaskBadge");
   const mobBadge = $("mobTaskBadge");
-  const noticeBadge = $("navNoticeBadge");
   if (navBadge) {
     navBadge.textContent = pendingCount;
     navBadge.classList.toggle("hide", pendingCount === 0);
@@ -503,10 +512,6 @@ function updateBadges(pendingCount) {
   if (mobBadge) {
     mobBadge.textContent = pendingCount;
     mobBadge.classList.toggle("hide", pendingCount === 0);
-  }
-  if (noticeBadge) {
-    noticeBadge.textContent = notices.length;
-    noticeBadge.classList.toggle("hide", notices.length === 0);
   }
 }
 
@@ -710,7 +715,7 @@ document.querySelectorAll("#catPills .pill-btn").forEach(btn => {
   };
 });
 
-// ====== 我的待办管理（自定义新增、批量完成、清理已完成、单条删除） ======
+// ====== 我的待办管理（自定义新增、点击标题修改、批量完成、清理已完成、单条删除） ======
 $("taskFilter").onchange = renderTasks;
 $("taskSearch")?.addEventListener("input", renderTasks);
 
@@ -799,7 +804,7 @@ function renderTasks() {
         t => `<div class="taskrow ${t.status === "completed" ? "done" : ""}">
           <input type="checkbox" data-task="${t.id}" ${t.status === "completed" ? "checked" : ""}>
           <div class="tasktext">
-            <b>${esc(t.title)}</b>
+            <b data-edit-task="${t.id}" title="点击修改待办内容">${esc(t.title)}</b>
             <small>
               ${getDueStatusMarkup(t.due_date, t.status)}
               <span>· ${t.notice_id ? "📌 来自通知" : "✍️ 个人待办"}</span>
@@ -824,6 +829,30 @@ function renderTasks() {
         renderTasks();
         renderHome();
         renderNotices();
+      } catch (e) {
+        toast(e.message);
+      }
+    };
+  });
+
+  document.querySelectorAll("[data-edit-task]").forEach(b => {
+    b.onclick = async () => {
+      const id = Number(b.dataset.editTask);
+      const t = tasks.find(item => Number(item.id) === id);
+      if (!t) return;
+      const nextTitle = prompt("修改待办事项名称：", t.title);
+      if (nextTitle === null) return;
+      const clean = nextTitle.trim();
+      if (!clean || clean === t.title) return;
+      try {
+        await api("/tasks/" + id, {
+          method: "PATCH",
+          body: JSON.stringify({ title: clean })
+        });
+        tasks = await api("/tasks");
+        renderTasks();
+        renderHome();
+        toast("待办内容已更新");
       } catch (e) {
         toast(e.message);
       }
@@ -975,7 +1004,7 @@ function initSuggestionsScroller() {
         e.stopPropagation();
         return;
       }
-      $("question").value = b.textContent;
+      $("question").value = b.dataset.q || b.textContent;
       autoResizeQuestion();
       $("question").focus();
     };
@@ -986,10 +1015,85 @@ function initSuggestionsScroller() {
 initSuggestionsScroller();
 
 // ====== 160份校规制度库检索与原文阅读弹窗 ======
+function renderKnowledgeGrid(docs, matchedChunks = [], q = "") {
+  const matchedBox = $("knowledgeMatchedBox");
+  const matchedList = $("knowledgeMatchedList");
+  if (q && matchedChunks.length && matchedBox && matchedList) {
+    matchedBox.classList.remove("hide");
+    matchedList.innerHTML = matchedChunks
+      .map(
+        c => `<article class="notice-card">
+          <div class="notice-top">
+            <div class="notice-tags">
+              <span class="tag">${esc(c.dept || "学校制度")}</span>
+              <span class="pill">${esc(c.category || "规章条款")}</span>
+            </div>
+            <div class="notice-actions">
+              <button type="button" class="outline" data-read-doc="${esc(c.docTitle || c.name)}">📖 阅读整篇制度</button>
+              <button type="button" class="ai-btn" data-ask-doc="${esc(c.docTitle || c.name)}">✳ AI 解读</button>
+            </div>
+          </div>
+          <h3>${esc(c.name)}</h3>
+          <p>${esc(String(c.content || "").slice(0, 360))}${String(c.content || "").length > 360 ? "…" : ""}</p>
+        </article>`
+      )
+      .join("");
+  } else if (matchedBox) {
+    matchedBox.classList.add("hide");
+  }
+
+  const grid = $("knowledgeGrid");
+  if (grid) {
+    grid.innerHTML =
+      docs
+        .map(
+          d => `<article class="knowledge-card">
+            <div>
+              <div class="notice-top">
+                <span class="tag">${esc(d.dept || "学校部门")}</span>
+                <small class="muted">${esc(d.date || "现行有效")}</small>
+              </div>
+              <h4>${esc(d.title)}</h4>
+              <p>${esc(d.preview || "")}</p>
+            </div>
+            <div class="knowledge-card-foot">
+              <small class="muted">${esc(d.category || "规章制度")} · ${d.chunk_count || 1} 节</small>
+              <div style="display:flex;gap:6px">
+                <button type="button" class="outline" data-read-doc="${esc(d.title)}">📖 查看原文</button>
+                <button type="button" class="ai-btn" data-ask-doc="${esc(d.title)}">✳ 解读</button>
+              </div>
+            </div>
+          </article>`
+        )
+        .join("") || '<div class="panel empty" style="grid-column:1/-1">没有找到匹配的规章制度文件。</div>';
+  }
+
+  document.querySelectorAll("[data-read-doc]").forEach(btn => {
+    btn.onclick = () => openDocReader(btn.dataset.readDoc);
+  });
+  document.querySelectorAll("[data-ask-doc]").forEach(btn => {
+    btn.onclick = () => {
+      const title = btn.dataset.askDoc;
+      go("ai");
+      $("question").value = `请根据《${title}》为我梳理该制度的核心适用对象、关键规定、所需材料表单以及红线注意事项。`;
+      autoResizeQuestion();
+      $("askForm").requestSubmit();
+    };
+  });
+}
+
 async function loadKnowledge() {
   const q = ($("knowledgeSearch")?.value || "").trim();
   const dept = $("knowledgeDept")?.value || "";
   $("clearKnowledgeSearch")?.classList.toggle("hide", !q);
+
+  // 若无关键词且已缓存完整制度目录，直接在前端零延迟过滤渲染
+  if (!q && allKnowledgeDocsCache) {
+    const filtered = dept ? allKnowledgeDocsCache.filter(d => d.dept === dept) : allKnowledgeDocsCache;
+    knowledgeDocs = filtered;
+    renderKnowledgeGrid(filtered, [], "");
+    return;
+  }
 
   try {
     const params = new URLSearchParams();
@@ -999,72 +1103,10 @@ async function loadKnowledge() {
     const data = await api("/knowledge" + qs);
 
     knowledgeDocs = data.docs || [];
-    const matchedChunks = data.matched_chunks || [];
-
-    const matchedBox = $("knowledgeMatchedBox");
-    const matchedList = $("knowledgeMatchedList");
-    if (q && matchedChunks.length && matchedBox && matchedList) {
-      matchedBox.classList.remove("hide");
-      matchedList.innerHTML = matchedChunks
-        .map(
-          c => `<article class="notice-card">
-            <div class="notice-top">
-              <div class="notice-tags">
-                <span class="tag">${esc(c.dept || "学校制度")}</span>
-                <span class="pill">${esc(c.category || "规章条款")}</span>
-              </div>
-              <div class="notice-actions">
-                <button type="button" class="outline" data-read-doc="${esc(c.docTitle || c.name)}">📖 阅读整篇制度</button>
-                <button type="button" class="ai-btn" data-ask-doc="${esc(c.docTitle || c.name)}">✳ AI 解读</button>
-              </div>
-            </div>
-            <h3>${esc(c.name)}</h3>
-            <p>${esc(String(c.content || "").slice(0, 360))}${String(c.content || "").length > 360 ? "…" : ""}</p>
-          </article>`
-        )
-        .join("");
-    } else if (matchedBox) {
-      matchedBox.classList.add("hide");
+    if (!q && !dept && knowledgeDocs.length) {
+      allKnowledgeDocsCache = knowledgeDocs;
     }
-
-    const grid = $("knowledgeGrid");
-    if (grid) {
-      grid.innerHTML =
-        knowledgeDocs
-          .map(
-            d => `<article class="knowledge-card">
-              <div>
-                <div class="notice-top">
-                  <span class="tag">${esc(d.dept || "学校部门")}</span>
-                  <small class="muted">${esc(d.date || "现行有效")}</small>
-                </div>
-                <h4>${esc(d.title)}</h4>
-                <p>${esc(d.preview || "")}</p>
-              </div>
-              <div class="knowledge-card-foot">
-                <small class="muted">${esc(d.category || "规章制度")} · ${d.chunk_count || 1} 节</small>
-                <div style="display:flex;gap:6px">
-                  <button type="button" class="outline" data-read-doc="${esc(d.title)}">📖 查看原文</button>
-                  <button type="button" class="ai-btn" data-ask-doc="${esc(d.title)}">✳ 解读</button>
-                </div>
-              </div>
-            </article>`
-          )
-          .join("") || '<div class="panel empty" style="grid-column:1/-1">没有找到匹配的规章制度文件。</div>';
-    }
-
-    document.querySelectorAll("[data-read-doc]").forEach(btn => {
-      btn.onclick = () => openDocReader(btn.dataset.readDoc);
-    });
-    document.querySelectorAll("[data-ask-doc]").forEach(btn => {
-      btn.onclick = () => {
-        const title = btn.dataset.askDoc;
-        go("ai");
-        $("question").value = `请根据《${title}》为我梳理该制度的核心适用对象、关键规定、所需材料表单以及红线注意事项。`;
-        autoResizeQuestion();
-        $("askForm").requestSubmit();
-      };
-    });
+    renderKnowledgeGrid(knowledgeDocs, data.matched_chunks || [], q);
   } catch (e) {
     toast(e.message);
   }
@@ -1107,11 +1149,15 @@ $("askAiDocBtn")?.addEventListener("click", () => {
   $("askForm").requestSubmit();
 });
 
-$("knowledgeSearchBtn")?.addEventListener("click", loadKnowledge);
 $("knowledgeDept")?.addEventListener("change", loadKnowledge);
+$("knowledgeSearch")?.addEventListener("input", () => {
+  clearTimeout(kSearchTimer);
+  kSearchTimer = setTimeout(loadKnowledge, 240);
+});
 $("knowledgeSearch")?.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     e.preventDefault();
+    clearTimeout(kSearchTimer);
     loadKnowledge();
   }
 });
@@ -1140,8 +1186,6 @@ async function checkAI() {
     let d = await api("/health");
     $("aiStatus").textContent = d.ai_configured ? "在线" : "未配置";
     $("aiStatus").classList.toggle("ready", d.ai_configured);
-    if (d.knowledge_files && $("authStatDocs")) $("authStatDocs").textContent = d.knowledge_files;
-    if (d.knowledge_chunks && $("authStatChunks")) $("authStatChunks").textContent = d.knowledge_chunks;
   } catch {
     $("aiStatus").textContent = "离线";
   }
@@ -1780,19 +1824,9 @@ $("aiThinking")?.addEventListener("change", () => {
 
 (async () => {
   try {
-    const h = await api("/health");
-    if ($("authServerBadge")) {
-      $("authServerBadge").textContent = "● 云端服务在线";
-      $("authServerBadge").classList.add("ready");
-    }
-    if (h.knowledge_files && $("authStatDocs")) $("authStatDocs").textContent = h.knowledge_files;
-    if (h.knowledge_chunks && $("authStatChunks")) $("authStatChunks").textContent = h.knowledge_chunks;
+    await api("/health");
     if (token) await enter();
-  } catch {
-    if ($("authServerBadge")) {
-      $("authServerBadge").textContent = "○ 离线 / 待连接";
-    }
-  }
+  } catch {}
 })();
 
 async function loadUsers() {

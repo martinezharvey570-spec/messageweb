@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#155eef">
+  <!-- 标签页图标：内联 SVG，不额外占请求，缩放不糊 -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23155eef'/%3E%3Cpath d='M32 14 48 26v24H37V38H27v12H16V26z' fill='white'/%3E%3C/svg%3E">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <title>校务智理校园事务服务平台</title>
+  <link rel="stylesheet" href="style.css?v=20261031_ai_v17">
+</head>
+<body>
+<!-- 全站线性图标集：统一 24×24 网格、1.75px 描边，颜色继承文字色。
+     emoji 当图标的问题：Windows / 安卓 / iOS 是四套字形，且彩色卡通感与校务调性冲突。 -->
+<svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="ico-base" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 10.2 12 3.6l8.4 6.6V19a1.7 1.7 0 0 1-1.7 1.7H5.3A1.7 1.7 0 0 1 3.6 19z"/><path d="M9.1 20.7v-6.1h5.8v6.1"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 15.6c1.2-1.5 1.6-2.4 1.6-6.2a5.2 5.2 0 0 1 10.4 0c0 3.8.4 4.7 1.6 6.2z"/><path d="M9.7 18.3a2.3 2.3 0 0 0 4.2 0"/></symbol>
+  <symbol id="i-check-square" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="3.6"/><path d="M7.9 12.1l2.9 2.9 5.4-5.6"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 8.3Q10.4 13 15.1 13.8Q10.4 14.6 9.6 19.3Q8.8 14.6 4.1 13.8Q8.8 13 9.6 8.3Z"/><path d="M17.6 4Q18 5.8 19.9 6.3Q18 6.8 17.6 8.6Q17.2 6.8 15.3 6.3Q17.2 5.8 17.6 4Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.4C9.7 4.7 6.2 4.3 4.2 5.1v13.2c2-.8 5.5-.4 7.8 1.3 2.3-1.7 5.8-2.1 7.8-1.3V5.1c-2-.8-5.5-.4-7.8 1.3z"/><path d="M12 6.4v13.2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.4" cy="8" r="3.4"/><path d="M3.4 19.6a6 6 0 0 1 12 0"/><path d="M16.6 5.4a3.3 3.3 0 0 1 0 6.2"/><path d="M17.8 14.5a5.6 5.6 0 0 1 2.8 5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 18.8h14.8"/><path d="M8.1 18.8v-5.6M12 18.8V5.2M15.9 18.8v-8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.9 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 10l5.8-.8z"/></symbol>
+  <symbol id="i-star-fill" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="m12 3.9 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 10l5.8-.8z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.6" y="8.6" width="11.8" height="11.8" rx="2.6"/><path d="M15.4 5.6a2.4 2.4 0 0 0-2.4-2.2H6.2a2.4 2.4 0 0 0-2.4 2.4v6.8a2.4 2.4 0 0 0 2.2 2.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 4.8v14.4M4.8 12h14.4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.4 8.6a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14.4 6.6 3 3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9.6 7V5.3A1.7 1.7 0 0 1 11.3 3.6h1.4A1.7 1.7 0 0 1 14.4 5.3V7"/><path d="m6.6 7 .9 12.1a2 2 0 0 0 2 1.9h5a2 2 0 0 0 2-1.9L17.4 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.6"/><path d="m15.9 15.9 4.3 4.3"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 12a8.2 8.2 0 1 1-8.2-8.2c2.3 0 4.5.9 6.1 2.5l2.1 2.1"/><path d="M20.2 3.4v5h-5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v11"/><path d="m7.6 10.4 4.4 4.4 4.4-4.4"/><path d="M4.4 20.4h15.2"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.4v15.2M5 11.4l7-7 7 7"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 12h14.2"/><path d="m13.2 6.4 5.6 5.6-5.6 5.6"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="5.7" y="5.7" width="12.6" height="12.6" rx="2.7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6.2 6.2l11.6 11.6M17.8 6.2 6.2 17.8"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6.2" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="17.8" cy="12" r="1.4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.4V12l3.2 1.9"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.7 4.2a1.5 1.5 0 0 1 2.6 0l7.3 12.9a1.5 1.5 0 0 1-1.3 2.2H4.7a1.5 1.5 0 0 1-1.3-2.2z"/><path d="M12 9.6v4M12 16.4h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 12.6l4.8 4.8L19.4 6.6"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 3.8H7.2a1.8 1.8 0 0 0-1.8 1.8v12.8a1.8 1.8 0 0 0 1.8 1.8h9.6a1.8 1.8 0 0 0 1.8-1.8V8.6z"/><path d="M13.4 3.8v4.8h5.2"/><path d="M8.6 12.6h6.8M8.6 16.2h4.6"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4.8" y="5.4" width="14.4" height="14.8" rx="2.5"/><path d="M9.2 5.4v-.8a1.3 1.3 0 0 1 1.3-1.3h3a1.3 1.3 0 0 1 1.3 1.3v.8"/><path d="M8.6 10.8h6.8M8.6 14.2h6.8M8.6 17.6h4"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="18.2" r="2.4"/><circle cx="18.2" cy="5.8" r="2.4"/><path d="M8.3 18.2h6.9a3.1 3.1 0 0 0 0-6.2H7.7a3.1 3.1 0 0 1 0-6.2h8.3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 3.4h5.6"/><path d="M9.9 3.4v6.2L7.2 13h9.6l-2.7-3.4V3.4"/><path d="M12 13v7.4"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 13.6a5.6 5.6 0 1 1 7.6 0c-.4.8-.6 1.6-.6 2.4v.6a1.4 1.4 0 0 1-1.4 1.4h-3.6a1.4 1.4 0 0 1-1.4-1.4v-.6c0-.8-.2-1.6-.6-2.4z"/><path d="M9.4 19.8h5.2"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.6a4.4 4.4 0 0 0 6.2 0l2.6-2.6a4.4 4.4 0 0 0-6.2-6.2L11.4 6"/><path d="M14 10.4a4.4 4.4 0 0 0-6.2 0l-2.6 2.6a4.4 4.4 0 0 0 6.2 6.2L12.6 18"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 7.4h7.6M15.4 7.4h5M3.6 16.6h4.6M12.4 16.6h8"/><circle cx="13.4" cy="7.4" r="2.2"/><circle cx="10.4" cy="16.6" r="2.2"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5.6h2.6a2.4 2.4 0 0 1 2.4 2.4v8a2.4 2.4 0 0 1-2.4 2.4H15"/><path d="M10.4 15.6 14 12l-3.6-3.6"/><path d="M14 12H3.6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6.6h16M4 12h16M4 17.4h16"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.4"/><path d="M12 3.2v2.4M12 18.4v2.4M3.2 12h2.4M18.4 12h2.4M5.8 5.8l1.7 1.7M16.5 16.5l1.7 1.7M18.2 5.8l-1.7 1.7M7.5 16.5l-1.7 1.7"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.3 14.6A8.6 8.6 0 0 1 9.4 3.7a8.6 8.6 0 1 0 10.9 10.9z"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m14.6 6.2-5.8 5.8 5.8 5.8"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9.4 6.2 5.8 5.8-5.8 5.8"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 12S6.6 6.8 12 6.8 20.4 12 20.4 12 17.4 17.2 12 17.2 3.6 12 3.6 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.4 6.9c.5-.1 1-.1 1.6-.1 5.4 0 8.4 5.2 8.4 5.2a14.4 14.4 0 0 1-2.6 3.4"/><path d="M6.4 8.4A14.4 14.4 0 0 0 3.6 12s3 5.2 8.4 5.2c1.4 0 2.6-.3 3.7-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M4 4l16 16"/></symbol>
+  <symbol id="i-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 9.6 12 5.4l8.4 4.2-8.4 4.2z"/><path d="M7 12v4c0 1.5 2.2 2.7 5 2.7s5-1.2 5-2.7v-4"/><path d="M20.4 9.6v4.8"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9.2" r="5.8"/><path d="M9 13.9 7 20.4l5-2.2 5 2.2-2-6.5"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.2" cy="8.2" r="4.6"/><path d="m11.6 11.6 8.6 8.6"/><path d="m17 17 2.2-2.2M14.8 14.8l2.2-2.2"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.8" y="4.4" width="16.4" height="15.2" rx="2.6"/><path d="M9.4 4.4v15.2"/></symbol>
+</svg>
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- 登录与注册视图（完全恢复原版简洁设计 + 仅增“登入演示账号”简洁字样） -->
+<section id="auth" class="auth">
+  <div class="hero">
+    <div class="logo">校</div>
+    <h1>校务智理</h1>
+    <p>让校园通知更清晰，让办事流程更简单。</p>
+    <div class="hero-list">
+      <p><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg> 通知公告集中管理</p>
+      <p><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg> 个人待办进度跟踪</p>
+      <p><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg> 文理智办 AI 问答</p>
+    </div>
+    <small>CAMPUS SERVICE PLATFORM</small>
+  </div>
+  <form id="authForm" class="authbox">
+    <div class="logo mobile">校</div>
+    <div class="tabs">
+      <button type="button" id="loginTab" class="selected">登录</button>
+      <button type="button" id="regTab">注册</button>
+    </div>
+    <h2 id="authTitle">欢迎回来</h2>
+    <p class="muted" id="authDesc">登录后查看校园通知与个人待办</p>
+    <label id="nameWrap" class="hide">姓名<input id="displayName" maxlength="60" placeholder="请输入您的显示姓名"></label>
+    <label>用户名<input id="username" required minlength="3" maxlength="80" autocomplete="username" placeholder="请输入用户名"></label>
+    <label>密码
+      <div class="input-group">
+        <input id="password" type="password" required minlength="8" maxlength="128" autocomplete="current-password" placeholder="至少 8 位密码">
+        <button type="button" id="togglePwd" class="icon-inside" title="显示/隐藏密码"><svg class="ico" aria-hidden="true"><use href="#i-eye"/></svg></button>
+      </div>
+    </label>
+    <button class="primary wide" id="authSubmit">登录</button>
+    <button type="button" id="quickDemoStudent" class="demo-login-link">登入演示账号</button>
+    <p class="hint">账号数据将加密保存在云端数据库</p>
+  </form>
+</section>
+
+<!-- 登录后的主应用工作台 -->
+<div id="app" class="hide">
+  <aside id="sidebar">
+    <div class="sidebrand">
+      <div class="logo">校</div>
+      <div><b>校务智理</b><small>CAMPUS SERVICES</small></div>
+    </div>
+    <small class="navcaption">工作台导航</small>
+    <button class="nav active" data-page="home"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>总览工作台</button>
+    <button class="nav" data-page="notices"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>通知公告</button>
+    <button class="nav" data-page="tasks"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>我的待办 <em id="navTaskBadge" class="nav-badge hide">0</em></button>
+    <button class="nav" data-page="ai"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>文理智办 AI</button>
+    <button class="nav" data-page="knowledge"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
+    <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
+    <button class="nav admin-only hide" data-page="users"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
+    <button class="nav admin-only hide" data-page="analytics"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
+    <div class="sidebottom">
+      <button id="openProfileSide" type="button"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg>账号与密码设置</button>
+      <button id="logout" type="button"><svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg>退出当前账号</button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="header-left">
+        <button id="menu" type="button" aria-label="打开导航菜单"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <div class="header-titles">
+          <small>校园事务 / <b id="crumb">工作台总览</b></small>
+          <p id="today"></p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button type="button" id="quickRefresh" class="icon-btn" title="同步最新数据"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+        <button type="button" id="themeToggle" class="icon-btn" title="切换深色/浅色模式"><svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button type="button" id="userProfileBtn" class="user" title="个人资料与密码设置">
+          <span id="avatar">同</span>
+          <div><b id="userName">同学</b><small id="userRole">学生用户</small></div>
+        </button>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <!-- 首页总览 -->
+      <section id="homePage" class="page">
+        <div class="welcome">
+          <div class="welcome-main">
+            <small class="blue">CAMPUS WORKSPACE</small>
+            <h1>你好，<span id="welcomeName">同学</span></h1>
+            <p class="muted">欢迎进入校务智理，及时掌握校园事务动态与个人办理进度。</p>
+          </div>
+          <div class="date"><small>今天日期</small><b id="dateBig">—</b></div>
+        </div>
+
+        <div class="stats stats-4">
+          <article class="clickable-card" data-goto="notices" title="点击查看全部通知">
+            <span><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg></span><small>通知公告</small><b id="statNotices">0</b>
+          </article>
+          <article class="clickable-card" data-goto-task="pending" title="点击查看待处理事项">
+            <span class="amber"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span><small>待办事项</small><b id="statPending">0</b>
+          </article>
+          <article class="clickable-card" data-goto-task="completed" title="点击查看已完成事项">
+            <span class="green"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg></span><small>已完成</small><b id="statDone">0</b>
+          </article>
+          <article class="clickable-card" data-goto="knowledge" data-kb-count-title title="点击查阅校规制度原文">
+            <span class="purple"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg></span><small>校规制度库</small><b id="statKnowledge">…</b>
+          </article>
+        </div>
+
+        <div class="cols">
+          <article class="panel">
+            <div class="panelhead">
+              <div><h3>最新通知</h3><small>校园动态与近期办事提醒</small></div>
+              <button class="link" data-goto="notices">查看全部 →</button>
+            </div>
+            <div id="recent"></div>
+          </article>
+          <article class="panel">
+            <div class="panelhead">
+              <div><h3>快捷服务</h3><small>高频校园事务直达</small></div>
+            </div>
+            <button class="quick" data-goto="notices"><span><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>浏览通知公告</span><i>→</i></button>
+            <button class="quick" data-goto="tasks"><span><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>管理我的待办</span><i>→</i></button>
+            <button class="quick" data-goto="ai"><span><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>咨询文理智办 AI</span><i>→</i></button>
+            <button class="quick" data-goto="knowledge"><span><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>查阅校规制度库</span><i>→</i></button>
+            <div class="quick-tags">
+              <small class="muted">常见事务一键提问</small>
+              <div class="mini-chips">
+                <button type="button" data-quick-ai="期末考试因病如何申请缓考？"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-file-text"/></svg>缓考申请</button>
+                <button type="button" data-quick-ai="转专业需要满足什么条件？什么情况会降级？"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-route"/></svg>转专业规定</button>
+                <button type="button" data-quick-ai="本科毕业论文查重率和AI生成内容检测占比要求是多少？"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-graduation"/></svg>论文查重规范</button>
+                <button type="button" data-quick-ai="申请家庭经济困难认定需要准备哪些材料？"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-award"/></svg>困难认定材料</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 通知公告 -->
+      <section id="noticesPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>通知公告</h1><p class="muted">集中查看校园通知，支持收藏置顶、加入待办或唤起 AI 解读要点。</p></div>
+          <button id="newNotice" class="primary hide"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>发布通知</button>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="search" placeholder="搜索通知标题、正文或发布人（Ctrl+K）…">
+            <button type="button" id="clearSearch" class="clear-btn hide" title="清空搜索"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <select id="category">
+            <option value="">全部类别</option>
+            <option value="办事提醒">办事提醒</option>
+            <option value="教学事务">教学事务</option>
+            <option value="学生工作">学生工作</option>
+            <option value="校园通知">校园通知</option>
+          </select>
+        </div>
+        <div class="cat-pills" id="catPills">
+          <button type="button" class="pill-btn active" data-cat="">全部</button>
+          <button type="button" class="pill-btn" data-cat="__starred__"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-star"/></svg>已收藏 <span id="starCountBadge"></span></button>
+          <button type="button" class="pill-btn" data-cat="办事提醒">办事提醒</button>
+          <button type="button" class="pill-btn" data-cat="教学事务">教学事务</button>
+          <button type="button" class="pill-btn" data-cat="学生工作">学生工作</button>
+          <button type="button" class="pill-btn" data-cat="校园通知">校园通知</button>
+        </div>
+        <div id="noticeCards" class="stack"></div>
+      </section>
+
+      <!-- 我的待办 -->
+      <section id="tasksPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>我的待办</h1><p class="muted">跟进个人事务办理进度，支持自定义添加与 AI 步骤导入。</p></div>
+          <div class="notice-actions">
+            <button type="button" id="markAllDone" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>全部完成</button>
+            <button type="button" id="clearCompletedTasks" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg>清理已完成</button>
+          </div>
+        </div>
+
+        <div class="task-overview-bar panel">
+          <div class="taskstats-inline">
+            <div><small>全部任务</small><b id="taskTotal">0</b></div>
+            <div><small>待处理</small><b id="taskOpen" class="amber-text">0</b></div>
+            <div><small>已完成</small><b id="taskDone" class="green-text">0</b></div>
+          </div>
+          <div class="progress-inline">
+            <div class="progress-head">
+              <span>完成进度</span>
+              <b id="taskPercent">0%</b>
+            </div>
+            <div class="progress-track"><div id="taskProgressBar" class="progress-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- 快速添加个人自定义待办 -->
+        <form id="addTaskForm" class="panel add-task-bar">
+          <div class="add-task-inputs">
+            <input id="newTaskTitle" required maxlength="200" placeholder="＋ 添加个人待办事项（例如：周五前向学院提交学分置换审批表）…">
+            <input id="newTaskDue" type="date" title="选填：截止日期">
+            <button type="submit" class="primary">添加</button>
+          </div>
+        </form>
+
+        <article class="panel">
+          <div class="panelhead">
+            <div><h3>任务清单</h3><small>勾选即可切换完成状态，点击标题可修改内容</small></div>
+          </div>
+          <div class="task-controls">
+            <input id="taskSearch" class="mini-input" placeholder="搜索待办…">
+            <select id="taskFilter">
+              <option value="all">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="completed">已完成</option>
+            </select>
+          </div>
+          <div id="taskList"></div>
+        </article>
+      </section>
+
+      <!-- 文理智办 AI -->
+      <section id="aiPage" class="page hide">
+        <div class="chat panel">
+          <!-- 紧凑型毛玻璃 AI 顶栏 -->
+          <div class="chat-topbar">
+            <div class="chatintro">
+              <div class="aiicon"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg></div>
+              <div class="chatintro-text">
+                <div class="chatintro-title-row">
+                  <h1>文理智办</h1>
+                  <span id="aiStatus" class="pill">检查服务中</span>
+                </div>
+                <p class="muted">基于 <span data-kb-count>…</span> 份学校正式制度文件，提供材料清单与办理流程指引</p>
+              </div>
+            </div>
+            <div class="chat-top-actions">
+              <button type="button" id="toggleAiConfig" class="outline config-toggle-btn" title="展开/收起模型参数"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>参数</span></button>
+              <button type="button" id="exportChat" class="outline" title="导出对话记录"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出</span></button>
+              <button type="button" id="clearChat" class="outline" title="清空当前对话"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空</span></button>
+            </div>
+          </div>
+
+          <!-- 可折叠/响应式 AI 参数配置条 -->
+          <div id="aiOptionsBar" class="ai-options">
+            <label class="ai-select-item">
+              <span>模型</span>
+              <select id="aiModel">
+                <option value="deepseek-flash">Flash（快速通用）</option>
+                <option value="deepseek-v4-pro">Pro（深度推理）</option>
+              </select>
+            </label>
+            <label class="ai-select-item">
+              <span>思考强度</span>
+              <select id="aiEffort">
+                <option value="low">低</option>
+                <option value="high" selected>高</option>
+                <option value="max">最高</option>
+              </select>
+            </label>
+            <label class="ai-toggle"><input id="aiThinking" type="checkbox" checked> <span>深度思考</span></label>
+            <label class="ai-toggle"><input id="aiWebSearch" type="checkbox"> <span>联网搜索</span></label>
+          </div>
+
+          <!-- 快捷提问胶囊栏（支持电脑端滚轮、按住拖拽与左右按钮丝滑滑动） -->
+          <div class="suggestions-bar">
+            <span class="suggestions-label">热门提问</span>
+            <button type="button" id="sugPrev" class="sug-nav-btn hide" aria-label="向左滑动" title="向左滑动"><svg class="ico" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+            <div id="suggestionsTrack" class="suggestions">
+              <button type="button" data-q="期末考试因病不能参加，怎么申请缓考？">期末因病怎么申请缓考？</button>
+              <button type="button" data-q="缺课多少会被取消考试资格？">缺课多少取消考试资格？</button>
+              <button type="button" data-q="转专业需要满足什么条件？">转专业需要什么条件？</button>
+              <button type="button" data-q="学士学位授予的绩点要求是多少？">学位绩点要求是多少？</button>
+              <button type="button" data-q="本科毕业论文查重率和AI生成内容占比上限是多少？">论文查重和AI占比上限？</button>
+              <button type="button" data-q="毕业论文中途想换题目怎么办？">论文中途能换题目吗？</button>
+              <button type="button" data-q="家庭经济困难认定需要准备哪些材料？">困难认定要哪些材料？</button>
+              <button type="button" data-q="国家奖学金和国家励志奖学金能同时获得吗？">国奖和励志奖能兼得吗？</button>
+              <button type="button" data-q="寒暑假留宿学生公寓怎么办理？">寒暑假留宿怎么审批？</button>
+              <button type="button" data-q="心理咨询怎么预约？">心理咨询怎么预约？</button>
+            </div>
+            <button type="button" id="sugNext" class="sug-nav-btn" aria-label="向右滑动" title="向右滑动"><svg class="ico" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+          </div>
+
+          <!-- 消息流区域 -->
+          <div id="messages" class="messages">
+            <div class="bubble-wrap msg-ai">
+              <div class="msg-meta">
+                <span class="msg-avatar ai"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
+                <span class="msg-sender">文理智办 AI</span>
+              </div>
+              <div class="bubble msg-ai welcome-bubble">
+                <div class="welcome-bubble-head">
+                  <b>你好！我是「文理智办」校园智能办事助手</b>
+                  <p>基于学校 <span data-kb-count>…</span> 份正式规章制度与附件模板，为您梳理清晰的办事指南：</p>
+                </div>
+                <div class="welcome-grid">
+                  <div class="welcome-item">
+                    <span><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></span>
+                    <div><b>材料清单</b><small>明确申请表与证明材料</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span><svg class="ico" aria-hidden="true"><use href="#i-route"/></svg></span>
+                    <div><b>办理流程</b><small>理清找谁审、去哪办</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg></span>
+                    <div><b>制度依据</b><small>定位具体文件与条款</small></div>
+                  </div>
+                  <div class="welcome-item">
+                    <span><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg></span>
+                    <div><b>关键提醒</b><small>预警门槛与时间节点</small></div>
+                  </div>
+                </div>
+                <div class="welcome-foot"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-bulb"/></svg>可直接点击上方热门提问，或在下方输入您的具体问题。</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 悬浮回到底部按钮 -->
+          <button type="button" id="scrollBottomBtn" class="scroll-bottom-btn hide"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow-up"/></svg>回到底部</button>
+
+          <!-- 底部输入舱 -->
+          <form id="askForm" class="ask">
+            <div class="ask-input-wrap">
+              <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题（按 Enter 发送，Shift+Enter 换行）…"></textarea>
+              <!-- 发送与停止合并成一个键：生成中这个键就是“停止” -->
+              <button class="primary" id="askSubmitBtn" type="button" aria-label="发送">
+                <span>发送</span> <i><svg class="ico" aria-hidden="true"><use href="#i-arrow-up"/></svg></i>
+              </button>
+            </div>
+            <div class="ask-footer-hint">
+              <span>请勿输入身份证号、密码等敏感信息 · 正式规定以学校最新公布文件为准</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- 校规制度库（唯一标题制度文件、办事指南与附件检索查阅，数量由后端接口注入） -->
+      <section id="knowledgePage" class="page hide">
+        <div class="pagehead">
+          <div>
+            <h1>校规制度库</h1>
+            <p class="muted">收录教务处、学生工作部 <span data-kb-count>…</span> 份唯一标题制度文件、办事指南与附件全文，支持实时检索查阅与 AI 解读。</p>
+          </div>
+          <button type="button" class="outline" data-goto="ai"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>前往 AI 问答</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="knowledgeSearch" placeholder="搜索制度名称或条款关键词（如：缓考、转专业、学分置换、查重、奖学金）…">
+            <button type="button" id="clearKnowledgeSearch" class="clear-btn hide" title="清空搜索"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <select id="knowledgeDept">
+            <option value="">全部部门</option>
+            <option value="教务处">教务处</option>
+            <option value="学生工作部">学生工作部</option>
+          </select>
+        </div>
+
+        <div class="cat-pills" id="knowledgePills">
+          <button type="button" class="pill-btn active" data-kdept="" data-base-label="全部">全部 (…)</button>
+          <button type="button" class="pill-btn" data-kdept="教务处" data-base-label="教务处">教务处</button>
+          <button type="button" class="pill-btn" data-kdept="学生工作部" data-base-label="学生工作部">学生工作部</button>
+          <button type="button" class="pill-btn" data-kq="考试">考试与缓补考</button>
+          <button type="button" class="pill-btn" data-kq="毕业论文">毕业论文规范</button>
+          <button type="button" class="pill-btn" data-kq="奖学金">奖助学金</button>
+          <button type="button" class="pill-btn" data-kq="公寓">学生公寓</button>
+        </div>
+
+        <!-- 关键词精准命中的条款片段展示区 -->
+        <div id="knowledgeMatchedBox" class="panel hide" style="margin-bottom: 16px;">
+          <div class="panelhead">
+            <div><h3><svg class="ico ico-head" aria-hidden="true"><use href="#i-target"/></svg>命中的制度条款片段</h3><small>已定位到以下相关章节</small></div>
+          </div>
+          <div id="knowledgeMatchedList" class="stack"></div>
+        </div>
+
+        <!-- 当前检索状态与结果计数 -->
+        <div id="knowledgeResultMeta" class="knowledge-result-meta" aria-live="polite">正在加载制度目录…</div>
+
+        <!-- 制度目录网格 -->
+        <div id="knowledgeGrid" class="knowledge-grid" aria-live="polite"></div>
+      </section>
+
+      <!-- 用户管理（管理员） -->
+      <section id="usersPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>用户管理</h1><p class="muted">查看注册用户、调整角色权限或重置用户密码。</p></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="userSearch" placeholder="搜索用户名、姓名或角色…">
+          </div>
+        </div>
+        <article class="panel">
+          <div class="panelhead">
+            <div><h3>用户列表</h3><small>密码经 PBKDF2 加密安全存储</small></div>
+            <button id="reloadUsers" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新</button>
+          </div>
+          <div id="userList"></div>
+        </article>
+      </section>
+
+      <!-- 数据统计（管理员） -->
+      <section id="analyticsPage" class="page hide">
+        <div class="pagehead">
+          <div><h1>数据统计</h1><p class="muted">汇总平台运行指标与校务知识库覆盖情况。</p></div>
+          <button id="reloadStats" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新</button>
+        </div>
+        <div class="stats">
+          <article><span><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg></span><small>通知总数</small><b id="aNotices">0</b></article>
+          <article><span class="amber"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg></span><small>注册学生</small><b id="aStudents">0</b></article>
+          <article><span class="green"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg></span><small>任务完成率</small><b id="aCompletion">0%</b></article>
+        </div>
+        <article class="panel">
+          <div class="panelhead">
+            <div><h3>平台运行概览</h3><small>数据由接口实时汇总，缺失时显示 —</small></div>
+          </div>
+          <div id="statsDetails"></div>
+        </article>
+      </section>
+
+      <footer id="appFooter">
+        <span>校务智理校园事务服务平台</span>
+        <span>正式规定请以学校相关部门最新公布文件为准</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- 手机端底部快捷导航栏 -->
+  <nav class="mobile-tabbar" aria-label="移动端底部导航">
+    <button type="button" class="tab-item active" data-page="home">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></i><span>总览</span>
+    </button>
+    <button type="button" class="tab-item" data-page="notices">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg></i><span>通知</span>
+    </button>
+    <button type="button" class="tab-item" data-page="tasks">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg></i><span>待办</span>
+      <em id="mobTaskBadge" class="mob-badge hide">0</em>
+    </button>
+    <button type="button" class="tab-item" data-page="ai">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg></i><span>智办AI</span>
+    </button>
+    <button type="button" class="tab-item" data-page="knowledge">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg></i><span>制度库</span>
+    </button>
+  </nav>
+</div>
+
+<!-- AI 待办审核：先核对任务标题与截止日期，再写入数据库 -->
+<dialog id="aiTodoDialog" class="task-dialog">
+  <div class="dialoghead">
+    <div><h2>把 AI 建议整理成待办</h2><small>先审核再保存；截止日期不会凭空猜测，可按实际要求补充。</small></div>
+    <button type="button" id="closeAiTodoDialog" aria-label="关闭"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <p id="aiTodoCount" class="ai-todo-count"></p>
+  <div id="aiTodoList" class="ai-todo-list"></div>
+  <div class="actions">
+    <button type="button" id="cancelAiTodoDialog" class="secondary">取消</button>
+    <button type="button" id="confirmAiTodoImport" class="primary">确认添加到我的待办</button>
+  </div>
+</dialog>
+
+<!-- 待办编辑：统一编辑标题与截止日期 -->
+<dialog id="editTaskDialog" class="task-dialog">
+  <form id="editTaskForm" class="task-edit-form">
+    <input type="hidden" id="editTaskId">
+    <div class="dialoghead"><div><h2>编辑待办</h2><small>修改后会同步更新你的个人待办清单。</small></div><button type="button" id="closeEditTaskDialog" aria-label="关闭"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <label>待办标题<input id="editTaskTitle" required maxlength="200" placeholder="例如：向学院提交缓考申请材料"></label>
+    <label>截止日期（选填）<input id="editTaskDue" type="date"></label>
+    <div class="actions"><button type="button" id="cancelEditTaskDialog" class="secondary">取消</button><button type="submit" id="saveEditTask" class="primary">保存修改</button></div>
+  </form>
+</dialog>
+
+<!-- 发布 / 编辑校园通知弹窗（管理员） -->
+<dialog id="dialog">
+  <form id="noticeForm">
+    <input type="hidden" id="nEditId" value="">
+    <div class="dialoghead">
+      <div><h2 id="dialogTitle">发布校园通知</h2><small>核对无误后提交发布</small></div>
+      <button type="button" id="closeDialog"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <label>通知标题<input id="nTitle" required maxlength="200" placeholder="请输入通知标题"></label>
+    <div class="twocol">
+      <label>通知类别
+        <select id="nCategory">
+          <option>校园通知</option>
+          <option>办事提醒</option>
+          <option>教学事务</option>
+          <option>学生工作</option>
+        </select>
+      </label>
+      <label>适用对象<input id="nAudience" value="全体学生"></label>
+    </div>
+    <label>截止日期（选填）<input id="nDeadline" type="date"></label>
+    <label>通知内容<textarea id="nBody" required rows="5" maxlength="12000" placeholder="请输入通知正文内容、办理要求或材料说明…"></textarea></label>
+    <label id="nTasksWrap" class="check"><input type="checkbox" id="nTasks" checked> 同时为现有学生账号生成待办事项</label>
+    <div class="actions">
+      <button type="button" id="cancelDialog" class="secondary">取消</button>
+      <button class="primary" id="submitNoticeBtn">确认发布</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 校规制度原文阅读器弹窗 -->
+<dialog id="docDialog" class="wide-dialog doc-dialog">
+  <div class="doc-reader">
+    <header class="doc-reader-bar">
+      <div class="doc-reader-id">
+        <div class="doc-dialog-badges">
+          <span id="docDialogDept" class="tag">教务处</span>
+          <span id="docDialogCategory" class="pill">教学运行管理</span>
+          <span id="docDialogDate" class="muted"></span>
+          <span id="docDialogIndex" class="doc-index">档案 —</span>
+        </div>
+        <h2 id="docDialogTitle">制度文件标题</h2>
+      </div>
+      <div class="doc-reader-tools">
+        <div class="doc-font-group" role="group" aria-label="阅读字号">
+          <button type="button" data-font="-1" title="缩小字号">A－</button>
+          <button type="button" data-font="0" title="默认字号">A</button>
+          <button type="button" data-font="1" title="放大字号">A＋</button>
+        </div>
+        <button type="button" id="docOutlineToggle" class="doc-tool-btn" title="显示/隐藏章节目录"><svg class="ico" aria-hidden="true"><use href="#i-panel"/></svg>目录</button>
+        <button type="button" id="closeDocDialog" class="doc-close" aria-label="关闭阅读器"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+    </header>
+    <div class="doc-reader-progress"><i id="docReaderProgress"></i></div>
+    <div class="doc-reader-scroll" id="docReaderScroll">
+      <nav class="doc-outline" id="docOutline" aria-label="章节目录"></nav>
+      <article class="doc-paper" id="docDialogBody"></article>
+    </div>
+    <div class="doc-reader-foot">
+      <a id="docDialogUrl" href="https://jwc.xawl.edu.cn/" target="_blank" rel="noopener noreferrer" class="doc-foot-link"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-link"/></svg>官网原文</a>
+      <span class="muted doc-foot-meta" id="docReaderMeta"></span>
+      <div class="doc-reader-actions">
+        <button type="button" id="copyDocTextBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg>复制全文</button>
+        <button type="button" id="askAiDocBtn" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>AI 解读此制度</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- 个人资料与密码修改弹窗 -->
+<dialog id="profileDialog">
+  <form id="profileForm" style="display:grid;gap:16px">
+    <div class="dialoghead">
+      <div><h2>账号与密码设置</h2><small>修改显示姓名或更新登录密码</small></div>
+      <button type="button" id="closeProfileDialog"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <label>用户名<input id="profUsername" disabled></label>
+    <label>显示姓名<input id="profDisplayName" required maxlength="60" placeholder="请输入您的显示姓名"></label>
+    <label>当前密码（修改密码时必填）<input id="profCurrentPwd" type="password" autocomplete="current-password" placeholder="不修改密码请留空"></label>
+    <label>新密码（至少 8 位）<input id="profNewPwd" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="不修改密码请留空"></label>
+    <div class="actions">
+      <button type="button" id="cancelProfileDialog" class="secondary">取消</button>
+      <button type="submit" class="primary">保存修改</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="config.js?v=20261025_layout2"></script>
+<script src="app.js?v=20261031_ai_v17"></script>
+</body>
+</html>

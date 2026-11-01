@@ -155,7 +155,8 @@ function restoreChatFromLocal() {
 // ====== 主题模式初始化与切换 ======
 function syncThemeButtons(isDark) {
   const btn = $("themeToggle");
-  if (btn) btn.innerHTML = ico(isDark ? "sun" : "moon");
+if (btn) btn.innerHTML = ico(isDark ? "moon" : "sun");
+
 }
 
 function initTheme() {

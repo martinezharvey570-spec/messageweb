@@ -1,8 +1,3 @@
-/*
- * 校务智理 / 文理智办 前端逻辑
- * 2026.09 起手，10 月大改过两轮，AI 问答那块基本是重写的
- * 接口统一走 /api，token 放 localStorage，页面切换全靠 go() 控显隐
- */
 const api_base = (window.XZ_CONFIG && window.XZ_CONFIG.API_BASE) || "/api";
 const chat_cache_key = "xz_chat_cache_v1";
 const star_notices_key = "xz_starred_notices_v1";

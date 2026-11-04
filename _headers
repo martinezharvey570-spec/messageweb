@@ -1,0 +1,22 @@
+# Cloudflare Pages 响应头配置。文件名就叫 _headers，无扩展名，放站点根目录。
+#
+# 一、三个静态资源让浏览器存一年，回访时一个请求都不发。
+#     代价是必须靠 ?v= 换版本号才能更新，改完文件记得同步改 index.html 里三处引用。
+/style.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/app.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/config.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# 二、HTML 反过来，每次都要回源确认。否则新版本号发不出去，
+#     用户会一直停在旧的那份 HTML 上。
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  Link: <https://api.messageweb.xyz>; rel=preconnect
+  X-Content-Type-Options: nosniff
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

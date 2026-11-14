@@ -5535,8 +5535,137 @@ html.dark .md-content .md-ol > li::before {
     align-items: center;
     justify-content: center;
   }
+  #aiOptionsBar,
+  .suggestions-bar {
+    max-height: 160px;
+    opacity: 1;
+    transform: translateY(0);
+    overflow: hidden;
+    transition: max-height .26s cubic-bezier(.22, 1, .36, 1), opacity .2s ease, transform .24s cubic-bezier(.22, 1, .36, 1), padding .24s ease, border-color .2s ease;
+  }
   body.ai-panel-collapsed #aiOptionsBar,
   body.ai-panel-collapsed .suggestions-bar {
-    display: none !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(-6px) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom-color: transparent !important;
+    pointer-events: none;
+  }
+}
+
+/* ---- v1.004: 全站交互动效美化（统一 Apple / Gemini 阻尼缓动曲线） ---- */
+@media (min-width: 761px) {
+  #sidebar {
+    transition: width .28s cubic-bezier(.22, 1, .36, 1), padding .28s cubic-bezier(.22, 1, .36, 1) !important;
+  }
+  main {
+    transition: margin-left .28s cubic-bezier(.22, 1, .36, 1) !important;
+  }
+  .sidebrand-text,
+  .navcaption,
+  .nav-badge {
+    transition: opacity .18s ease, transform .22s cubic-bezier(.22, 1, .36, 1);
+  }
+  #sidebar .nav,
+  #sidebar .sidebottom button,
+  #sidebar .sidebottom a {
+    transition: width .24s cubic-bezier(.22, 1, .36, 1), padding .24s cubic-bezier(.22, 1, .36, 1), background-color .16s ease, color .16s ease, transform .14s ease !important;
+  }
+  #sidebar .nav:active,
+  #sidebar .sidebottom button:active {
+    transform: scale(0.97);
+  }
+}
+
+/* 移动端侧边栏抽屉平滑进出 */
+@media (max-width: 760px) {
+  #sidebar {
+    transition: transform .28s cubic-bezier(.22, 1, .36, 1) !important;
+  }
+}
+
+/* 自定义下拉浮层菜单平滑展开 */
+.xz-select-menu {
+  display: grid !important;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  transform-origin: top center;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity .18s ease, transform .2s cubic-bezier(.22, 1, .36, 1), visibility .18s;
+}
+.xz-select.open .xz-select-menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* 全站弹窗平滑浮现 */
+@keyframes xzDialogPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes xzBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+dialog[open] {
+  animation: xzDialogPop .22s cubic-bezier(.22, 1, .36, 1);
+}
+dialog[open]::backdrop {
+  animation: xzBackdropFade .2s ease;
+}
+
+/* 页面切换与聊天消息轻柔入场动画 */
+@keyframes xzPageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.page:not(.hide) {
+  animation: xzPageSlideIn .22s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes xzMsgRise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.msg {
+  animation: xzMsgRise .24s cubic-bezier(.22, 1, .36, 1);
+}
+
+/* 分段胶囊与操作按钮微缩放触感 */
+.ai-seg-btn:active,
+.ai-seg-school:active,
+.desktop-rail-toggle:active,
+.config-toggle-btn:active,
+#askSubmitBtn:active {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -3411,3 +3411,15 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   }, 20));
 });
 
+/* ---- v56: 监听 AI 对话条数，开始聊天后自动收起热门提问条释放空间 ---- */
+(function init_ai_has_chat_observer() {
+  const msgBox = $("messages");
+  if (!msgBox) return;
+  const sync = () => {
+    const hasUserOrAiMsg = msgBox.querySelectorAll(".msg:not(.ai-welcome-msg)").length > 0;
+    document.body.classList.toggle("ai-has-chat", hasUserOrAiMsg);
+  };
+  sync();
+  new MutationObserver(sync).observe(msgBox, { childList: true });
+})();
+

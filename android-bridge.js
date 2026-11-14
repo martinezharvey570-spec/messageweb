@@ -297,27 +297,14 @@
     return /Android|HarmonyOS|iPhone|iPad|iPod|Mobile/i.test(ua);
   }
 
-  var deferredPrompt = null;
-  window.addEventListener("beforeinstallprompt", function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    updateInstallButtons();
-  });
-
-  function triggerAppDownloadOrInstall() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.finally(function () {
-        deferredPrompt = null;
-      });
-      return;
+  function handleApkClick(e) {
+    var ua = navigator.userAgent || "";
+    if (/MicroMessenger|QQ\//i.test(ua)) {
+      e.preventDefault();
+      alert("微信/QQ 内置浏览器不支持直接下载安装包，请点击右上角「···」选择「在浏览器中打开」后再下载安装。");
+      return false;
     }
-    var a = document.createElement("a");
-    a.href = "/xiaowu-zhili.apk";
-    a.download = "校务智理_v36.apk";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    return true;
   }
 
   function updateInstallButtons() {
@@ -327,13 +314,14 @@
 
     var authForm = document.getElementById("authForm");
     if (authForm && !document.getElementById("downloadAppBtnAuth")) {
-      var btn = document.createElement("button");
-      btn.type = "button";
+      var btn = document.createElement("a");
       btn.id = "downloadAppBtnAuth";
+      btn.href = "/xiaowu-zhili.apk";
+      btn.setAttribute("download", "校务智理_v36.apk");
       btn.className = "demo-login-link";
-      btn.style.cssText = "margin-top:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#1677ff;font-weight:600;";
+      btn.style.cssText = "margin-top:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#1677ff;font-weight:600;text-decoration:none;";
       btn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>下载安卓手机客户端 (.apk)</span>';
-      btn.onclick = triggerAppDownloadOrInstall;
+      btn.onclick = handleApkClick;
       var hint = authForm.querySelector(".hint");
       if (hint) {
         authForm.insertBefore(btn, hint);
@@ -344,11 +332,13 @@
 
     var sideBottom = document.querySelector("#sidebar .sidebottom");
     if (sideBottom && !document.getElementById("downloadAppBtnSide")) {
-      var sbtn = document.createElement("button");
-      sbtn.type = "button";
+      var sbtn = document.createElement("a");
       sbtn.id = "downloadAppBtnSide";
+      sbtn.href = "/xiaowu-zhili.apk";
+      sbtn.setAttribute("download", "校务智理_v36.apk");
+      sbtn.style.cssText = "display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;color:inherit;text-decoration:none;font-size:14px;";
       sbtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>下载安卓手机客户端';
-      sbtn.onclick = triggerAppDownloadOrInstall;
+      sbtn.onclick = handleApkClick;
       sideBottom.insertBefore(sbtn, sideBottom.firstChild);
     }
   }

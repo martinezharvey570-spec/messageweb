@@ -290,13 +290,11 @@
   // ---------------------------------------------------------
   function isMobileBrowser() {
     var ua = navigator.userAgent || "";
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobile/i.test(ua)) {
-      return true;
+    // 明确排除所有 Windows / Mac / 桌面 Linux 电脑（防止触屏笔记本或分屏窄窗口误判）
+    if (/Windows NT|Win64|WOW64|Macintosh|Mac OS X|CrOS|Linux x86_64/i.test(ua) && !/Android|HarmonyOS/i.test(ua)) {
+      return false;
     }
-    if (navigator.maxTouchPoints > 1 && window.innerWidth <= 900) {
-      return true;
-    }
-    return false;
+    return /Android|HarmonyOS|iPhone|iPad|iPod|Mobile/i.test(ua);
   }
 
   var deferredPrompt = null;

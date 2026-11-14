@@ -6,31 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261114_v41">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23155eef'/%3E%3Cpath d='M32 14 48 26v24H37V38H27v12H16V26z' fill='white'/%3E%3C/svg%3E">
   <meta name="format-detection" content="telephone=no,email=no">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="校务智理">
-  <style>
-    html.has-saved-auth #auth { display: none !important; }
-    html.has-saved-auth #app { display: block !important; }
-  </style>
-  <script>
-    (function () {
-      try {
-        if (sessionStorage.getItem("xz_manual_logout_v1")) return;
-        var hasTok = !!localStorage.getItem("xz_token") || /(?:^|;\s*)xz_token_bak=[^;]+/.test(document.cookie);
-        if (!hasTok && window.AndroidBridge && window.AndroidBridge.loadAuthData && window.AndroidBridge.loadAuthData()) {
-          hasTok = true;
-        }
-        if (hasTok) document.documentElement.classList.add("has-saved-auth");
-      } catch (e) {}
-    })();
-  </script>
-
   <title>校务智理校园事务服务平台</title>
 
   <script>
@@ -52,7 +29,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=20261104_ai_v36" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=20261114_v46" fetchpriority="high">
 </head>
 <body>
 
@@ -173,7 +150,6 @@
         </div>
       </div>
       <div class="header-right">
-        <button type="button" id="quickRefresh" class="icon-btn" title="同步最新数据"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg></button>
         <button type="button" id="themeToggle" class="icon-btn" title="切换深色/浅色模式"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg></button>
         <button type="button" id="userProfileBtn" class="user" title="个人资料与密码设置">
           <span id="avatar">同</span>
@@ -335,23 +311,34 @@
           </div>
 
           <div id="aiOptionsBar" class="ai-options">
-            <label class="ai-select-item">
-              <span>模型</span>
-              <select id="aiModel">
-                <option value="deepseek-flash">Flash（快速通用）</option>
+            <div class="ai-seg-group" role="group" aria-label="模型选择">
+              <span class="ai-seg-label">模型</span>
+              <div class="ai-seg" data-seg-target="aiModel">
+                <button type="button" class="ai-seg-btn active" data-seg-val="deepseek-flash" title="响应快，适合日常校务咨询">Flash</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="deepseek-v4-pro" title="深度推理，适合复杂条文对比">Pro</button>
+              </div>
+              <select id="aiModel" class="hide" aria-hidden="true">
+                <option value="deepseek-flash" selected>Flash（快速通用）</option>
                 <option value="deepseek-v4-pro">Pro（深度推理）</option>
               </select>
-            </label>
-            <label class="ai-select-item">
-              <span>思考强度</span>
-              <select id="aiEffort">
+            </div>
+
+            <div class="ai-seg-group" role="group" aria-label="思考强度">
+              <span class="ai-seg-label">思考</span>
+              <div class="ai-seg" data-seg-target="aiEffort">
+                <button type="button" class="ai-seg-btn" data-seg-val="low">低</button>
+                <button type="button" class="ai-seg-btn active" data-seg-val="high">高</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="max">最高</button>
+              </div>
+              <select id="aiEffort" class="hide" aria-hidden="true">
                 <option value="low">低</option>
                 <option value="high" selected>高</option>
                 <option value="max">最高</option>
               </select>
-            </label>
+            </div>
+
             <label class="ai-toggle"><input id="aiThinking" type="checkbox" checked> <span>深度思考</span></label>
-            <label class="ai-toggle"><input id="aiWebSearch" type="checkbox"> <span>联网搜索</span></label>
+            <button type="button" id="aiSchoolBtn" class="ai-school-btn" title="切换检索高校"><svg class="ico" aria-hidden="true"><use href="#i-graduation"/></svg><span id="aiSchoolLabel">西安文理学院</span><svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
           </div>
 
           <div class="suggestions-bar">
@@ -618,6 +605,22 @@
   </div>
 </dialog>
 
+
+<dialog id="schoolDialog" class="school-dialog">
+  <div class="school-dialog-box">
+    <div class="dialoghead">
+      <div><h2>选择目标高校</h2><small>切换后将默认联网检索该校官网正式文件</small></div>
+      <button type="button" id="closeSchoolDialog" aria-label="关闭"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="school-search-wrap">
+      <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="schoolSearchInput" type="search" placeholder="输入学校名称、简称或省份（如：清华、西电、陕西）" autocomplete="off">
+    </div>
+    <div id="schoolCustomAction" class="school-custom-action hide"></div>
+    <div id="schoolList" class="school-list"></div>
+  </div>
+</dialog>
+
 <dialog id="profileDialog">
   <form id="profileForm" style="display:grid;gap:16px">
     <div class="dialoghead">
@@ -635,8 +638,7 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=20261114_v44"></script>
-<script src="config.js?v=20261104_ai_v36"></script>
-<script src="app.js?v=20261104_ai_v36"></script>
+<script src="config.js?v=20261114_v46"></script>
+<script src="app.js?v=20261114_v46"></script>
 </body>
 </html>

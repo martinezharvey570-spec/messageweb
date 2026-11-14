@@ -571,11 +571,6 @@ function go(p) {
   if (p === "analytics") load_stats();
 }
 
-$("quickRefresh")?.addEventListener("click", async () => {
-  await refresh();
-  toast("数据已同步更新");
-});
-
 async function enter() {
   const me_req = api("/me");
   const data_req = Promise.all([api("/notices"), api("/tasks")]);
@@ -2453,14 +2448,15 @@ $("askForm").onsubmit = async e => {
   };
 
   const run_ask = async (continue_from = "") => {
-    const search_toggle = $("aiWebSearch");
-    const web_search = Boolean(search_toggle && search_toggle.checked);
+    const selSchool = typeof get_selected_school === "function" ? get_selected_school() : { n: "西安文理学院", d: "xawl.edu.cn" };
     const payload = {
       question: q,
       model: $("aiModel")?.value || "deepseek-flash",
       thinking: $("aiThinking")?.checked !== false,
       reasoning_effort: $("aiEffort")?.value || "high",
-      web_search: web_search,
+      web_search: true,
+      school_name: selSchool.n,
+      school_domain: selSchool.d || "", 
       ...(continue_from ? { continue_from: continue_from.slice(-4000) } : {}),
       history: chat_history.slice(-9, -1).map(m => ({
         role: m.role === "学生" ? "user" : "assistant",
@@ -3125,3 +3121,312 @@ document.addEventListener("change", async e => {
     render_tasks();
   }
 });
+
+/* ---- 全国本科高校选择弹窗逻辑 ---- */
+const PRESET_SCHOOLS = [
+  { n: "西安文理学院", d: "xawl.edu.cn", p: "陕西", a: "西文理 xawl xwly" },
+  { n: "西安交通大学", d: "xjtu.edu.cn", p: "陕西", a: "西交 xjtu" },
+  { n: "西北工业大学", d: "nwpu.edu.cn", p: "陕西", a: "西工大 nwpu" },
+  { n: "西安电子科技大学", d: "xidian.edu.cn", p: "陕西", a: "西电 xidian" },
+  { n: "西北大学", d: "nwu.edu.cn", p: "陕西", a: "西大 nwu" },
+  { n: "陕西师范大学", d: "snnu.edu.cn", p: "陕西", a: "陕师大 snnu" },
+  { n: "长安大学", d: "chd.edu.cn", p: "陕西", a: "长大 chd" },
+  { n: "西北农林科技大学", d: "nwafu.edu.cn", p: "陕西", a: "西农 nwafu" },
+  { n: "西安理工大学", d: "xaut.edu.cn", p: "陕西", a: "西理工 xaut" },
+  { n: "西安建筑科技大学", d: "xauat.edu.cn", p: "陕西", a: "西建大 xauat" },
+  { n: "陕西科技大学", d: "sust.edu.cn", p: "陕西", a: "陕科大 sust" },
+  { n: "西安科技大学", d: "xust.edu.cn", p: "陕西", a: "西科大 xust" },
+  { n: "西安邮电大学", d: "xupt.edu.cn", p: "陕西", a: "西邮 xupt" },
+  { n: "西安石油大学", d: "xsyu.edu.cn", p: "陕西", a: "西石大 xsyu" },
+  { n: "西安工业大学", d: "xatu.edu.cn", p: "陕西", a: "西工院 xatu" },
+  { n: "西安工程大学", d: "xpu.edu.cn", p: "陕西", a: "西工程 xpu" },
+  { n: "西安外国语大学", d: "xisu.edu.cn", p: "陕西", a: "西外 xisu" },
+  { n: "西北政法大学", d: "nwupl.edu.cn", p: "陕西", a: "西法大 nwupl" },
+  { n: "西安财经大学", d: "xaufe.edu.cn", p: "陕西", a: "西财 xaufe" },
+  { n: "西安美术学院", d: "xafa.edu.cn", p: "陕西", a: "西美 xafa" },
+  { n: "西安音乐学院", d: "xacom.edu.cn", p: "陕西", a: "西音 xacom" },
+  { n: "西安体育学院", d: "xaipe.edu.cn", p: "陕西", a: "西体 xaipe" },
+  { n: "西安医学院", d: "xiyi.edu.cn", p: "陕西", a: "西医 xiyi" },
+  { n: "延安大学", d: "yau.edu.cn", p: "陕西", a: "延大 yau" },
+  { n: "陕西理工大学", d: "snut.edu.cn", p: "陕西", a: "陕理工 snut" },
+  { n: "宝鸡文理学院", d: "bjwlxy.edu.cn", p: "陕西", a: "宝文理 bjwlxy" },
+  { n: "咸阳师范学院", d: "xync.edu.cn", p: "陕西", a: "咸师 xync" },
+  { n: "渭南师范学院", d: "wnu.edu.cn", p: "陕西", a: "渭师 wnu" },
+  { n: "榆林学院", d: "yulinu.edu.cn", p: "陕西", a: "榆林 yulinu" },
+  { n: "安康学院", d: "aku.edu.cn", p: "陕西", a: "安康 aku" },
+  { n: "商洛学院", d: "slxy.cn", p: "陕西", a: "商洛 slxy" },
+  { n: "陕西学前师范学院", d: "snsy.edu.cn", p: "陕西", a: "陕师院 snsy" },
+  { n: "西藏民族大学", d: "xzmu.edu.cn", p: "陕西", a: "西民大 xzmu" },
+  { n: "北京大学", d: "pku.edu.cn", p: "北京", a: "北大 pku" },
+  { n: "清华大学", d: "tsinghua.edu.cn", p: "北京", a: "清华 thu" },
+  { n: "中国人民大学", d: "ruc.edu.cn", p: "北京", a: "人大 ruc" },
+  { n: "北京航空航天大学", d: "buaa.edu.cn", p: "北京", a: "北航 buaa" },
+  { n: "北京理工大学", d: "bit.edu.cn", p: "北京", a: "北理 bit" },
+  { n: "北京师范大学", d: "bnu.edu.cn", p: "北京", a: "北师大 bnu" },
+  { n: "中国农业大学", d: "cau.edu.cn", p: "北京", a: "农大 cau" },
+  { n: "北京邮电大学", d: "bupt.edu.cn", p: "北京", a: "北邮 bupt" },
+  { n: "北京交通大学", d: "bjtu.edu.cn", p: "北京", a: "北交 bjtu" },
+  { n: "北京科技大学", d: "ustb.edu.cn", p: "北京", a: "北科 ustb" },
+  { n: "北京化工大学", d: "buct.edu.cn", p: "北京", a: "北化 buct" },
+  { n: "北京工业大学", d: "bjut.edu.cn", p: "北京", a: "北工大 bjut" },
+  { n: "北京外国语大学", d: "bfsu.edu.cn", p: "北京", a: "北外 bfsu" },
+  { n: "中央财经大学", d: "cufe.edu.cn", p: "北京", a: "央财 cufe" },
+  { n: "对外经济贸易大学", d: "uibe.edu.cn", p: "北京", a: "贸大 uibe" },
+  { n: "中国政法大学", d: "cupl.edu.cn", p: "北京", a: "法大 cupl" },
+  { n: "华北电力大学", d: "ncepu.edu.cn", p: "北京", a: "华电 ncepu" },
+  { n: "中国传媒大学", d: "cuc.edu.cn", p: "北京", a: "中传 cuc" },
+  { n: "首都师范大学", d: "cnu.edu.cn", p: "北京", a: "首师大 cnu" },
+  { n: "中央民族大学", d: "muc.edu.cn", p: "北京", a: "民大 muc" },
+  { n: "复旦大学", d: "fudan.edu.cn", p: "上海", a: "复旦 fudan" },
+  { n: "上海交通大学", d: "sjtu.edu.cn", p: "上海", a: "上交 sjtu" },
+  { n: "同济大学", d: "tongji.edu.cn", p: "上海", a: "同济 tongji" },
+  { n: "华东师范大学", d: "ecnu.edu.cn", p: "上海", a: "华师大 ecnu" },
+  { n: "华东理工大学", d: "ecust.edu.cn", p: "上海", a: "华理 ecust" },
+  { n: "上海大学", d: "shu.edu.cn", p: "上海", a: "上大 shu" },
+  { n: "上海财经大学", d: "sufe.edu.cn", p: "上海", a: "上财 sufe" },
+  { n: "东华大学", d: "dhu.edu.cn", p: "上海", a: "东华 dhu" },
+  { n: "上海外国语大学", d: "shisu.edu.cn", p: "上海", a: "上外 shisu" },
+  { n: "上海理工大学", d: "usst.edu.cn", p: "上海", a: "上理 usst" },
+  { n: "上海师范大学", d: "shnu.edu.cn", p: "上海", a: "上师大 shnu" },
+  { n: "南开大学", d: "nankai.edu.cn", p: "天津", a: "南开 nku" },
+  { n: "天津大学", d: "tju.edu.cn", p: "天津", a: "天大 tju" },
+  { n: "天津医科大学", d: "tmu.edu.cn", p: "天津", a: "天医 tmu" },
+  { n: "天津师范大学", d: "tjnu.edu.cn", p: "天津", a: "天师大 tjnu" },
+  { n: "天津工业大学", d: "tiangong.edu.cn", p: "天津", a: "天工 tiangong" },
+  { n: "河北工业大学", d: "hebut.edu.cn", p: "天津", a: "河工大 hebut" },
+  { n: "重庆大学", d: "cqu.edu.cn", p: "重庆", a: "重大 cqu" },
+  { n: "西南大学", d: "swu.edu.cn", p: "重庆", a: "西大 swu" },
+  { n: "西南政法大学", d: "swupl.edu.cn", p: "重庆", a: "西政 swupl" },
+  { n: "重庆邮电大学", d: "cqupt.edu.cn", p: "重庆", a: "重邮 cqupt" },
+  { n: "重庆医科大学", d: "cqmu.edu.cn", p: "重庆", a: "重医 cqmu" },
+  { n: "重庆师范大学", d: "cqnu.edu.cn", p: "重庆", a: "重师 cqnu" },
+  { n: "南京大学", d: "nju.edu.cn", p: "江苏", a: "南大 nju" },
+  { n: "东南大学", d: "seu.edu.cn", p: "江苏", a: "东大 seu" },
+  { n: "南京航空航天大学", d: "nuaa.edu.cn", p: "江苏", a: "南航 nuaa" },
+  { n: "南京理工大学", d: "njust.edu.cn", p: "江苏", a: "南理工 njust" },
+  { n: "苏州大学", d: "suda.edu.cn", p: "江苏", a: "苏大 suda" },
+  { n: "河海大学", d: "hhu.edu.cn", p: "江苏", a: "河海 hhu" },
+  { n: "江南大学", d: "jiangnan.edu.cn", p: "江苏", a: "江南 jiangnan" },
+  { n: "南京农业大学", d: "njau.edu.cn", p: "江苏", a: "南农 njau" },
+  { n: "南京师范大学", d: "njnu.edu.cn", p: "江苏", a: "南师大 njnu" },
+  { n: "中国矿业大学", d: "cumt.edu.cn", p: "江苏", a: "矿大 cumt" },
+  { n: "中国药科大学", d: "cpu.edu.cn", p: "江苏", a: "药大 cpu" },
+  { n: "南京邮电大学", d: "njupt.edu.cn", p: "江苏", a: "南邮 njupt" },
+  { n: "南京信息工程大学", d: "nuist.edu.cn", p: "江苏", a: "南信大 nuist" },
+  { n: "扬州大学", d: "yzu.edu.cn", p: "江苏", a: "扬大 yzu" },
+  { n: "江苏大学", d: "ujs.edu.cn", p: "江苏", a: "江大 ujs" },
+  { n: "浙江大学", d: "zju.edu.cn", p: "浙江", a: "浙大 zju" },
+  { n: "浙江工业大学", d: "zjut.edu.cn", p: "浙江", a: "浙工大 zjut" },
+  { n: "宁波大学", d: "nbu.edu.cn", p: "浙江", a: "宁大 nbu" },
+  { n: "杭州电子科技大学", d: "hdu.edu.cn", p: "浙江", a: "杭电 hdu" },
+  { n: "浙江师范大学", d: "zjnu.edu.cn", p: "浙江", a: "浙师大 zjnu" },
+  { n: "浙江理工大学", d: "zstu.edu.cn", p: "浙江", a: "浙理工 zstu" },
+  { n: "温州大学", d: "wzu.edu.cn", p: "浙江", a: "温大 wzu" },
+  { n: "中国科学技术大学", d: "ustc.edu.cn", p: "安徽", a: "中科大 ustc" },
+  { n: "合肥工业大学", d: "hfut.edu.cn", p: "安徽", a: "合工大 hfut" },
+  { n: "安徽大学", d: "ahu.edu.cn", p: "安徽", a: "安大 ahu" },
+  { n: "安徽师范大学", d: "ahnu.edu.cn", p: "安徽", a: "安师大 ahnu" },
+  { n: "厦门大学", d: "xmu.edu.cn", p: "福建", a: "厦大 xmu" },
+  { n: "福州大学", d: "fzu.edu.cn", p: "福建", a: "福大 fzu" },
+  { n: "福建师范大学", d: "fjnu.edu.cn", p: "福建", a: "福师大 fjnu" },
+  { n: "华侨大学", d: "hqu.edu.cn", p: "福建", a: "华大 hqu" },
+  { n: "武汉大学", d: "whu.edu.cn", p: "湖北", a: "武大 whu" },
+  { n: "华中科技大学", d: "hust.edu.cn", p: "湖北", a: "华科 hust" },
+  { n: "武汉理工大学", d: "whut.edu.cn", p: "湖北", a: "武理工 whut" },
+  { n: "华中师范大学", d: "ccnu.edu.cn", p: "湖北", a: "华师 ccnu" },
+  { n: "中国地质大学(武汉)", d: "cug.edu.cn", p: "湖北", a: "地大 cug" },
+  { n: "华中农业大学", d: "hzau.edu.cn", p: "湖北", a: "华农 hzau" },
+  { n: "中南财经政法大学", d: "zuel.edu.cn", p: "湖北", a: "中南大 zuel" },
+  { n: "湖北大学", d: "hubu.edu.cn", p: "湖北", a: "湖大 hubu" },
+  { n: "中南大学", d: "csu.edu.cn", p: "湖南", a: "中南 csu" },
+  { n: "湖南大学", d: "hnu.edu.cn", p: "湖南", a: "湖大 hnu" },
+  { n: "湖南师范大学", d: "hunnu.edu.cn", p: "湖南", a: "湖师大 hunnu" },
+  { n: "湘潭大学", d: "xtu.edu.cn", p: "湖南", a: "湘大 xtu" },
+  { n: "长沙理工大学", d: "csust.edu.cn", p: "湖南", a: "长理 csust" },
+  { n: "中山大学", d: "sysu.edu.cn", p: "广东", a: "中大 sysu" },
+  { n: "华南理工大学", d: "scut.edu.cn", p: "广东", a: "华工 scut" },
+  { n: "暨南大学", d: "jnu.edu.cn", p: "广东", a: "暨大 jnu" },
+  { n: "华南师范大学", d: "scnu.edu.cn", p: "广东", a: "华师 scnu" },
+  { n: "深圳大学", d: "szu.edu.cn", p: "广东", a: "深大 szu" },
+  { n: "南方科技大学", d: "sustech.edu.cn", p: "广东", a: "南科大 sustech" },
+  { n: "广东工业大学", d: "gdut.edu.cn", p: "广东", a: "广工 gdut" },
+  { n: "广州大学", d: "gzhu.edu.cn", p: "广东", a: "广大 gzhu" },
+  { n: "华南农业大学", d: "scau.edu.cn", p: "广东", a: "华农 scau" },
+  { n: "四川大学", d: "scu.edu.cn", p: "四川", a: "川大 scu" },
+  { n: "电子科技大学", d: "uestc.edu.cn", p: "四川", a: "成电 uestc" },
+  { n: "西南交通大学", d: "swjtu.edu.cn", p: "四川", a: "西南交大 swjtu" },
+  { n: "西南财经大学", d: "swufe.edu.cn", p: "四川", a: "西财 swufe" },
+  { n: "四川农业大学", d: "sicau.edu.cn", p: "四川", a: "川农 sicau" },
+  { n: "四川师范大学", d: "sicnu.edu.cn", p: "四川", a: "川师 sicnu" },
+  { n: "成都理工大学", d: "cdut.edu.cn", p: "四川", a: "成理 cdut" },
+  { n: "山东大学", d: "sdu.edu.cn", p: "山东", a: "山大 sdu" },
+  { n: "中国海洋大学", d: "ouc.edu.cn", p: "山东", a: "海大 ouc" },
+  { n: "中国石油大学(华东)", d: "upc.edu.cn", p: "山东", a: "石大 upc" },
+  { n: "山东师范大学", d: "sdnu.edu.cn", p: "山东", a: "山师 sdnu" },
+  { n: "青岛大学", d: "qdu.edu.cn", p: "山东", a: "青大 qdu" },
+  { n: "济南大学", d: "ujn.edu.cn", p: "山东", a: "济大 ujn" },
+  { n: "山东科技大学", d: "sdust.edu.cn", p: "山东", a: "山科 sdust" },
+  { n: "哈尔滨工业大学", d: "hit.edu.cn", p: "黑龙江", a: "哈工大 hit" },
+  { n: "哈尔滨工程大学", d: "hrbeu.edu.cn", p: "黑龙江", a: "哈工程 hrbeu" },
+  { n: "东北林业大学", d: "nefu.edu.cn", p: "黑龙江", a: "东林 nefu" },
+  { n: "东北农业大学", d: "neau.edu.cn", p: "黑龙江", a: "东农 neau" },
+  { n: "黑龙江大学", d: "hlju.edu.cn", p: "黑龙江", a: "黑大 hlju" },
+  { n: "吉林大学", d: "jlu.edu.cn", p: "吉林", a: "吉大 jlu" },
+  { n: "东北师范大学", d: "nenu.edu.cn", p: "吉林", a: "东师 nenu" },
+  { n: "延边大学", d: "ybu.edu.cn", p: "吉林", a: "延大 ybu" },
+  { n: "大连理工大学", d: "dlut.edu.cn", p: "辽宁", a: "大工 dlut" },
+  { n: "东北大学", d: "neu.edu.cn", p: "辽宁", a: "东大 neu" },
+  { n: "大连海事大学", d: "dlmu.edu.cn", p: "辽宁", a: "海大 dlmu" },
+  { n: "辽宁大学", d: "lnu.edu.cn", p: "辽宁", a: "辽大 lnu" },
+  { n: "沈阳工业大学", d: "sut.edu.cn", p: "辽宁", a: "沈工大 sut" },
+  { n: "郑州大学", d: "zzu.edu.cn", p: "河南", a: "郑大 zzu" },
+  { n: "河南大学", d: "henu.edu.cn", p: "河南", a: "河大 henu" },
+  { n: "河南师范大学", d: "htu.edu.cn", p: "河南", a: "河师大 htu" },
+  { n: "河南理工大学", d: "hpu.edu.cn", p: "河南", a: "河理工 hpu" },
+  { n: "燕山大学", d: "ysu.edu.cn", p: "河北", a: "燕大 ysu" },
+  { n: "河北大学", d: "hbu.edu.cn", p: "河北", a: "河大 hbu" },
+  { n: "河北师范大学", d: "hebtu.edu.cn", p: "河北", a: "河师大 hebtu" },
+  { n: "太原理工大学", d: "tyut.edu.cn", p: "山西", a: "太理 tyut" },
+  { n: "山西大学", d: "sxu.edu.cn", p: "山西", a: "山大 sxu" },
+  { n: "中北大学", d: "nuc.edu.cn", p: "山西", a: "中北 nuc" },
+  { n: "南昌大学", d: "ncu.edu.cn", p: "江西", a: "昌大 ncu" },
+  { n: "江西师范大学", d: "jxnu.edu.cn", p: "江西", a: "江师大 jxnu" },
+  { n: "江西财经大学", d: "jxufe.edu.cn", p: "江西", a: "江财 jxufe" },
+  { n: "兰州大学", d: "lzu.edu.cn", p: "甘肃", a: "兰大 lzu" },
+  { n: "西北师范大学", d: "nwnu.edu.cn", p: "甘肃", a: "西北师大 nwnu" },
+  { n: "兰州理工大学", d: "lut.edu.cn", p: "甘肃", a: "兰理工 lut" },
+  { n: "兰州交通大学", d: "lzjtu.edu.cn", p: "甘肃", a: "兰交大 lzjtu" },
+  { n: "云南大学", d: "ynu.edu.cn", p: "云南", a: "云大 ynu" },
+  { n: "昆明理工大学", d: "kust.edu.cn", p: "云南", a: "昆工 kust" },
+  { n: "云南师范大学", d: "ynnu.edu.cn", p: "云南", a: "云师 ynnu" },
+  { n: "贵州大学", d: "gzu.edu.cn", p: "贵州", a: "贵大 gzu" },
+  { n: "贵州师范大学", d: "gznu.edu.cn", p: "贵州", a: "贵师大 gznu" },
+  { n: "广西大学", d: "gxu.edu.cn", p: "广西", a: "西大 gxu" },
+  { n: "广西师范大学", d: "gxnu.edu.cn", p: "广西", a: "广师大 gxnu" },
+  { n: "桂林电子科技大学", d: "guet.edu.cn", p: "广西", a: "桂电 guet" },
+  { n: "海南大学", d: "hainanu.edu.cn", p: "海南", a: "海大 hainanu" },
+  { n: "内蒙古大学", d: "imu.edu.cn", p: "内蒙古", a: "内大 imu" },
+  { n: "宁夏大学", d: "nxu.edu.cn", p: "宁夏", a: "宁大 nxu" },
+  { n: "青海大学", d: "qhu.edu.cn", p: "青海", a: "青大 qhu" },
+  { n: "新疆大学", d: "xju.edu.cn", p: "新疆", a: "新大 xju" },
+  { n: "石河子大学", d: "shzu.edu.cn", p: "新疆", a: "石大 shzu" },
+  { n: "西藏大学", d: "utibet.edu.cn", p: "西藏", a: "藏大 utibet" }
+];
+
+function get_selected_school() {
+  try {
+    const raw = localStorage.getItem("xz_school_v1");
+    if (raw) {
+      const obj = JSON.parse(raw);
+      if (obj && obj.n) return obj;
+    }
+  } catch {}
+  return { n: "西安文理学院", d: "xawl.edu.cn" };
+}
+
+function sync_school_ui() {
+  const s = get_selected_school();
+  const lbl = $("aiSchoolLabel");
+  if (lbl) lbl.textContent = s.n;
+  const welcomeSub = document.querySelector(".welcome-card > p");
+  if (welcomeSub) {
+    if (s.n === "西安文理学院") {
+      welcomeSub.textContent = "基于学校 122 份正式规章制度与附件模板，为您梳理清晰的办事指南：";
+    } else {
+      welcomeSub.textContent = `当前已切换至【${s.n}】官网实时检索模式，优先依据该校官网公开文件为您解答：`;
+    }
+  }
+}
+
+function set_selected_school(n, d) {
+  try {
+    localStorage.setItem("xz_school_v1", JSON.stringify({ n, d: d || "" }));
+  } catch {}
+  sync_school_ui();
+  $("schoolDialog")?.close();
+  toast(`已切换检索高校：${n}`);
+}
+
+function render_school_list(kw = "") {
+  const box = $("schoolList");
+  const customBox = $("schoolCustomAction");
+  if (!box) return;
+  const cur = get_selected_school();
+  const q = String(kw || "").trim().toLowerCase();
+  const matched = q
+    ? PRESET_SCHOOLS.filter(s =>
+        s.n.toLowerCase().includes(q) ||
+        s.p.toLowerCase().includes(q) ||
+        s.a.toLowerCase().includes(q) ||
+        s.d.toLowerCase().includes(q)
+      )
+    : PRESET_SCHOOLS;
+
+  box.innerHTML = matched.slice(0, 80).map(s => {
+    const active = cur.n === s.n ? " active" : "";
+    return `<button type="button" class="school-item${active}" data-sn="${esc(s.n)}" data-sd="${esc(s.d)}"><span>${esc(s.n)}</span><small>${esc(s.p)} · ${esc(s.d)}</small></button>`;
+  }).join("") || '<div class="empty" style="padding:14px 0">未在内置名录中找到，可点击上方按钮直接使用该校名称检索官网</div>';
+
+  box.querySelectorAll(".school-item").forEach(btn => {
+    btn.onclick = () => set_selected_school(btn.dataset.sn, btn.dataset.sd);
+  });
+
+  if (customBox) {
+    const exact = matched.some(s => s.n === kw.trim());
+    if (kw.trim().length >= 2 && !exact) {
+      customBox.classList.remove("hide");
+      customBox.innerHTML = `<button type="button" id="useCustomSchoolBtn">🔍 直接使用「${esc(kw.trim())}」联网检索官网</button>`;
+      $("useCustomSchoolBtn").onclick = () => set_selected_school(kw.trim(), "");
+    } else {
+      customBox.classList.add("hide");
+      customBox.innerHTML = "";
+    }
+  }
+}
+
+$("aiSchoolBtn")?.addEventListener("click", () => {
+  const inp = $("schoolSearchInput");
+  if (inp) inp.value = "";
+  render_school_list("");
+  $("schoolDialog")?.showModal();
+  setTimeout(() => inp?.focus(), 60);
+});
+$("closeSchoolDialog")?.addEventListener("click", () => $("schoolDialog")?.close());
+$("schoolSearchInput")?.addEventListener("input", e => render_school_list(e.target.value));
+sync_school_ui();
+
+/* ---- 模型与思考强度分段胶囊交互逻辑 ---- */
+(function init_ai_segmented_controls() {
+  function sync_seg_ui(targetId, val) {
+    const group = document.querySelector(`.ai-seg[data-seg-target="${targetId}"]`);
+    if (!group) return;
+    group.querySelectorAll(".ai-seg-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.segVal === val);
+    });
+  }
+
+  document.querySelectorAll(".ai-seg").forEach(seg => {
+    const targetId = seg.dataset.segTarget;
+    const sel = $(targetId);
+    if (!sel) return;
+    const storeKey = "xz_seg_" + targetId;
+    try {
+      const saved = localStorage.getItem(storeKey);
+      if (saved && [...sel.options].some(o => o.value === saved)) {
+        sel.value = saved;
+      }
+    } catch {}
+    sync_seg_ui(targetId, sel.value);
+
+    seg.querySelectorAll(".ai-seg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.segVal;
+        sel.value = v;
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        sync_seg_ui(targetId, v);
+        try { localStorage.setItem(storeKey, v); } catch {}
+      });
+    });
+  });
+})();
+

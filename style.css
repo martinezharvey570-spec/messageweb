@@ -6228,15 +6228,19 @@ dialog[open]::backdrop {
   .doc-mobile-hero-meta .tag,
   .doc-mobile-hero-meta .pill,
   .doc-mobile-hero-meta .doc-index {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    line-height: 1.2;
-    font-size: 11.5px;
-    padding: 4px 10px;
-    letter-spacing: 0;
-    margin: 0;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    font-size: 11.5px !important;
+    padding: 4px 10px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    vertical-align: middle !important;
+    letter-spacing: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
   .doc-mobile-hero-title {
     margin: 0;

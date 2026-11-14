@@ -1,6 +1,6 @@
 {
-  "versionCode": 70,
-  "versionName": "1.012",
+  "versionCode": 71,
+  "versionName": "1.013",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.012：修复手机端文件数量胶囊文字居中对齐问题。"
+  "notes": "v1.013：修复安卓端 Android 15/16 状态栏与顶栏重叠问题，升级后自动清理 WebView 旧缓存，确保胶囊样式实时生效。"
 }

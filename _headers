@@ -20,3 +20,15 @@
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
+
+/android-bridge.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/manifest.json
+  Content-Type: application/manifest+json; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+/wenli-zhiban.apk
+  Content-Type: application/vnd.android.package-archive
+  Content-Disposition: attachment; filename="wenli-zhiban-v36.apk"
+  Cache-Control: public, max-age=300

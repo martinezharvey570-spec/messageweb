@@ -3436,10 +3436,12 @@ pre, code {
   white-space: pre-wrap;
 }
 
-dialog {
-  max-width: calc(100vw - 24px);
-  max-height: calc(100dvh - 24px);
-  overflow: auto;
+@media (min-width: 761px) {
+  dialog {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+  }
 }
 
 @media (max-width: 600px) {
@@ -6257,5 +6259,23 @@ dialog[open]::backdrop {
   }
   #docDialog .doc-paper .doc-p {
     text-indent: 1.5em !important;
+  }
+}
+
+/* ---- v1.014: 手机端所有底部弹窗 100% 铺满宽度（修复右侧留白） ---- */
+@media (max-width: 760px) {
+  dialog:not(#docDialog),
+  dialog.wide-dialog:not(#docDialog) {
+    margin: auto 0 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    inset-inline: 0 !important;
+    max-height: 90dvh !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
   }
 }

@@ -139,7 +139,7 @@ function welcome_html(is_reset = false) {
     <div class="bubble msg-ai welcome-bubble">
       <div class="welcome-bubble-head">
         <b>${is_reset ? "对话已重置，随时为您服务！" : "你好！我是「文理智办」校园智能办事助手"}</b>
-        <p>基于学校 ${kb_total_text()} 份正式规章制度与附件模板，为您梳理清晰的办事指南：</p>
+        <p>基于学校正式规章制度与附件模板，为您梳理清晰的办事指南：</p>
       </div>
       <div class="welcome-grid">
         <div class="welcome-item">
@@ -3141,10 +3141,10 @@ function sync_school_ui() {
   const s = get_selected_school();
   const lbl = $("aiSchoolLabel");
   if (lbl) lbl.textContent = s.n;
-  const welcomeSub = document.querySelector(".welcome-card > p");
+  const welcomeSub = document.querySelector(".welcome-bubble-head > p, .welcome-card > p");
   if (welcomeSub) {
     if (s.n === "西安文理学院") {
-      welcomeSub.textContent = "基于学校 122 份正式规章制度与附件模板，为您梳理清晰的办事指南：";
+      welcomeSub.textContent = "基于学校正式规章制度与附件模板，为您梳理清晰的办事指南：";
     } else {
       welcomeSub.textContent = `当前已切换至【${s.n}】官网实时检索模式，优先依据该校官网公开文件为您解答：`;
     }

@@ -3827,11 +3827,13 @@ dialog.doc-dialog[open] {
   font-family: var(--doc-sans);
 }
 .doc-outline-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--subtle);
-  letter-spacing: 0.12em;
-  padding: 0 10px 8px;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  padding: 2px 10px 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 6px;
 }
 .doc-outline-item {
   display: block;
@@ -3839,28 +3841,30 @@ dialog.doc-dialog[open] {
   text-align: left;
   border: 0;
   background: transparent;
-  color: var(--ink-secondary);
-  font-size: 12.5px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.5;
-  padding: 6px 10px;
+  padding: 7px 10px;
   border-radius: 8px;
-  border-left: 2px solid transparent;
+  border-left: 2.5px solid transparent;
   cursor: pointer;
 }
 .doc-outline-item:hover {
-  background: var(--card);
+  background: var(--surface);
   color: var(--ink);
 }
 .doc-outline-item.lv2 {
   padding-left: 20px;
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-secondary);
 }
 .doc-outline-item.active {
   color: var(--blue);
   background: var(--blue-light);
   border-left-color: var(--blue);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .doc-paper {
@@ -4031,15 +4035,15 @@ dialog.doc-dialog[open] {
     z-index: 60;
     left: 12px;
     right: 12px;
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     top: auto;
-    max-height: 52dvh;
+    max-height: 54dvh;
     overflow: auto;
     padding: 12px;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 14px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, .22);
   }
   .doc-paper {
     padding: 26px 18px 34px;
@@ -6073,6 +6077,7 @@ dialog[open]::backdrop {
     display: none !important;
   }
   .doc-mobile-nav {
+    position: relative;
     display: flex !important;
     align-items: center;
     justify-content: space-between;
@@ -6081,7 +6086,12 @@ dialog[open]::backdrop {
     gap: 8px;
   }
   .doc-m-title {
-    font-size: 14.5px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    white-space: nowrap;
+    font-size: 15px;
     font-weight: 700;
     color: var(--ink);
     letter-spacing: 0.02em;
@@ -6193,13 +6203,15 @@ dialog[open]::backdrop {
   /* 手机端随正文滚动的标题区 */
   .doc-mobile-hero {
     display: block;
-    padding: 6px 14px 12px;
+    padding: 8px 14px 14px;
     border-bottom: 1px solid var(--line);
     margin-bottom: 6px;
+    text-align: center;
   }
   .doc-mobile-hero-meta {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
     margin-bottom: 8px;
   }
@@ -6209,6 +6221,7 @@ dialog[open]::backdrop {
     line-height: 1.4;
     font-weight: 800;
     color: var(--ink);
+    text-align: center;
   }
   #docDialog .doc-paper {
     text-align: left !important;

@@ -111,7 +111,116 @@
         document.documentElement.classList.add("has-saved-auth");
       }
     } catch (e) {}
-  })();
+  
+  // ---------------------------------------------------------
+  // 5. v58 App 实用功能：下拉刷新（非AI页生效）+ 制度/AI内容原生分享
+  // ---------------------------------------------------------
+  if (isAndroidApp) {
+    // (A) 原生手感下拉刷新（仅在非 AI 页面、且页面处于顶部时触发）
+    var ptrStartY = 0;
+    var ptrPulling = false;
+    var ptrBar = null;
+
+    function ensurePtrBar() {
+      if (!ptrBar) {
+        ptrBar = document.createElement("div");
+        ptrBar.className = "app-ptr-bar";
+        ptrBar.textContent = "下拉刷新数据";
+        document.body.appendChild(ptrBar);
+      }
+      return ptrBar;
+    }
+
+    document.addEventListener("touchstart", function (e) {
+      if (document.body.classList.contains("on-ai-page")) return;
+      if (document.querySelector("dialog[open]")) return;
+      if ((window.scrollY || document.documentElement.scrollTop || 0) <= 2 && e.touches && e.touches.length === 1) {
+        ptrStartY = e.touches[0].clientY;
+        ptrPulling = true;
+      } else {
+        ptrPulling = false;
+      }
+    }, { passive: true });
+
+    document.addEventListener("touchmove", function (e) {
+      if (!ptrPulling || !e.touches || !e.touches.length) return;
+      var dy = e.touches[0].clientY - ptrStartY;
+      if (dy > 20 && (window.scrollY || 0) <= 2) {
+        var bar = ensurePtrBar();
+        var offset = Math.min(20, Math.round((dy - 20) * 0.45));
+        bar.style.transform = "translate(-50%, " + offset + "px)";
+        bar.classList.add("visible");
+        bar.textContent = dy > 85 ? "松手立即刷新" : "继续下拉刷新";
+      }
+    }, { passive: true });
+
+    document.addEventListener("touchend", function (e) {
+      if (!ptrPulling) return;
+      ptrPulling = false;
+      var endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : ptrStartY;
+      var dy = endY - ptrStartY;
+      if (ptrBar) {
+        ptrBar.classList.remove("visible");
+        ptrBar.style.transform = "translate(-50%, -48px)";
+      }
+      if (dy > 85 && (window.scrollY || 0) <= 2 && typeof window.refresh === "function") {
+        window.refresh().then(function () {
+          if (typeof window.toast === "function") window.toast("已同步最新数据");
+        }).catch(function () {});
+      }
+    }, { passive: true });
+
+    // (B) 制度阅读器与 AI 回复一键系统原生分享
+    document.addEventListener("DOMContentLoaded", function () {
+      var docActions = document.querySelector(".doc-reader-actions");
+      if (docActions && !document.getElementById("appShareDocBtn")) {
+        var sBtn = document.createElement("button");
+        sBtn.type = "button";
+        sBtn.id = "appShareDocBtn";
+        sBtn.className = "outline";
+        sBtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>分享';
+        sBtn.onclick = function () {
+          var titleEl = document.getElementById("docDialogTitle");
+          var bodyEl = document.getElementById("docDialogBody");
+          var urlEl = document.getElementById("docDialogUrl");
+          var title = titleEl ? titleEl.textContent : "校务制度文件";
+          var text = (bodyEl ? bodyEl.innerText : "").slice(0, 1200);
+          var url = (urlEl && !urlEl.classList.contains("hide")) ? urlEl.href : "";
+          var shareBody = "【" + title + "】\n" + text + (url ? "\n官网原文：" + url : "");
+          if (window.AndroidBridge && window.AndroidBridge.shareText) {
+            window.AndroidBridge.shareText(title, shareBody);
+          }
+        };
+        docActions.insertBefore(sBtn, docActions.firstChild);
+      }
+
+      // 为每条 AI 回答自动附带“分享”按钮
+      var msgBox = document.getElementById("messages");
+      if (msgBox) {
+        new MutationObserver(function () {
+          msgBox.querySelectorAll(".msg.ai:not(.ai-welcome-msg) .msg-actions").forEach(function (actBar) {
+            if (actBar.querySelector(".app-share-msg-btn")) return;
+            var msgEl = actBar.closest(".msg");
+            var bubble = msgEl ? msgEl.querySelector(".msg-bubble") : null;
+            if (!bubble) return;
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "app-share-msg-btn";
+            btn.innerHTML = '<svg class="ico ico-xs" aria-hidden="true"><use href="#i-share"/></svg>分享';
+            btn.onclick = function () {
+              var txt = (bubble.innerText || "").trim();
+              if (txt && window.AndroidBridge && window.AndroidBridge.shareText) {
+                window.AndroidBridge.shareText("校务智理 AI 解答", txt);
+              }
+            };
+            actBar.appendChild(btn);
+          });
+        }).observe(msgBox, { childList: true, subtree: true });
+      }
+    });
+  }
+
+})();
 
   // 劫持 fetch，实现登录凭据自动捕获 & Token 过期静默续期
   var origFetch = window.fetch ? window.fetch.bind(window) : null;

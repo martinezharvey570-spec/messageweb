@@ -3423,3 +3423,33 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   new MutationObserver(sync).observe(msgBox, { childList: true });
 })();
 
+/* ---- v58: 移动端侧边栏遮罩点击关闭与层级同步 ---- */
+(function init_sidebar_backdrop() {
+  const sb = $("sidebar");
+  const bd = $("sidebarBackdrop");
+  if (!sb) return;
+  const syncOpen = () => {
+    document.body.classList.toggle("sidebar-open", sb.classList.contains("open"));
+  };
+  new MutationObserver(syncOpen).observe(sb, { attributes: true, attributeFilter: ["class"] });
+  bd?.addEventListener("click", () => {
+    sb.classList.remove("open");
+    syncOpen();
+  });
+})();
+
+/* ---- v1.001: 电脑端侧边栏收起/展开切换与状态记忆 ---- */
+(function init_desktop_sidebar_rail() {
+  const KEY = "xz_sidebar_collapsed";
+  const btn = $("desktopSidebarToggle");
+  try {
+    if (localStorage.getItem(KEY) === "1") {
+      document.body.classList.add("sidebar-collapsed");
+    }
+  } catch {}
+  btn?.addEventListener("click", () => {
+    const collapsed = document.body.classList.toggle("sidebar-collapsed");
+    try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch {}
+  });
+})();
+

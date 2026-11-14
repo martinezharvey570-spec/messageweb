@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=20261114_v46" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=20261114_v50" fetchpriority="high">
 </head>
 <body>
 
@@ -337,8 +337,23 @@
               </select>
             </div>
 
-            <label class="ai-toggle"><input id="aiThinking" type="checkbox" checked> <span>深度思考</span></label>
-            <button type="button" id="aiSchoolBtn" class="ai-school-btn" title="切换检索高校"><svg class="ico" aria-hidden="true"><use href="#i-graduation"/></svg><span id="aiSchoolLabel">西安文理学院</span><svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+            <div class="ai-seg-group" role="group" aria-label="深度思考">
+              <span class="ai-seg-label">深度思考</span>
+              <div class="ai-seg" data-seg-bool="aiThinking">
+                <button type="button" class="ai-seg-btn active" data-seg-val="1">开启</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="0">关闭</button>
+              </div>
+              <input id="aiThinking" type="checkbox" checked class="hide" aria-hidden="true">
+            </div>
+
+            <div class="ai-seg-group" role="group" aria-label="检索高校">
+              <span class="ai-seg-label">高校</span>
+              <button type="button" id="aiSchoolBtn" class="ai-seg-school" title="切换检索高校">
+                <svg class="ico" aria-hidden="true"><use href="#i-graduation"/></svg>
+                <span id="aiSchoolLabel">西安文理学院</span>
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
           </div>
 
           <div class="suggestions-bar">
@@ -621,6 +636,36 @@
   </div>
 </dialog>
 
+
+<dialog id="uiConfirmDialog" class="ui-modal-dialog">
+  <div class="ui-modal-box">
+    <div class="dialoghead">
+      <div><h2 id="uiConfirmTitle">确认操作</h2><small id="uiConfirmSub">请确认是否继续</small></div>
+      <button type="button" id="closeUiConfirm"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <p id="uiConfirmMsg" class="ui-modal-msg"></p>
+    <div class="actions">
+      <button type="button" id="cancelUiConfirm" class="secondary">取消</button>
+      <button type="button" id="okUiConfirm" class="primary">确定</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="uiPromptDialog" class="ui-modal-dialog">
+  <form id="uiPromptForm" class="ui-modal-box">
+    <div class="dialoghead">
+      <div><h2 id="uiPromptTitle">输入信息</h2><small id="uiPromptSub">填写后点击确定保存</small></div>
+      <button type="button" id="closeUiPrompt"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <p id="uiPromptMsg" class="ui-modal-msg"></p>
+    <input id="uiPromptInput" required autocomplete="off">
+    <div class="actions">
+      <button type="button" id="cancelUiPrompt" class="secondary">取消</button>
+      <button type="submit" id="okUiPrompt" class="primary">确定</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="profileDialog">
   <form id="profileForm" style="display:grid;gap:16px">
     <div class="dialoghead">
@@ -638,7 +683,7 @@
   </form>
 </dialog>
 
-<script src="config.js?v=20261114_v46"></script>
-<script src="app.js?v=20261114_v46"></script>
+<script src="config.js?v=20261114_v50"></script>
+<script src="app.js?v=20261114_v50"></script>
 </body>
 </html>

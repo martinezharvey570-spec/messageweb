@@ -1,6 +1,6 @@
 {
-  "versionCode": 59,
-  "versionName": "1.001",
+  "versionCode": 61,
+  "versionName": "1.003",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.001：新增电脑端侧边栏图标窄轨收起模式，集成全站SVG精修、侧边栏遮罩、App启动页/下拉刷新/一键打开与原生分享。"
+  "notes": "v1.003：新增电脑端一键收起模型配置与热门提问栏，全量同步最新前端、图标与原生App功能。"
 }

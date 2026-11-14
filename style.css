@@ -5482,3 +5482,61 @@ html.dark .md-content .md-ol > li::before {
     justify-items: center;
   }
 }
+
+/* ---- v1.002: 移动端 AI 界面视觉与交互全面对齐桌面端高级质感 ---- */
+@media (max-width: 760px) {
+  body.on-ai-page.ai-has-chat .suggestions-bar {
+    display: none !important;
+  }
+  body.on-ai-page .msg.ai .msg-bubble {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 4px 0 !important;
+  }
+  body.on-ai-page .welcome-card {
+    border: 1px solid var(--line) !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, .04) !important;
+    background: var(--card) !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+  }
+  body.on-ai-page .welcome-item {
+    border-radius: 11px !important;
+    border: 1px solid var(--line) !important;
+    background: var(--surface) !important;
+  }
+  body.on-ai-page .welcome-item:nth-child(1) span { background: rgba(21, 94, 239, .1); color: #155eef; border-radius: 8px; }
+  body.on-ai-page .welcome-item:nth-child(2) span { background: rgba(16, 185, 129, .12); color: #059669; border-radius: 8px; }
+  body.on-ai-page .welcome-item:nth-child(3) span { background: rgba(139, 92, 246, .12); color: #7c3aed; border-radius: 8px; }
+  body.on-ai-page .welcome-item:nth-child(4) span { background: rgba(245, 158, 11, .14); color: #d97706; border-radius: 8px; }
+  body.on-ai-page .ask {
+    background: linear-gradient(to top, var(--bg) 70%, rgba(248, 250, 252, 0)) !important;
+    padding: 12px 12px 8px !important;
+  }
+  html.dark body.on-ai-page .ask {
+    background: linear-gradient(to top, var(--bg) 70%, rgba(11, 17, 32, 0)) !important;
+  }
+  body.on-ai-page .ask .ask-input-wrap {
+    border-radius: 24px !important;
+    border: 1.5px solid var(--line) !important;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, .08) !important;
+  }
+  body.on-ai-page .ask .ask-input-wrap:focus-within {
+    border-color: var(--blue) !important;
+    box-shadow: 0 8px 24px rgba(21, 94, 239, .16) !important;
+  }
+}
+
+/* ---- v1.003: 电脑端支持一键收起/展开“模型配置栏”和“热门提问栏” ---- */
+@media (min-width: 761px) {
+  .config-toggle-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+  body.ai-panel-collapsed #aiOptionsBar,
+  body.ai-panel-collapsed .suggestions-bar {
+    display: none !important;
+  }
+}

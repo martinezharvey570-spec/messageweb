@@ -3453,3 +3453,30 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
+/* ---- v1.003: 电脑端收起/展开模型选择与热门提问记忆 ---- */
+(function init_desktop_ai_panel_toggle() {
+  const KEY = "xz_desktop_ai_panel_collapsed";
+  const btn = $("toggleAiConfig");
+  const syncBtnState = () => {
+    if (!btn) return;
+    if (window.innerWidth >= 761) {
+      const collapsed = document.body.classList.contains("ai-panel-collapsed");
+      btn.classList.toggle("added", !collapsed);
+      btn.title = collapsed ? "展开模型选择与热门提问" : "收起模型选择与热门提问";
+    }
+  };
+  try {
+    if (localStorage.getItem(KEY) === "1") {
+      document.body.classList.add("ai-panel-collapsed");
+    }
+  } catch {}
+  syncBtnState();
+  btn?.addEventListener("click", () => {
+    if (window.innerWidth >= 761) {
+      const collapsed = document.body.classList.toggle("ai-panel-collapsed");
+      try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch {}
+      syncBtnState();
+    }
+  });
+})();
+

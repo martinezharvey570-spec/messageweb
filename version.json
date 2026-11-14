@@ -1,6 +1,6 @@
 {
-  "versionCode": 64,
-  "versionName": "1.006",
+  "versionCode": 65,
+  "versionName": "1.007",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.006：电脑端采用 Gemini 风格极简圆形 ≡ 收起侧边栏窄轨模式。"
+  "notes": "v1.007：全部弹窗与日历均已替换为网页自定义UI；App更新改为侧边栏红点+底部轻横幅；手机端阅读器100%全屏居中。"
 }

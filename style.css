@@ -5674,3 +5674,257 @@ dialog[open]::backdrop {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- v1.007: 手机端制度阅读器 100% 全屏居中 + 排法 B（底部仅留复制全文 + AI解读） ---- */
+@media (max-width: 760px) {
+  dialog#docDialog.wide-dialog.doc-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    inset: 0 !important;
+  }
+  #docDialog .doc-reader {
+    height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+  #docDialog .doc-reader-bar {
+    padding: 10px 12px !important;
+  }
+  #docDialog .doc-reader-scroll {
+    padding: 12px 14px 20px !important;
+    display: block !important;
+  }
+  #docDialog .doc-paper {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 14px 14px 24px !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+  }
+  #docDialog .doc-reader-foot {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+  #docDialog .doc-reader-foot .doc-foot-meta,
+  #docDialog .doc-reader-foot .doc-foot-link {
+    display: none !important;
+  }
+  #docDialog .doc-reader-actions {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 8px !important;
+  }
+  #docDialog .doc-reader-actions button {
+    width: 100%;
+    justify-content: center;
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+  .doc-top-icon-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+@media (min-width: 761px) {
+  .doc-top-icon-btn {
+    display: none !important;
+  }
+}
+
+/* ---- v1.007: App 更新底部轻横幅 & 侧边栏红点 ---- */
+.app-update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 24px);
+  z-index: 1050;
+  width: min(400px, calc(100vw - 24px));
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, .16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease, transform .24s cubic-bezier(.22, 1, .36, 1);
+}
+.app-update-banner.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+.app-update-banner-txt {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-update-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.app-update-go {
+  border: 0;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.app-update-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.update-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ---- v1.007: 全站自定义日历选择浮层 (.xz-date-wrap) ---- */
+.xz-date-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+.xz-date-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.xz-date-trigger.is-empty {
+  color: var(--subtle);
+}
+.xz-cal-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 272px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, .16);
+  z-index: 120;
+  display: none;
+}
+.xz-cal-pop.open {
+  display: block;
+  animation: xzDialogPop .18s cubic-bezier(.22, 1, .36, 1);
+}
+.xz-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.xz-cal-head button {
+  border: 0;
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.xz-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  text-align: center;
+}
+.xz-cal-wd {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 4px 0;
+}
+.xz-cal-day {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12.5px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.xz-cal-day:hover {
+  background: var(--surface);
+}
+.xz-cal-day.selected {
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
+}
+.xz-cal-day.today {
+  border: 1px solid var(--blue);
+}
+.xz-cal-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.xz-cal-foot button {
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+}

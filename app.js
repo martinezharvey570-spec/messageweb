@@ -3480,3 +3480,111 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
+/* ---- v1.007: 全站自定义日历组件 (替换所有系统 <input type="date">) ---- */
+(function init_custom_date_pickers() {
+  document.querySelectorAll('input[type="date"]').forEach(inp => {
+    if (inp.dataset.xzDateDone) return;
+    inp.dataset.xzDateDone = "1";
+    inp.classList.add("xz-native-select-hidden");
+
+    const wrap = document.createElement("div");
+    wrap.className = "xz-date-wrap";
+    const trig = document.createElement("button");
+    trig.type = "button";
+    trig.className = "xz-date-trigger";
+    const pop = document.createElement("div");
+    pop.className = "xz-cal-pop";
+
+    let viewDate = new Date();
+    const syncText = () => {
+      if (inp.value) {
+        trig.classList.remove("is-empty");
+        trig.innerHTML = `<span>${inp.value}</span><svg class="ico ico-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M8 2.8v3.4M16 2.8v3.4M3.5 9.5h17"/></svg>`;
+      } else {
+        trig.classList.add("is-empty");
+        trig.innerHTML = `<span>选择日期（选填）</span><svg class="ico ico-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M8 2.8v3.4M16 2.8v3.4M3.5 9.5h17"/></svg>`;
+      }
+    };
+
+    const renderCal = () => {
+      const y = viewDate.getFullYear(), m = viewDate.getMonth();
+      const firstDay = new Date(y, m, 1).getDay();
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+      const todayStr = new Date().toISOString().slice(0, 10);
+      let cells = ["日", "一", "二", "三", "四", "五", "六"].map(w => `<div class="xz-cal-wd">${w}</div>`).join("");
+      for (let i = 0; i < firstDay; i++) cells += `<div></div>`;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const ds = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const cls = ["xz-cal-day", inp.value === ds ? "selected" : "", ds === todayStr ? "today" : ""].filter(Boolean).join(" ");
+        cells += `<button type="button" class="${cls}" data-ds="${ds}">${d}</button>`;
+      }
+      pop.innerHTML = `
+        <div class="xz-cal-head">
+          <button type="button" data-cal-prev>‹</button>
+          <span>${y} 年 ${m + 1} 月</span>
+          <button type="button" data-cal-next>›</button>
+        </div>
+        <div class="xz-cal-grid">${cells}</div>
+        <div class="xz-cal-foot">
+          <button type="button" data-cal-clear>清空</button>
+          <button type="button" data-cal-today>今天</button>
+        </div>`;
+
+      pop.querySelector("[data-cal-prev]").onclick = e => { e.stopPropagation(); viewDate = new Date(y, m - 1, 1); renderCal(); };
+      pop.querySelector("[data-cal-next]").onclick = e => { e.stopPropagation(); viewDate = new Date(y, m + 1, 1); renderCal(); };
+      pop.querySelector("[data-cal-clear]").onclick = e => { e.stopPropagation(); inp.value = ""; syncText(); pop.classList.remove("open"); inp.dispatchEvent(new Event("change", { bubbles: true })); };
+      pop.querySelector("[data-cal-today]").onclick = e => { e.stopPropagation(); inp.value = todayStr; syncText(); pop.classList.remove("open"); inp.dispatchEvent(new Event("change", { bubbles: true })); };
+      pop.querySelectorAll("[data-ds]").forEach(b => {
+        b.onclick = e => {
+          e.stopPropagation();
+          inp.value = b.dataset.ds;
+          syncText();
+          pop.classList.remove("open");
+          inp.dispatchEvent(new Event("change", { bubbles: true }));
+        };
+      });
+    };
+
+    trig.onclick = e => {
+      e.stopPropagation();
+      const willOpen = !pop.classList.contains("open");
+      document.querySelectorAll(".xz-cal-pop.open").forEach(p => p.classList.remove("open"));
+      if (willOpen) {
+        if (inp.value) viewDate = new Date(inp.value + "T00:00:00");
+        renderCal();
+        pop.classList.add("open");
+      }
+    };
+
+    inp.addEventListener("change", syncText);
+    wrap.appendChild(trig);
+    wrap.appendChild(pop);
+    inp.parentNode.insertBefore(wrap, inp.nextSibling);
+    syncText();
+  });
+
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".xz-cal-pop.open").forEach(p => p.classList.remove("open"));
+  });
+})();
+
+/* ---- v1.007: 阅读器排法 B（手机端顶部工具栏同步“官网原文”小按钮） ---- */
+(function init_doc_reader_top_link() {
+  const tools = document.querySelector("#docDialog .doc-reader-tools");
+  const footLink = $("docDialogUrl");
+  if (!tools || !footLink || $("docTopUrlBtn")) return;
+  const topA = document.createElement("a");
+  topA.id = "docTopUrlBtn";
+  topA.className = "doc-top-icon-btn";
+  topA.target = "_blank";
+  topA.rel = "noopener noreferrer";
+  topA.title = "官网原文";
+  topA.innerHTML = '<svg class="ico" style="width:16px;height:16px;" aria-hidden="true"><use href="#i-link"/></svg>';
+  const closeBtn = $("closeDocDialog");
+  tools.insertBefore(topA, closeBtn || null);
+  new MutationObserver(() => {
+    topA.href = footLink.href || "#";
+    topA.classList.toggle("hide", footLink.classList.contains("hide"));
+  }).observe(footLink, { attributes: true, attributeFilter: ["href", "class"] });
+})();
+

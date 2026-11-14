@@ -172,13 +172,14 @@
 
     // (B) 制度阅读器与 AI 回复一键系统原生分享
     document.addEventListener("DOMContentLoaded", function () {
-      var docActions = document.querySelector(".doc-reader-actions");
+      var docActions = document.querySelector("#docDialog .doc-reader-tools") || document.querySelector(".doc-reader-actions");
       if (docActions && !document.getElementById("appShareDocBtn")) {
         var sBtn = document.createElement("button");
         sBtn.type = "button";
         sBtn.id = "appShareDocBtn";
-        sBtn.className = "outline";
-        sBtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>分享';
+        sBtn.className = "doc-tool-btn";
+        sBtn.title = "分享";
+        sBtn.innerHTML = '<svg class="ico" style="width:15px;height:15px;" aria-hidden="true"><use href="#i-share"/></svg>';
         sBtn.onclick = function () {
           var titleEl = document.getElementById("docDialogTitle");
           var bodyEl = document.getElementById("docDialogBody");
@@ -219,6 +220,74 @@
       }
     });
   }
+
+
+  // ---------------------------------------------------------
+  // 6. v1.007: 网页同款 UI 接管 App 新版本轻提示（方案1）与文件打开弹窗
+  // ---------------------------------------------------------
+  window.__onAppUpdateAvailable = function (versionName, apkUrl, notes) {
+    try {
+      var openUpdateDialog = function () {
+        var msg = "发现新版本 v" + versionName + "：\n" + (notes || "包含界面优化与新功能，是否立即下载更新？");
+        if (typeof window.ui_confirm === "function") {
+          window.ui_confirm(msg, { title: "版本更新 v" + versionName, okText: "立即更新", danger: false }).then(function (ok) {
+            if (ok && window.AndroidBridge && window.AndroidBridge.startAppUpdate) {
+              window.AndroidBridge.startAppUpdate(apkUrl, versionName);
+            }
+          });
+        }
+      };
+
+      var sideBottom = document.querySelector("#sidebar .sidebottom");
+      if (sideBottom && !document.getElementById("appSideUpdateBtn")) {
+        var ubtn = document.createElement("button");
+        ubtn.type = "button";
+        ubtn.id = "appSideUpdateBtn";
+        ubtn.title = "点击更新到 v" + versionName;
+        ubtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>新版本 v' + versionName + '</span><i class="update-dot"></i>';
+        ubtn.onclick = openUpdateDialog;
+        sideBottom.insertBefore(ubtn, sideBottom.firstChild);
+      }
+
+      if (!document.getElementById("appUpdateBanner")) {
+        var bar = document.createElement("div");
+        bar.id = "appUpdateBanner";
+        bar.className = "app-update-banner";
+        bar.innerHTML =
+          '<span class="app-update-banner-txt">发现新版本 v' + versionName + '</span>' +
+          '<div class="app-update-banner-actions">' +
+          '<button type="button" class="app-update-go">查看更新</button>' +
+          '<button type="button" class="app-update-close" aria-label="关闭">×</button>' +
+          '</div>';
+        document.body.appendChild(bar);
+        bar.querySelector(".app-update-go").onclick = function () {
+          bar.classList.remove("show");
+          openUpdateDialog();
+        };
+        bar.querySelector(".app-update-close").onclick = function () {
+          bar.classList.remove("show");
+        };
+        setTimeout(function () { bar.classList.add("show"); }, 80);
+        setTimeout(function () { bar.classList.remove("show"); }, 5200);
+      }
+    } catch (e) {}
+  };
+
+  window.__onAppFileReady = function (title, msg) {
+    try {
+      if (typeof window.ui_confirm === "function") {
+        window.ui_confirm(msg || "文件已保存到手机「下载/Download」目录，是否立即打开查看？", {
+          title: title || "文件已就绪",
+          okText: "立即打开",
+          danger: false
+        }).then(function (ok) {
+          if (ok && window.AndroidBridge && window.AndroidBridge.openLastReadyFile) {
+            window.AndroidBridge.openLastReadyFile();
+          }
+        });
+      }
+    } catch (e) {}
+  };
 
 })();
 

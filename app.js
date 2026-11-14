@@ -3582,3 +3582,77 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   }
 })();
 
+/* ---- v1.010: 手机端极简阅读器交互（Aa/⋯浮层、滚动标题同步、回到顶部） ---- */
+(function init_mobile_doc_v1010() {
+  const aaBtn = $("docMobileAaBtn");
+  const moreBtn = $("docMobileMoreBtn");
+  const aaPop = $("docMobileAaPop");
+  const morePop = $("docMobileMorePop");
+
+  const closePops = () => {
+    aaPop?.classList.remove("open");
+    morePop?.classList.remove("open");
+  };
+
+  aaBtn?.addEventListener("click", e => {
+    e.stopPropagation();
+    const willOpen = !aaPop?.classList.contains("open");
+    closePops();
+    if (willOpen) aaPop?.classList.add("open");
+  });
+
+  moreBtn?.addEventListener("click", e => {
+    e.stopPropagation();
+    const willOpen = !morePop?.classList.contains("open");
+    closePops();
+    if (willOpen) morePop?.classList.add("open");
+  });
+
+  document.addEventListener("click", closePops);
+  $("docMobileClose")?.addEventListener("click", () => { closePops(); $("closeDocDialog")?.click(); });
+  $("docMobileAiBtn")?.addEventListener("click", () => { closePops(); $("askAiDocBtn")?.click(); });
+  $("docMobileOutlineBtn")?.addEventListener("click", () => { closePops(); $("docOutlineToggle")?.click(); });
+  $("docMobileCopyBtn")?.addEventListener("click", () => { closePops(); $("copyDocTextBtn")?.click(); });
+
+  document.querySelectorAll("[data-m-font]").forEach(b => {
+    b.addEventListener("click", e => {
+      e.stopPropagation();
+      const target = document.querySelector(`.doc-font-group button[data-font="${b.dataset.mFont}"]`);
+      target?.click();
+    });
+  });
+
+  // 同步官网原文链接 & 标题/标签到滚动区顶部
+  const footUrl = $("docDialogUrl");
+  const mUrl = $("docMobileUrlBtn");
+  if (footUrl && mUrl) {
+    new MutationObserver(() => {
+      mUrl.href = footUrl.href || "#";
+      mUrl.classList.toggle("hide", footUrl.classList.contains("hide"));
+    }).observe(footUrl, { attributes: true, attributeFilter: ["href", "class"] });
+  }
+
+  const syncHero = () => {
+    const titleEl = $("docDialogTitle");
+    const mTitle = $("docMobileHeroTitle");
+    const mMeta = $("docMobileHeroMeta");
+    const badges = document.querySelector("#docDialog .doc-dialog-badges");
+    if (titleEl && mTitle) mTitle.textContent = titleEl.textContent || "";
+    if (badges && mMeta) mMeta.innerHTML = badges.innerHTML;
+  };
+  const titleEl = $("docDialogTitle");
+  if (titleEl) {
+    new MutationObserver(syncHero).observe(titleEl, { childList: true, characterData: true, subtree: true });
+  }
+
+  // 回到顶部按钮
+  const sc = $("docReaderScroll");
+  const backTop = $("docBackTopBtn");
+  if (sc && backTop) {
+    sc.addEventListener("scroll", () => {
+      backTop.classList.toggle("show", sc.scrollTop > 260);
+    }, { passive: true });
+    backTop.addEventListener("click", () => sc.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+})();
+

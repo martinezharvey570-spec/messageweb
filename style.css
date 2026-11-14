@@ -6004,3 +6004,218 @@ dialog[open]::backdrop {
     margin: 0 !important;
   }
 }
+
+/* ---- v1.010: 阅读器文字可读性升级（现代黑体 + 500字重饱满清晰 + 纯净白底 + 3px进度条） ---- */
+#docDialog .doc-paper {
+  font-family: var(--doc-sans) !important;
+  font-weight: 500 !important;
+  background: var(--card) !important;
+  color: var(--ink) !important;
+  line-height: 1.85 !important;
+}
+#docDialog .doc-paper .doc-p {
+  font-weight: 500 !important;
+}
+#docDialog .doc-reader-progress {
+  height: 3px !important;
+}
+.doc-back-top {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .12);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .2s, transform .2s;
+}
+.doc-back-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.doc-back-top .ico {
+  width: 17px;
+  height: 17px;
+}
+
+/* 桌面端隐藏移动端专属导航与标题区 */
+@media (min-width: 761px) {
+  .doc-mobile-nav,
+  .doc-mobile-hero,
+  .doc-m-pop {
+    display: none !important;
+  }
+}
+
+/* ---- v1.010: 手机端阅读器顶端方案 1（48px 极简栏 + 标题随正文滚动 + 浮层菜单 + 左对齐） ---- */
+@media (max-width: 760px) {
+  #docDialog .doc-reader-bar {
+    position: relative !important;
+    padding: 0 10px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  #docDialog .doc-reader-id,
+  #docDialog .doc-reader-tools {
+    display: none !important;
+  }
+  .doc-mobile-nav {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 48px;
+    gap: 8px;
+  }
+  .doc-m-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .doc-m-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .doc-m-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .doc-m-btn:hover,
+  .doc-m-btn:active {
+    background: var(--surface);
+  }
+  .doc-m-btn .ico {
+    width: 18px;
+    height: 18px;
+  }
+  .doc-m-btn.is-ai {
+    color: var(--blue);
+  }
+  .doc-m-pop {
+    position: absolute;
+    top: 52px;
+    right: 10px;
+    width: 210px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, .16);
+    z-index: 60;
+    display: none;
+    gap: 4px;
+  }
+  .doc-m-pop.open {
+    display: grid;
+    animation: xzDialogPop .18s cubic-bezier(.22, 1, .36, 1);
+  }
+  .doc-m-pop-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .doc-m-font-seg {
+    display: inline-flex;
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 2px;
+    gap: 2px;
+  }
+  .doc-m-font-seg button {
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .doc-m-font-seg button:active {
+    background: var(--blue);
+    color: #fff;
+  }
+  .doc-m-pop-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .doc-m-pop-item:hover {
+    background: var(--surface);
+  }
+  .doc-m-pop-item .ico {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+  }
+
+  /* 手机端随正文滚动的标题区 */
+  .doc-mobile-hero {
+    display: block;
+    padding: 6px 14px 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+  }
+  .doc-mobile-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .doc-mobile-hero-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  #docDialog .doc-paper {
+    text-align: left !important;
+    line-height: 1.8 !important;
+    padding: 12px 14px 36px !important;
+  }
+  #docDialog .doc-paper .doc-p {
+    text-indent: 1.5em !important;
+  }
+}

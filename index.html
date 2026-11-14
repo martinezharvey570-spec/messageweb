@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.009">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.009">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.010">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.010">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.009" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.010" fetchpriority="high">
 </head>
 <body>
 
@@ -530,7 +530,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.009</span>
+        <span>校务智理校园事务服务平台 · v1.010</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -627,16 +627,49 @@
           <button type="button" data-font="1" title="放大字号">A+</button>
         </div>
         <button type="button" id="docOutlineToggle" class="doc-tool-btn" title="显示/隐藏章节目录"><svg class="ico" aria-hidden="true"><use href="#i-panel"/></svg><span class="doc-btn-txt">目录</span></button>
-        <button type="button" id="copyDocTextBtnTop" class="doc-icon-btn doc-mobile-only" title="复制全文" aria-label="复制全文"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg></button>
-        <a id="docDialogUrlTop" href="https://jwc.xawl.edu.cn/" target="_blank" rel="noopener noreferrer" class="doc-icon-btn doc-mobile-only" title="官网原文" aria-label="官网原文"><svg class="ico" aria-hidden="true"><use href="#i-link"/></svg></a>
-        <button type="button" id="askAiDocBtnTop" class="doc-icon-btn is-ai doc-mobile-only" title="AI 解读此制度" aria-label="AI 解读此制度"><svg class="ico ico-star" aria-hidden="true"><use href="#i-sparkles"/></svg></button>
         <button type="button" id="closeDocDialog" class="doc-close" aria-label="关闭阅读器"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+
+      <!-- 手机端极简单行导航栏 (顶端方案 1) -->
+      <div class="doc-mobile-nav">
+        <button type="button" id="docMobileClose" class="doc-m-btn" aria-label="关闭阅读器"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+        <span class="doc-m-title">制度正文</span>
+        <div class="doc-m-actions">
+          <button type="button" id="docMobileAaBtn" class="doc-m-btn doc-m-aa" aria-label="字号与目录">Aa</button>
+          <button type="button" id="docMobileAiBtn" class="doc-m-btn is-ai" aria-label="AI 解读此制度"><svg class="ico ico-star" aria-hidden="true"><use href="#i-sparkles"/></svg></button>
+          <button type="button" id="docMobileMoreBtn" class="doc-m-btn" aria-label="更多操作"><svg class="ico" aria-hidden="true"><use href="#i-more"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Aa 浮层：字号 + 目录 -->
+      <div id="docMobileAaPop" class="doc-m-pop">
+        <div class="doc-m-pop-row">
+          <span>阅读字号</span>
+          <div class="doc-m-font-seg">
+            <button type="button" data-m-font="-1">A-</button>
+            <button type="button" data-m-font="0">标准</button>
+            <button type="button" data-m-font="1">A+</button>
+          </div>
+        </div>
+        <button type="button" id="docMobileOutlineBtn" class="doc-m-pop-item"><svg class="ico" aria-hidden="true"><use href="#i-panel"/></svg><span>显示 / 隐藏章节目录</span></button>
+      </div>
+
+      <!-- ⋯ 更多浮层：复制全文 / 官网原文 / 分享 -->
+      <div id="docMobileMorePop" class="doc-m-pop">
+        <button type="button" id="docMobileCopyBtn" class="doc-m-pop-item"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span>复制全文</span></button>
+        <a id="docMobileUrlBtn" href="#" target="_blank" rel="noopener noreferrer" class="doc-m-pop-item"><svg class="ico" aria-hidden="true"><use href="#i-link"/></svg><span>打开官网原文</span></a>
+        <button type="button" id="docMobileShareBtn" class="doc-m-pop-item hide"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg><span>分享给好友</span></button>
       </div>
     </header>
     <div class="doc-reader-progress"><i id="docReaderProgress"></i></div>
     <div class="doc-reader-scroll" id="docReaderScroll">
+      <div class="doc-mobile-hero" id="docMobileHero">
+        <div class="doc-mobile-hero-meta" id="docMobileHeroMeta"></div>
+        <h2 class="doc-mobile-hero-title" id="docMobileHeroTitle">制度文件标题</h2>
+      </div>
       <nav class="doc-outline" id="docOutline" aria-label="章节目录"></nav>
       <article class="doc-paper" id="docDialogBody"></article>
+      <button type="button" id="docBackTopBtn" class="doc-back-top" title="回到顶部" aria-label="回到顶部"><svg class="ico" aria-hidden="true"><use href="#i-arrow-up"/></svg></button>
     </div>
     <div class="doc-reader-foot">
       <a id="docDialogUrl" href="https://jwc.xawl.edu.cn/" target="_blank" rel="noopener noreferrer" class="doc-foot-link"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-link"/></svg>官网原文</a>
@@ -712,8 +745,8 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=1.009"></script>
-<script src="config.js?v=1.009"></script>
-<script src="app.js?v=1.009"></script>
+<script src="android-bridge.js?v=1.010"></script>
+<script src="config.js?v=1.010"></script>
+<script src="app.js?v=1.010"></script>
 </body>
 </html>

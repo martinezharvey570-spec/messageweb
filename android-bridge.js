@@ -173,6 +173,22 @@
     // (B) 制度阅读器与 AI 回复一键系统原生分享
     document.addEventListener("DOMContentLoaded", function () {
       var docActions = document.querySelector("#docDialog .doc-reader-tools") || document.querySelector(".doc-reader-actions");
+      var mShare = document.getElementById("docMobileShareBtn");
+      if (mShare) {
+        mShare.classList.remove("hide");
+        mShare.onclick = function () {
+          var mPop = document.getElementById("docMobileMorePop");
+          if (mPop) mPop.classList.remove("open");
+          var titleEl = document.getElementById("docDialogTitle");
+          var bodyEl = document.getElementById("docDialogBody");
+          var urlEl = document.getElementById("docDialogUrl");
+          var title = titleEl ? titleEl.textContent : "校务制度文件";
+          var text = (bodyEl ? bodyEl.innerText : "").slice(0, 1200);
+          var url = (urlEl && !urlEl.classList.contains("hide")) ? urlEl.href : "";
+          var shareBody = "【" + title + "】\n" + text + (url ? "\n官网原文：" + url : "");
+          if (window.AndroidBridge && window.AndroidBridge.shareText) window.AndroidBridge.shareText(title, shareBody);
+        };
+      }
       if (docActions && !document.getElementById("appShareDocBtn")) {
         var sBtn = document.createElement("button");
         sBtn.type = "button";

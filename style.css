@@ -5197,3 +5197,16 @@ html.dark .md-content .md-ol > li::before {
   line-height: 1.6;
   color: var(--ink-secondary);
 }
+
+/* ---- v51: 高校按钮强制单行不折行 ---- */
+.ai-seg-school {
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+#aiSchoolLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}

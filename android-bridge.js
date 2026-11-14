@@ -317,7 +317,7 @@
       var btn = document.createElement("a");
       btn.id = "downloadAppBtnAuth";
       btn.href = "/xiaowu-zhili.apk";
-      btn.setAttribute("download", "校务智理_v36.apk");
+      btn.setAttribute("download", "校务智理.apk");
       btn.className = "demo-login-link";
       btn.style.cssText = "margin-top:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#1677ff;font-weight:600;text-decoration:none;";
       btn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>下载安卓手机客户端 (.apk)</span>';
@@ -335,7 +335,7 @@
       var sbtn = document.createElement("a");
       sbtn.id = "downloadAppBtnSide";
       sbtn.href = "/xiaowu-zhili.apk";
-      sbtn.setAttribute("download", "校务智理_v36.apk");
+      sbtn.setAttribute("download", "校务智理.apk");
       sbtn.style.cssText = "display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;color:inherit;text-decoration:none;font-size:14px;";
       sbtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>下载安卓手机客户端';
       sbtn.onclick = handleApkClick;

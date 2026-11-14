@@ -1,6 +1,6 @@
 {
-  "versionCode": 69,
-  "versionName": "1.011",
+  "versionCode": 70,
+  "versionName": "1.012",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.011：优化手机端阅读器顶部标题与元数据胶囊居中对齐，精简目录按钮文案，增强章节目录文字对比度。"
+  "notes": "v1.012：修复手机端文件数量胶囊文字居中对齐问题。"
 }

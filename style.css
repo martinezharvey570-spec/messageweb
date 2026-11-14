@@ -4994,97 +4994,80 @@ html.dark .md-content .md-ol > li::before {
   color: currentColor;
 }
 
-/* ---- v54: 移动端 AI 顶栏不置顶 + 去底部白底与提示字 + 严丝合缝填满空白 ---- */
+/* ---- v55: 移动端 AI 页面与其他页面 100% 一致的自然布局 + 底部唯一悬浮输入框 ---- */
 @media (max-width: 760px) {
   body.on-ai-page main {
-    height: 100dvh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
-    box-sizing: border-box;
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
   }
   body.on-ai-page header {
-    position: relative !important;
-    top: auto !important;
-    flex-shrink: 0;
+    position: sticky !important;
+    top: 0 !important;
   }
   body.on-ai-page .wrap {
     padding: 0 !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    display: block !important;
   }
   body.on-ai-page #aiPage,
   body.on-ai-page .ai-shell {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
+    height: auto !important;
+    display: block !important;
   }
   body.on-ai-page .chat {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
     height: auto !important;
+    min-height: 0 !important;
     max-height: none !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     background: transparent !important;
-    display: flex !important;
-    flex-direction: column !important;
+    overflow: visible !important;
+    display: block !important;
   }
   body.on-ai-page .chat-topbar {
-    padding: 8px 12px !important;
+    padding: 10px 14px !important;
     background: var(--card);
+    border-bottom: 1px solid var(--line);
   }
   body.on-ai-page .suggestions-bar {
-    padding: 4px 10px !important;
+    padding: 6px 12px !important;
     background: var(--card);
+    border-bottom: 1px solid var(--line);
   }
   body.on-ai-page .messages {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    padding: 8px 10px !important;
+    overflow: visible !important;
+    height: auto !important;
+    padding: 10px 12px 76px !important;
   }
   body.on-ai-page .msg-bubble,
   body.on-ai-page .welcome-card {
     max-width: 100% !important;
   }
-  body.on-ai-page .welcome-card {
-    padding: 12px !important;
-    border-radius: 12px !important;
-  }
-  body.on-ai-page .welcome-card b {
-    font-size: 14.5px !important;
-  }
-  body.on-ai-page .welcome-card > p {
-    font-size: 12.5px !important;
-    margin: 4px 0 8px !important;
-  }
-  body.on-ai-page .welcome-grid {
-    gap: 6px !important;
-  }
-  body.on-ai-page .welcome-item {
-    padding: 8px 10px !important;
-  }
   body.on-ai-page .ask {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 40 !important;
     background: transparent !important;
     border-top: 0 !important;
-    padding: 4px 10px 8px !important;
-    flex-shrink: 0;
+    padding: 6px 12px 8px !important;
+    pointer-events: none;
+  }
+  body.on-ai-page .ask .ask-input-wrap {
+    pointer-events: auto;
+    background: var(--card) !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, .10) !important;
   }
   body.on-ai-page .ask-footer-hint {
     display: none !important;
   }
-  body.on-ai-page .ask-input-wrap {
-    background: var(--card) !important;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, .06) !important;
+  body.on-ai-page .scroll-bottom-btn {
+    bottom: calc(124px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

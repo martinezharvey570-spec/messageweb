@@ -4994,44 +4994,62 @@ html.dark .md-content .md-ol > li::before {
   color: currentColor;
 }
 
-/* ---- v48: 极限扩充移动端 AI 聊天框显示面积 ---- */
+/* ---- v54: 移动端 AI 顶栏不置顶 + 去底部白底与提示字 + 严丝合缝填满空白 ---- */
 @media (max-width: 760px) {
+  body.on-ai-page main {
+    height: 100dvh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+  }
   body.on-ai-page header {
-    min-height: 46px !important;
-    height: 46px !important;
-    padding: 0 12px !important;
+    position: relative !important;
+    top: auto !important;
+    flex-shrink: 0;
   }
-  body.on-ai-page header #today {
-    display: none !important;
+  body.on-ai-page .wrap {
+    padding: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
   }
-  body.on-ai-page .tabbar {
-    height: 54px !important;
-    min-height: 54px !important;
+  body.on-ai-page #aiPage,
+  body.on-ai-page .ai-shell {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   body.on-ai-page .chat {
-    height: calc(100dvh - 46px - 54px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
-  body.on-ai-page .ai-bar {
-    padding: 6px 12px !important;
-    min-height: 40px !important;
-  }
-  body.on-ai-page .aiicon {
-    width: 26px !important;
-    height: 26px !important;
-    border-radius: 8px !important;
-  }
-  body.on-ai-page .aiicon .ico {
-    width: 15px !important;
-    height: 15px !important;
-  }
-  body.on-ai-page .ai-title-row b {
-    font-size: 14px !important;
+  body.on-ai-page .chat-topbar {
+    padding: 8px 12px !important;
+    background: var(--card);
   }
   body.on-ai-page .suggestions-bar {
     padding: 4px 10px !important;
-    min-height: 32px !important;
+    background: var(--card);
   }
   body.on-ai-page .messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
     padding: 8px 10px !important;
   }
   body.on-ai-page .msg-bubble,
@@ -5056,13 +5074,17 @@ html.dark .md-content .md-ol > li::before {
     padding: 8px 10px !important;
   }
   body.on-ai-page .ask {
-    padding: 6px 10px 8px !important;
+    background: transparent !important;
+    border-top: 0 !important;
+    padding: 4px 10px 8px !important;
+    flex-shrink: 0;
   }
-  body.on-ai-page .ask-note {
+  body.on-ai-page .ask-footer-hint {
     display: none !important;
   }
-  body.on-ai-page .ask-box {
-    padding: 4px 6px 4px 12px !important;
+  body.on-ai-page .ask-input-wrap {
+    background: var(--card) !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, .06) !important;
   }
 }
 

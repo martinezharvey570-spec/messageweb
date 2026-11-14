@@ -4,7 +4,7 @@
  * 2. 登录表单增加“记住登录信息（自动续期）”选项，支持浏览器密码管理器及 Token 过期静默重登
  * 3. 解决安卓 WebView 内 Blob 导出咨询记录无法下载的问题
  * 4. 适配安卓 13/14/15/16 手势返回与深色状态栏同步
- * 5. 严格仅在手机/移动端浏览器展示“下载安卓手机客户端 (.apk)”入口，电脑端不显示
+ * 5. 严格仅在手机/移动端浏览器展示“下载安卓端应用 (.apk)”入口，电脑端不显示
  */
 (function () {
   var isAndroidApp = typeof window.AndroidBridge !== "undefined" || /XiaowuZhiliApp/i.test(navigator.userAgent);
@@ -286,7 +286,7 @@
   }
 
   // ---------------------------------------------------------
-  // 4. 严格仅在移动端浏览器显示“下载安卓手机客户端 (.apk)”按钮，电脑端绝不显示
+  // 4. 严格仅在移动端浏览器显示“下载安卓端应用 (.apk)”按钮，电脑端绝不显示
   // ---------------------------------------------------------
   function isMobileBrowser() {
     var ua = navigator.userAgent || "";
@@ -319,8 +319,8 @@
       btn.href = "/xiaowu-zhili.apk";
       btn.setAttribute("download", "校务智理.apk");
       btn.className = "demo-login-link";
-      btn.style.cssText = "margin-top:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#1677ff;font-weight:600;text-decoration:none;";
-      btn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>下载安卓手机客户端 (.apk)</span>';
+      btn.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:5px;color:var(--blue);font-size:13px;font-weight:600;font-family:inherit;text-decoration:none;";
+      btn.innerHTML = '<svg class="ico" style="width:14px;height:14px;" aria-hidden="true"><use href="#i-download"/></svg><span>下载安卓端应用</span>';
       btn.onclick = handleApkClick;
       var hint = authForm.querySelector(".hint");
       if (hint) {
@@ -336,8 +336,8 @@
       sbtn.id = "downloadAppBtnSide";
       sbtn.href = "/xiaowu-zhili.apk";
       sbtn.setAttribute("download", "校务智理.apk");
-      sbtn.style.cssText = "display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;color:inherit;text-decoration:none;font-size:14px;";
-      sbtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>下载安卓手机客户端';
+      sbtn.style.cssText = "display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:var(--radius-sm);color:var(--muted);font-weight:600;min-height:38px;font-size:13px;font-family:inherit;text-decoration:none;text-align:left;box-sizing:border-box;width:100%;";
+      sbtn.innerHTML = '<svg class="ico" style="width:15px;height:15px;opacity:.75;" aria-hidden="true"><use href="#i-download"/></svg>下载安卓端应用';
       sbtn.onclick = handleApkClick;
       sideBottom.insertBefore(sbtn, sideBottom.firstChild);
     }

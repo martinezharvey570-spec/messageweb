@@ -5407,43 +5407,43 @@ html.dark .md-content .md-ol > li::before {
     display: grid;
     place-items: center;
     margin-left: auto;
-    width: 30px;
-    height: 30px;
-    min-height: 30px;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
     padding: 0;
     border: 0;
-    border-radius: 8px;
+    border-radius: 50%;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background .15s, color .15s;
+    transition: background .16s ease, color .16s ease, transform .14s ease;
   }
   .desktop-rail-toggle:hover {
     background: var(--surface);
     color: var(--ink);
   }
   .desktop-rail-toggle .ico {
-    width: 17px;
-    height: 17px;
+    width: 19px;
+    height: 19px;
   }
 
-  /* 收起态：68px 图标窄轨 */
+  /* 方案 A（Gemini 极简风）：收起态顶部只留唯一居中的圆形 ≡ 按钮，不挤 Logo */
   body.sidebar-collapsed #sidebar {
     width: 68px !important;
-    padding: 18px 10px !important;
+    padding: 16px 10px !important;
     align-items: center;
   }
   body.sidebar-collapsed main {
     margin-left: 68px !important;
   }
   body.sidebar-collapsed .sidebrand {
-    flex-direction: column;
-    gap: 10px;
     width: 100%;
     padding: 0;
+    margin-bottom: 12px;
     justify-content: center;
   }
+  body.sidebar-collapsed .sidebrand .logo,
   body.sidebar-collapsed .sidebrand-text,
   body.sidebar-collapsed .navcaption,
   body.sidebar-collapsed .nav-badge {
@@ -5451,8 +5451,13 @@ html.dark .md-content .md-ol > li::before {
   }
   body.sidebar-collapsed .desktop-rail-toggle {
     margin-left: 0;
-    width: 38px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 50%;
+    background: transparent;
+  }
+  body.sidebar-collapsed .desktop-rail-toggle:hover {
     background: var(--surface);
   }
   body.sidebar-collapsed #sidebar .nav,

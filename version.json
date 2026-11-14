@@ -1,6 +1,6 @@
 {
-  "versionCode": 63,
-  "versionName": "1.005",
+  "versionCode": 64,
+  "versionName": "1.006",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.005：深度精修书籍、柱状图、侧栏收起、图钉、灯泡、勋章等SVG图标细节。"
+  "notes": "v1.006：电脑端采用 Gemini 风格极简圆形 ≡ 收起侧边栏窄轨模式。"
 }

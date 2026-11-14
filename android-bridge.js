@@ -177,9 +177,10 @@
         var sBtn = document.createElement("button");
         sBtn.type = "button";
         sBtn.id = "appShareDocBtn";
-        sBtn.className = "doc-tool-btn";
+        sBtn.className = "doc-icon-btn";
         sBtn.title = "分享";
-        sBtn.innerHTML = '<svg class="ico" style="width:15px;height:15px;" aria-hidden="true"><use href="#i-share"/></svg>';
+        sBtn.setAttribute("aria-label", "分享");
+        sBtn.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>';
         sBtn.onclick = function () {
           var titleEl = document.getElementById("docDialogTitle");
           var bodyEl = document.getElementById("docDialogBody");
@@ -192,7 +193,8 @@
             window.AndroidBridge.shareText(title, shareBody);
           }
         };
-        docActions.insertBefore(sBtn, docActions.firstChild);
+        var aiDocBtn = document.getElementById("askAiDocBtnTop") || document.getElementById("askAiDocBtn");
+        docActions.insertBefore(sBtn, aiDocBtn || docActions.lastElementChild);
       }
 
       // 为每条 AI 回答自动附带“分享”按钮

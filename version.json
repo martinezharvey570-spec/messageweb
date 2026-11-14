@@ -1,6 +1,6 @@
 {
-  "versionCode": 65,
-  "versionName": "1.007",
+  "versionCode": 67,
+  "versionName": "1.009",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.007：全部弹窗与日历均已替换为网页自定义UI；App更新改为侧边栏红点+底部轻横幅；手机端阅读器100%全屏居中。"
+  "notes": "v1.009：制度阅读器桌面端恢复完整文字版，移动端保持顶部纯符号极简一排。"
 }

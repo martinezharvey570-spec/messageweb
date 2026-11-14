@@ -3568,23 +3568,17 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
-/* ---- v1.007: 阅读器排法 B（手机端顶部工具栏同步“官网原文”小按钮） ---- */
-(function init_doc_reader_top_link() {
-  const tools = document.querySelector("#docDialog .doc-reader-tools");
-  const footLink = $("docDialogUrl");
-  if (!tools || !footLink || $("docTopUrlBtn")) return;
-  const topA = document.createElement("a");
-  topA.id = "docTopUrlBtn";
-  topA.className = "doc-top-icon-btn";
-  topA.target = "_blank";
-  topA.rel = "noopener noreferrer";
-  topA.title = "官网原文";
-  topA.innerHTML = '<svg class="ico" style="width:16px;height:16px;" aria-hidden="true"><use href="#i-link"/></svg>';
-  const closeBtn = $("closeDocDialog");
-  tools.insertBefore(topA, closeBtn || null);
-  new MutationObserver(() => {
-    topA.href = footLink.href || "#";
-    topA.classList.toggle("hide", footLink.classList.contains("hide"));
-  }).observe(footLink, { attributes: true, attributeFilter: ["href", "class"] });
+/* ---- v1.009: 移动端阅读器顶部纯符号按钮联动 ---- */
+(function init_mobile_doc_top_actions() {
+  $("copyDocTextBtnTop")?.addEventListener("click", () => $("copyDocTextBtn")?.click());
+  $("askAiDocBtnTop")?.addEventListener("click", () => $("askAiDocBtn")?.click());
+  const footUrl = $("docDialogUrl");
+  const topUrl = $("docDialogUrlTop");
+  if (footUrl && topUrl) {
+    new MutationObserver(() => {
+      topUrl.href = footUrl.href || "#";
+      topUrl.classList.toggle("hide", footUrl.classList.contains("hide"));
+    }).observe(footUrl, { attributes: true, attributeFilter: ["href", "class"] });
+  }
 })();
 

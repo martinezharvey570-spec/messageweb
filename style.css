@@ -5928,3 +5928,79 @@ dialog[open]::backdrop {
   cursor: pointer;
   padding: 2px 6px;
 }
+/* ---- v1.009: 阅读器桌面端保持原版带文字布局，移动端采用顶部紧凑纯符号一排 ---- */
+@media (min-width: 761px) {
+  .doc-mobile-only {
+    display: none !important;
+  }
+  #docDialog .doc-font-group.is-compact {
+    gap: 0 !important;
+  }
+}
+@media (max-width: 760px) {
+  #docDialog .doc-reader-foot {
+    display: none !important;
+  }
+  #docDialog .doc-reader-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    flex-wrap: nowrap !important;
+  }
+  #docDialog .doc-font-group.is-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0 !important;
+    padding: 2px !important;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  #docDialog .doc-font-group.is-compact button {
+    min-width: 24px !important;
+    width: auto !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    padding: 0 5px !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em;
+    border-radius: 6px;
+  }
+  #docDialog #docOutlineToggle .doc-btn-txt {
+    display: none !important;
+  }
+  #docDialog #docOutlineToggle,
+  #docDialog .doc-icon-btn,
+  #docDialog .doc-close {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    color: var(--ink) !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  #docDialog .doc-icon-btn.is-ai {
+    background: var(--blue) !important;
+    border-color: var(--blue) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(21, 94, 239, .28);
+  }
+  #docDialog #docOutlineToggle .ico,
+  #docDialog .doc-icon-btn .ico,
+  #docDialog .doc-close .ico {
+    width: 15px !important;
+    height: 15px !important;
+    margin: 0 !important;
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "versionCode": 73,
-  "versionName": "1.015",
+  "versionCode": 76,
+  "versionName": "1.018",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.015：APP 切换为纯云端实时加载模式，今后只需更新网页端，APP 打开即自动同步最新版本。"
+  "notes": "v1.018：新增断网中文提示页与一键重新加载，消除断网时的系统英文报错界面。"
 }

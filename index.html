@@ -6,9 +6,30 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261114_v51">
-  <link rel="apple-touch-icon" href="icon-192.png?v=20261114_v51">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261114_v52">
+  <link rel="apple-touch-icon" href="icon-192.png?v=20261114_v52">
   <meta name="format-detection" content="telephone=no,email=no">
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="校务智理">
+  <style>
+    html.has-saved-auth #auth { display: none !important; }
+    html.has-saved-auth #app { display: block !important; }
+  </style>
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem("xz_manual_logout_v1")) return;
+        var hasTok = !!localStorage.getItem("xz_token") || /(?:^|;\s*)xz_token_bak=[^;]+/.test(document.cookie);
+        if (!hasTok && window.AndroidBridge && window.AndroidBridge.loadAuthData && window.AndroidBridge.loadAuthData()) {
+          hasTok = true;
+        }
+        if (hasTok) document.documentElement.classList.add("has-saved-auth");
+      } catch (e) {}
+    })();
+  </script>
   <title>校务智理校园事务服务平台</title>
 
   <script>
@@ -30,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=20261114_v51" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=20261114_v52" fetchpriority="high">
 </head>
 <body>
 
@@ -683,7 +704,8 @@
   </form>
 </dialog>
 
-<script src="config.js?v=20261114_v51"></script>
-<script src="app.js?v=20261114_v51"></script>
+<script src="android-bridge.js?v=20261114_v52"></script>
+<script src="config.js?v=20261114_v52"></script>
+<script src="app.js?v=20261114_v52"></script>
 </body>
 </html>

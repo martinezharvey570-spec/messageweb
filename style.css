@@ -6689,3 +6689,29 @@ body.on-ai-page .ask #askSubmitBtn:not(.is-idle):not(.is-stop) {
 body.on-ai-page .ask #askSubmitBtn:not(.is-idle):not(.is-stop):hover {
   background: #124fd4 !important;
 }
+
+/* ---- v1.027: 优化深度思考三点波浪动画 + 加深普通空态发送按钮 ---- */
+.pulse-dots i {
+  width: 6.5px !important;
+  height: 6.5px !important;
+  background: var(--purple) !important;
+  animation: dotPulseV2 1.35s infinite ease-in-out both !important;
+}
+.pulse-dots i:nth-child(1) { animation-delay: 0s !important; }
+.pulse-dots i:nth-child(2) { animation-delay: 0.18s !important; }
+.pulse-dots i:nth-child(3) { animation-delay: 0.36s !important; }
+@keyframes dotPulseV2 {
+  0%, 100% { opacity: 0.35; transform: translateY(0) scale(0.85); }
+  45% { opacity: 1; transform: translateY(-3px) scale(1.15); }
+}
+
+body.on-ai-page .ask #askSubmitBtn.is-idle {
+  background: #cbd5e1 !important;
+  color: #0f172a !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
+  background: rgba(255, 255, 255, .22) !important;
+  color: #ffffff !important;
+}

@@ -6458,32 +6458,15 @@ html.dark .ask-plus-btn.open {
   justify-content: center !important;
   transition: background .18s ease, color .18s ease, transform .15s ease;
 }
-#askSubmitBtn.is-mic {
+#askSubmitBtn.is-idle {
   background: #e9eef6 !important;
-  color: #1e293b !important;
-  border: 1px solid rgba(15, 23, 42, .06) !important;
+  color: #64748b !important;
+  border: 0 !important;
   box-shadow: none !important;
 }
-#askSubmitBtn.is-mic:hover {
-  background: #dce3ee !important;
-}
-html.dark #askSubmitBtn.is-mic {
-  background: rgba(255, 255, 255, .13) !important;
-  color: #f1f5f9 !important;
-  border-color: rgba(255, 255, 255, .08) !important;
-}
-html.dark #askSubmitBtn.is-mic:hover {
-  background: rgba(255, 255, 255, .20) !important;
-}
-#askSubmitBtn.is-recording {
-  background: #ef4444 !important;
-  color: #ffffff !important;
-  border-color: transparent !important;
-  animation: xzMicPulse 1.2s ease-in-out infinite;
-}
-@keyframes xzMicPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, .45); }
-  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+html.dark #askSubmitBtn.is-idle {
+  background: rgba(255, 255, 255, .10) !important;
+  color: #94a3b8 !important;
 }
 .ask-attach-pop {
   position: absolute;
@@ -6648,5 +6631,38 @@ html.dark body.on-ai-page .ask .ask-plus-btn.open {
   body.on-ai-page .ask .ask-plus-btn svg {
     width: 22px !important;
     height: 22px !important;
+  }
+}
+
+/* ---- v1.025: 修复加号悬停圆角被 .ask button 覆盖成方形的问题（与发送键同尺寸纯圆）+ 侧边栏折叠按钮改为 12px 圆角方形 ---- */
+body.on-ai-page .ask .ask-plus-btn {
+  border-radius: 50% !important;
+  padding: 0 !important;
+}
+@media (min-width: 761px) {
+  body.on-ai-page .ask .ask-plus-btn,
+  body.on-ai-page .ask #askSubmitBtn {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    flex: 0 0 42px !important;
+  }
+  .desktop-rail-toggle {
+    border-radius: 12px !important;
+  }
+  body.sidebar-collapsed .desktop-rail-toggle {
+    width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 12px !important;
+  }
+}
+@media (max-width: 760px) {
+  body.on-ai-page .ask .ask-plus-btn,
+  body.on-ai-page .ask #askSubmitBtn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    flex: 0 0 36px !important;
   }
 }

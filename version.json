@@ -1,6 +1,7 @@
 {
-  "versionCode": 78,
-  "versionName": "1.020",
+  "versionCode": 79,
+  "versionName": "1.021",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.020：桌面与移动端统一 Gemini 悬浮输入胶囊，支持左侧 + 号选图/拍照/文档与右侧动态语音麦克风。"
+  "notes": "v1.020：桌面与移动端统一 Gemini 悬浮输入胶囊，支持左侧 + 号选图/拍照/文档与右侧动态语音麦克风。",
+  "releaseNotes": "修复识图/上传菜单与语音转文字，统一桌面与移动端 Gemini 悬浮胶囊样式"
 }

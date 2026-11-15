@@ -447,9 +447,9 @@
               <button type="button" id="askImgBtn" class="ask-attach-opt"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>选择图片</span></button>
               <button type="button" id="askFileBtn" class="ask-attach-opt"><svg class="ico" aria-hidden="true"><use href="#i-file-text"/></svg><span>上传文件</span></button>
             </div>
-            <input type="file" id="askCamInput" accept="image/*" capture="environment" hidden>
-            <input type="file" id="askImgInput" accept="image/*" multiple hidden>
-            <input type="file" id="askFileInput" accept=".txt,.md,.csv,.json,.log,.xml,.html" multiple hidden>
+            <input type="file" id="askCamInput" accept="image/*" capture="environment" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
+            <input type="file" id="askImgInput" accept="image/*" multiple style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
+            <input type="file" id="askFileInput" accept=".txt,.md,.csv,.json,.log,.xml,.html" multiple style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
             <div class="ask-input-wrap">
               <div id="askAttachPreview" class="ask-attach-preview hide"></div>
               <div class="ask-input-row">

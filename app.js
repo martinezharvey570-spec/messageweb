@@ -2448,30 +2448,102 @@ async function handle_text_file_select(fileList) {
   };
 })();
 
-function start_voice_input() {
-  if (window.AndroidBridge && typeof window.AndroidBridge.startVoiceInput === "function") {
-    try { window.AndroidBridge.startVoiceInput(); return; } catch {}
+let voice_recorder = null;
+let voice_stream = null;
+let voice_chunks = [];
+let voice_recording = false;
+let voice_timer = 0;
+
+async function start_recorder_whisper() {
+  if (voice_recording && voice_recorder) {
+    try { voice_recorder.stop(); } catch {}
+    return;
   }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    toast("当前浏览器不支持直接语音识别，可使用输入法自带语音");
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+    toast("当前环境不支持麦克风录音，请使用输入法自带语音");
+    $("question")?.focus();
     return;
   }
   try {
-    const rec = new SR();
-    rec.lang = "zh-CN";
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    toast("请开始说话…");
-    rec.onresult = ev => {
-      const t = ev.results?.[0]?.[0]?.transcript || "";
-      if (t) window.__onAppVoiceResult(t);
-    };
-    rec.onerror = () => toast("语音识别未成功，请重试");
-    rec.start();
+    voice_stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch {
-    toast("无法启动语音识别");
+    toast("请允许麦克风权限后再试");
+    return;
   }
+  const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+    ? "audio/webm;codecs=opus"
+    : (MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4" : "");
+  voice_chunks = [];
+  voice_recorder = mime ? new MediaRecorder(voice_stream, { mimeType: mime }) : new MediaRecorder(voice_stream);
+  voice_recording = true;
+  sync_ask_idle();
+  toast("正在聆听，再次点击麦克风结束…");
+
+  voice_recorder.ondataavailable = e => {
+    if (e.data && e.data.size > 0) voice_chunks.push(e.data);
+  };
+  voice_recorder.onstop = async () => {
+    clearTimeout(voice_timer);
+    voice_recording = false;
+    sync_ask_idle();
+    try { voice_stream?.getTracks().forEach(t => t.stop()); } catch {}
+    voice_stream = null;
+    const blob = new Blob(voice_chunks, { type: voice_recorder?.mimeType || "audio/webm" });
+    voice_chunks = [];
+    if (blob.size < 400) {
+      toast("说话时间太短，请重试");
+      return;
+    }
+    toast("正在识别语音…");
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const rd = new FileReader();
+        rd.onerror = reject;
+        rd.onload = () => resolve(String(rd.result || ""));
+        rd.readAsDataURL(blob);
+      });
+      const base64 = dataUrl.split(",")[1] || "";
+      const res = await fetch(api_base + "/ai/transcribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        body: JSON.stringify({ audio: base64 })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || "语音识别失败");
+      const text = String(data.text || "").trim();
+      if (!text) {
+        toast("未识别到有效语音，请重试");
+        return;
+      }
+      window.__onAppVoiceResult(text);
+    } catch (err) {
+      toast(err?.message || "语音识别失败，请重试");
+    }
+  };
+  voice_recorder.start();
+  voice_timer = setTimeout(() => {
+    if (voice_recording && voice_recorder) {
+      try { voice_recorder.stop(); } catch {}
+    }
+  }, 30000);
+}
+
+window.__onAppVoiceFallbackToRecorder = () => {
+  start_recorder_whisper();
+};
+
+function start_voice_input() {
+  if (voice_recording) {
+    start_recorder_whisper();
+    return;
+  }
+  if (window.AndroidBridge && typeof window.AndroidBridge.startVoiceInput === "function") {
+    try { window.AndroidBridge.startVoiceInput(); return; } catch {}
+  }
+  start_recorder_whisper();
 }
 
 function sync_ask_idle() {
@@ -2480,11 +2552,19 @@ function sync_ask_idle() {
   if (!el || !b) return;
   const hasContent = Boolean(el.value.trim()) || pending_ai_images.length > 0 || pending_ai_files.length > 0;
   if (ai_busy) {
-    b.classList.remove("is-mic", "is-idle");
+    b.classList.remove("is-mic", "is-idle", "is-recording");
     return;
   }
+  if (voice_recording) {
+    b.classList.remove("is-mic", "is-idle");
+    b.classList.add("is-recording");
+    b.setAttribute("aria-label", "停止录音");
+    b.title = "点击结束录音";
+    b.innerHTML = ico("stop");
+    return;
+  }
+  b.classList.remove("is-recording", "is-idle");
   b.classList.toggle("is-mic", !hasContent);
-  b.classList.remove("is-idle");
   if (hasContent) {
     b.setAttribute("aria-label", "发送");
     b.title = "发送";

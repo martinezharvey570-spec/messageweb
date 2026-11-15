@@ -89,7 +89,7 @@ function toast(s) {
   const msg = String(s ?? "");
   const kind = /失败|错误|无法|不能|异常|未找到|不能为空|请先|请检查|至少|超时/.test(msg)
     ? "warn"
-    : (/成功|已复制|已保存|已更新|已同步|已完成|已添加|已删除|已清空|已导出|已分享|已切换/.test(msg) ? "ok" : "info");
+    : (/成功|已复制|已保存|已更新|已同步|已完成|已添加|已删除|已清空|已导出|已分享|已切换|已识别/.test(msg) ? "ok" : "info");
   const mark = kind === "ok" ? "✓" : (kind === "warn" ? "!" : "✦");
   el.innerHTML = `<span class="toast-ico ${kind}" aria-hidden="true">${mark}</span><span>${esc(msg)}</span>`;
   el.classList.add("show");
@@ -2314,11 +2314,186 @@ $("exportChat")?.addEventListener("click", () => {
   toast("咨询记录已导出");
 });
 
+let pending_ai_images = [];
+let pending_ai_files = [];
+
+function render_ask_attachments() {
+  const box = $("askAttachPreview");
+  if (!box) return;
+  if (!pending_ai_images.length && !pending_ai_files.length) {
+    box.classList.add("hide");
+    box.innerHTML = "";
+    sync_ask_idle();
+    return;
+  }
+  box.classList.remove("hide");
+  const imgsHtml = pending_ai_images.map((src, i) =>
+    `<div class="ask-thumb-item"><img src="${src}" alt="预览图"><button type="button" class="ask-att-del" data-del-img="${i}" aria-label="移除">×</button></div>`
+  ).join("");
+  const filesHtml = pending_ai_files.map((f, i) =>
+    `<div class="ask-file-chip"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-file-text"/></svg><span>${esc(f.name)}</span><button type="button" class="ask-att-del" data-del-file="${i}" aria-label="移除">×</button></div>`
+  ).join("");
+  box.innerHTML = imgsHtml + filesHtml;
+  box.querySelectorAll("[data-del-img]").forEach(btn => {
+    btn.onclick = () => {
+      pending_ai_images.splice(Number(btn.dataset.delImg), 1);
+      render_ask_attachments();
+    };
+  });
+  box.querySelectorAll("[data-del-file]").forEach(btn => {
+    btn.onclick = () => {
+      pending_ai_files.splice(Number(btn.dataset.delFile), 1);
+      render_ask_attachments();
+    };
+  });
+  sync_ask_idle();
+}
+
+function compress_image_file(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("读取图片失败"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("图片格式不支持"));
+      img.onload = () => {
+        const maxSide = 1280;
+        let w = img.width, h = img.height;
+        if (w > maxSide || h > maxSide) {
+          if (w >= h) { h = Math.round(h * maxSide / w); w = maxSide; }
+          else { w = Math.round(w * maxSide / h); h = maxSide; }
+        }
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handle_image_select(fileList) {
+  const arr = [...(fileList || [])].filter(f => f && f.type.startsWith("image/"));
+  if (!arr.length) return;
+  for (const f of arr) {
+    if (pending_ai_images.length >= 3) {
+      toast("最多一次上传 3 张图片");
+      break;
+    }
+    try {
+      const dataUrl = await compress_image_file(f);
+      pending_ai_images.push(dataUrl);
+    } catch {
+      toast("图片处理失败，请换一张试试");
+    }
+  }
+  render_ask_attachments();
+}
+
+async function handle_text_file_select(fileList) {
+  const arr = [...(fileList || [])];
+  for (const f of arr) {
+    if (pending_ai_files.length >= 2) {
+      toast("最多一次附带 2 个文档");
+      break;
+    }
+    try {
+      const txt = await f.text();
+      if (!txt || /[ --]/.test(txt.slice(0, 200))) {
+        toast("暂仅支持纯文本/Markdown/CSV 文件，图片文档请直接截图识图");
+        continue;
+      }
+      pending_ai_files.push({ name: f.name, text: txt.slice(0, 14000) });
+    } catch {
+      toast("读取文件失败");
+    }
+  }
+  render_ask_attachments();
+}
+
+(function bind_ask_attach_and_voice() {
+  const btn = $("askAttachBtn");
+  const pop = $("askAttachPop");
+  const closePop = () => {
+    pop?.classList.remove("open");
+    btn?.classList.remove("open");
+  };
+  btn?.addEventListener("click", e => {
+    e.stopPropagation();
+    const open = !pop?.classList.contains("open");
+    pop?.classList.toggle("open", open);
+    btn?.classList.toggle("open", open);
+  });
+  document.addEventListener("click", closePop);
+  pop?.addEventListener("click", e => e.stopPropagation());
+
+  $("askCamBtn")?.addEventListener("click", () => { closePop(); $("askCamInput")?.click(); });
+  $("askImgBtn")?.addEventListener("click", () => { closePop(); $("askImgInput")?.click(); });
+  $("askFileBtn")?.addEventListener("click", () => { closePop(); $("askFileInput")?.click(); });
+
+  $("askCamInput")?.addEventListener("change", e => { handle_image_select(e.target.files); e.target.value = ""; });
+  $("askImgInput")?.addEventListener("change", e => { handle_image_select(e.target.files); e.target.value = ""; });
+  $("askFileInput")?.addEventListener("change", e => { handle_text_file_select(e.target.files); e.target.value = ""; });
+
+  window.__onAppVoiceResult = txt => {
+    if (!txt) return;
+    const el = $("question");
+    if (!el) return;
+    el.value = el.value ? (el.value + " " + txt) : txt;
+    auto_resize_question();
+    el.focus();
+  };
+})();
+
+function start_voice_input() {
+  if (window.AndroidBridge && typeof window.AndroidBridge.startVoiceInput === "function") {
+    try { window.AndroidBridge.startVoiceInput(); return; } catch {}
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast("当前浏览器不支持直接语音识别，可使用输入法自带语音");
+    return;
+  }
+  try {
+    const rec = new SR();
+    rec.lang = "zh-CN";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    toast("请开始说话…");
+    rec.onresult = ev => {
+      const t = ev.results?.[0]?.[0]?.transcript || "";
+      if (t) window.__onAppVoiceResult(t);
+    };
+    rec.onerror = () => toast("语音识别未成功，请重试");
+    rec.start();
+  } catch {
+    toast("无法启动语音识别");
+  }
+}
+
 function sync_ask_idle() {
   const el = $("question");
   const b = $("askSubmitBtn");
   if (!el || !b) return;
-  b.classList.toggle("is-idle", !el.value.trim() && !ai_busy);
+  const hasContent = Boolean(el.value.trim()) || pending_ai_images.length > 0 || pending_ai_files.length > 0;
+  if (ai_busy) {
+    b.classList.remove("is-mic", "is-idle");
+    return;
+  }
+  b.classList.toggle("is-mic", !hasContent);
+  b.classList.remove("is-idle");
+  if (hasContent) {
+    b.setAttribute("aria-label", "发送");
+    b.title = "发送";
+    b.innerHTML = ico("arrow-up");
+  } else {
+    b.setAttribute("aria-label", "语音输入");
+    b.title = "语音输入";
+    b.innerHTML = ico("mic");
+  }
 }
 
 function auto_resize_question() {
@@ -2335,9 +2510,7 @@ sync_ask_idle();
 function set_placeholder() {
   const el = $("question");
   if (!el) return;
-  el.placeholder = window.innerWidth > 720
-    ? "输入办事问题（按 Enter 发送，Shift+Enter 换行）…"
-    : "输入办事问题…";
+  el.placeholder = "输入办事问题";
 }
 set_placeholder();
 let ph_timer;
@@ -2370,22 +2543,47 @@ $("askSubmitBtn")?.addEventListener("click", () => {
     if (typeof ai_abort_handler === "function") ai_abort_handler();
     return;
   }
+  const hasContent = Boolean($("question")?.value.trim()) || pending_ai_images.length > 0 || pending_ai_files.length > 0;
+  if (!hasContent) {
+    start_voice_input();
+    return;
+  }
   $("askForm").requestSubmit();
 });
 
 $("askForm").onsubmit = async e => {
   e.preventDefault();
   if (ai_busy) return;
-  const q = $("question").value.trim();
-  if (!q) return;
+  let q = $("question").value.trim();
+  const imgs = pending_ai_images.slice();
+  const files = pending_ai_files.slice();
+  if (!q && !imgs.length && !files.length) return;
+  if (!q && imgs.length) q = "请帮我识别并解读这张图片的内容与办理要点。";
+  if (!q && files.length) q = "请帮我梳理并解读所附文档的核心内容。";
   $("question").value = "";
+  pending_ai_images = [];
+  pending_ai_files = [];
+  render_ask_attachments();
   auto_resize_question();
 
   $("aiOptionsBar")?.classList.remove("open");
   $("toggleAiConfig")?.classList.remove("added");
 
   auto_follow = true;
-  create_message(q, "user");
+  const userMsgEl = create_message(q, "user");
+  if (imgs.length && userMsgEl) {
+    const bubble = userMsgEl.querySelector(".bubble");
+    if (bubble) {
+      const wrap = document.createElement("div");
+      wrap.className = "msg-att-imgs";
+      wrap.innerHTML = imgs.map(src => `<img src="${src}" alt="上传图片">`).join("");
+      bubble.prepend(wrap);
+    }
+  }
+  const filePrefix = files.length
+    ? files.map(f => `【附带文档：${f.name}】\n${f.text}`).join("\n\n") + "\n\n"
+    : "";
+  const fullQuestion = filePrefix + q;
 
   const controller = new AbortController();
   let aborted = false;
@@ -2467,7 +2665,8 @@ $("askForm").onsubmit = async e => {
   const run_ask = async (continue_from = "") => {
     const selSchool = typeof get_selected_school === "function" ? get_selected_school() : { n: "西安文理学院", d: "xawl.edu.cn" };
     const payload = {
-      question: q,
+      question: fullQuestion,
+      ...(imgs.length ? { images: imgs } : {}),
       model: $("aiModel")?.value || "deepseek-flash",
       thinking: $("aiThinking")?.checked !== false,
       reasoning_effort: $("aiEffort")?.value || "high",

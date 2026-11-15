@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.018">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.018">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.020">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.020">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,13 +51,18 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.018" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.020" fetchpriority="high">
 </head>
 <body>
 
 <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <g id="ico-base" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></g>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5M8 22h8"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
   </defs>
   <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.4 10.9 4.3a1.8 1.8 0 0 1 2.2 0l7.4 6.1A1.6 1.6 0 0 1 21 11.6V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7.4a1.6 1.6 0 0 1 .5-1.2z"/><path d="M9.4 21v-5.6a2.6 2.6 0 0 1 5.2 0V21"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 4.2a1.5 1.5 0 0 1 3 0"/><path d="M5 16c1.2-1.5 1.7-2.6 1.7-6.3a5.3 5.3 0 0 1 10.6 0c0 3.7.5 4.8 1.7 6.3z"/><path d="M9.6 18.7a2.4 2.4 0 0 0 4.8 0"/></symbol>
@@ -437,14 +442,25 @@
           <button type="button" id="scrollBottomBtn" class="scroll-bottom-btn hide"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow-down"/></svg>回到底部</button>
 
           <form id="askForm" class="ask">
-            <div class="ask-input-wrap">
-              <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题（按 Enter 发送，Shift+Enter 换行）…"></textarea>
-              <button class="primary" id="askSubmitBtn" type="button" aria-label="发送" title="发送">
-                <svg class="ico" aria-hidden="true"><use href="#i-arrow-up"/></svg>
-              </button>
+            <div id="askAttachPop" class="ask-attach-pop" role="menu" aria-label="添加附件">
+              <button type="button" id="askCamBtn" class="ask-attach-opt is-mobile-only"><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg><span>拍照识图</span></button>
+              <button type="button" id="askImgBtn" class="ask-attach-opt"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>选择图片</span></button>
+              <button type="button" id="askFileBtn" class="ask-attach-opt"><svg class="ico" aria-hidden="true"><use href="#i-file-text"/></svg><span>上传文件</span></button>
             </div>
-            <div class="ask-footer-hint">
-              <span>请勿输入身份证号、密码等敏感信息 · 正式规定以学校最新公布文件为准</span>
+            <input type="file" id="askCamInput" accept="image/*" capture="environment" hidden>
+            <input type="file" id="askImgInput" accept="image/*" multiple hidden>
+            <input type="file" id="askFileInput" accept=".txt,.md,.csv,.json,.log,.xml,.html" multiple hidden>
+            <div class="ask-input-wrap">
+              <div id="askAttachPreview" class="ask-attach-preview hide"></div>
+              <div class="ask-input-row">
+                <button type="button" id="askAttachBtn" class="ask-plus-btn" aria-label="添加图片或文件" title="添加图片或文件">
+                  <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>
+                </button>
+                <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题"></textarea>
+                <button class="primary is-mic" id="askSubmitBtn" type="button" aria-label="语音输入" title="语音输入">
+                  <svg class="ico" aria-hidden="true"><use href="#i-mic"/></svg>
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -530,7 +546,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.018</span>
+        <span>校务智理校园事务服务平台 · v1.020</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -745,8 +761,8 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=1.018"></script>
-<script src="config.js?v=1.018"></script>
-<script src="app.js?v=1.018"></script>
+<script src="android-bridge.js?v=1.020"></script>
+<script src="config.js?v=1.020"></script>
+<script src="app.js?v=1.020"></script>
 </body>
 </html>

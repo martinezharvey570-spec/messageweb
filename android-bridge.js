@@ -327,7 +327,6 @@
   };
 
 
-  // Gemini 浅色胶囊轻提示 + 圆环下拉刷新样式
   (function injectGeminiUiStyle() {
     if (document.getElementById("xzGeminiUiStyle")) return;
     var st = document.createElement("style");

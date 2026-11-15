@@ -3711,20 +3711,14 @@ dialog.doc-dialog[open] {
   flex-wrap: wrap;
 }
 .doc-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.2;
   color: var(--muted);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 4px 10px;
-  letter-spacing: 0;
-  white-space: nowrap;
+  padding: 2px 9px;
+  letter-spacing: 0.02em;
 }
 #docDialogTitle {
   margin: 8px 0 0;
@@ -3835,7 +3829,7 @@ dialog.doc-dialog[open] {
   font-family: var(--doc-sans);
 }
 .doc-outline-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 0.08em;
@@ -3853,13 +3847,13 @@ dialog.doc-dialog[open] {
   font-size: 13px;
   font-weight: 600;
   line-height: 1.5;
-  padding: 7px 10px;
+  padding: 6px 10px;
   border-radius: 8px;
-  border-left: 2.5px solid transparent;
+  border-left: 2px solid transparent;
   cursor: pointer;
 }
 .doc-outline-item:hover {
-  background: var(--surface);
+  background: var(--card);
   color: var(--ink);
 }
 .doc-outline-item.lv2 {
@@ -3872,7 +3866,7 @@ dialog.doc-dialog[open] {
   color: var(--blue);
   background: var(--blue-light);
   border-left-color: var(--blue);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .doc-paper {
@@ -4043,15 +4037,15 @@ dialog.doc-dialog[open] {
     z-index: 60;
     left: 12px;
     right: 12px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
     top: auto;
-    max-height: 54dvh;
+    max-height: 52dvh;
     overflow: auto;
     padding: 12px;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 14px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, .22);
+    box-shadow: var(--shadow-lg);
   }
   .doc-paper {
     padding: 26px 18px 34px;
@@ -6211,10 +6205,9 @@ dialog[open]::backdrop {
   /* 手机端随正文滚动的标题区 */
   .doc-mobile-hero {
     display: block;
-    padding: 8px 14px 14px;
+    padding: 6px 14px 12px;
     border-bottom: 1px solid var(--line);
     margin-bottom: 6px;
-    text-align: center;
   }
   .doc-mobile-hero-meta {
     display: flex;
@@ -6224,9 +6217,7 @@ dialog[open]::backdrop {
     gap: 6px;
     margin-bottom: 8px;
   }
-  .doc-mobile-hero-meta .muted:empty {
-    display: none;
-  }
+  .doc-mobile-hero-meta .muted:empty { display: none; }
   .doc-mobile-hero-meta .tag,
   .doc-mobile-hero-meta .pill,
   .doc-mobile-hero-meta .doc-index {
@@ -6245,12 +6236,12 @@ dialog[open]::backdrop {
     box-sizing: border-box !important;
   }
   .doc-mobile-hero-title {
+    text-align: center;
     margin: 0;
     font-size: 18px;
     line-height: 1.4;
     font-weight: 800;
     color: var(--ink);
-    text-align: center;
   }
   #docDialog .doc-paper {
     text-align: left !important;
@@ -6262,7 +6253,7 @@ dialog[open]::backdrop {
   }
 }
 
-/* ---- v1.014: 手机端所有底部弹窗 100% 铺满宽度（修复右侧留白） ---- */
+/* ---- v1.014: 手机端所有底部弹窗 100% 铺满宽度 ---- */
 @media (max-width: 760px) {
   dialog:not(#docDialog),
   dialog.wide-dialog:not(#docDialog) {
@@ -6278,4 +6269,227 @@ dialog[open]::backdrop {
     padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
     box-sizing: border-box !important;
   }
+}
+
+/* ---- v1.020: Gemini 悬浮输入胶囊（桌面端 + 移动端统一简洁布局） ---- */
+body.on-ai-page .ask {
+  position: relative;
+  background: transparent !important;
+  border-top: 0 !important;
+}
+@media (min-width: 761px) {
+  body.on-ai-page .ask {
+    width: min(820px, calc(100% - 48px)) !important;
+    margin: 0 auto 20px !important;
+    padding: 8px 0 0 !important;
+  }
+  body.on-ai-page .messages {
+    padding-bottom: 18px !important;
+  }
+  .ask-attach-opt.is-mobile-only {
+    display: none !important;
+  }
+}
+body.on-ai-page .ask .ask-input-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 8px 10px !important;
+  border-radius: 28px !important;
+  background: var(--card) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, .08) !important;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+html.dark body.on-ai-page .ask .ask-input-wrap {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .32) !important;
+}
+body.on-ai-page .ask .ask-input-wrap:focus-within {
+  border-color: var(--blue) !important;
+  box-shadow: 0 10px 30px rgba(21, 94, 239, .14) !important;
+}
+.ask-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+.ask-input-row textarea {
+  flex: 1;
+  min-width: 0;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 7px 4px !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  resize: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  max-height: 120px;
+}
+.ask-plus-btn {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--ink-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .15s;
+}
+.ask-plus-btn:hover,
+.ask-plus-btn.open {
+  background: var(--surface);
+  color: var(--ink);
+}
+.ask-plus-btn.open svg {
+  transform: rotate(45deg);
+}
+.ask-plus-btn svg,
+#askSubmitBtn svg {
+  width: 19px;
+  height: 19px;
+  transition: transform .18s ease;
+}
+#askSubmitBtn {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  flex: 0 0 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background .18s ease, color .18s ease, transform .15s ease;
+}
+#askSubmitBtn.is-mic {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+#askSubmitBtn.is-mic:hover {
+  background: var(--line) !important;
+}
+.ask-attach-pop {
+  position: absolute;
+  left: 8px;
+  bottom: calc(100% + 8px);
+  width: 164px;
+  padding: 6px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, .14);
+  display: none;
+  z-index: 40;
+}
+@media (max-width: 760px) {
+  .ask-attach-pop {
+    left: 14px;
+    bottom: calc(100% + 4px);
+  }
+}
+.ask-attach-pop.open {
+  display: grid;
+  gap: 2px;
+  animation: xzDialogPop .16s cubic-bezier(.22, 1, .36, 1);
+}
+.ask-attach-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.ask-attach-opt:hover {
+  background: var(--surface);
+}
+.ask-attach-opt .ico {
+  width: 17px;
+  height: 17px;
+  color: var(--blue);
+}
+.ask-attach-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 4px 0;
+}
+.ask-thumb-item {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.ask-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ask-file-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 26px 6px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  max-width: 190px;
+}
+.ask-file-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ask-att-del {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(15, 23, 42, .65);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.msg-att-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.msg-att-imgs img {
+  max-width: 160px;
+  max-height: 160px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  object-fit: cover;
 }

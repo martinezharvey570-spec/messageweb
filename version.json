@@ -1,6 +1,6 @@
 {
-  "versionCode": 76,
-  "versionName": "1.018",
+  "versionCode": 77,
+  "versionName": "1.019",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "v1.018：新增断网中文提示页与一键重新加载，消除断网时的系统英文报错界面。"
+  "notes": "v1.019：全站弹窗升级为 Gemini 浅色胶囊轻提示；优化顶部蓝色加载条为高对比匀速渐变，确保后端数据全部就绪后再进入主界面。"
 }

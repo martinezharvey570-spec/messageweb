@@ -117,21 +117,6 @@
   // ---------------------------------------------------------
   if (isAndroidApp) {
     // (A) Gemini 风格圆环下拉刷新（仅在非 AI 页面、且页面处于顶部时触发）
-    (function injectGeminiPtrStyle() {
-      if (document.getElementById("xzGeminiPtrStyle")) return;
-      var st = document.createElement("style");
-      st.id = "xzGeminiPtrStyle";
-      st.textContent = ""
-        + ".app-ptr-bar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;width:38px;height:38px;padding:0;border-radius:50%;background:var(--card,#fff);border:1px solid var(--line,#e2e8f0);box-shadow:0 4px 16px rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;z-index:1200;opacity:0;pointer-events:none;transform:translate(-50%,-54px) scale(.82);transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .18s ease;}"
-        + ".app-ptr-bar.visible{opacity:1;}"
-        + ".app-ptr-bar.is-pulling{transition:none;}"
-        + ".app-ptr-bar svg{width:20px;height:20px;display:block;color:var(--blue,#1a73e8);transition:transform .1s linear;}"
-        + ".app-ptr-bar.is-spinning svg{animation:xzPtrSpin .75s linear infinite;}"
-        + "@keyframes xzPtrSpin{to{transform:rotate(360deg);}}"
-        + ".toast{border-radius:999px !important;padding:9px 18px !important;font-size:13.5px !important;font-weight:500 !important;letter-spacing:.01em !important;box-shadow:0 8px 24px rgba(15,23,42,.18) !important;}";
-      document.head.appendChild(st);
-    })();
-
     var ptrStartY = 0;
     var ptrPulling = false;
     var ptrRefreshing = false;
@@ -341,6 +326,32 @@
     } catch (e) {}
   };
 
+
+  // Gemini 浅色胶囊轻提示 + 圆环下拉刷新样式
+  (function injectGeminiUiStyle() {
+    if (document.getElementById("xzGeminiUiStyle")) return;
+    var st = document.createElement("style");
+    st.id = "xzGeminiUiStyle";
+    st.textContent = ""
+      + ".app-ptr-bar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;width:38px;height:38px;padding:0;border-radius:50%;background:var(--card,#fff);border:1px solid var(--line,#e2e8f0);box-shadow:0 4px 16px rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;z-index:1200;opacity:0;pointer-events:none;transform:translate(-50%,-54px) scale(.82);transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .18s ease;}"
+      + ".app-ptr-bar.visible{opacity:1;}"
+      + ".app-ptr-bar.is-pulling{transition:none;}"
+      + ".app-ptr-bar svg{width:20px;height:20px;display:block;color:var(--blue,#155eef);transition:transform .1s linear;}"
+      + ".app-ptr-bar.is-spinning svg{animation:xzPtrSpin .75s linear infinite;}"
+      + "@keyframes xzPtrSpin{to{transform:rotate(360deg);}}"
+      + ".toast{top:auto !important;bottom:calc(28px + env(safe-area-inset-bottom,0px)) !important;left:50% !important;transform:translate(-50%,16px) scale(.96) !important;background:#ffffff !important;color:#0f172a !important;border:1px solid #e2e8f0 !important;border-radius:999px !important;padding:9px 16px !important;font-size:13.5px !important;font-weight:500 !important;line-height:1.4 !important;box-shadow:0 8px 28px rgba(15,23,42,.12) !important;display:inline-flex !important;align-items:center !important;gap:8px !important;max-width:min(360px,calc(100vw - 32px)) !important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}"
+      + ".toast.show{transform:translate(-50%,0) scale(1) !important;}"
+      + "html.dark .toast{background:#1e293b !important;color:#f8fafc !important;border-color:#334155 !important;box-shadow:0 10px 28px rgba(0,0,0,.38) !important;}"
+      + ".toast-ico{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:11px;font-weight:700;}"
+      + ".toast-ico.ok{background:#dcfce7;color:#15803d;}"
+      + ".toast-ico.warn{background:#fee2e2;color:#dc2626;}"
+      + ".toast-ico.info{background:#dbeafe;color:#1d4ed8;}"
+      + "html.dark .toast-ico.ok{background:rgba(34,197,94,.18);color:#4ade80;}"
+      + "html.dark .toast-ico.warn{background:rgba(239,68,68,.18);color:#f87171;}"
+      + "html.dark .toast-ico.info{background:rgba(59,130,246,.2);color:#60a5fa;}"
+      + "@media (max-width:760px){.toast{bottom:calc(76px + env(safe-area-inset-bottom,0px)) !important;}body.on-ai-page .toast{bottom:calc(132px + env(safe-area-inset-bottom,0px)) !important;}}";
+    (document.head || document.documentElement).appendChild(st);
+  })();
 })();
 
   // 劫持 fetch，实现登录凭据自动捕获 & Token 过期静默续期

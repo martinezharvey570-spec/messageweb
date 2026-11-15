@@ -86,10 +86,15 @@ function toast(s) {
   if (typeof s === "string" && /登录已失效|登录已过期/.test(s)) return;
   const el = $("toast");
   if (!el) return;
-  el.textContent = s;
+  const msg = String(s ?? "");
+  const kind = /失败|错误|无法|不能|异常|未找到|不能为空|请先|请检查|至少|超时/.test(msg)
+    ? "warn"
+    : (/成功|已复制|已保存|已更新|已同步|已完成|已添加|已删除|已清空|已导出|已分享|已切换/.test(msg) ? "ok" : "info");
+  const mark = kind === "ok" ? "✓" : (kind === "warn" ? "!" : "✦");
+  el.innerHTML = `<span class="toast-ico ${kind}" aria-hidden="true">${mark}</span><span>${esc(msg)}</span>`;
   el.classList.add("show");
   clearTimeout(timer);
-  timer = setTimeout(() => el.classList.remove("show"), 2600);
+  timer = setTimeout(() => el.classList.remove("show"), 2200);
 }
 
 function load_starred_notices() {
@@ -593,9 +598,11 @@ async function enter() {
       } catch {}
       $("auth").classList.remove("hide");
       $("app").classList.add("hide");
+      try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
       return;
     }
     toast(e.message);
+    try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
     return;
   }
   $("auth").classList.add("hide");
@@ -635,6 +642,7 @@ async function enter() {
   }
   check_ai();
   if (cur_page === "home") go("home");
+  try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
 }
 
 async function refresh() {
@@ -2797,6 +2805,7 @@ $("aiThinking")?.addEventListener("change", () => {
     return;
   }
   check_ai();
+  try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
 })();
 
 async function load_users() {

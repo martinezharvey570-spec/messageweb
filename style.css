@@ -6594,3 +6594,15 @@ html.dark #askSubmitBtn.is-mic:hover {
   border: 1px solid rgba(255, 255, 255, .2);
   object-fit: cover;
 }
+
+/* ---- v1.022: 提示胶囊单行显示（修复 left:50% 未设 max-content 导致被压成 50vw 换行） ---- */
+.toast {
+  width: max-content !important;
+  max-width: calc(100vw - 32px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 9px 18px !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}

@@ -7115,3 +7115,63 @@ dialog:not(#docDialog) .actions button.danger {
   color: #ffffff !important;
   border: 0 !important;
 }
+
+/* ---- v1.030: 桌面端公文阅读器体验全面优化（更宽画幅、精简顶底栏、独立白卡目录、A4红线顶边） ---- */
+@media (min-width: 900px) {
+  dialog#docDialog.doc-dialog {
+    width: min(1220px, calc(100vw - 44px)) !important;
+    height: min(92dvh, 920px) !important;
+    max-height: 92dvh !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+  }
+  #docDialog .doc-reader-bar {
+    padding: 14px 24px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  html.dark #docDialog .doc-reader-bar {
+    background: #181a1f !important;
+    border-bottom-color: #2d333d !important;
+  }
+  #docDialog #docDialogTitle {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 19px !important;
+    line-height: 1.35 !important;
+  }
+  #docDialog .doc-reader-body {
+    gap: 22px !important;
+    padding: 20px 24px 28px !important;
+  }
+  #docDialog .doc-outline {
+    width: 248px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 14px 12px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, .03) !important;
+    max-height: calc(92dvh - 180px) !important;
+  }
+  html.dark #docDialog .doc-outline {
+    background: #181a1f !important;
+    border-color: #2d333d !important;
+  }
+  #docDialog .doc-paper {
+    max-width: 860px !important;
+    padding: 46px 64px 64px !important;
+    border-top: 3px solid var(--gov-red) !important;
+  }
+  html.dark #docDialog .doc-paper {
+    border-top-color: #dc4c46 !important;
+  }
+  #docDialog .doc-reader-foot {
+    padding: 10px 24px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+  }
+  html.dark #docDialog .doc-reader-foot {
+    background: #181a1f !important;
+    border-top-color: #2d333d !important;
+  }
+}

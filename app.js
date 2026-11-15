@@ -1412,7 +1412,8 @@ async function open_doc_reader(doc_title) {
     $("docDialogIndex").textContent = `档案 ${doc.catalog_no || "—"}/${kb_total_text()}`;
 
     const paper = $("docDialogBody");
-    paper.innerHTML = render_doc_html(full_text) || '<p class="doc-p">暂无正文内容</p>';
+    const paperTitle = `<h1 class="doc-paper-title">${esc(doc.title || clean_title)}</h1>`;
+    paper.innerHTML = paperTitle + (render_doc_html(full_text) || '<p class="doc-p">暂无正文内容</p>');
     apply_font_scale();
     build_outline(paper);
 

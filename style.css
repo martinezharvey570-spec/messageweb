@@ -7175,3 +7175,33 @@ dialog:not(#docDialog) .actions button.danger {
     border-top-color: #2d333d !important;
   }
 }
+
+/* ---- v1.031: 桌面端将文件标题移入 A4 纸内居中大字号显示 ---- */
+.doc-paper-title {
+  display: none;
+}
+@media (min-width: 900px) {
+  #docDialog #docDialogTitle {
+    display: none !important;
+  }
+  #docDialog .doc-reader-bar {
+    padding: 10px 24px !important;
+  }
+  #docDialog .doc-paper-title {
+    display: block;
+    font-family: var(--doc-title-serif) !important;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+    text-align: center;
+    color: #111111;
+    margin: 2px auto 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  html.dark #docDialog .doc-paper-title {
+    color: #f8fafc;
+    border-bottom-color: rgba(255, 255, 255, .08);
+  }
+}

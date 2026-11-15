@@ -7267,24 +7267,21 @@ html.dark .msg-avatar.ai {
   transform-origin: center;
 }
 
-/* 为侧边栏、底部导航、欢迎卡片与工具按钮赋予和谐彩色图标（不再只有 AI 图标有颜色） */
+/* 仅保留左侧边栏（及手机底栏对应导航项）图标彩色，参数/导出/清空等工具按钮恢复原色 */
 #sidebar .nav[data-page="home"] .ico,
 .tab-item[data-page="home"] .ico {
   color: #2563eb !important;
 }
 #sidebar .nav[data-page="notices"] .ico,
-.tab-item[data-page="notices"] .ico,
-.quick[data-goto="notices"] .ico {
+.tab-item[data-page="notices"] .ico {
   color: #f59e0b !important;
 }
 #sidebar .nav[data-page="tasks"] .ico,
-.tab-item[data-page="tasks"] .ico,
-.quick[data-goto="tasks"] .ico {
+.tab-item[data-page="tasks"] .ico {
   color: #10b981 !important;
 }
 #sidebar .nav[data-page="knowledge"] .ico,
-.tab-item[data-page="knowledge"] .ico,
-.quick[data-goto="knowledge"] .ico {
+.tab-item[data-page="knowledge"] .ico {
   color: #6366f1 !important;
 }
 #sidebar .nav[data-page="users"] .ico {
@@ -7293,19 +7290,3 @@ html.dark .msg-avatar.ai {
 #sidebar .nav[data-page="analytics"] .ico {
   color: #ec4899 !important;
 }
-#openProfileSide .ico {
-  color: #64748b !important;
-}
-#logout .ico {
-  color: #ef4444 !important;
-}
-
-/* AI 欢迎卡片 4 个功能图标与顶栏工具图标柔和配色 */
-.welcome-item:nth-child(1) span .ico { color: #2563eb !important; }
-.welcome-item:nth-child(2) span .ico { color: #0ea5e9 !important; }
-.welcome-item:nth-child(3) span .ico { color: #6366f1 !important; }
-.welcome-item:nth-child(4) span .ico { color: #f59e0b !important; }
-#toggleAiConfig .ico { color: #6366f1 !important; }
-#exportChat .ico { color: #0ea5e9 !important; }
-#clearChat .ico { color: #ef4444 !important; }
-#aiSchoolBtn .ico:first-child { color: #155eef !important; }

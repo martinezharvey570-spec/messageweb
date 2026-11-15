@@ -83,6 +83,7 @@ function ico(name, cls = "") {
 }
 
 function toast(s) {
+  if (typeof s === "string" && /登录已失效|登录已过期/.test(s)) return;
   const el = $("toast");
   if (!el) return;
   el.textContent = s;
@@ -277,6 +278,13 @@ async function api(path, opt = {}) {
   if (!r.ok) {
     const err = Error(d.detail || "请求失败");
     err.status = r.status;
+    if ((r.status === 401 || r.status === 403) && token) {
+      token = "";
+      try { localStorage.removeItem("xz_token"); } catch {}
+      $("auth")?.classList.remove("hide");
+      $("app")?.classList.add("hide");
+      err.silent = true;
+    }
     throw err;
   }
   return d;
@@ -585,6 +593,7 @@ async function enter() {
       } catch {}
       $("auth").classList.remove("hide");
       $("app").classList.add("hide");
+      return;
     }
     toast(e.message);
     return;

@@ -116,22 +116,40 @@
   // 5. v58 App 实用功能：下拉刷新（非AI页生效）+ 制度/AI内容原生分享
   // ---------------------------------------------------------
   if (isAndroidApp) {
-    // (A) 原生手感下拉刷新（仅在非 AI 页面、且页面处于顶部时触发）
+    // (A) Gemini 风格圆环下拉刷新（仅在非 AI 页面、且页面处于顶部时触发）
+    (function injectGeminiPtrStyle() {
+      if (document.getElementById("xzGeminiPtrStyle")) return;
+      var st = document.createElement("style");
+      st.id = "xzGeminiPtrStyle";
+      st.textContent = ""
+        + ".app-ptr-bar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;width:38px;height:38px;padding:0;border-radius:50%;background:var(--card,#fff);border:1px solid var(--line,#e2e8f0);box-shadow:0 4px 16px rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;z-index:1200;opacity:0;pointer-events:none;transform:translate(-50%,-54px) scale(.82);transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .18s ease;}"
+        + ".app-ptr-bar.visible{opacity:1;}"
+        + ".app-ptr-bar.is-pulling{transition:none;}"
+        + ".app-ptr-bar svg{width:20px;height:20px;display:block;color:var(--blue,#1a73e8);transition:transform .1s linear;}"
+        + ".app-ptr-bar.is-spinning svg{animation:xzPtrSpin .75s linear infinite;}"
+        + "@keyframes xzPtrSpin{to{transform:rotate(360deg);}}"
+        + ".toast{border-radius:999px !important;padding:9px 18px !important;font-size:13.5px !important;font-weight:500 !important;letter-spacing:.01em !important;box-shadow:0 8px 24px rgba(15,23,42,.18) !important;}";
+      document.head.appendChild(st);
+    })();
+
     var ptrStartY = 0;
     var ptrPulling = false;
+    var ptrRefreshing = false;
     var ptrBar = null;
 
     function ensurePtrBar() {
       if (!ptrBar) {
         ptrBar = document.createElement("div");
         ptrBar.className = "app-ptr-bar";
-        ptrBar.textContent = "下拉刷新数据";
+        ptrBar.setAttribute("aria-hidden", "true");
+        ptrBar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/></svg>';
         document.body.appendChild(ptrBar);
       }
       return ptrBar;
     }
 
     document.addEventListener("touchstart", function (e) {
+      if (ptrRefreshing) return;
       if (document.body.classList.contains("on-ai-page")) return;
       if (document.querySelector("dialog[open]")) return;
       if ((window.scrollY || document.documentElement.scrollTop || 0) <= 2 && e.touches && e.touches.length === 1) {
@@ -143,14 +161,18 @@
     }, { passive: true });
 
     document.addEventListener("touchmove", function (e) {
-      if (!ptrPulling || !e.touches || !e.touches.length) return;
+      if (!ptrPulling || ptrRefreshing || !e.touches || !e.touches.length) return;
       var dy = e.touches[0].clientY - ptrStartY;
-      if (dy > 20 && (window.scrollY || 0) <= 2) {
+      if (dy > 18 && (window.scrollY || 0) <= 2) {
         var bar = ensurePtrBar();
-        var offset = Math.min(20, Math.round((dy - 20) * 0.45));
-        bar.style.transform = "translate(-50%, " + offset + "px)";
-        bar.classList.add("visible");
-        bar.textContent = dy > 85 ? "松手立即刷新" : "继续下拉刷新";
+        var progress = Math.min(1, (dy - 18) / 72);
+        var offset = Math.min(28, Math.round((dy - 18) * 0.36));
+        var scale = (0.82 + 0.18 * progress).toFixed(2);
+        bar.classList.remove("is-spinning");
+        bar.classList.add("visible", "is-pulling");
+        bar.style.transform = "translate(-50%, " + offset + "px) scale(" + scale + ")";
+        var svg = bar.querySelector("svg");
+        if (svg) svg.style.transform = "rotate(" + Math.round(progress * 270) + "deg)";
       }
     }, { passive: true });
 
@@ -159,14 +181,26 @@
       ptrPulling = false;
       var endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : ptrStartY;
       var dy = endY - ptrStartY;
-      if (ptrBar) {
-        ptrBar.classList.remove("visible");
-        ptrBar.style.transform = "translate(-50%, -48px)";
-      }
       if (dy > 85 && (window.scrollY || 0) <= 2 && typeof window.refresh === "function") {
-        window.refresh().then(function () {
-          if (typeof window.toast === "function") window.toast("已同步最新数据");
-        }).catch(function () {});
+        var bar = ensurePtrBar();
+        ptrRefreshing = true;
+        bar.classList.remove("is-pulling");
+        bar.classList.add("visible", "is-spinning");
+        bar.style.transform = "translate(-50%, 16px) scale(1)";
+        var svg = bar.querySelector("svg");
+        if (svg) svg.style.transform = "";
+        Promise.resolve(window.refresh()).finally(function () {
+          setTimeout(function () {
+            ptrRefreshing = false;
+            if (ptrBar) {
+              ptrBar.classList.remove("visible", "is-spinning");
+              ptrBar.style.transform = "translate(-50%, -54px) scale(.82)";
+            }
+          }, 260);
+        });
+      } else if (ptrBar) {
+        ptrBar.classList.remove("visible", "is-pulling");
+        ptrBar.style.transform = "translate(-50%, -54px) scale(.82)";
       }
     }, { passive: true });
 

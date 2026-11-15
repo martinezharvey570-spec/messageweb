@@ -139,7 +139,7 @@ async function copy_text_safe(text) {
 function welcome_html(is_reset = false) {
   return `<div class="bubble-wrap msg-ai">
     <div class="msg-meta">
-      <span class="msg-avatar ai">${ico("sparkles")}</span>
+      <span class="msg-avatar ai">${ico("ai-brand")}</span>
       <span class="msg-sender">文理智办 AI</span>
     </div>
     <div class="bubble msg-ai welcome-bubble">
@@ -2224,7 +2224,7 @@ function create_msg_meta(who) {
     const user_char = me && me.display_name ? me.display_name.slice(0, 1) : "我";
     meta.innerHTML = `<span class="msg-avatar user">${esc(user_char)}</span><span class="msg-sender">我</span>`;
   } else {
-    meta.innerHTML = `<span class="msg-avatar ai">${ico("sparkles")}</span><span class="msg-sender">文理智办 AI</span>`;
+    meta.innerHTML = `<span class="msg-avatar ai">${ico("ai-brand")}</span><span class="msg-sender">文理智办 AI</span>`;
   }
   return meta;
 }
@@ -2553,7 +2553,7 @@ $("askForm").onsubmit = async e => {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble msg-ai";
-  bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("sparkles", "ico-xs")}正在检索校规库并思考中</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+  bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在检索校规库并思考中</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
   wrap.appendChild(bubble);
   $("messages").appendChild(wrap);
   scroll_messages_to_bottom(true);
@@ -2585,7 +2585,7 @@ $("askForm").onsubmit = async e => {
     if (full_answer.trim()) {
       html += format_markdown_safe(strip_meta_talk(full_answer));
     } else if (is_streaming) {
-      html += `<div class="ai-thinking-status"><span>${ico("sparkles", "ico-xs")}正在生成办事指引</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+      html += `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在生成办事指引</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
     }
     bubble.innerHTML = html;
   };

@@ -7205,3 +7205,25 @@ dialog:not(#docDialog) .actions button.danger {
     border-bottom-color: rgba(255, 255, 255, .08);
   }
 }
+
+/* ---- v1.032: 全面启用流光丝带星芒 AI Logo（浅蓝白底衬托彩色流光图标） ---- */
+.aiicon,
+.msg-avatar.ai {
+  background: #ffffff !important;
+  border: 1px solid #dbeafe !important;
+  box-shadow: 0 4px 12px rgba(21, 94, 239, .12) !important;
+}
+html.dark .aiicon,
+html.dark .msg-avatar.ai {
+  background: #1e293b !important;
+  border-color: rgba(96, 165, 250, .28) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .3) !important;
+}
+.aiicon .ico {
+  width: 26px !important;
+  height: 26px !important;
+}
+.msg-avatar.ai .ico {
+  width: 20px !important;
+  height: 20px !important;
+}

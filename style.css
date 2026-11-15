@@ -6666,3 +6666,26 @@ body.on-ai-page .ask .ask-plus-btn {
     flex: 0 0 36px !important;
   }
 }
+
+/* ---- v1.026: 发送键空态改深灰底+深色箭头（同左侧+号色深），有内容时切为蓝底白箭头 ---- */
+body.on-ai-page .ask #askSubmitBtn.is-idle {
+  background: #dce3ee !important;
+  color: #1f1f1f !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  cursor: default;
+}
+html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
+  background: rgba(255, 255, 255, .16) !important;
+  color: #f1f5f9 !important;
+}
+body.on-ai-page .ask #askSubmitBtn:not(.is-idle):not(.is-stop) {
+  background: #155EEF !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 4px 12px rgba(21, 94, 239, .28) !important;
+  cursor: pointer;
+}
+body.on-ai-page .ask #askSubmitBtn:not(.is-idle):not(.is-stop):hover {
+  background: #124fd4 !important;
+}

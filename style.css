@@ -6945,3 +6945,173 @@ html.dark #docDialog .doc-outline-item.active {
   border-left-color: #dc4c46 !important;
   color: #ffffff !important;
 }
+
+/* ---- v1.029: 全站弹窗质感全面升级（原生顶部拉条 + 信息卡包裹 + 等宽对称双按钮 + 44px 输入框） ---- */
+dialog:not(#docDialog)::backdrop {
+  background: rgba(15, 23, 42, .44);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+dialog:not(#docDialog) {
+  border: 1px solid rgba(15, 23, 42, .08) !important;
+  box-shadow: 0 24px 56px rgba(15, 23, 42, .18) !important;
+}
+html.dark dialog:not(#docDialog) {
+  border-color: rgba(255, 255, 255, .10) !important;
+}
+dialog:not(#docDialog) .dialoghead {
+  align-items: flex-start;
+  gap: 12px;
+}
+dialog:not(#docDialog) .dialoghead h2 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+dialog:not(#docDialog) .dialoghead small {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--muted);
+}
+dialog:not(#docDialog) .dialoghead > button[id^="close"] {
+  width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: var(--surface) !important;
+  color: var(--muted) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+dialog:not(#docDialog) .dialoghead > button[id^="close"]:hover {
+  background: var(--line) !important;
+  color: var(--ink) !important;
+}
+dialog:not(#docDialog) .ui-modal-msg {
+  margin: 4px 0 6px !important;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  font-size: 14.5px !important;
+  line-height: 1.65 !important;
+}
+html.dark dialog:not(#docDialog) .ui-modal-msg {
+  background: rgba(255, 255, 255, .05) !important;
+  border-color: rgba(255, 255, 255, .10) !important;
+  color: #e2e8f0 !important;
+}
+dialog:not(#docDialog) label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+dialog:not(#docDialog) input,
+dialog:not(#docDialog) select,
+dialog:not(#docDialog) textarea {
+  min-height: 44px;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 14.5px !important;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+dialog:not(#docDialog) input:focus,
+dialog:not(#docDialog) select:focus,
+dialog:not(#docDialog) textarea:focus {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(21, 94, 239, .14) !important;
+}
+dialog:not(#docDialog) .actions {
+  gap: 10px !important;
+  margin-top: 6px !important;
+}
+dialog:not(#docDialog) .actions button {
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+  padding: 0 18px !important;
+}
+@media (max-width: 760px) {
+  dialog:not(#docDialog),
+  dialog.wide-dialog:not(#docDialog) {
+    padding-top: 22px !important;
+    border-radius: 22px 22px 0 0 !important;
+  }
+  dialog:not(#docDialog)::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: #cbd5e1;
+  }
+  html.dark dialog:not(#docDialog)::before {
+    background: rgba(255, 255, 255, .22);
+  }
+  dialog:not(#docDialog) .actions {
+    display: flex !important;
+    width: 100% !important;
+  }
+  dialog:not(#docDialog) .actions button {
+    flex: 1 1 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ---- v1.029 补充一致性：桌面端统一圆角内边距 + 全站弹窗次按钮/主按钮/危险按钮配色统一 ---- */
+@media (min-width: 761px) {
+  dialog:not(#docDialog) {
+    padding: 24px 26px !important;
+    border-radius: 20px !important;
+  }
+}
+dialog:not(#docDialog) .dialoghead button[id^="close"] {
+  width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: var(--surface) !important;
+  color: var(--muted) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+dialog:not(#docDialog) .actions button.secondary {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 0 !important;
+}
+dialog:not(#docDialog) .actions button.secondary:hover {
+  background: #e2e8f0 !important;
+}
+html.dark dialog:not(#docDialog) .actions button.secondary {
+  background: rgba(255, 255, 255, .10) !important;
+  color: #e2e8f0 !important;
+}
+dialog:not(#docDialog) .actions button.primary {
+  background: #155EEF !important;
+  color: #ffffff !important;
+  border: 0 !important;
+}
+dialog:not(#docDialog) .actions button.danger {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: 0 !important;
+}

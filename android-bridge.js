@@ -265,9 +265,16 @@
   window.__onAppUpdateAvailable = function (versionName, apkUrl, notes) {
     try {
       var openUpdateDialog = function () {
-        var msg = "发现新版本 v" + versionName + "：\n" + (notes || "包含界面优化与新功能，是否立即下载更新？");
+        var cleanNotes = String(notes || "").replace(/^v?\d+\.\d+\s*[：:]\s*/i, "").trim();
+        var msg = cleanNotes || "优化了校规文件库与公文阅读排版，提升整体界面视觉与操作流畅度。";
         if (typeof window.ui_confirm === "function") {
-          window.ui_confirm(msg, { title: "版本更新 v" + versionName, okText: "立即更新", danger: false }).then(function (ok) {
+          window.ui_confirm(msg, {
+            title: "发现新版本 v" + versionName,
+            sub: "推荐更新以获得更佳阅读与使用体验",
+            okText: "立即更新",
+            cancelText: "稍后再说",
+            danger: false
+          }).then(function (ok) {
             if (ok && window.AndroidBridge && window.AndroidBridge.startAppUpdate) {
               window.AndroidBridge.startAppUpdate(apkUrl, versionName);
             }

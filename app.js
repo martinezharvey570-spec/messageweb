@@ -3455,6 +3455,8 @@ function ui_confirm(message, opts = {}) {
     const okBtn = $("okUiConfirm");
     okBtn.textContent = opts.okText || (opts.danger ? "确认删除" : "确定");
     okBtn.className = opts.danger ? "danger" : "primary";
+    const cancelBtn = $("cancelUiConfirm");
+    if (cancelBtn) cancelBtn.textContent = opts.cancelText || "取消";
 
     let settled = false;
     const done = val => {

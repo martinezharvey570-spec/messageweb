@@ -7227,3 +7227,85 @@ html.dark .msg-avatar.ai {
   width: 20px !important;
   height: 20px !important;
 }
+
+/* ---- v1.033: 去掉 AI 图标外框 + 全站配套彩色图标体系 + AI 回答时聊天框图标动态流光旋转动画 ---- */
+.aiicon,
+.msg-avatar.ai,
+html.dark .aiicon,
+html.dark .msg-avatar.ai {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.aiicon {
+  width: 36px !important;
+  height: 36px !important;
+}
+.aiicon .ico {
+  width: 34px !important;
+  height: 34px !important;
+}
+.msg-avatar.ai {
+  width: 26px !important;
+  height: 26px !important;
+}
+.msg-avatar.ai .ico {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* AI 回答/思考时：聊天框内 AI 图标旋转呼吸动画 */
+@keyframes xzAiLogoSpin {
+  0% { transform: rotate(0deg) scale(0.96); filter: drop-shadow(0 0 2px rgba(0, 229, 255, .35)); }
+  50% { transform: rotate(180deg) scale(1.08); filter: drop-shadow(0 0 7px rgba(21, 94, 239, .55)); }
+  100% { transform: rotate(360deg) scale(0.96); filter: drop-shadow(0 0 2px rgba(0, 229, 255, .35)); }
+}
+.bubble-wrap.msg-ai.is-generating .msg-avatar.ai .ico,
+.ai-thinking-status .ico {
+  animation: xzAiLogoSpin 2.4s cubic-bezier(.4, 0, .2, 1) infinite;
+  transform-origin: center;
+}
+
+/* 为侧边栏、底部导航、欢迎卡片与工具按钮赋予和谐彩色图标（不再只有 AI 图标有颜色） */
+#sidebar .nav[data-page="home"] .ico,
+.tab-item[data-page="home"] .ico {
+  color: #2563eb !important;
+}
+#sidebar .nav[data-page="notices"] .ico,
+.tab-item[data-page="notices"] .ico,
+.quick[data-goto="notices"] .ico {
+  color: #f59e0b !important;
+}
+#sidebar .nav[data-page="tasks"] .ico,
+.tab-item[data-page="tasks"] .ico,
+.quick[data-goto="tasks"] .ico {
+  color: #10b981 !important;
+}
+#sidebar .nav[data-page="knowledge"] .ico,
+.tab-item[data-page="knowledge"] .ico,
+.quick[data-goto="knowledge"] .ico {
+  color: #6366f1 !important;
+}
+#sidebar .nav[data-page="users"] .ico {
+  color: #0ea5e9 !important;
+}
+#sidebar .nav[data-page="analytics"] .ico {
+  color: #ec4899 !important;
+}
+#openProfileSide .ico {
+  color: #64748b !important;
+}
+#logout .ico {
+  color: #ef4444 !important;
+}
+
+/* AI 欢迎卡片 4 个功能图标与顶栏工具图标柔和配色 */
+.welcome-item:nth-child(1) span .ico { color: #2563eb !important; }
+.welcome-item:nth-child(2) span .ico { color: #0ea5e9 !important; }
+.welcome-item:nth-child(3) span .ico { color: #6366f1 !important; }
+.welcome-item:nth-child(4) span .ico { color: #f59e0b !important; }
+#toggleAiConfig .ico { color: #6366f1 !important; }
+#exportChat .ico { color: #0ea5e9 !important; }
+#clearChat .ico { color: #ef4444 !important; }
+#aiSchoolBtn .ico:first-child { color: #155eef !important; }

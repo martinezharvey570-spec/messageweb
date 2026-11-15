@@ -2548,7 +2548,7 @@ $("askForm").onsubmit = async e => {
   };
 
   const wrap = document.createElement("div");
-  wrap.className = "bubble-wrap msg-ai";
+  wrap.className = "bubble-wrap msg-ai is-generating";
   wrap.appendChild(create_msg_meta("ai"));
 
   const bubble = document.createElement("div");
@@ -2940,6 +2940,7 @@ $("askForm").onsubmit = async e => {
       bubble.innerHTML = `<span style="color:#d92d20">${ico("alert", "ico-xs")}请求出错：${esc(friendly_error(err))}</span>`;
     }
   } finally {
+    wrap.classList.remove("is-generating");
     ai_abort_handler = null;
     set_ask_busy(false);
     follow_bottom();

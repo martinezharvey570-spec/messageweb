@@ -4347,7 +4347,7 @@ function render_schedule_mobile(now) {
     }
     wStrip.innerHTML = wh;
     const sel = wStrip.querySelector(".sched-week-chip.on");
-    if (sel) setTimeout(() => sel.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), 30);
+    if (sel) sel.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
   }
 
   // Date strip
@@ -5416,7 +5416,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         return;
       }
       // 若内部有正在滚动的子列表且未到顶，则不拦截
-      const scrollable = e.target.closest(".sched-ai-preview, .sched-clist, textarea, select");
+      const scrollable = e.target.closest(".sched-ai-preview, .sched-clist, .school-list, .xz-select-menu, textarea, select");
       if (scrollable && scrollable.scrollTop > 0) return;
 
       if (dy > 8) {
@@ -5457,7 +5457,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
 })();
 
 
-// ==================== v1.079 全站 GPU 液态玻璃胶囊滑动+按压一体联动引擎 ====================
+// ==================== v1.083 全站 GPU 液态玻璃胶囊滑动+按压一体联动引擎（零误弹、高帧率） ====================
 (function init_sliding_glass_pills() {
   function bindSlider(container, itemSel, activeSel, pillVariant) {
     if (!container || container.dataset.lgSlideBound) return;
@@ -5476,14 +5476,25 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     };
 
     let rafId = 0;
-    let glideTimer = 0;
     let isInternal = false;
     let pressingActive = false;
+    let lastClickAt = 0;
+    let wasHidden = container.offsetWidth === 0 || container.offsetHeight === 0;
 
     const applyTransform = (pill, x, y, press) => {
       pill.style.transform = press
-        ? `translate3d(${x}px, ${y}px, 0) scale3d(0.955, 0.955, 1)`
+        ? `translate3d(${x}px, ${y}px, 0) scale3d(0.965, 0.965, 1)`
         : `translate3d(${x}px, ${y}px, 0)`;
+    };
+
+    const snapPill = (pill, x, y, w, h) => {
+      pill.style.transition = "none";
+      pill.style.width = w + "px";
+      pill.style.height = h + "px";
+      applyTransform(pill, x, y, false);
+      pill.classList.add("is-ready");
+      void pill.offsetWidth;
+      pill.style.transition = "";
     };
 
     const syncNow = (instant) => {
@@ -5497,7 +5508,8 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         });
         const active = container.querySelector(activeSel);
         if (!active || active.offsetWidth === 0 || active.offsetHeight === 0) {
-          pill.classList.remove("is-ready", "is-gliding", "is-pressing");
+          wasHidden = true;
+          pill.classList.remove("is-ready", "is-pressing");
           return;
         }
         active.classList.add("lg-slide-active-clean");
@@ -5506,6 +5518,8 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         const w = active.offsetWidth;
         const h = active.offsetHeight;
 
+        const isBrandNewPill = !pill.classList.contains("is-ready") || pill.style.width === "";
+        const justClicked = (Date.now() - lastClickAt) < 600;
         const hasPrev = container.dataset.lgPrevW !== undefined;
         const prevX = Number(container.dataset.lgPrevX || x);
         const prevY = Number(container.dataset.lgPrevY || y);
@@ -5513,42 +5527,26 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         const prevH = Number(container.dataset.lgPrevH || h);
         const moved = hasPrev && (prevX !== x || prevY !== y || prevW !== w || prevH !== h);
 
-        // 仅当容器刚被 innerHTML 重绘重建了 pill 时，先瞬移到旧坐标再下一帧滑向新坐标
-        if (!instant && moved && pill.style.width === "") {
-          pill.style.transition = "none";
-          pill.style.width = prevW + "px";
-          pill.style.height = prevH + "px";
-          applyTransform(pill, prevX, prevY, false);
-          pill.classList.add("is-ready");
-          void pill.offsetWidth;
+        // 1. 容器刚从隐藏切为显示、或未曾发生点击而重绘时：必须瞬时落位，绝不能从第1周(0,0)往右弹飞！
+        if (instant || wasHidden || (isBrandNewPill && (!justClicked || !hasPrev))) {
+          wasHidden = false;
+          snapPill(pill, x, y, w, h);
+        } else if (isBrandNewPill && justClicked && moved) {
+          // 2. 仅当用户刚刚点击并触发了 innerHTML 重绘时，先瞬移到旧坐标再下一帧丝滑滑向新坐标
+          wasHidden = false;
+          snapPill(pill, prevX, prevY, prevW, prevH);
           requestAnimationFrame(() => {
-            pill.style.transition = "";
             pill.style.width = w + "px";
             pill.style.height = h + "px";
             applyTransform(pill, x, y, false);
-            pill.classList.add("is-gliding");
-            clearTimeout(glideTimer);
-            glideTimer = setTimeout(() => pill.classList.remove("is-gliding"), 350);
           });
         } else {
-          if (instant) {
-            pill.style.transition = "none";
-          } else {
-            pill.style.transition = "";
-          }
-          pill.style.width = w + "px";
-          pill.style.height = h + "px";
+          // 3. 常规点击切换：直接同帧纯 GPU translate3d 滑动
+          wasHidden = false;
+          if (pill.style.width !== w + "px") pill.style.width = w + "px";
+          if (pill.style.height !== h + "px") pill.style.height = h + "px";
           applyTransform(pill, x, y, pressingActive && active.classList.contains("is-pressing"));
           pill.classList.add("is-ready");
-          if (!instant && moved) {
-            pill.classList.add("is-gliding");
-            clearTimeout(glideTimer);
-            glideTimer = setTimeout(() => pill.classList.remove("is-gliding"), 350);
-          }
-          if (instant) {
-            void pill.offsetWidth;
-            pill.style.transition = "";
-          }
         }
 
         container.dataset.lgPrevX = String(x);
@@ -5569,7 +5567,6 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
       }
     };
 
-    // 按压联动：点击/按住时，胶囊与按钮文字同步缩放高亮，消除脱节感
     const clearPress = () => {
       if (!pressingActive) return;
       pressingActive = false;
@@ -5586,6 +5583,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     container.addEventListener("pointerdown", (e) => {
       const item = e.target && e.target.closest ? e.target.closest(itemSel) : null;
       if (!item || !container.contains(item)) return;
+      lastClickAt = Date.now();
       pressingActive = true;
       item.classList.add("is-pressing");
       const active = container.querySelector(activeSel);
@@ -5600,8 +5598,8 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     container.addEventListener("pointercancel", clearPress, { passive: true });
     container.addEventListener("pointerleave", clearPress, { passive: true });
 
-    // 点击后在同帧微任务立即触发滑动，确保胶囊滑动与文字变色 0ms 同步启动
     container.addEventListener("click", () => {
+      lastClickAt = Date.now();
       clearPress();
       queueMicrotask(() => sync(false, true));
     }, { passive: true });
@@ -5612,7 +5610,15 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     mo.observe(container, { attributes: true, childList: true, subtree: true, attributeFilter: ["class"] });
     window.addEventListener("resize", () => sync(true, false), { passive: true });
     if (window.ResizeObserver) {
-      new ResizeObserver(() => sync(true, false)).observe(container);
+      let lastCW = container.clientWidth, lastCH = container.clientHeight;
+      new ResizeObserver(() => {
+        const cw = container.clientWidth, ch = container.clientHeight;
+        if (cw !== lastCW || ch !== lastCH) {
+          lastCW = cw;
+          lastCH = ch;
+          sync(true, false);
+        }
+      }).observe(container);
     }
     sync(true, true);
   }

@@ -6726,7 +6726,7 @@ html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
 
 /* 1) 文件库列表页：政务条列式目录 */
 #knowledgePills .pill {
-  border-radius: 4px !important;
+  border-radius: 999px !important;
   font-size: 13px;
   font-weight: 600;
   border-color: #e2e8f0;
@@ -6806,7 +6806,7 @@ html.dark #knowledgeGrid .knowledge-card p {
   background: #fef2f2 !important;
   color: var(--gov-red) !important;
   border: 1px solid rgba(200, 22, 29, .28) !important;
-  border-radius: 4px !important;
+  border-radius: 999px !important;
   font-weight: 600;
 }
 html.dark #knowledgeGrid .knowledge-card .tag,
@@ -6818,7 +6818,7 @@ html.dark #docDialog .doc-mobile-hero-meta .tag {
 }
 #knowledgeGrid .doc-index,
 #docDialog .doc-index {
-  border-radius: 4px !important;
+  border-radius: 999px !important;
   background: #f8fafc !important;
   border-color: #e2e8f0 !important;
   color: #666666 !important;
@@ -6910,7 +6910,7 @@ html.dark #docDialog .doc-outline-title {
   border-bottom-color: var(--line) !important;
 }
 #docDialog .doc-outline-item {
-  border-radius: 4px !important;
+  border-radius: 12px !important;
   border-left: 3px solid transparent !important;
   color: #1f2937 !important;
   font-family: var(--doc-sans) !important;
@@ -10393,24 +10393,19 @@ button, .pill, .pill-btn, .sched-week-chip, .sched-date-chip, #avatar, #themeTog
   pointer-events: none;
   border-radius: 999px;
   opacity: 0;
-  will-change: transform, width, height, opacity, filter;
+  contain: layout style;
+  will-change: transform, opacity;
   transition:
-    transform 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
-    width 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
-    height 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
-    opacity 0.16s ease,
-    filter 0.22s ease;
-}
-.lg-slide-pill.is-gliding {
-  filter: brightness(1.08) saturate(1.16);
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.14s ease;
 }
 .lg-slide-pill.is-pressing {
   transition:
-    transform 0.12s cubic-bezier(0.32, 0.72, 0.25, 1),
-    width 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
-    height 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
-    filter 0.12s ease !important;
-  filter: brightness(1.06) saturate(1.12);
+    transform 0.10s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.26s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 .lg-slide-pill.is-ready {
   opacity: 1;
@@ -10604,7 +10599,7 @@ main > header,
 #schedulePage .lg-slide-host > .lg-slide-item .dw,
 #schedulePage .lg-slide-host > .lg-slide-item .dd {
   transition:
-    color 0.28s cubic-bezier(0.26, 1.10, 0.36, 1),
+    color 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.22s ease,
     transform 0.14s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
 }
@@ -10615,7 +10610,7 @@ main > header,
   filter: none !important;
 }
 .lg-slide-host > .lg-slide-item.is-pressing {
-  transform: scale3d(0.955, 0.955, 1) !important;
+  transform: scale3d(0.965, 0.965, 1) !important;
 }
 .lg-slide-host > .lg-slide-item:not(.active):not(.on):not(.selected).is-pressing {
   opacity: 0.72;

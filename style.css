@@ -8625,160 +8625,206 @@ dialog:not(#docDialog) {
 }
 
 
-/* ==================== v1.056 全站 Apple Liquid Glass（三级毛玻璃）统一视觉系统 ==================== */
+
+/* ==================== v1.057 液态玻璃（Liquid Glass）× Gemini 圆润风格统一与体验修复 ==================== */
 :root {
+  /* 去掉右上角紫灰色漫延，改为干净通透的苹果极浅冷蓝氛围 */
   --lg-bg-ambient:
-    radial-gradient(960px 580px at 6% -6%, rgba(21, 94, 239, 0.085), transparent 62%),
-    radial-gradient(880px 520px at 96% 4%, rgba(105, 56, 239, 0.075), transparent 60%),
-    radial-gradient(760px 480px at 50% 102%, rgba(14, 165, 233, 0.06), transparent 64%);
-  --lg-surface-1: rgba(255, 255, 255, 0.76);
-  --lg-surface-2: rgba(255, 255, 255, 0.80);
-  --lg-surface-3: rgba(255, 255, 255, 0.88);
-  --lg-item-bg: rgba(255, 255, 255, 0.86);
-  --lg-pill-bg: rgba(241, 245, 249, 0.78);
+    radial-gradient(900px 520px at 15% -5%, rgba(21, 94, 239, 0.055), transparent 62%),
+    radial-gradient(800px 480px at 85% 98%, rgba(14, 165, 233, 0.045), transparent 64%);
+  --lg-surface-1: rgba(255, 255, 255, 0.78);
+  --lg-surface-2: rgba(255, 255, 255, 0.84);
+  --lg-surface-3: rgba(255, 255, 255, 0.92);
+  --lg-pop-bg: rgba(255, 255, 255, 0.97);
+  --lg-item-bg: rgba(255, 255, 255, 0.88);
   --lg-border-outer: rgba(15, 23, 42, 0.07);
-  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.78);
-  --lg-shadow-card: 0 8px 28px -6px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
-  --lg-shadow-float: 0 20px 48px -10px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.06);
+  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  --lg-shadow-card: 0 8px 26px -8px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.025);
+  --lg-shadow-float: 0 18px 44px -10px rgba(15, 23, 42, 0.16), 0 4px 14px rgba(15, 23, 42, 0.06);
   --lg-spring: cubic-bezier(0.32, 0.72, 0.3, 1);
 }
 
 html.dark body, body.dark {
   --lg-bg-ambient:
-    radial-gradient(960px 580px at 6% -6%, rgba(59, 130, 246, 0.13), transparent 62%),
-    radial-gradient(880px 520px at 96% 4%, rgba(139, 92, 246, 0.11), transparent 60%),
-    radial-gradient(760px 480px at 50% 102%, rgba(14, 165, 233, 0.08), transparent 64%);
-  --lg-surface-1: rgba(17, 24, 39, 0.75);
-  --lg-surface-2: rgba(17, 24, 39, 0.78);
-  --lg-surface-3: rgba(17, 24, 39, 0.88);
-  --lg-item-bg: rgba(30, 41, 59, 0.76);
-  --lg-pill-bg: rgba(30, 41, 59, 0.72);
-  --lg-border-outer: rgba(255, 255, 255, 0.085);
-  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    radial-gradient(900px 520px at 15% -5%, rgba(59, 130, 246, 0.11), transparent 62%),
+    radial-gradient(800px 480px at 85% 98%, rgba(14, 165, 233, 0.08), transparent 64%);
+  --lg-surface-1: rgba(17, 24, 39, 0.78);
+  --lg-surface-2: rgba(17, 24, 39, 0.82);
+  --lg-surface-3: rgba(17, 24, 39, 0.92);
+  --lg-pop-bg: rgba(17, 24, 39, 0.97);
+  --lg-item-bg: rgba(30, 41, 59, 0.82);
+  --lg-border-outer: rgba(255, 255, 255, 0.09);
+  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.09);
   --lg-shadow-card: 0 10px 30px -6px rgba(0, 0, 0, 0.36), 0 2px 8px rgba(0, 0, 0, 0.22);
   --lg-shadow-float: 0 24px 54px -8px rgba(0, 0, 0, 0.58), 0 6px 18px rgba(0, 0, 0, 0.32);
 }
 
-/* 1. 全站通透环境光晕底纹与丝滑切页过渡 */
+/* 1. 全局背景与无锁死滚动修复 */
+html, body {
+  overflow-x: clip !important;
+}
 body {
+  background-color: var(--bg);
   background-image: var(--lg-bg-ambient);
   background-attachment: fixed;
 }
 
 .page {
-  animation: lgPageEnter 0.22s var(--lg-spring);
+  animation: lgPageEnter 0.2s var(--lg-spring);
 }
 @keyframes lgPageEnter {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 2. 一级导航层（左侧边栏、顶部 Header、移动端底部 6-Tab 栏、课表吸顶区） */
-#sidebar {
+/* 2. 一级液态玻璃导航层 */
+#sidebar,
+main > header {
   background: var(--lg-surface-1) !important;
-  backdrop-filter: blur(24px) saturate(185%);
-  -webkit-backdrop-filter: blur(24px) saturate(185%);
-  border-right: 1px solid var(--lg-border-outer) !important;
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  border-color: var(--lg-border-outer) !important;
   box-shadow: var(--lg-border-inner);
 }
 
 #sidebar .nav {
-  border-radius: 12px;
-  transition: background 0.18s var(--lg-spring), color 0.18s var(--lg-spring), transform 0.15s var(--lg-spring);
+  border-radius: 999px !important;
+  transition: background 0.18s var(--lg-spring), color 0.18s var(--lg-spring), transform 0.14s var(--lg-spring);
 }
-#sidebar .nav:active {
-  transform: scale(0.975);
-}
+#sidebar .nav:active { transform: scale(0.975); }
 #sidebar .nav.active {
   box-shadow: 0 4px 14px rgba(21, 94, 239, 0.14), var(--lg-border-inner);
-}
-
-main > header {
-  background: var(--lg-surface-1) !important;
-  backdrop-filter: blur(24px) saturate(185%);
-  -webkit-backdrop-filter: blur(24px) saturate(185%);
-  border-bottom: 1px solid var(--lg-border-outer) !important;
-  box-shadow: var(--lg-border-inner);
 }
 
 @media (max-width: 960px) {
   .mobile-tabbar {
     background: var(--lg-surface-1) !important;
-    backdrop-filter: blur(26px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+    backdrop-filter: blur(28px) saturate(195%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(195%) !important;
     border-top: 1px solid var(--lg-border-outer) !important;
-    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05), var(--lg-border-inner);
+    box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.05), var(--lg-border-inner);
+  }
+  .mobile-tabbar .tab-item.active i {
+    background: var(--blue-light);
+    border-radius: 999px;
+    padding: 3px 12px;
   }
   .sched-m-sticky {
     background: var(--lg-surface-1) !important;
-    backdrop-filter: blur(24px) saturate(185%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(185%) !important;
+    backdrop-filter: blur(26px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
     border-bottom: 1px solid var(--lg-border-outer) !important;
     box-shadow: var(--lg-border-inner);
   }
 }
 
-/* 3. 二级容器与内容卡片层（全站 7 大页面统一毛玻璃质感） */
+/* 3. Gemini 圆润胶囊 + 液态玻璃卡片体系 */
 .panel,
 .stats article,
-.welcome .date,
 .sched-d-header,
 .sched-today-card,
 .sched-matrix-card,
 .sched-manage-card,
 .sched-tt-card,
-.auth-card,
 #auth form {
   background: var(--lg-surface-2) !important;
-  backdrop-filter: blur(18px) saturate(175%);
-  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--lg-border-outer) !important;
-  border-radius: 18px !important;
+  border-radius: 22px !important;
   box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
 }
 
-/* 列表子卡片（兼顾高帧率滚动与玻璃高光边） */
+.welcome .date,
+.home-sched-strip,
+.pill,
+.sched-m-seg,
+.sched-d-seg,
+.suggestions button {
+  border-radius: 999px !important;
+}
+
+.home-sched-strip {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+}
+
 .notice-card,
 #knowledgeGrid .knowledge-card,
 .sched-lesson,
-.sched-clist-item {
+.sched-clist-item,
+.welcome-item {
   background: var(--lg-item-bg) !important;
   border: 1px solid var(--lg-border-outer) !important;
-  border-radius: 15px !important;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04), var(--lg-border-inner);
+  border-radius: 18px !important;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035), var(--lg-border-inner);
   transition: transform 0.18s var(--lg-spring), border-color 0.18s ease, box-shadow 0.18s ease;
 }
-.notice-card:hover,
-#knowledgeGrid .knowledge-card:hover,
-.sched-lesson:hover {
-  border-color: var(--blue-border) !important;
-  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+
+/* 4. 彻底修复移动端 AI 聊天背景割裂 + 滑动卡死 Bug + 砍掉冗余视觉区 */
+body.on-ai-page .messages {
+  background: transparent !important;
 }
-.sched-lesson.active {
-  background: linear-gradient(135deg, rgba(59, 108, 255, 0.11), rgba(105, 56, 239, 0.04)) !important;
-  border-color: rgba(59, 108, 255, 0.48) !important;
-}
-html.dark .sched-lesson.active {
-  background: linear-gradient(135deg, rgba(91, 140, 255, 0.18), rgba(91, 140, 255, 0.05)) !important;
-  border-color: rgba(91, 140, 255, 0.55) !important;
+@media (max-width: 760px) {
+  body.on-ai-page main {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  body.on-ai-page .messages {
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: touch;
+    background: transparent !important;
+    padding: 10px 14px 104px !important;
+  }
+  /* 消除底栏与输入框之间那条突兀的隔离带，让对话直接透出底层氛围 */
+  body.on-ai-page .ask {
+    background: transparent !important;
+    padding: 6px 12px 10px !important;
+  }
+  /* 精简移动端 AI 顶部栏，避免和主顶栏“校园事务 / 文理智办”重复 */
+  body.on-ai-page .chat-topbar {
+    background: var(--lg-surface-1) !important;
+    backdrop-filter: blur(22px) saturate(185%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(185%) !important;
+    border-bottom: 1px solid var(--lg-border-outer) !important;
+    padding: 8px 14px !important;
+  }
+  body.on-ai-page .suggestions-bar {
+    background: var(--lg-surface-1) !important;
+    backdrop-filter: blur(18px) saturate(175%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(175%) !important;
+    border-bottom: 1px solid var(--lg-border-outer) !important;
+  }
+  body.on-ai-page .chat-topbar .ai-title-meta small,
+  body.on-ai-page .chat-topbar .ai-status-pill {
+    display: none;
+  }
 }
 
-/* 统计卡与首页下一节课胶囊微光升级 */
-.stats article {
-  transition: transform 0.18s var(--lg-spring), box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.stats article:hover {
-  transform: translateY(-2px);
-  border-color: var(--blue-border) !important;
-}
-.home-sched-strip {
-  backdrop-filter: blur(16px) saturate(175%);
-  -webkit-backdrop-filter: blur(16px) saturate(175%);
-  border-radius: 16px !important;
-  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+body.on-ai-page .ask .ask-input-wrap {
+  background: var(--lg-surface-3) !important;
+  backdrop-filter: blur(26px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(195%) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
 }
 
-/* 4. 三级浮层、弹窗与 AI 悬浮输入胶囊（Apple Sheet 级通透感） */
+/* 5. 修复阅读官网原文弹窗（15699.jpg）过于透明导致文字透底的问题 */
+.doc-m-pop,
+.ask-attach-pop {
+  background: var(--lg-pop-bg) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
+}
+
+/* 6. 全站弹窗与公文阅读器外框统一液态玻璃 */
 dialog:not(#docDialog) {
   background: var(--lg-surface-3) !important;
   backdrop-filter: blur(28px) saturate(195%) !important;
@@ -8787,39 +8833,46 @@ dialog:not(#docDialog) {
   box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
 }
 dialog::backdrop {
-  background: rgba(15, 23, 42, 0.36);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  background: rgba(15, 23, 42, 0.34);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
 }
-
-.ask-input-wrap,
-.ask-attach-pop,
-.doc-m-pop {
-  background: var(--lg-surface-3) !important;
-  backdrop-filter: blur(24px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-  border: 1px solid var(--lg-border-outer) !important;
-  box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
-}
-
-/* 公文阅读器：外栏与目录卡升级毛玻璃，中间公文纸张严格保留 GB/T 9704 实体纸感 */
 #docDialog .doc-reader-bar,
 #docDialog .doc-outline,
 #docDialog .doc-mobile-nav {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(185%);
+  -webkit-backdrop-filter: blur(22px) saturate(185%);
 }
 
-/* 5. 全站胶囊、分段切换器与表单控件统一圆角与阻尼 */
-.pill,
-.sched-m-seg,
-.sched-d-seg {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* 7. 全站按钮与输入控件 Gemini 圆润化 */
+button.primary,
+button.secondary,
+button.outline,
+.sched-btn-primary,
+.sched-btn-ghost,
+.sched-btn-danger {
+  border-radius: 999px !important;
+  transition: transform 0.16s var(--lg-spring), filter 0.16s ease, background-color 0.16s ease;
 }
 input:not([type="checkbox"]):not([type="radio"]),
 select,
 textarea {
-  border-radius: 12px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  border-radius: 14px;
+}
+
+
+/* ==================== v1.058 移动端全局隐藏右侧灰色滚动条 ==================== */
+@media (max-width: 960px) {
+  html, body, * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
 }

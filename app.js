@@ -813,6 +813,7 @@ document.querySelectorAll("#catPills .pill-btn").forEach(btn => {
     btn.classList.add("active");
     if (btn.dataset.cat !== "__starred__") {
       $("category").value = btn.dataset.cat;
+      if (typeof sync_xz_select === "function") sync_xz_select($("category"));
     }
     render_notices();
   };
@@ -993,7 +994,7 @@ $("noticeForm").onsubmit = async e => {
   }
 };
 
-/* ---- 全站横向区域抓取拖动（不影响普通点击和纵向触摸滚动） ---- */
+/* ---- 全站横向区域抓取拖动（仅桌面鼠标拖动，不影响普通点击和移动端触摸滚动） ---- */
 (function init_global_grab_scroll() {
   const selector = [
     '#knowledgePage .cat-pills', '#noticesPage #catPills', '#knowledgePills',
@@ -1002,6 +1003,7 @@ $("noticeForm").onsubmit = async e => {
     '.doc-font-group', '.doc-m-font-seg', '.sched-m-seg', '.sched-d-seg'
   ].join(',');
   let active = null;
+  let suppressClickEl = null;
   let suppressClickUntil = 0;
 
   function eligible(el) {
@@ -1009,35 +1011,45 @@ $("noticeForm").onsubmit = async e => {
     return el.scrollWidth > el.clientWidth + 4;
   }
   document.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    const el = e.target.closest(selector);
+    suppressClickEl = null;
+    suppressClickUntil = 0;
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+    const el = target ? target.closest(selector) : null;
     if (!eligible(el)) return;
     active = { el, id:e.pointerId, x:e.clientX, left:el.scrollLeft, moved:false };
     el.classList.add('is-grab-scroll');
-    try { el.setPointerCapture(e.pointerId); } catch (_) {}
   }, {passive:true});
   document.addEventListener('pointermove', e => {
     if (!active || active.id !== e.pointerId) return;
     const dx = e.clientX - active.x;
     if (!active.moved && Math.abs(dx) < 7) return;
-    active.moved = true;
-    active.el.classList.add('is-grab-scrolling');
+    if (!active.moved) {
+      active.moved = true;
+      active.el.classList.add('is-grab-scrolling');
+      try { active.el.setPointerCapture(e.pointerId); } catch (_) {}
+    }
     active.el.scrollLeft = active.left - dx;
     if (e.cancelable) e.preventDefault();
   }, {passive:false});
   function finish(e) {
     if (!active || (e && active.id !== e.pointerId)) return;
-    if (active.moved) suppressClickUntil = Date.now() + 420;
+    if (active.moved) {
+      suppressClickEl = active.el;
+      suppressClickUntil = Date.now() + 420;
+      try { if (active.el.hasPointerCapture?.(active.id)) active.el.releasePointerCapture(active.id); } catch (_) {}
+    }
     active.el.classList.remove('is-grab-scroll','is-grab-scrolling');
     active = null;
   }
   document.addEventListener('pointerup', finish, {passive:true});
   document.addEventListener('pointercancel', finish, {passive:true});
   document.addEventListener('click', e => {
-    if (Date.now() < suppressClickUntil) {
+    if (suppressClickEl && Date.now() < suppressClickUntil && suppressClickEl.contains(e.target)) {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      suppressClickUntil = 0;
     }
+    suppressClickEl = null;
+    suppressClickUntil = 0;
   }, true);
 })();
 
@@ -1560,6 +1572,7 @@ document.querySelectorAll("#knowledgePills .pill-btn").forEach(btn => {
       $("knowledgeDept").value = "";
       $("knowledgeSearch").value = btn.dataset.kq;
     }
+    if (typeof sync_xz_select === "function") sync_xz_select($("knowledgeDept"));
     load_knowledge();
   };
 });

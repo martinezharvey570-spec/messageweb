@@ -8189,3 +8189,247 @@ html.dark .home-sched-strip {
 .sched-sub-card .ico { width: 20px; height: 20px; color: var(--blue); flex: 0 0 auto; }
 .sched-sub-card b { display: block; font-size: 13px; color: var(--ink); line-height: 1.25; }
 .sched-sub-card small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+
+/* ==================== v1.043 桌面端统一美术语言 + AI导课表 + 移动端弹窗顺滑滚动 ==================== */
+.sched-d-header {
+  background: var(--glass-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 18px 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 14px;
+}
+.sched-d-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.sched-d-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .01em;
+}
+.sched-d-wstrip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  scrollbar-width: none;
+}
+.sched-d-wstrip::-webkit-scrollbar { display: none; }
+.sched-d-wstrip .sched-week-chip {
+  flex: 0 0 auto;
+  min-width: 54px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.sched-d-wstrip .sched-week-chip.on {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(21, 94, 239, .22);
+}
+.sched-d-wstrip .sched-week-chip.cur::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #10b981;
+  margin: 2px auto 0;
+}
+.sched-d-wstrip .sched-week-chip.on.cur::after { background: #fff; }
+
+.sched-d-dstrip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.sched-d-dstrip .sched-date-chip {
+  padding: 7px 6px 6px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  position: relative;
+  cursor: pointer;
+}
+.sched-d-dstrip .sched-date-chip .dw { font-size: 12px; color: var(--muted); font-weight: 600; }
+.sched-d-dstrip .sched-date-chip .dd { font-size: 13px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sched-d-dstrip .sched-date-chip.today { border-color: var(--blue-border); background: var(--blue-light); }
+.sched-d-dstrip .sched-date-chip.today .dw,
+.sched-d-dstrip .sched-date-chip.today .dd { color: var(--blue); }
+.sched-d-dstrip .sched-date-chip.today::before {
+  content: "今";
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: #fff;
+}
+.sched-d-dstrip .sched-date-chip.on {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(21, 94, 239, .24);
+}
+.sched-d-dstrip .sched-date-chip.on .dw,
+.sched-d-dstrip .sched-date-chip.on .dd { color: #fff; }
+.sched-d-dstrip .sched-date-chip.on.today::before { background: var(--card); color: var(--blue); }
+
+.sched-d-stage {
+  display: grid;
+  grid-template-columns: 356px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1180px) and (min-width: 961px) {
+  .sched-d-stage { grid-template-columns: 310px minmax(0, 1fr); gap: 12px; }
+}
+.sched-d-leftcol {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.sched-d-rightcol {
+  min-width: 0;
+}
+.sched-d-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sched-d-seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.sched-dseg-btn {
+  min-height: 0;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.sched-dseg-btn .ico { width: 14px; height: 14px; }
+.sched-dseg-btn.on {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(21, 94, 239, .2);
+}
+
+/* AI 导课表弹窗样式 */
+.sched-upload-drop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--blue-border);
+  background: var(--blue-light);
+  cursor: pointer;
+}
+.sched-upload-drop .ico { width: 24px; height: 24px; color: var(--blue); flex: 0 0 auto; }
+.sched-upload-drop b { display: block; font-size: 13.5px; color: var(--ink); }
+.sched-upload-drop small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.sched-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 96px;
+}
+html.dark .sched-field textarea { background: var(--surface); color: var(--ink); border-color: var(--border); }
+.sched-import-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sched-radio-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sched-radio-pill input { width: 16px; height: 16px; margin: 0; accent-color: var(--blue); }
+
+/* 解决移动端弹窗（15690.jpg）空间太小及不能单指顺滑滚动的问题 */
+@media (max-width: 960px) {
+  #scheduleSettingDialog,
+  #scheduleCourseDialog,
+  #scheduleAiImportDialog {
+    max-height: 92dvh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #scheduleSettingDialog:not([open]),
+  #scheduleCourseDialog:not([open]),
+  #scheduleAiImportDialog:not([open]) {
+    display: none !important;
+  }
+  #scheduleSettingDialog .dialoghead,
+  #scheduleCourseDialog .dialoghead,
+  #scheduleAiImportDialog .dialoghead {
+    flex: 0 0 auto;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--line);
+    margin: 0;
+  }
+  #scheduleSettingDialog .sched-setting-body,
+  #scheduleCourseDialog .sched-dlg-form,
+  #scheduleAiImportDialog .sched-ai-import-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 14px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+  }
+  #scheduleSettingDialog .sched-clist {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

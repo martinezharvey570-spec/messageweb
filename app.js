@@ -2189,6 +2189,7 @@ function add_tools(wrap_el, text_getter, retry_question = "") {
   tools.appendChild(copy_btn);
 
   const answer_text = typeof text_getter === "function" ? text_getter() : text_getter;
+  setTimeout(() => { if (typeof apply_ai_schedule_action === "function") apply_ai_schedule_action(answer_text, tools); }, 0);
   const steps = pick_steps(answer_text);
   const todo_btn = document.createElement("button");
   todo_btn.type = "button";
@@ -4160,7 +4161,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
     const emptyHint = !schedState.courses.length
       ? `<div class="sched-empty-actions">
            <button type="button" class="sched-btn-primary" data-empty-act="add"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加第一门课</span></button>
-           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>AI 截图导课表</span></button>
+           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>AI 导课表</span></button>
          </div>`
       : `<div style="font-size:12px;opacity:.8">可以去自习或点击上方“+”添加课程</div>`;
     return `<div class="sched-empty-box">
@@ -4201,6 +4202,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
 
 function render_schedule_desktop(now) {
   const weekNo = schedState.selectedWeek;
+  const day = schedState.selectedDay;
   const todayWeek = schedGetWeekNumber(now, schedState.startDate);
   const todayDay = now.getDay() || 7;
   const monday = schedGetDateOf(weekNo, 1, schedState.startDate);
@@ -4208,20 +4210,59 @@ function render_schedule_desktop(now) {
   const season = schedGetSeason(schedAddDays(monday, 3));
   const periods = SCHED_TIMES[season].periods;
 
-  const lbl = $("schedDesktopWeekLabel");
-  if (lbl) lbl.textContent = `第 ${weekNo} 周`;
   const rng = $("schedDesktopRange");
-  if (rng) rng.textContent = `${schedFmtShort(monday)} – ${schedFmtShort(sunday)}`;
+  if (rng) rng.textContent = `第 ${weekNo} 周 · ${schedFmtShort(monday)} – ${schedFmtShort(sunday)}`;
   const sb = $("schedDesktopSeasonBadge");
   if (sb) {
     sb.className = "sched-season-badge" + (season === "winter" ? " is-winter" : "");
-    sb.innerHTML = schedSeasonHtml(season);
+    sb.innerHTML = schedSeasonHtml(season, false);
   }
 
-  // 7x5 矩阵
+  // 桌面端周次胶囊条（与移动端统一视觉）
+  const dwStrip = $("schedDeskWeekStrip");
+  if (dwStrip) {
+    let wh = "";
+    for (let w = 1; w <= schedState.totalWeeks; w++) {
+      wh += `<button type="button" class="sched-week-chip${w === weekNo ? " on" : ""}${w === todayWeek ? " cur" : ""}" data-w="${w}">第${w}周</button>`;
+    }
+    dwStrip.innerHTML = wh;
+  }
+
+  // 桌面端日期胶囊条（带“今”角标）
+  const ddStrip = $("schedDeskDateStrip");
+  if (ddStrip) {
+    let dh = "";
+    for (let d = 1; d <= 7; d++) {
+      const cd = schedGetDateOf(weekNo, d, schedState.startDate);
+      const isT = weekNo === todayWeek && d === todayDay;
+      dh += `<button type="button" class="sched-date-chip${d === day ? " on" : ""}${isT ? " today" : ""}" data-d="${d}">
+        <span class="dw">${SCHED_DAY_SHORT[d]}</span>
+        <span class="dd">${cd.getMonth() + 1}/${cd.getDate()}</span>
+      </button>`;
+    }
+    ddStrip.innerHTML = dh;
+  }
+
+  // 左栏：原版黄金比例 Hero + 选中日课程时间轴
+  const sideIsToday = weekNo === todayWeek && day === todayDay;
+  const sideCourses = schedCoursesOfDay(weekNo, day);
+  const heroObj = schedBuildHeroHtml(now, sideCourses, weekNo, day, sideIsToday);
+  const heroEl = $("schedDesktopHero");
+  if (heroEl) {
+    heroEl.className = "sched-hero" + (heroObj.empty ? " empty" : "");
+    heroEl.innerHTML = heroObj.html;
+  }
+  const tTitle = $("schedDesktopTodayTitle");
+  if (tTitle) tTitle.textContent = sideIsToday ? "今日课程" : `${SCHED_DAY_NAMES[day]} 课程`;
+  const tDate = $("schedDesktopTodayDate");
+  if (tDate) tDate.textContent = `${schedFmtShort(schedGetDateOf(weekNo, day, schedState.startDate))} · 第 ${weekNo} 周`;
+  const tl = $("schedDesktopTimeline");
+  if (tl) tl.innerHTML = schedBuildTimelineNodes(sideCourses, now, weekNo, day, sideIsToday);
+
+  // 右栏：7x5 周课表矩阵（点击表头同步左栏日期）
   const matrix = $("schedDesktopMatrix");
   if (matrix) {
-    let html = `<div class="sched-m-head" style="display:flex;align-items:center;justify-content:center;">节次</div>`;
+    let html = `<div class="sched-m-head" style="display:flex;align-items:center;justify-content:center;cursor:default;">节次</div>`;
     for (let d = 1; d <= 7; d++) {
       const cd = schedGetDateOf(weekNo, d, schedState.startDate);
       const isT = weekNo === todayWeek && d === todayDay;
@@ -4250,23 +4291,8 @@ function render_schedule_desktop(now) {
     matrix.innerHTML = html;
   }
 
-  // 桌面端顶部扁平状态横幅（方案A：固定紧凑高度，不挤占周课表）
-  const sideDay = todayDay;
-  const sideWeek = (todayWeek >= 1 && todayWeek <= schedState.totalWeeks) ? todayWeek : weekNo;
-  const sideIsToday = sideWeek === todayWeek && sideDay === todayDay;
-  const sideCourses = schedCoursesOfDay(sideWeek, sideDay);
-  const heroObj = schedBuildHeroHtml(now, sideCourses, sideWeek, sideDay, sideIsToday);
-  const heroEl = $("schedDesktopHero");
-  if (heroEl) {
-    heroEl.className = "sched-hero sched-hero-banner" + (heroObj.empty ? " empty" : "");
-    heroEl.innerHTML = heroObj.html;
-  }
-  const tTitle = $("schedDesktopTodayTitle");
-  if (tTitle) tTitle.textContent = sideIsToday ? "今日课程" : `第 ${sideWeek} 周 ${SCHED_DAY_NAMES[sideDay]}`;
-  const tDate = $("schedDesktopTodayDate");
-  if (tDate) tDate.textContent = `${schedFmtShort(schedGetDateOf(sideWeek, sideDay, schedState.startDate))} · ${SCHED_DAY_NAMES[sideDay]}`;
-  const tl = $("schedDesktopTimeline");
-  if (tl) tl.innerHTML = schedBuildTimelineNodes(sideCourses, now, sideWeek, sideDay, sideIsToday);
+  // 右栏：作息对照双卡
+  render_timetable_cards($("schedDesktopInlineTimetable"), null, now);
 }
 
 function render_schedule_mobile(now) {
@@ -4838,47 +4864,172 @@ async function compress_sched_image(file) {
 (function bind_sched_ux_extras() {
   $("homeScheduleStrip")?.addEventListener("click", () => go("schedule"));
 
-  const triggerImgImport = () => $("schedImgFile")?.click();
-  $("schedImportImgBtn")?.addEventListener("click", triggerImgImport);
-  $("schedMobImportImgBtn")?.addEventListener("click", triggerImgImport);
+  let pendingAiFile = null;
+
+  const openAiImportModal = () => {
+    pendingAiFile = null;
+    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = "支持教务系统截图、导出 PDF、课表表格等任意格式";
+    if ($("schedAiPasteText")) $("schedAiPasteText").value = "";
+    $("scheduleAiImportDialog")?.showModal();
+  };
+
+  $("schedImportImgBtn")?.addEventListener("click", openAiImportModal);
   $("schedSettingImportImgBtn")?.addEventListener("click", () => {
     $("scheduleSettingDialog")?.close();
-    triggerImgImport();
+    openAiImportModal();
+  });
+  $("closeSchedAiImportDlg")?.addEventListener("click", () => $("scheduleAiImportDialog")?.close());
+  $("schedAiPickFileBtn")?.addEventListener("click", () => $("schedImgFile")?.click());
+
+  // 桌面端周次条、日期条、分段切换
+  $("schedDeskWeekStrip")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-w]");
+    if (!btn) return;
+    schedState.selectedWeek = Number(btn.dataset.w);
+    render_schedule_all();
+  });
+  $("schedDeskDateStrip")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-d]");
+    if (!btn) return;
+    schedState.selectedDay = Number(btn.dataset.d);
+    render_schedule_all();
+  });
+  document.querySelectorAll(".sched-dseg-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      const t = b.dataset.dtab;
+      document.querySelectorAll(".sched-dseg-btn").forEach(x => x.classList.toggle("on", x.dataset.dtab === t));
+      $("schedDeskViewMatrix")?.classList.toggle("hide", t !== "matrix");
+      $("schedDeskViewTimetable")?.classList.toggle("hide", t !== "timetable");
+    });
   });
 
   $("schedulePage")?.addEventListener("click", e => {
     const act = e.target.closest("[data-empty-act]");
     if (!act) return;
     if (act.dataset.emptyAct === "add") open_schedule_course_dlg(-1);
-    if (act.dataset.emptyAct === "img") triggerImgImport();
+    if (act.dataset.emptyAct === "img") openAiImportModal();
   });
 
-  $("schedImgFile")?.addEventListener("change", async e => {
+  $("schedImgFile")?.addEventListener("change", e => {
     const file = e.target.files && e.target.files[0];
     e.target.value = "";
     if (!file) return;
-    toast("正在用 AI 识别课表截图，请稍候…");
-    schedSetSyncLabel("AI 识别中…", true);
+    pendingAiFile = file;
+    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = `已选择：${file.name}（${Math.max(1, Math.round(file.size / 1024))} KB）`;
+  });
+
+  function load_ext_script(url) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${url}"]`)) { resolve(); return; }
+      const s = document.createElement("script");
+      s.src = url;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("加载解析组件失败，请检查网络"));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function extract_pdf_for_schedule(file) {
+    await load_ext_script("https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js");
+    const pdfjsLib = window.pdfjsLib;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let fullText = "";
+    for (let i = 1; i <= Math.min(pdf.numPages, 6); i++) {
+      const page = await pdf.getPage(i);
+      const tc = await page.getTextContent();
+      fullText += tc.items.map(it => it.str).join(" ") + "\n";
+    }
+    if (fullText.trim().length > 40) {
+      return { text: fullText.trim() };
+    }
+    // 扫描版 PDF：渲染第 1 页成高清图片走视觉识图
+    const page1 = await pdf.getPage(1);
+    const vp = page1.getViewport({ scale: 1.8 });
+    const canvas = document.createElement("canvas");
+    canvas.width = vp.width; canvas.height = vp.height;
+    await page1.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+    return { image: canvas.toDataURL("image/jpeg", 0.88) };
+  }
+
+  async function extract_xlsx_for_schedule(file) {
+    await load_ext_script("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+    const buf = await file.arrayBuffer();
+    const wb = window.XLSX.read(buf, { type: "array" });
+    let txt = "";
+    for (const name of wb.SheetNames.slice(0, 3)) {
+      txt += `[工作表:${name}]\n` + window.XLSX.utils.sheet_to_csv(wb.Sheets[name]) + "\n";
+    }
+    return { text: txt };
+  }
+
+  $("schedAiRunBtn")?.addEventListener("click", async () => {
+    const pasted = ($("schedAiPasteText")?.value || "").trim();
+    if (!pendingAiFile && !pasted) {
+      toast("请先选择课表文件，或粘贴课表文字");
+      return;
+    }
+    const mode = document.querySelector('input[name="schedImportMode"]:checked')?.value || "merge";
+    const btn = $("schedAiRunBtn");
+    btn.disabled = true;
+    toast("正在解析课表，请稍候…");
+    schedSetSyncLabel("AI 解析中…", true);
+
     try {
-      const dataUrl = await compress_sched_image(file);
-      const res = await api("/schedule/parse-image", {
+      let payload = {};
+      if (pendingAiFile) {
+        const fname = (pendingAiFile.name || "").toLowerCase();
+        if (pendingAiFile.type.startsWith("image/")) {
+          payload.image = await compress_sched_image(pendingAiFile);
+          if (pasted) payload.text = pasted;
+        } else if (fname.endsWith(".pdf")) {
+          payload = await extract_pdf_for_schedule(pendingAiFile);
+          if (pasted) payload.text = (payload.text ? payload.text + "\n" : "") + pasted;
+        } else if (fname.endsWith(".xlsx") || fname.endsWith(".xls")) {
+          payload = await extract_xlsx_for_schedule(pendingAiFile);
+          if (pasted) payload.text += "\n" + pasted;
+        } else if (fname.endsWith(".json")) {
+          const raw = await pendingAiFile.text();
+          try {
+            const j = JSON.parse(raw);
+            const arr = Array.isArray(j) ? j : (Array.isArray(j.courses) ? j.courses : null);
+            if (arr && arr.length && arr[0].name && arr[0].day) {
+              schedState.courses = mode === "replace" ? arr : [...schedState.courses, ...arr];
+              if (j.startDate) schedState.startDate = j.startDate;
+              schedQueueSync();
+              render_schedule_all();
+              $("scheduleAiImportDialog")?.close();
+              toast(`已导入 ${arr.length} 条 JSON 课程`);
+              btn.disabled = false;
+              return;
+            }
+          } catch {}
+          payload.text = raw + (pasted ? "\n" + pasted : "");
+        } else {
+          payload.text = (await pendingAiFile.text()) + (pasted ? "\n" + pasted : "");
+        }
+      } else {
+        payload.text = pasted;
+      }
+
+      const res = await api("/schedule/parse", {
         method: "POST",
-        body: JSON.stringify({ image: dataUrl })
+        body: JSON.stringify(payload)
       });
       const parsed = Array.isArray(res?.courses) ? res.courses : [];
-      if (!parsed.length) { toast("未识别到课程，请换一张清晰截图"); return; }
-      if (schedState.courses.length > 0) {
-        const merge = confirm(`AI 成功识别出 ${parsed.length} 条课程！\n点击“确定”追加到现有课表，点击“取消”替换原有课表。`);
-        schedState.courses = merge ? [...schedState.courses, ...parsed] : parsed;
-      } else {
-        schedState.courses = parsed;
-      }
+      if (!parsed.length) { toast("未识别到有效课程，请换一份更清晰的课表"); return; }
+
+      schedState.courses = mode === "replace" ? parsed : [...schedState.courses, ...parsed];
       schedQueueSync();
       render_schedule_all();
-      toast(`已导入 ${parsed.length} 条课程并同步云端`);
+      $("scheduleAiImportDialog")?.close();
+      toast(`成功导入 ${parsed.length} 条课程并同步云端`);
     } catch (err) {
-      schedSetSyncLabel("识别失败", false);
-      toast(err?.message || "截图识别失败，请重试");
+      schedSetSyncLabel("导入失败", false);
+      toast(err?.message || "课表解析失败，请重试");
+    } finally {
+      btn.disabled = false;
     }
   });
 
@@ -4932,3 +5083,60 @@ async function compress_sched_image(file) {
     }
   });
 })();
+
+function apply_ai_schedule_action(rawText, toolsEl) {
+  const m = String(rawText || "").match(/<!--SCHEDULE_ACTION\s*([\s\S]*?)\s*SCHEDULE_ACTION-->/);
+  if (!m || !toolsEl || toolsEl.dataset.schedApplied) return;
+  let act = null;
+  try { act = JSON.parse(m[1]); } catch { return; }
+  if (!act || !act.mode) return;
+  toolsEl.dataset.schedApplied = "1";
+
+  const snapshot = JSON.parse(JSON.stringify(schedState.courses));
+  let changedMsg = "";
+  if (act.mode === "merge" && Array.isArray(act.courses) && act.courses.length) {
+    schedState.courses = [...schedState.courses, ...act.courses];
+    changedMsg = `已为你添加 ${act.courses.length} 门课程`;
+  } else if (act.mode === "replace" && Array.isArray(act.courses) && act.courses.length) {
+    schedState.courses = act.courses;
+    changedMsg = `已为你替换为 ${act.courses.length} 门新课程`;
+  } else if (act.mode === "delete" && act.match) {
+    const targetName = String(act.match.name || "").trim();
+    const targetDay = act.match.day ? Number(act.match.day) : 0;
+    const targetStart = act.match.start ? Number(act.match.start) : 0;
+    const before = schedState.courses.length;
+    schedState.courses = schedState.courses.filter(c => {
+      const nameOk = !targetName || String(c.name || "").includes(targetName);
+      const dayOk = !targetDay || Number(c.day) === targetDay;
+      const startOk = !targetStart || Number(c.start) === targetStart;
+      return !(nameOk && dayOk && startOk);
+    });
+    changedMsg = `已从课表删除 ${before - schedState.courses.length} 门课程`;
+  } else {
+    return;
+  }
+
+  schedQueueSync();
+  render_schedule_all();
+  toast(changedMsg + "，已同步云端");
+
+  const viewBtn = document.createElement("button");
+  viewBtn.type = "button";
+  viewBtn.className = "todo-action-btn";
+  viewBtn.innerHTML = `${ico("calendar", "ico-xs")}查看课表`;
+  viewBtn.onclick = () => go("schedule");
+  toolsEl.appendChild(viewBtn);
+
+  const undoBtn = document.createElement("button");
+  undoBtn.type = "button";
+  undoBtn.className = "todo-action-btn is-manual";
+  undoBtn.innerHTML = `${ico("refresh", "ico-xs")}撤销更改`;
+  undoBtn.onclick = () => {
+    schedState.courses = snapshot;
+    schedQueueSync();
+    render_schedule_all();
+    undoBtn.disabled = true;
+    toast("已撤销本次 AI 课表更改");
+  };
+  toolsEl.appendChild(undoBtn);
+}

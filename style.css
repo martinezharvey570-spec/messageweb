@@ -9645,3 +9645,323 @@ html.dark .scroll-bottom-btn {
 .ask-attach-preview > div {
   border-radius: 999px !important;
 }
+
+
+/* ==================== v1.065 深度审查补全：高校弹窗、公文工具栏、全部表单与四层逻辑闭环 ==================== */
+
+/* 【Layer 1：全站所有弹窗内输入槽 & 字号切换槽 & 高校搜索槽】 */
+.school-search-wrap input,
+dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
+dialog:not(#docDialog) select,
+#docDialog .doc-font-group,
+.doc-m-font-seg {
+  border-radius: 999px !important;
+  background: rgba(226, 232, 240, 0.48) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(15, 23, 42, 0.07),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88) !important;
+}
+dialog:not(#docDialog) textarea {
+  border-radius: 18px !important;
+  background: rgba(226, 232, 240, 0.42) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: inset 0 1.5px 4px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .school-search-wrap input,
+html.dark dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
+html.dark dialog:not(#docDialog) select,
+html.dark dialog:not(#docDialog) textarea,
+html.dark #docDialog .doc-font-group,
+html.dark .doc-m-font-seg {
+  background: rgba(15, 23, 42, 0.58) !important;
+  border-color: rgba(255, 255, 255, 0.11) !important;
+  box-shadow: inset 0 1.5px 5px rgba(0, 0, 0, 0.42), inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 【Layer 2：弹窗内信息提示卡、AI导课表上传区与预览框】 */
+.ui-modal-msg,
+.sched-upload-drop,
+.sched-ai-preview {
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  border-radius: 18px !important;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.94), 0 4px 14px rgba(15, 23, 42, 0.04) !important;
+}
+html.dark .ui-modal-msg,
+html.dark .sched-upload-drop,
+html.dark .sched-ai-preview {
+  background: rgba(30, 41, 59, 0.66) !important;
+  border-color: rgba(255, 255, 255, 0.11) !important;
+}
+
+/* 【Layer 3：高校列表项、AI待办整理项、弹窗关闭钮、公文工具钮、附件菜单项】 */
+.school-item,
+.ai-todo-item,
+.stat-bar-row {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 248, 255, 0.86) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 4px 12px -3px rgba(15, 23, 42, 0.05) !important;
+  transition: transform 0.16s var(--lg-spring), border-color 0.16s ease !important;
+}
+.school-item.selected {
+  border-color: rgba(21, 94, 239, 0.45) !important;
+  background: linear-gradient(135deg, rgba(235, 244, 255, 0.95), rgba(255, 255, 255, 0.90)) !important;
+}
+html.dark .school-item,
+html.dark .ai-todo-item,
+html.dark .stat-bar-row {
+  background: linear-gradient(180deg, rgba(38, 49, 68, 0.88) 0%, rgba(24, 33, 50, 0.82) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dialoghead button,
+.doc-tool-btn,
+.doc-m-btn,
+#docDialog .doc-font-group button,
+.doc-m-font-seg button {
+  border-radius: 999px !important;
+}
+.dialoghead button,
+.doc-tool-btn,
+.doc-m-btn:not(.is-ai) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 241, 252, 0.82) 100%) !important;
+  border: 1px solid rgba(21, 94, 239, 0.12) !important;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+}
+html.dark .dialoghead button,
+html.dark .doc-tool-btn,
+html.dark .doc-m-btn:not(.is-ai) {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.85) 0%, rgba(30, 41, 59, 0.78) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+#docDialog .doc-font-group button.active,
+.doc-m-font-seg button.active {
+  background: linear-gradient(160deg, #2563eb 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 3px 8px rgba(21, 94, 239, 0.24) !important;
+}
+
+.ask-attach-pop button {
+  border-radius: 14px !important;
+  transition: background 0.15s ease, transform 0.14s var(--lg-spring);
+}
+.ask-attach-pop button:active { transform: scale(0.98); }
+
+/* 【Layer 4：公文阅读器顶/底栏 & 移动端课表吸顶区圆润液态玻璃】 */
+#docDialog .doc-reader-bar,
+#docDialog .doc-reader-foot,
+#docDialog .doc-mobile-nav {
+  background: var(--lg-surface-1) !important;
+  border-color: var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner) !important;
+}
+@media (max-width: 960px) {
+  .sched-m-sticky {
+    border-radius: 0 0 22px 22px !important;
+    box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
+  }
+}
+
+
+/* ==================== v1.066 专项清除Bug & 曲面透镜级液态玻璃升级 ==================== */
+
+/* Bug 1 修复（33f86f1a.jpg）：下拉菜单被下一行盖住 + 过透重影 */
+#usersPage .panel {
+  overflow: visible !important;
+}
+.taskrow:has(.xz-select.open),
+.user-row:has(.xz-select.open) {
+  position: relative !important;
+  z-index: 80 !important;
+  transform: none !important;
+}
+.xz-select.open {
+  z-index: 120 !important;
+}
+.xz-select-menu {
+  z-index: 130 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 16px 38px rgba(15, 23, 42, 0.16) !important;
+}
+html.dark .xz-select-menu {
+  background: rgba(17, 24, 39, 0.98) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 18px 42px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Bug 2 修复（c518ef13.jpg）：蓝色液态玻璃胶囊不再只有一条生硬白细线，改为曲面透镜柔光折射 */
+button.primary,
+.sched-btn-primary,
+.sched-m-ibtn.is-primary,
+.ai-seg-btn.active,
+.sched-seg-btn.on,
+.sched-dseg-btn.on,
+.pill.active,
+.pill-btn.active,
+.authbox .tabs button.selected,
+#docDialog .doc-outline-item.active,
+#docDialog .doc-font-group button.active,
+.doc-m-font-seg button.active,
+#schedulePage .sched-week-chip.on,
+#schedulePage .sched-date-chip.on {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(160deg, #3b82f6 0%, #2563eb 54%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 -3px 8px rgba(15, 23, 42, 0.22),
+    0 8px 20px -4px rgba(37, 99, 235, 0.38) !important;
+}
+
+/* Bug 3 修复：浅色次级玻璃按钮 & 未选中胶囊也升级为全周柔和玻璃光环，去掉生硬断层 */
+button.secondary,
+button.outline,
+.sched-btn-ghost,
+.pill:not(.active),
+.pill-btn:not(.active),
+.quick,
+.bubble-tools button,
+.todo-action-btn,
+.icon-btn,
+.chat-top-actions button,
+.sched-m-ibtn:not(.is-primary),
+.sched-step-btn,
+.dialoghead button,
+.doc-tool-btn,
+.doc-m-btn:not(.is-ai),
+#schedulePage .sched-week-chip:not(.on),
+#schedulePage .sched-date-chip:not(.on):not(.today) {
+  background:
+    radial-gradient(110% 80% at 25% 0%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(235, 242, 253, 0.78) 100%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.04),
+    0 3px 10px rgba(15, 23, 42, 0.055) !important;
+}
+html.dark button.secondary,
+html.dark button.outline,
+html.dark .sched-btn-ghost,
+html.dark .pill:not(.active),
+html.dark .pill-btn:not(.active),
+html.dark .quick,
+html.dark .bubble-tools button,
+html.dark .todo-action-btn,
+html.dark .icon-btn,
+html.dark .chat-top-actions button,
+html.dark .sched-m-ibtn:not(.is-primary),
+html.dark .sched-step-btn,
+html.dark .dialoghead button,
+html.dark .doc-tool-btn,
+html.dark .doc-m-btn:not(.is-ai),
+html.dark #schedulePage .sched-week-chip:not(.on),
+html.dark #schedulePage .sched-date-chip:not(.on):not(.today) {
+  background:
+    radial-gradient(110% 80% at 25% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(51, 65, 85, 0.86) 0%, rgba(30, 41, 59, 0.78) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Bug 4 修复：防止卡片内下拉或悬浮元素在移动/桌面端被 content-visibility 异常裁剪 */
+#noticeCards > .notice-card,
+#taskList > .taskrow,
+#userList > .user-row {
+  content-visibility: visible !important;
+}
+
+
+/* ==================== v1.067 红宝石液态玻璃危险按钮 & 全站宝石玻璃标签 ==================== */
+
+/* 1. 删除用户 / 清空课表 / 删除课程等危险按钮 → 凸起的红宝石液态玻璃（Ruby Liquid Glass） */
+button.danger,
+.danger,
+.sched-btn-danger,
+[data-delete-user],
+#btnSchedDeleteCourse {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.06) 46%, transparent 65%),
+    linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.34) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 8px rgba(127, 29, 29, 0.34),
+    0 6px 18px -4px rgba(220, 38, 38, 0.38) !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.16s ease, filter 0.16s ease !important;
+}
+button.danger:hover,
+.danger:hover,
+.sched-btn-danger:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
+    inset 0 -3px 8px rgba(127, 29, 29, 0.38),
+    0 8px 22px -4px rgba(220, 38, 38, 0.48) !important;
+}
+button.danger:active,
+.danger:active,
+.sched-btn-danger:active {
+  transform: scale(0.965);
+}
+
+/* 2. 全站小标签（学生/管理员/教学事务/收藏/截止日期）→ 宝石折射液态玻璃胶囊 */
+.tag,
+.due-tag {
+  background:
+    radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.72) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(239, 246, 255, 0.92) 0%, rgba(219, 234, 254, 0.78) 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.18) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), 0 2px 6px rgba(21, 94, 239, 0.08) !important;
+}
+.tag.star-tag,
+.due-tag.soon {
+  background:
+    radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.72) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 251, 235, 0.94) 0%, rgba(254, 243, 199, 0.80) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.due-tag.overdue {
+  background:
+    radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.70) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(254, 242, 242, 0.94) 0%, rgba(254, 226, 226, 0.82) 100%) !important;
+  border-color: rgba(239, 68, 68, 0.26) !important;
+}
+html.dark .tag,
+html.dark .due-tag {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.24) 0%, rgba(37, 99, 235, 0.16) 100%) !important;
+  border-color: rgba(96, 165, 250, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+/* 3. 侧边栏底部设置与退出按钮：同步胶囊液态玻璃悬浮反馈 */
+.sidebottom button {
+  border-radius: 999px !important;
+  transition: background 0.16s ease, transform 0.14s var(--lg-spring), box-shadow 0.16s ease;
+}
+.sidebottom button:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 3px 10px rgba(15, 23, 42, 0.06);
+}

@@ -13322,9 +13322,10 @@ html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
 
 /* 2. 移动端 AI 页面（对齐 v1.047 自然整页滚动并兼容悬浮 6-Tab 底栏，同时消除 761px~960px 断点冲突） */
 @media (max-width: 960px) {
-  html {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+  html,
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
   body.on-ai-page,
   html:has(body.on-ai-page) {
@@ -13432,7 +13433,7 @@ html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
 .xz-select-menu,
 .ask-attach-pop,
 .doc-m-pop {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 247, 255, 0.88) 100%) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 248, 255, 0.92) 100%) !important;
   backdrop-filter: blur(28px) saturate(190%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
 }
@@ -13440,32 +13441,32 @@ html.dark .xz-cal-pop,
 html.dark .xz-select-menu,
 html.dark .ask-attach-pop,
 html.dark .doc-m-pop {
-  background: linear-gradient(155deg, rgba(24, 33, 52, 0.94) 0%, rgba(15, 23, 42, 0.90) 100%) !important;
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.96) 0%, rgba(15, 23, 42, 0.92) 100%) !important;
 }
 
 dialog:not(#docDialog) {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 248, 255, 0.89) 100%) !important;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 248, 255, 0.92) 100%) !important;
 }
 html.dark dialog:not(#docDialog) {
-  background: linear-gradient(160deg, rgba(24, 33, 52, 0.94) 0%, rgba(15, 23, 42, 0.90) 100%) !important;
+  background: linear-gradient(160deg, rgba(24, 33, 52, 0.96) 0%, rgba(15, 23, 42, 0.92) 100%) !important;
 }
 
 body.on-ai-page .ask .ask-input-wrap {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.86) 0%, rgba(242, 247, 255, 0.78) 100%) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.90) 0%, rgba(242, 247, 255, 0.84) 100%) !important;
 }
 html.dark body.on-ai-page .ask .ask-input-wrap {
-  background: linear-gradient(155deg, rgba(24, 33, 52, 0.86) 0%, rgba(15, 23, 42, 0.78) 100%) !important;
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.90) 0%, rgba(15, 23, 42, 0.84) 100%) !important;
 }
 
 .mobile-tabbar,
 main > header,
 .sched-m-sticky {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 248, 255, 0.80) 100%) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.91) 0%, rgba(244, 248, 255, 0.85) 100%) !important;
 }
 html.dark .mobile-tabbar,
 html.dark main > header,
 html.dark .sched-m-sticky {
-  background: linear-gradient(180deg, rgba(24, 33, 52, 0.88) 0%, rgba(15, 23, 42, 0.80) 100%) !important;
+  background: linear-gradient(180deg, rgba(24, 33, 52, 0.91) 0%, rgba(15, 23, 42, 0.85) 100%) !important;
 }
 
 .panel,
@@ -13483,7 +13484,7 @@ html.dark .sched-m-sticky {
 .sched-d-right-panel,
 .stat-metric,
 .stat-bars {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.84) 0%, rgba(244, 248, 255, 0.76) 100%) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 248, 255, 0.82) 100%) !important;
 }
 html.dark .panel,
 html.dark .welcome,
@@ -13500,20 +13501,20 @@ html.dark .sched-d-header,
 html.dark .sched-d-right-panel,
 html.dark .stat-metric,
 html.dark .stat-bars {
-  background: linear-gradient(155deg, rgba(28, 39, 58, 0.84) 0%, rgba(15, 23, 42, 0.76) 100%) !important;
+  background: linear-gradient(155deg, rgba(28, 39, 58, 0.88) 0%, rgba(15, 23, 42, 0.82) 100%) !important;
 }
 
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(242, 247, 255, 0.78) 100%) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.91) 0%, rgba(242, 247, 255, 0.84) 100%) !important;
 }
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
-  background: linear-gradient(155deg, rgba(28, 39, 58, 0.86) 0%, rgba(15, 23, 42, 0.78) 100%) !important;
+  background: linear-gradient(155deg, rgba(28, 39, 58, 0.90) 0%, rgba(15, 23, 42, 0.84) 100%) !important;
 }
 body.on-ai-page #messages .welcome-item {
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.72) 100%) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.86) 0%, rgba(241, 245, 249, 0.78) 100%) !important;
 }
 html.dark body.on-ai-page #messages .welcome-item {
-  background: linear-gradient(155deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.84) 0%, rgba(15, 23, 42, 0.76) 100%) !important;
 }
 
 .xz-date-trigger,

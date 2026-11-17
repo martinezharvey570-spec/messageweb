@@ -3660,7 +3660,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .taskrow .tag { margin-left:28px; }
   .task-del-btn { margin-left:auto; }
   #addTaskForm .add-task-inputs { grid-template-columns:minmax(0,1fr); }
-  #addTaskForm .add-task-inputs button { width:100%; }
+  #addTaskForm .add-task-inputs > button,
+  #addTaskForm .add-task-inputs .xz-date-trigger { width:100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ai-todo-draft, .taskrow, .task-del-btn { transition:none !important; }
@@ -13112,6 +13113,33 @@ html.dark .sched-sub-card {
 .xz-cal-pop {
   z-index: 140 !important;
   max-width: calc(100vw - 40px);
+  padding: 12px 14px !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 246, 255, 0.78) 100%) !important;
+}
+html.dark .xz-cal-pop {
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.90) 0%, rgba(15, 23, 42, 0.82) 100%) !important;
+}
+.xz-cal-head button {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: inline-grid !important;
+  place-items: center !important;
+}
+.xz-cal-day {
+  width: 100% !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+}
+.xz-cal-foot button {
+  width: auto !important;
+  min-height: 28px !important;
+  padding: 4px 10px !important;
 }
 
 #addTaskForm .add-task-inputs {

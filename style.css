@@ -9036,3 +9036,202 @@ textarea {
   -webkit-backdrop-filter: blur(20px) saturate(185%);
   box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
 }
+
+
+/* ==================== v1.060 全站 iOS 液态玻璃高亮胶囊扩展 ==================== */
+
+/* 1. 移动端底部 6-Tab 栏升级为 iOS 悬浮液态玻璃胶囊岛 */
+@media (max-width: 960px) {
+  .mobile-tabbar {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    height: 60px !important;
+    padding: 4px 6px !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--lg-border-outer) !important;
+    box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
+  }
+  .mobile-tabbar .tab-item {
+    height: 50px;
+    border-radius: 999px !important;
+    margin: 0 !important;
+  }
+  body:not(.on-ai-page) main {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+  body.on-ai-page .ask {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* 2. 桌面端侧边栏导航选中态：同款 iOS 液态玻璃高亮胶囊 */
+#sidebar .nav.active {
+  background: linear-gradient(135deg, rgba(21, 94, 239, 0.13), rgba(59, 130, 246, 0.07)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 4px 14px rgba(21, 94, 239, 0.12) !important;
+  border: 1px solid rgba(21, 94, 239, 0.18) !important;
+}
+html.dark #sidebar .nav.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(59, 130, 246, 0.10)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 16px rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+}
+
+/* 3. 全站分段切换器（AI配置、课表周/作息切换、制度库分类胶囊）：iOS 玻璃槽 + 立体高亮滑块 */
+.ai-seg,
+.sched-m-seg,
+.sched-d-seg {
+  background: rgba(241, 245, 249, 0.72) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), var(--lg-border-inner) !important;
+}
+html.dark .ai-seg,
+html.dark .sched-m-seg,
+html.dark .sched-d-seg {
+  background: rgba(30, 41, 59, 0.72) !important;
+}
+
+.ai-seg-btn.active,
+.sched-seg-btn.on,
+.sched-dseg-btn.on,
+#knowledgePills .pill.active,
+.pill.active {
+  background: linear-gradient(135deg, var(--blue), #4f46e5) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 4px 12px rgba(21, 94, 239, 0.26) !important;
+}
+
+/* 4. 超级课表周次 & 日期选中胶囊：同款顶部液态高光 */
+#schedulePage .sched-week-chip.on,
+#schedulePage .sched-date-chip.on {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 4px 14px rgba(21, 94, 239, 0.26) !important;
+}
+
+
+/* ==================== v1.061 高质感液态玻璃（强折射高光边）& 视觉错误修复 ==================== */
+
+/* 1. 修复桌面端日期胶囊“今”角标悬在圆角肩部的问题：改为精致右上角内嵌/微浮胶囊且对齐 */
+.sched-d-dstrip .sched-date-chip {
+  border-radius: 999px !important;
+  overflow: visible !important;
+}
+.sched-d-dstrip .sched-date-chip.today::before {
+  top: -7px !important;
+  right: 12px !important;
+  padding: 1px 6px !important;
+  border: 1.5px solid #ffffff !important;
+  box-shadow: 0 2px 6px rgba(21, 94, 239, 0.28) !important;
+}
+html.dark .sched-d-dstrip .sched-date-chip.today::before {
+  border-color: #111827 !important;
+}
+
+/* 2. 修复 Hero 卡片发灰发暗的问题：改为通透亮白的苹果液态玻璃质感，绝不发灰 */
+#schedulePage .sched-hero {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(235, 244, 255, 0.84) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    0 12px 32px -8px rgba(21, 94, 239, 0.10),
+    0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+#schedulePage .sched-hero::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.14), transparent 65%) !important;
+}
+#schedulePage .sched-hero.empty {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(241, 245, 249, 0.82) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+}
+html.dark #schedulePage .sched-hero {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(23, 37, 84, 0.72) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 14px 36px rgba(0, 0, 0, 0.36) !important;
+}
+html.dark #schedulePage .sched-hero.empty {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.78) 0%, rgba(17, 24, 39, 0.82) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 3. 增强分段切换槽（周课表矩阵 / 作息对照）和所有玻璃容器的物理折射质感，同时保持100%文字清晰 */
+.ai-seg,
+.sched-m-seg,
+.sched-d-seg {
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(22px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(195%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 4px 16px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .ai-seg,
+html.dark .sched-m-seg,
+html.dark .sched-d-seg {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 6px 20px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* 4. 强化全站玻璃卡片与次级玻璃胶囊的高光边缘（存在感更强、白字/黑字绝不糊） */
+.panel,
+.stats article,
+.welcome,
+.sched-d-header,
+.sched-today-card,
+.sched-matrix-card,
+.sched-manage-card,
+.sched-tt-card {
+  background: rgba(255, 255, 255, 0.76) !important;
+  backdrop-filter: blur(24px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(195%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 10px 30px -8px rgba(15, 23, 42, 0.07),
+    0 2px 6px rgba(15, 23, 42, 0.03) !important;
+}
+html.dark .panel,
+html.dark .stats article,
+html.dark .welcome,
+html.dark .sched-d-header,
+html.dark .sched-today-card,
+html.dark .sched-matrix-card,
+html.dark .sched-manage-card,
+html.dark .sched-tt-card {
+  background: rgba(17, 24, 39, 0.74) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 12px 32px -6px rgba(0, 0, 0, 0.42) !important;
+}
+
+/* 次级按钮与未选中胶囊：通透白玻璃折射感 */
+button.secondary,
+button.outline,
+.sched-btn-ghost,
+.pill:not(.active),
+#schedulePage .sched-week-chip:not(.on),
+#schedulePage .sched-date-chip:not(.on):not(.today) {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+}
+html.dark button.secondary,
+html.dark button.outline,
+html.dark .sched-btn-ghost,
+html.dark .pill:not(.active),
+html.dark #schedulePage .sched-week-chip:not(.on),
+html.dark #schedulePage .sched-date-chip:not(.on):not(.today) {
+  background: rgba(30, 41, 59, 0.72) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 2px 8px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* 主按钮与渐变胶囊：玻璃顶部高光边缘 */
+button.primary,
+.sched-btn-primary {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 6px 18px rgba(21, 94, 239, 0.26) !important;
+}

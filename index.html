@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.035">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.035">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.036">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.036">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.035" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.036" fetchpriority="high">
 </head>
 <body>
 
@@ -133,6 +133,11 @@
   <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.2" cy="8.2" r="4.6"/><path d="m11.6 11.6 8.6 8.6"/><path d="m17 17 2.2-2.2M14.8 14.8l2.2-2.2"/></symbol>
   <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5.5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="18.5" r="2.6"/><path d="m8.3 10.8 7.4-4.1M8.3 13.2l7.4 4.1"/></symbol>
   <symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="4.2" width="17.2" height="15.6" rx="3.2"/><path d="M9.6 4.2v15.6"/><path d="M5.7 8.4h1.6M5.7 11.6h1.6M5.7 14.8h1.6"/><path d="m16.2 9.6-2.4 2.4 2.4 2.4"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3.5 9.5h17"/><path d="M8 13.5h2M14 13.5h2M8 17h2M14 17h2"/></symbol>
+  <symbol id="i-snowflake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.93 7l14.14 10M19.07 7 4.93 17"/><path d="m9.5 4.5 2.5 2 2.5-2M9.5 19.5l2.5-2 2.5 2M4 10.5l2.5-1L6 7M20 13.5l-2.5 1 .5 2.5M4 13.5l2.5 1L6 17M20 10.5l-2.5-1 .5-2.5"/></symbol>
+  <symbol id="i-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11.5-8 11.5S4 15.5 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.8"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
 </svg>
 <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -186,6 +191,7 @@
     <button class="nav" data-page="tasks" title="我的待办"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>我的待办 <em id="navTaskBadge" class="nav-badge hide">0</em></button>
     <button class="nav" data-page="ai" title="文理智办 AI"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>文理智办 AI</button>
     <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
+    <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
@@ -568,8 +574,107 @@
         </article>
       </section>
 
+      <section id="schedulePage" class="page hide">
+        <!-- 桌面端专属工作台视图 -->
+        <div class="sched-desktop-wrap">
+          <div class="sched-d-toolbar">
+            <div class="sched-d-left">
+              <div class="sched-week-stepper">
+                <button type="button" id="schedPrevWeek" class="sched-step-btn" title="上一周" aria-label="上一周"><svg class="ico" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+                <span id="schedDesktopWeekLabel" class="sched-week-label">第 1 周</span>
+                <button type="button" id="schedNextWeek" class="sched-step-btn" title="下一周" aria-label="下一周"><svg class="ico" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+              </div>
+              <span id="schedDesktopRange" class="sched-range-text"></span>
+              <span id="schedDesktopSeasonBadge" class="sched-season-badge"></span>
+              <span id="schedSyncBadge" class="sched-sync-badge">云端同步</span>
+            </div>
+            <div class="sched-d-actions">
+              <button type="button" id="schedDesktopToday" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg><span>回到本周</span></button>
+              <button type="button" id="schedOpenTimetable" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>作息对照</span></button>
+              <button type="button" id="schedOpenSettings" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>设置与备份</span></button>
+              <button type="button" id="schedDesktopAdd" class="sched-btn-primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加课程</span></button>
+            </div>
+          </div>
+
+          <div class="sched-d-grid">
+            <div class="sched-matrix-card">
+              <div id="schedDesktopMatrix" class="sched-matrix"></div>
+            </div>
+            <aside class="sched-side-col">
+              <div id="schedDesktopHero" class="sched-hero"></div>
+              <div class="sched-today-card">
+                <div class="sched-today-head">
+                  <div>
+                    <b id="schedDesktopTodayTitle">今日课程</b>
+                    <small id="schedDesktopTodayDate"></small>
+                  </div>
+                  <button type="button" id="schedAskAiBtn" class="sched-ai-chip" title="让文理智办 AI 结合课表回答">
+                    <svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>
+                    <span>问 AI</span>
+                  </button>
+                </div>
+                <div id="schedDesktopTimeline" class="sched-timeline"></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <!-- 移动端专属触控视图 -->
+        <div class="sched-mobile-wrap">
+          <div class="sched-m-sticky">
+            <div class="sched-m-toprow">
+              <div class="sched-m-title">
+                <b id="schedMobTitle">我的课表</b>
+                <span id="schedMobSeasonBadge" class="sched-season-badge"></span>
+              </div>
+              <div class="sched-m-actions">
+                <button type="button" id="schedMobToday" class="sched-m-ibtn" title="回到今天" aria-label="回到今天"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg></button>
+                <button type="button" id="schedMobSettings" class="sched-m-ibtn" title="课表设置" aria-label="课表设置"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></button>
+                <button type="button" id="schedMobAdd" class="sched-m-ibtn is-primary" title="添加课程" aria-label="添加课程"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></button>
+              </div>
+            </div>
+            <div id="schedWeekStrip" class="sched-week-strip"></div>
+            <div class="sched-date-strip-wrap">
+              <div id="schedDateStrip" class="sched-date-strip"></div>
+            </div>
+            <div class="sched-m-seg" role="tablist" aria-label="课表视图切换">
+              <button type="button" class="sched-seg-btn on" data-stab="today"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>单日</span></button>
+              <button type="button" class="sched-seg-btn" data-stab="week"><svg class="ico" aria-hidden="true"><use href="#i-panel"/></svg><span>周视图</span></button>
+              <button type="button" class="sched-seg-btn" data-stab="timetable"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>作息</span></button>
+            </div>
+          </div>
+
+          <div id="schedMobViewToday" class="sched-m-view">
+            <div id="schedMobHero" class="sched-hero"></div>
+            <div class="sched-m-sec-head">
+              <b id="schedMobDayLabel">今日课程</b>
+              <span id="schedMobTodayDate"></span>
+            </div>
+            <div id="schedMobTimeline" class="sched-timeline"></div>
+          </div>
+
+          <div id="schedMobViewWeek" class="sched-m-view hide">
+            <div class="sched-m-sec-head">
+              <b id="schedMobWeekTitle">第 1 周</b>
+              <span id="schedMobWeekRange"></span>
+            </div>
+            <div class="sched-wg-wrap">
+              <div id="schedMobWeekGrid" class="sched-wg"></div>
+            </div>
+          </div>
+
+          <div id="schedMobViewTimetable" class="sched-m-view hide">
+            <div class="sched-m-sec-head">
+              <b>作息时间对照</b>
+              <span id="schedMobSeasonTag"></span>
+            </div>
+            <div id="schedMobTimetableContainer"></div>
+          </div>
+        </div>
+      </section>
+
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.035</span>
+        <span>校务智理校园事务服务平台 · v1.036</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -591,6 +696,9 @@
     </button>
     <button type="button" class="tab-item" data-page="knowledge">
       <i><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg></i><span>制度库</span>
+    </button>
+    <button type="button" class="tab-item" data-page="schedule">
+      <i><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></i><span>课表</span>
     </button>
   </nav>
 </div>
@@ -784,8 +892,110 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=1.035"></script>
-<script src="config.js?v=1.035"></script>
-<script src="app.js?v=1.035"></script>
+<script src="android-bridge.js?v=1.036"></script>
+<script src="config.js?v=1.036"></script>
+<script src="app.js?v=1.036"></script>
+
+<dialog id="scheduleCourseDialog" class="task-dialog">
+  <div class="dialoghead">
+    <div><h2 id="schedCourseDlgTitle">添加课程</h2><small>保存后将自动同步至你的账号云端</small></div>
+    <button type="button" id="closeSchedCourseDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <form id="schedCourseForm" class="sched-dlg-form">
+    <div class="sched-field">
+      <label for="scName">课程名称</label>
+      <input id="scName" type="text" placeholder="例如：高等数学A" maxlength="80" required>
+    </div>
+    <div class="sched-field-row">
+      <div class="sched-field">
+        <label for="scDay">星期</label>
+        <select id="scDay">
+          <option value="1">星期一</option><option value="2">星期二</option><option value="3">星期三</option>
+          <option value="4">星期四</option><option value="5">星期五</option><option value="6">星期六</option><option value="7">星期日</option>
+        </select>
+      </div>
+      <div class="sched-field">
+        <label for="scType">课程类型</label>
+        <select id="scType">
+          <option value="理论">理论</option><option value="实验">实验</option><option value="上机">上机</option>
+          <option value="线上">线上</option><option value="体育">体育</option><option value="其他">其他</option>
+        </select>
+      </div>
+    </div>
+    <div class="sched-field-row">
+      <div class="sched-field">
+        <label for="scStart">开始节次</label>
+        <select id="scStart">
+          <option value="1">第 1 节</option><option value="2">第 2 节</option><option value="3">第 3 节</option><option value="4">第 4 节</option><option value="5">第 5 节</option>
+          <option value="6">第 6 节</option><option value="7">第 7 节</option><option value="8">第 8 节</option><option value="9">第 9 节</option><option value="10">第 10 节</option>
+        </select>
+      </div>
+      <div class="sched-field">
+        <label for="scEnd">结束节次</label>
+        <select id="scEnd">
+          <option value="1">第 1 节</option><option value="2" selected>第 2 节</option><option value="3">第 3 节</option><option value="4">第 4 节</option><option value="5">第 5 节</option>
+          <option value="6">第 6 节</option><option value="7">第 7 节</option><option value="8">第 8 节</option><option value="9">第 9 节</option><option value="10">第 10 节</option>
+        </select>
+      </div>
+    </div>
+    <div class="sched-field">
+      <label for="scWeeks">上课周次（支持 1-16、1-8(单)、2-14(双)）</label>
+      <input id="scWeeks" type="text" placeholder="例如：1-16 或 1-8,10-16(双)" maxlength="60" value="1-18">
+    </div>
+    <div class="sched-field-row">
+      <div class="sched-field">
+        <label for="scRoom">上课地点</label>
+        <input id="scRoom" type="text" placeholder="例如：明德楼B0218" maxlength="60">
+      </div>
+      <div class="sched-field">
+        <label for="scTeacher">任课教师</label>
+        <input id="scTeacher" type="text" placeholder="例如：张老师" maxlength="40">
+      </div>
+    </div>
+    <div class="sched-dlg-actions">
+      <button type="button" id="btnSchedDeleteCourse" class="sched-btn-danger hide"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>删除</span></button>
+      <button type="submit" class="sched-btn-primary" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>保存课程</span></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="scheduleSettingDialog" class="task-dialog">
+  <div class="dialoghead">
+    <div><h2>课表设置与管理</h2><small>支持自定义开学日期、云端同步及 JSON 备份</small></div>
+    <button type="button" id="closeSchedSettingDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="sched-setting-body">
+    <div class="sched-field-row">
+      <div class="sched-field">
+        <label for="schedStartInput">第 1 周周一日期</label>
+        <input id="schedStartInput" type="date">
+      </div>
+      <div class="sched-field">
+        <label for="schedTotalWeeksInput">学期总周数</label>
+        <input id="schedTotalWeeksInput" type="number" min="1" max="30" value="18">
+      </div>
+    </div>
+    <div class="sched-list-head">
+      <b>已录入课程（<span id="schedCourseCount">0</span>）</b>
+      <button type="button" id="schedSettingAddBtn" class="sched-link-btn"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加课程</span></button>
+    </div>
+    <div id="schedSettingCourseList" class="sched-clist"></div>
+    <div class="sched-dlg-actions" style="margin-top:14px">
+      <button type="button" id="schedExportBtn" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出 JSON</span></button>
+      <button type="button" id="schedImportBtn" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg><span>导入 JSON</span></button>
+    </div>
+    <button type="button" id="schedClearBtn" class="sched-btn-danger" style="width:100%;margin-top:8px"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空所有课程</span></button>
+    <input type="file" id="schedImportFile" accept=".json,application/json" style="display:none">
+  </div>
+</dialog>
+
+<dialog id="scheduleTimetableDialog" class="task-dialog wide-dialog">
+  <div class="dialoghead">
+    <div><h2>春夏季 / 秋冬季作息对照</h2><small id="schedDlgSeasonTag">按日期自动切换作息时间</small></div>
+    <button type="button" id="closeSchedTimetableDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div id="schedDesktopTimetableContainer" class="sched-tt-grid"></div>
+</dialog>
+
 </body>
 </html>

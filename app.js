@@ -553,7 +553,7 @@ function scroll_messages_to_bottom(force = false) {
 
 function go(p) {
   cur_page = p;
-  ["home", "notices", "tasks", "ai", "knowledge", "users", "analytics"].forEach(x =>
+  ["home", "notices", "tasks", "ai", "knowledge", "schedule", "users", "analytics"].forEach(x =>
     $(`${x}Page`)?.classList.toggle("hide", x !== p)
   );
   document.body.classList.toggle("on-ai-page", p === "ai");
@@ -569,6 +569,7 @@ function go(p) {
     tasks: "我的待办",
     ai: "文理智办",
     knowledge: "校规制度库",
+    schedule: "超级课表",
     users: "用户管理",
     analytics: "数据统计"
   }[p] || "工作台总览";
@@ -580,6 +581,7 @@ function go(p) {
     setTimeout(sync_hot_nav, 60);
   }
   if (p === "knowledge") load_knowledge();
+  if (p === "schedule" && typeof render_schedule_all === "function") render_schedule_all();
   if (p === "users") load_users();
   if (p === "analytics") load_stats();
 }
@@ -627,6 +629,7 @@ async function enter() {
     .querySelectorAll(".admin-only")
     .forEach(el => el.classList.toggle("hide", me.role !== "admin"));
   load_starred_notices();
+  if (typeof load_schedule === "function") load_schedule();
   restore_home_snap();
   try {
     const [n, t] = await data_req;
@@ -3830,3 +3833,882 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   }
 })();
 
+
+
+// ==================== 超级课表模块（v1.036） ====================
+const SCHED_TIMES = {
+  winter: {
+    label: "秋冬季作息",
+    range: "10月1日 – 4月30日",
+    rows: [
+      { n: "预备", t: "07:50" },
+      { n: "第一节", t: "08:00 – 08:50" },
+      { n: "第二节", t: "09:00 – 09:50" },
+      { n: "课间操", t: "09:50 – 10:10", br: true },
+      { n: "第三节", t: "10:10 – 11:00" },
+      { n: "第四节", t: "11:10 – 12:00" },
+      { n: "午餐午休", t: "12:00 – 13:50", br: true },
+      { n: "预备", t: "13:50", br: true },
+      { n: "第五节", t: "14:00 – 14:50" },
+      { n: "第六节", t: "15:00 – 15:50" },
+      { n: "课间操", t: "15:50 – 16:10", br: true },
+      { n: "第七节", t: "16:10 – 17:00" },
+      { n: "第八节", t: "17:10 – 18:00" },
+      { n: "晚餐", t: "18:00 – 19:00", br: true },
+      { n: "第九节", t: "19:00 – 19:50" },
+      { n: "第十节", t: "20:00 – 20:50" },
+      { n: "熄灯", t: "22:00", br: true }
+    ],
+    periods: [
+      { n: 1, s: "08:00", e: "08:50" }, { n: 2, s: "09:00", e: "09:50" },
+      { n: 3, s: "10:10", e: "11:00" }, { n: 4, s: "11:10", e: "12:00" },
+      { n: 5, s: "14:00", e: "14:50" }, { n: 6, s: "15:00", e: "15:50" },
+      { n: 7, s: "16:10", e: "17:00" }, { n: 8, s: "17:10", e: "18:00" },
+      { n: 9, s: "19:00", e: "19:50" }, { n: 10, s: "20:00", e: "20:50" }
+    ]
+  },
+  summer: {
+    label: "春夏季作息",
+    range: "5月1日 – 9月30日",
+    rows: [
+      { n: "预备", t: "07:50" },
+      { n: "第一节", t: "08:00 – 08:50" },
+      { n: "第二节", t: "09:00 – 09:50" },
+      { n: "课间操", t: "09:50 – 10:10", br: true },
+      { n: "第三节", t: "10:10 – 11:00" },
+      { n: "第四节", t: "11:10 – 12:00" },
+      { n: "午餐午休", t: "12:00 – 14:20", br: true },
+      { n: "预备", t: "14:20", br: true },
+      { n: "第五节", t: "14:30 – 15:20" },
+      { n: "第六节", t: "15:30 – 16:20" },
+      { n: "课间操", t: "16:20 – 16:40", br: true },
+      { n: "第七节", t: "16:40 – 17:30" },
+      { n: "第八节", t: "17:40 – 18:30" },
+      { n: "晚餐", t: "18:30 – 19:30", br: true },
+      { n: "第九节", t: "19:30 – 20:20" },
+      { n: "第十节", t: "20:30 – 21:20" },
+      { n: "熄灯", t: "22:30", br: true }
+    ],
+    periods: [
+      { n: 1, s: "08:00", e: "08:50" }, { n: 2, s: "09:00", e: "09:50" },
+      { n: 3, s: "10:10", e: "11:00" }, { n: 4, s: "11:10", e: "12:00" },
+      { n: 5, s: "14:30", e: "15:20" }, { n: 6, s: "15:30", e: "16:20" },
+      { n: 7, s: "16:40", e: "17:30" }, { n: 8, s: "17:40", e: "18:30" },
+      { n: 9, s: "19:30", e: "20:20" }, { n: 10, s: "20:30", e: "21:20" }
+    ]
+  }
+};
+
+const SCHED_TYPE_COLOR = {
+  "理论": "var(--sc-theory, #2563eb)",
+  "实验": "var(--sc-lab, #10b981)",
+  "上机": "var(--sc-pc, #f59e0b)",
+  "线上": "var(--sc-online, #06b6d4)",
+  "体育": "var(--sc-sport, #ef4444)",
+  "其他": "var(--sc-other, #7c3aed)"
+};
+const SCHED_DAY_NAMES = ["", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];
+const SCHED_DAY_SHORT = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+const SCHED_BLOCKS = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]];
+
+const schedState = {
+  startDate: "2026-08-31",
+  totalWeeks: 18,
+  courses: [],
+  selectedWeek: 1,
+  selectedDay: 1,
+  mobTab: "today",
+  editingIdx: -1,
+  bound: false,
+  saveTimer: null,
+  lastMin: -1,
+  isScrolling: false,
+  scrollTimer: null
+};
+
+function schedEsc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+function schedPad(n) { return n < 10 ? "0" + n : "" + n; }
+function schedToMin(t) {
+  const parts = String(t || "0:0").split(":").map(Number);
+  return (parts[0] || 0) * 60 + (parts[1] || 0);
+}
+function schedFmtDate(d) {
+  return d.getFullYear() + "-" + schedPad(d.getMonth() + 1) + "-" + schedPad(d.getDate());
+}
+function schedFmtShort(d) { return (d.getMonth() + 1) + "月" + d.getDate() + "日"; }
+function schedStartOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function schedAddDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function schedParseDate(str) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(str || ""))
+    ? new Date(str + "T00:00:00")
+    : new Date("2026-08-31T00:00:00");
+}
+function schedGetWeekNumber(date, startStr) {
+  const s = schedStartOfDay(schedParseDate(startStr));
+  const diff = Math.round((schedStartOfDay(date) - s) / 86400000);
+  return diff < 0 ? 0 : Math.floor(diff / 7) + 1;
+}
+function schedGetDateOf(weekNo, dayOfWeek, startStr) {
+  return schedAddDays(schedParseDate(startStr), (weekNo - 1) * 7 + (dayOfWeek - 1));
+}
+function schedGetSeason(date) {
+  const m = date.getMonth() + 1;
+  return (m >= 5 && m <= 9) ? "summer" : "winter";
+}
+function schedSeasonHtml(seasonKey) {
+  const isW = seasonKey === "winter";
+  const ico = isW ? "#i-snowflake" : "#i-sun";
+  return `<svg class="ico" aria-hidden="true"><use href="${ico}"/></svg><span>${SCHED_TIMES[seasonKey].label}</span>`;
+}
+function schedParseWeeks(str) {
+  const set = new Set();
+  if (!str) return set;
+  for (let p of String(str).split(/[,，、]/)) {
+    p = p.trim();
+    if (!p) continue;
+    let m;
+    if ((m = p.match(/^(\d+)\s*[-–~]\s*(\d+)\s*[（(]\s*单\s*[）)]$/))) {
+      for (let w = +m[1]; w <= +m[2]; w++) if (w % 2 === 1) set.add(w);
+    } else if ((m = p.match(/^(\d+)\s*[-–~]\s*(\d+)\s*[（(]\s*双\s*[）)]$/))) {
+      for (let w = +m[1]; w <= +m[2]; w++) if (w % 2 === 0) set.add(w);
+    } else if ((m = p.match(/^(\d+)\s*[-–~]\s*(\d+)$/))) {
+      for (let w = +m[1]; w <= +m[2]; w++) set.add(w);
+    } else if (/^\d+$/.test(p)) {
+      set.add(+p);
+    }
+  }
+  return set;
+}
+function schedCacheKey() {
+  return "xz_sched_v1_" + (me?.id || "guest");
+}
+function schedSetSyncLabel(text, saving) {
+  const el = $("schedSyncBadge");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle("is-saving", !!saving);
+}
+function schedSaveLocal() {
+  try {
+    localStorage.setItem(schedCacheKey(), JSON.stringify({
+      start_date: schedState.startDate,
+      total_weeks: schedState.totalWeeks,
+      courses: schedState.courses
+    }));
+  } catch {}
+}
+function schedQueueSync() {
+  schedSaveLocal();
+  schedSetSyncLabel("正在同步…", true);
+  clearTimeout(schedState.saveTimer);
+  schedState.saveTimer = setTimeout(async () => {
+    try {
+      await api("/schedule", {
+        method: "PUT",
+        body: JSON.stringify({
+          start_date: schedState.startDate,
+          total_weeks: schedState.totalWeeks,
+          courses: schedState.courses
+        })
+      });
+      schedSetSyncLabel("已同步云端", false);
+    } catch {
+      schedSetSyncLabel("仅本地缓存", false);
+    }
+  }, 450);
+}
+
+async function load_schedule() {
+  bind_schedule_events();
+  // 先读本地缓存避免白屏
+  try {
+    const raw = localStorage.getItem(schedCacheKey());
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.start_date) schedState.startDate = d.start_date;
+      if (d.total_weeks) schedState.totalWeeks = Number(d.total_weeks) || 18;
+      if (Array.isArray(d.courses)) schedState.courses = d.courses;
+    }
+  } catch {}
+
+  try {
+    const remote = await api("/schedule");
+    if (remote && Array.isArray(remote.courses)) {
+      schedState.startDate = remote.start_date || schedState.startDate;
+      schedState.totalWeeks = Number(remote.total_weeks) || 18;
+      schedState.courses = remote.courses;
+      schedSaveLocal();
+      schedSetSyncLabel("已同步云端", false);
+    }
+  } catch {
+    schedSetSyncLabel("离线缓存", false);
+  }
+
+  const now = new Date();
+  const w = schedGetWeekNumber(now, schedState.startDate);
+  schedState.selectedWeek = Math.max(1, Math.min(schedState.totalWeeks, w || 1));
+  schedState.selectedDay = now.getDay() || 7;
+  if (cur_page === "schedule") render_schedule_all();
+}
+
+function schedCoursesOfDay(weekNo, day) {
+  return schedState.courses
+    .map((c, i) => ({ ...c, _idx: i }))
+    .filter(c => Number(c.day) === day && schedParseWeeks(c.weeks).has(weekNo))
+    .sort((a, b) => a.start - b.start || a.end - b.end);
+}
+
+function schedBuildHeroHtml(now, dayCourses, weekNo, day, isToday) {
+  const tagText = `第 ${weekNo} 周 · ${SCHED_DAY_NAMES[day]}`;
+  const targetDate = schedGetDateOf(weekNo, day, schedState.startDate);
+  const periods = SCHED_TIMES[schedGetSeason(targetDate)].periods;
+
+  if (!dayCourses.length) {
+    return {
+      empty: true,
+      html: `<div class="sched-hero-tag"><span class="dot"></span>${tagText}</div>
+        <h3 class="sched-hero-title">${isToday ? "今天没有安排课程" : "这一天没有安排课程"}</h3>
+        <div class="sched-hero-meta"><span><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>${schedState.courses.length ? "适合自习、阅读或适当运动" : "点击“添加课程”录入你的课表"}</span></div>`
+    };
+  }
+
+  if (!isToday) {
+    const first = dayCourses[0];
+    const s = periods.find(p => p.n === Number(first.start));
+    const e = periods.find(p => p.n === Number(first.end));
+    return {
+      empty: false,
+      html: `<div class="sched-hero-tag"><span class="dot"></span>${tagText}</div>
+        <h3 class="sched-hero-title">${schedEsc(first.name)}</h3>
+        <div class="sched-hero-meta">
+          <span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(first.teacher || "未填教师")}</span>
+          <span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(first.room || "未填地点")}</span>
+        </div>
+        <div class="sched-hero-count">
+          <span class="unit">当日共 ${dayCourses.length} 门课程</span>
+          ${s && e ? `<span class="sched-hero-endtime"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>首节 ${s.s} – ${e.e}</span>` : ""}
+        </div>`
+    };
+  }
+
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const items = [];
+  for (const c of dayCourses) {
+    const s = periods.find(p => p.n === Number(c.start));
+    const e = periods.find(p => p.n === Number(c.end));
+    if (s && e) items.push({ c, sMin: schedToMin(s.s), eMin: schedToMin(e.e), sText: s.s, eText: e.e });
+  }
+  items.sort((a, b) => a.sMin - b.sMin);
+  let cur = null, next = null;
+  for (const it of items) {
+    if (nowMin >= it.sMin && nowMin < it.eMin) { cur = it; break; }
+    if (nowMin < it.sMin && !next) next = it;
+  }
+
+  if (cur) {
+    const pct = Math.min(100, Math.max(2, ((nowMin - cur.sMin) / (cur.eMin - cur.sMin)) * 100)).toFixed(1);
+    return {
+      empty: false,
+      html: `<div class="sched-hero-tag"><span class="dot"></span>正在上课 · ${tagText}</div>
+        <h3 class="sched-hero-title">${schedEsc(cur.c.name)}</h3>
+        <div class="sched-hero-meta">
+          <span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(cur.c.teacher || "—")}</span>
+          <span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(cur.c.room || "—")}</span>
+        </div>
+        <div class="sched-hero-count">
+          <span class="num">${cur.eMin - nowMin}</span>
+          <span class="unit">分钟后下课</span>
+          <span class="sched-hero-endtime"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>${cur.eText} 下课</span>
+        </div>
+        <div class="sched-hero-progress"><i style="width:${pct}%"></i></div>`
+    };
+  }
+
+  if (next) {
+    return {
+      empty: false,
+      html: `<div class="sched-hero-tag"><span class="dot"></span>下一节 · ${tagText}</div>
+        <h3 class="sched-hero-title">${schedEsc(next.c.name)}</h3>
+        <div class="sched-hero-meta">
+          <span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(next.c.teacher || "—")}</span>
+          <span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(next.c.room || "—")}</span>
+        </div>
+        <div class="sched-hero-count">
+          <span class="num">${next.sMin - nowMin}</span>
+          <span class="unit">分钟后上课</span>
+          <span class="sched-hero-endtime"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>${next.sText} – ${next.eText}</span>
+        </div>`
+    };
+  }
+
+  return {
+    empty: false,
+    html: `<div class="sched-hero-tag"><span class="dot"></span>${tagText}</div>
+      <h3 class="sched-hero-title">今日课程已全部结束</h3>
+      <div class="sched-hero-meta"><span><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>今日共完成 ${items.length} 门课程，好好休息</span></div>`
+  };
+}
+
+function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
+  if (!courses.length) {
+    return `<div class="sched-empty-box">
+      <svg class="ico-big" aria-hidden="true"><use href="#i-calendar"/></svg>
+      <div>${isToday ? "今天" : "这一天"}暂无课程安排</div>
+      <div style="font-size:12px;opacity:.8">点击右上角“+”即可添加课程，支持单双周设置</div>
+    </div>`;
+  }
+  const periods = SCHED_TIMES[schedGetSeason(schedGetDateOf(weekNo, day, schedState.startDate))].periods;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  let html = "";
+  for (const c of courses) {
+    const s = periods.find(p => p.n === Number(c.start));
+    const e = periods.find(p => p.n === Number(c.end));
+    if (!s || !e) continue;
+    const sMin = schedToMin(s.s), eMin = schedToMin(e.e);
+    let cls = "sched-lesson";
+    if (isToday) {
+      if (nowMin >= sMin && nowMin < eMin) cls += " active";
+      else if (nowMin >= eMin) cls += " past";
+    }
+    const color = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
+    html += `<div class="${cls}" data-edit-idx="${c._idx}">
+      <div class="sched-lesson-time"><span class="t">${s.s}</span><span class="p">${e.e}</span></div>
+      <div class="sched-lesson-bar" style="background:${color}"></div>
+      <div class="sched-lesson-body">
+        <div class="sched-lesson-name"><span>${schedEsc(c.name)}</span><span class="sched-badge" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
+        <div class="sched-lesson-info">
+          ${c.room ? `<span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(c.room)}</span>` : ""}
+          ${c.teacher ? `<span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(c.teacher)}</span>` : ""}
+          <span><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>${schedEsc(c.weeks)} 周</span>
+        </div>
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function render_schedule_desktop(now) {
+  const weekNo = schedState.selectedWeek;
+  const todayWeek = schedGetWeekNumber(now, schedState.startDate);
+  const todayDay = now.getDay() || 7;
+  const monday = schedGetDateOf(weekNo, 1, schedState.startDate);
+  const sunday = schedGetDateOf(weekNo, 7, schedState.startDate);
+  const season = schedGetSeason(schedAddDays(monday, 3));
+  const periods = SCHED_TIMES[season].periods;
+
+  const lbl = $("schedDesktopWeekLabel");
+  if (lbl) lbl.textContent = `第 ${weekNo} 周`;
+  const rng = $("schedDesktopRange");
+  if (rng) rng.textContent = `${schedFmtShort(monday)} – ${schedFmtShort(sunday)}`;
+  const sb = $("schedDesktopSeasonBadge");
+  if (sb) {
+    sb.className = "sched-season-badge" + (season === "winter" ? " is-winter" : "");
+    sb.innerHTML = schedSeasonHtml(season);
+  }
+
+  // 7x5 矩阵
+  const matrix = $("schedDesktopMatrix");
+  if (matrix) {
+    let html = `<div class="sched-m-head" style="display:flex;align-items:center;justify-content:center;">节次</div>`;
+    for (let d = 1; d <= 7; d++) {
+      const cd = schedGetDateOf(weekNo, d, schedState.startDate);
+      const isT = weekNo === todayWeek && d === todayDay;
+      html += `<div class="sched-m-head${isT ? " today" : ""}">${SCHED_DAY_SHORT[d]}<small>${cd.getMonth() + 1}/${cd.getDate()}</small></div>`;
+    }
+    for (const pair of SCHED_BLOCKS) {
+      const ps = periods.find(p => p.n === pair[0]);
+      const pe = periods.find(p => p.n === pair[1]);
+      html += `<div class="sched-m-period"><b>${pair[0]}-${pair[1]}</b><span>${ps ? ps.s : ""}</span><span>${pe ? pe.e : ""}</span></div>`;
+      for (let d = 1; d <= 7; d++) {
+        const isT = weekNo === todayWeek && d === todayDay;
+        const matched = schedState.courses
+          .map((c, i) => ({ ...c, _idx: i }))
+          .filter(c => Number(c.day) === d && Number(c.start) >= pair[0] && Number(c.start) <= pair[1] && schedParseWeeks(c.weeks).has(weekNo));
+        let cards = "";
+        for (const c of matched) {
+          const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
+          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" style="background:${col}">
+            <div class="sc-n">${schedEsc(c.name)}</div>
+            <div class="sc-r">${schedEsc(c.room || c.teacher || "")}</div>
+          </div>`;
+        }
+        html += `<div class="sched-m-cell${isT ? " today" : ""}" data-add-day="${d}" data-add-start="${pair[0]}" data-add-end="${pair[1]}">${cards}</div>`;
+      }
+    }
+    matrix.innerHTML = html;
+  }
+
+  // 右侧边栏：永远显示今天（若不在本学期则显示选中周当日）
+  const sideDay = todayDay;
+  const sideWeek = (todayWeek >= 1 && todayWeek <= schedState.totalWeeks) ? todayWeek : weekNo;
+  const sideIsToday = sideWeek === todayWeek && sideDay === todayDay;
+  const sideCourses = schedCoursesOfDay(sideWeek, sideDay);
+  const heroObj = schedBuildHeroHtml(now, sideCourses, sideWeek, sideDay, sideIsToday);
+  const heroEl = $("schedDesktopHero");
+  if (heroEl) {
+    heroEl.className = "sched-hero" + (heroObj.empty ? " empty" : "");
+    heroEl.innerHTML = heroObj.html;
+  }
+  const tTitle = $("schedDesktopTodayTitle");
+  if (tTitle) tTitle.textContent = sideIsToday ? "今日课程" : `第 ${sideWeek} 周 ${SCHED_DAY_NAMES[sideDay]}`;
+  const tDate = $("schedDesktopTodayDate");
+  if (tDate) tDate.textContent = `${schedFmtShort(schedGetDateOf(sideWeek, sideDay, schedState.startDate))} · ${SCHED_DAY_NAMES[sideDay]}`;
+  const tl = $("schedDesktopTimeline");
+  if (tl) tl.innerHTML = schedBuildTimelineNodes(sideCourses, now, sideWeek, sideDay, sideIsToday);
+}
+
+function render_schedule_mobile(now) {
+  const weekNo = schedState.selectedWeek;
+  const day = schedState.selectedDay;
+  const todayWeek = schedGetWeekNumber(now, schedState.startDate);
+  const todayDay = now.getDay() || 7;
+  const isToday = weekNo === todayWeek && day === todayDay;
+  const targetDate = schedGetDateOf(weekNo, day, schedState.startDate);
+  const season = schedGetSeason(targetDate);
+
+  const mb = $("schedMobSeasonBadge");
+  if (mb) {
+    mb.className = "sched-season-badge" + (season === "winter" ? " is-winter" : "");
+    mb.innerHTML = schedSeasonHtml(season);
+  }
+
+  // Week strip
+  const wStrip = $("schedWeekStrip");
+  if (wStrip) {
+    let wh = "";
+    for (let w = 1; w <= schedState.totalWeeks; w++) {
+      wh += `<button type="button" class="sched-week-chip${w === weekNo ? " on" : ""}${w === todayWeek ? " cur" : ""}" data-w="${w}">第${w}周</button>`;
+    }
+    wStrip.innerHTML = wh;
+    const sel = wStrip.querySelector(".sched-week-chip.on");
+    if (sel) setTimeout(() => sel.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), 30);
+  }
+
+  // Date strip
+  const dStrip = $("schedDateStrip");
+  if (dStrip) {
+    let dh = "";
+    for (let d = 1; d <= 7; d++) {
+      const cd = schedGetDateOf(weekNo, d, schedState.startDate);
+      const isT = weekNo === todayWeek && d === todayDay;
+      dh += `<button type="button" class="sched-date-chip${d === day ? " on" : ""}${isT ? " today" : ""}" data-d="${d}">
+        <span class="dw">${SCHED_DAY_SHORT[d]}</span>
+        <span class="dd">${cd.getMonth() + 1}/${cd.getDate()}</span>
+      </button>`;
+    }
+    dStrip.innerHTML = dh;
+  }
+
+  // Today tab
+  const dayCourses = schedCoursesOfDay(weekNo, day);
+  const heroObj = schedBuildHeroHtml(now, dayCourses, weekNo, day, isToday);
+  const mobHero = $("schedMobHero");
+  if (mobHero) {
+    mobHero.className = "sched-hero" + (heroObj.empty ? " empty" : "");
+    mobHero.innerHTML = heroObj.html;
+  }
+  const mDayLbl = $("schedMobDayLabel");
+  if (mDayLbl) mDayLbl.textContent = isToday ? "今日课程" : `${SCHED_DAY_NAMES[day]} 课程`;
+  const mDate = $("schedMobTodayDate");
+  if (mDate) mDate.textContent = `${schedFmtShort(targetDate)} · ${SCHED_DAY_NAMES[day]}`;
+  const mTl = $("schedMobTimeline");
+  if (mTl) mTl.innerHTML = schedBuildTimelineNodes(dayCourses, now, weekNo, day, isToday);
+
+  // Week grid tab
+  const monday = schedGetDateOf(weekNo, 1, schedState.startDate);
+  const sunday = schedGetDateOf(weekNo, 7, schedState.startDate);
+  const wSeason = schedGetSeason(schedAddDays(monday, 3));
+  const periods = SCHED_TIMES[wSeason].periods;
+  const wTitle = $("schedMobWeekTitle");
+  if (wTitle) wTitle.textContent = `第 ${weekNo} 周 · ${SCHED_TIMES[wSeason].label}`;
+  const wRange = $("schedMobWeekRange");
+  if (wRange) wRange.textContent = `${schedFmtShort(monday)} – ${schedFmtShort(sunday)}`;
+
+  const wg = $("schedMobWeekGrid");
+  if (wg) {
+    let gh = `<div class="sched-m-head" style="display:flex;align-items:center;justify-content:center;">节次</div>`;
+    for (let d = 1; d <= 7; d++) {
+      const cd = schedGetDateOf(weekNo, d, schedState.startDate);
+      const isT = weekNo === todayWeek && d === todayDay;
+      gh += `<div class="sched-m-head${isT ? " today" : ""}" data-jump-day="${d}">${SCHED_DAY_SHORT[d]}<small>${cd.getMonth() + 1}/${cd.getDate()}</small></div>`;
+    }
+    for (const pair of SCHED_BLOCKS) {
+      const ps = periods.find(p => p.n === pair[0]);
+      const pe = periods.find(p => p.n === pair[1]);
+      gh += `<div class="sched-m-period"><b>${pair[0]}-${pair[1]}</b><span>${ps ? ps.s : ""}</span><span>${pe ? pe.e : ""}</span></div>`;
+      for (let d = 1; d <= 7; d++) {
+        const isT = weekNo === todayWeek && d === todayDay;
+        const matched = schedState.courses
+          .map((c, i) => ({ ...c, _idx: i }))
+          .filter(c => Number(c.day) === d && Number(c.start) >= pair[0] && Number(c.start) <= pair[1] && schedParseWeeks(c.weeks).has(weekNo));
+        let cards = "";
+        for (const c of matched) {
+          const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
+          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" style="background:${col}">
+            <div class="sc-n">${schedEsc(c.name)}</div>
+            <div class="sc-r">${schedEsc(c.room || "")}</div>
+          </div>`;
+        }
+        gh += `<div class="sched-m-cell${isT ? " today" : ""}" data-add-day="${d}" data-add-start="${pair[0]}" data-add-end="${pair[1]}">${cards}</div>`;
+      }
+    }
+    wg.innerHTML = gh;
+  }
+
+  // Timetable tab
+  render_timetable_cards($("schedMobTimetableContainer"), $("schedMobSeasonTag"), now);
+}
+
+function render_timetable_cards(container, tagEl, now) {
+  if (!container) return;
+  const curSeason = schedGetSeason(now);
+  const sch = SCHED_TIMES[curSeason];
+  if (tagEl) tagEl.textContent = `当前生效：${sch.label}（${sch.range}）`;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  let activePeriod = 0;
+  for (const p of sch.periods) {
+    if (nowMin >= schedToMin(p.s) && nowMin < schedToMin(p.e)) { activePeriod = p.n; break; }
+  }
+  const numMap = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10 };
+  const makeCard = key => {
+    const s = SCHED_TIMES[key];
+    const isCur = key === curSeason;
+    let rows = "";
+    for (const r of s.rows) {
+      let cls = "sched-tt-row" + (r.br ? " break" : "");
+      const m = /^第([一二三四五六七八九十]+)节$/.exec(r.n);
+      if (m && isCur && numMap[m[1]] === activePeriod) cls += " active";
+      rows += `<div class="${cls}"><span class="n">${r.n}</span><span class="t">${r.t}</span></div>`;
+    }
+    return `<div class="sched-tt-card">
+      <div class="sched-tt-head"><span>${s.label}</span><span class="tag${isCur ? " on" : ""}">${isCur ? "当前执行" : s.range}</span></div>
+      ${rows}
+    </div>`;
+  };
+  container.innerHTML = makeCard(curSeason) + makeCard(curSeason === "winter" ? "summer" : "winter");
+}
+
+function render_schedule_all() {
+  const now = new Date();
+  render_schedule_desktop(now);
+  render_schedule_mobile(now);
+}
+
+function open_schedule_course_dlg(idx, prefill) {
+  schedState.editingIdx = typeof idx === "number" ? idx : -1;
+  const isEdit = schedState.editingIdx >= 0;
+  $("schedCourseDlgTitle").textContent = isEdit ? "编辑课程" : "添加课程";
+  $("btnSchedDeleteCourse").classList.toggle("hide", !isEdit);
+  const c = isEdit ? schedState.courses[schedState.editingIdx] : {
+    name: "",
+    day: prefill?.day || schedState.selectedDay || 1,
+    start: prefill?.start || 1,
+    end: prefill?.end || 2,
+    weeks: "1-" + schedState.totalWeeks,
+    room: "",
+    teacher: "",
+    type: "理论"
+  };
+  $("scName").value = c.name || "";
+  $("scDay").value = String(c.day || 1);
+  $("scType").value = c.type || "理论";
+  $("scStart").value = String(c.start || 1);
+  $("scEnd").value = String(c.end || 2);
+  $("scWeeks").value = c.weeks || "1-" + schedState.totalWeeks;
+  $("scRoom").value = c.room || "";
+  $("scTeacher").value = c.teacher || "";
+  $("scheduleCourseDialog")?.showModal();
+}
+
+function render_setting_course_list() {
+  const cnt = $("schedCourseCount");
+  if (cnt) cnt.textContent = String(schedState.courses.length);
+  const list = $("schedSettingCourseList");
+  if (!list) return;
+  if (!schedState.courses.length) {
+    list.innerHTML = `<div style="text-align:center;padding:18px;color:var(--muted);font-size:12.5px">还没有录入任何课程</div>`;
+    return;
+  }
+  const sorted = schedState.courses.map((c, i) => ({ ...c, _idx: i })).sort((a, b) => a.day - b.day || a.start - b.start);
+  list.innerHTML = sorted.map(c => {
+    const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
+    return `<div class="sched-clist-item">
+      <div class="bar" style="background:${col}"></div>
+      <div class="body" data-edit-idx="${c._idx}">
+        <div class="n">${schedEsc(c.name)}</div>
+        <div class="m">${SCHED_DAY_SHORT[c.day]} · 第${c.start}-${c.end}节 · ${schedEsc(c.weeks)}周 · ${schedEsc(c.room || "未填地点")}</div>
+      </div>
+      <button type="button" class="del" data-del-idx="${c._idx}" aria-label="删除"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg></button>
+    </div>`;
+  }).join("");
+}
+
+function open_schedule_settings_dlg() {
+  $("schedStartInput").value = schedState.startDate;
+  $("schedTotalWeeksInput").value = String(schedState.totalWeeks);
+  render_setting_course_list();
+  $("scheduleSettingDialog")?.showModal();
+}
+
+function bind_schedule_events() {
+  if (schedState.bound) return;
+  schedState.bound = true;
+
+  $("schedPrevWeek")?.addEventListener("click", () => {
+    if (schedState.selectedWeek > 1) { schedState.selectedWeek--; render_schedule_all(); }
+  });
+  $("schedNextWeek")?.addEventListener("click", () => {
+    if (schedState.selectedWeek < schedState.totalWeeks) { schedState.selectedWeek++; render_schedule_all(); }
+  });
+  const goToday = () => {
+    const now = new Date();
+    const w = schedGetWeekNumber(now, schedState.startDate);
+    schedState.selectedWeek = Math.max(1, Math.min(schedState.totalWeeks, w || 1));
+    schedState.selectedDay = now.getDay() || 7;
+    render_schedule_all();
+    toast("已回到当前周与今天");
+  };
+  $("schedDesktopToday")?.addEventListener("click", goToday);
+  $("schedMobToday")?.addEventListener("click", () => {
+    goToday();
+    switch_mob_sched_tab("today");
+  });
+
+  $("schedDesktopAdd")?.addEventListener("click", () => open_schedule_course_dlg(-1));
+  $("schedMobAdd")?.addEventListener("click", () => open_schedule_course_dlg(-1));
+  $("schedOpenSettings")?.addEventListener("click", open_schedule_settings_dlg);
+  $("schedMobSettings")?.addEventListener("click", open_schedule_settings_dlg);
+  $("schedOpenTimetable")?.addEventListener("click", () => {
+    render_timetable_cards($("schedDesktopTimetableContainer"), $("schedDlgSeasonTag"), new Date());
+    $("scheduleTimetableDialog")?.showModal();
+  });
+
+  $("schedAskAiBtn")?.addEventListener("click", () => {
+    go("ai");
+    setTimeout(() => {
+      const q = $("question");
+      if (q) {
+        q.value = "请结合我录入的课表，告诉我今天和明天有哪些课、几点在哪个教室上？";
+        q.focus();
+      }
+    }, 80);
+  });
+
+  // 移动端周条 & 日期条 & 分段切换
+  $("schedWeekStrip")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-w]");
+    if (!btn) return;
+    schedState.selectedWeek = Number(btn.dataset.w);
+    render_schedule_all();
+  });
+  $("schedDateStrip")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-d]");
+    if (!btn) return;
+    schedState.selectedDay = Number(btn.dataset.d);
+    render_schedule_all();
+  });
+
+  function switch_mob_sched_tab(t) {
+    schedState.mobTab = t;
+    document.querySelectorAll(".sched-seg-btn").forEach(b => b.classList.toggle("on", b.dataset.stab === t));
+    $("schedMobViewToday")?.classList.toggle("hide", t !== "today");
+    $("schedMobViewWeek")?.classList.toggle("hide", t !== "week");
+    $("schedMobViewTimetable")?.classList.toggle("hide", t !== "timetable");
+  }
+  document.querySelectorAll(".sched-seg-btn").forEach(b => {
+    b.addEventListener("click", () => switch_mob_sched_tab(b.dataset.stab));
+  });
+
+  // 点击课表卡片/格子事件委托
+  $("schedulePage")?.addEventListener("click", e => {
+    const jump = e.target.closest("[data-jump-day]");
+    if (jump) {
+      schedState.selectedDay = Number(jump.dataset.jumpDay);
+      render_schedule_all();
+      switch_mob_sched_tab("today");
+      return;
+    }
+    const editEl = e.target.closest("[data-edit-idx]");
+    if (editEl) {
+      e.stopPropagation();
+      open_schedule_course_dlg(Number(editEl.dataset.editIdx));
+      return;
+    }
+    const addCell = e.target.closest("[data-add-day]");
+    if (addCell) {
+      open_schedule_course_dlg(-1, {
+        day: Number(addCell.dataset.addDay),
+        start: Number(addCell.dataset.addStart),
+        end: Number(addCell.dataset.addEnd)
+      });
+    }
+  });
+
+  // 移动端单日视图左右滑切天
+  const mobToday = $("schedMobViewToday");
+  if (mobToday) {
+    let sx = 0, sy = 0, st = 0;
+    mobToday.addEventListener("touchstart", e => {
+      if (e.touches.length !== 1) return;
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+    }, { passive: true });
+    mobToday.addEventListener("touchend", e => {
+      if (e.changedTouches.length !== 1) return;
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Date.now() - st < 360 && Math.abs(dx) > 48 && Math.abs(dy) < 40) {
+        if (dx < 0) {
+          if (schedState.selectedDay < 7) schedState.selectedDay++;
+          else if (schedState.selectedWeek < schedState.totalWeeks) { schedState.selectedWeek++; schedState.selectedDay = 1; }
+        } else {
+          if (schedState.selectedDay > 1) schedState.selectedDay--;
+          else if (schedState.selectedWeek > 1) { schedState.selectedWeek--; schedState.selectedDay = 7; }
+        }
+        render_schedule_all();
+      }
+    }, { passive: true });
+  }
+
+  // 对话框关闭与提交
+  $("closeSchedCourseDlg")?.addEventListener("click", () => $("scheduleCourseDialog")?.close());
+  $("closeSchedSettingDlg")?.addEventListener("click", () => $("scheduleSettingDialog")?.close());
+  $("closeSchedTimetableDlg")?.addEventListener("click", () => $("scheduleTimetableDialog")?.close());
+
+  $("schedCourseForm")?.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = $("scName").value.trim();
+    if (!name) { toast("请填写课程名称"); return; }
+    const start = Number($("scStart").value);
+    const end = Number($("scEnd").value);
+    if (end < start) { toast("结束节次不能小于开始节次"); return; }
+    const item = {
+      name,
+      day: Number($("scDay").value),
+      start,
+      end,
+      weeks: $("scWeeks").value.trim() || ("1-" + schedState.totalWeeks),
+      room: $("scRoom").value.trim(),
+      teacher: $("scTeacher").value.trim(),
+      type: $("scType").value
+    };
+    if (schedState.editingIdx >= 0) {
+      schedState.courses[schedState.editingIdx] = item;
+      toast("课程已更新");
+    } else {
+      schedState.courses.push(item);
+      toast("课程已添加");
+    }
+    $("scheduleCourseDialog")?.close();
+    schedQueueSync();
+    render_schedule_all();
+    render_setting_course_list();
+  });
+
+  $("btnSchedDeleteCourse")?.addEventListener("click", () => {
+    if (schedState.editingIdx < 0) return;
+    if (!confirm("确定删除这门课程吗？")) return;
+    schedState.courses.splice(schedState.editingIdx, 1);
+    $("scheduleCourseDialog")?.close();
+    schedQueueSync();
+    render_schedule_all();
+    render_setting_course_list();
+    toast("已删除课程");
+  });
+
+  // 设置面板交互
+  $("schedStartInput")?.addEventListener("change", e => {
+    if (!e.target.value) return;
+    schedState.startDate = e.target.value;
+    schedQueueSync();
+    render_schedule_all();
+    toast("开学日期已更新");
+  });
+  $("schedTotalWeeksInput")?.addEventListener("change", e => {
+    const v = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 18));
+    schedState.totalWeeks = v;
+    e.target.value = String(v);
+    if (schedState.selectedWeek > v) schedState.selectedWeek = v;
+    schedQueueSync();
+    render_schedule_all();
+  });
+  $("schedSettingAddBtn")?.addEventListener("click", () => {
+    $("scheduleSettingDialog")?.close();
+    open_schedule_course_dlg(-1);
+  });
+  $("schedSettingCourseList")?.addEventListener("click", e => {
+    const del = e.target.closest("[data-del-idx]");
+    if (del) {
+      const idx = Number(del.dataset.delIdx);
+      if (!confirm("确定删除这门课程吗？")) return;
+      schedState.courses.splice(idx, 1);
+      schedQueueSync();
+      render_setting_course_list();
+      render_schedule_all();
+      toast("已删除");
+      return;
+    }
+    const ed = e.target.closest("[data-edit-idx]");
+    if (ed) {
+      $("scheduleSettingDialog")?.close();
+      open_schedule_course_dlg(Number(ed.dataset.editIdx));
+    }
+  });
+  $("schedExportBtn")?.addEventListener("click", () => {
+    const data = { startDate: schedState.startDate, totalWeeks: schedState.totalWeeks, courses: schedState.courses };
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+    a.download = "超级课表备份_" + schedFmtDate(new Date()) + ".json";
+    a.click();
+    toast("已导出 JSON 备份");
+  });
+  $("schedImportBtn")?.addEventListener("click", () => $("schedImportFile")?.click());
+  $("schedImportFile")?.addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.startDate) schedState.startDate = data.startDate;
+        if (data.totalWeeks) schedState.totalWeeks = Math.min(30, Math.max(1, Number(data.totalWeeks) || 18));
+        if (Array.isArray(data.courses)) schedState.courses = data.courses;
+        schedQueueSync();
+        render_setting_course_list();
+        render_schedule_all();
+        toast("导入成功，已同步云端");
+      } catch {
+        toast("导入失败：JSON 格式有误");
+      }
+    };
+    reader.readAsText(f);
+    e.target.value = "";
+  });
+  $("schedClearBtn")?.addEventListener("click", () => {
+    if (!confirm("确定清空所有已录入的课程吗？")) return;
+    schedState.courses = [];
+    schedQueueSync();
+    render_setting_course_list();
+    render_schedule_all();
+    toast("已清空课表");
+  });
+
+  // 滚动静默 + 分钟级实时刷新
+  window.addEventListener("scroll", () => {
+    schedState.isScrolling = true;
+    clearTimeout(schedState.scrollTimer);
+    schedState.scrollTimer = setTimeout(() => { schedState.isScrolling = false; }, 450);
+  }, { passive: true });
+
+  setInterval(() => {
+    if (cur_page !== "schedule" || schedState.isScrolling) return;
+    const now = new Date();
+    const m = now.getHours() * 60 + now.getMinutes();
+    if (m === schedState.lastMin) return;
+    schedState.lastMin = m;
+    render_schedule_all();
+  }, 10000);
+}

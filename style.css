@@ -3312,7 +3312,7 @@ dialog::backdrop {
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-top: 1px solid var(--line);
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     z-index: 30;
   }
 
@@ -7292,7 +7292,8 @@ html.dark .msg-avatar.ai {
 }
 
 
-/* ==================== 超级课表（v1.036 · 跟随校务智理主视觉） ==================== */
+
+/* ==================== 超级课表（v1.037 · 原版质感 × 校务智理风格） ==================== */
 #sidebar .nav[data-page="schedule"] .ico,
 .tab-item[data-page="schedule"] .ico {
   color: #0ea5e9 !important;
@@ -7307,10 +7308,10 @@ html.dark .msg-avatar.ai {
   --sc-other: #7c3aed;
 }
 
-/* 桌面端默认显示桌面布局、隐藏移动端布局 */
 .sched-mobile-wrap { display: none; }
 .sched-desktop-wrap { display: block; }
 
+/* 桌面端顶部工具栏（对齐校务智理玻璃卡片） */
 .sched-d-toolbar {
   display: flex;
   align-items: center;
@@ -7318,10 +7319,12 @@ html.dark .msg-avatar.ai {
   flex-wrap: wrap;
   gap: 12px;
   padding: 14px 18px;
-  background: var(--card);
+  background: var(--glass-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: var(--shadow-xs);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
 }
 .sched-d-left {
@@ -7336,13 +7339,13 @@ html.dark .msg-avatar.ai {
   gap: 4px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 3px;
 }
 .sched-step-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7350,14 +7353,15 @@ html.dark .msg-avatar.ai {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, transform .12s;
 }
-.sched-step-btn:hover { background: var(--card); color: var(--blue); }
+.sched-step-btn:hover { background: var(--card); color: var(--blue); box-shadow: var(--shadow-xs); }
+.sched-step-btn:active { transform: scale(.93); }
 .sched-step-btn .ico { width: 16px; height: 16px; }
 .sched-week-label {
-  min-width: 72px;
+  min-width: 76px;
   text-align: center;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
@@ -7388,8 +7392,8 @@ html.dark .msg-avatar.ai {
 .sched-sync-badge {
   font-size: 11.5px;
   color: var(--muted);
-  padding: 3px 8px;
-  border-radius: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
   background: var(--surface);
   border: 1px solid var(--line);
 }
@@ -7407,12 +7411,12 @@ html.dark .msg-avatar.ai {
   justify-content: center;
   gap: 6px;
   height: 36px;
-  padding: 0 13px;
-  border-radius: 10px;
+  padding: 0 14px;
+  border-radius: 11px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform .12s, background .15s, border-color .15s;
+  transition: transform .12s, background .15s, border-color .15s, box-shadow .15s;
 }
 .sched-btn-ghost .ico, .sched-btn-primary .ico, .sched-btn-danger .ico { width: 15px; height: 15px; }
 .sched-btn-ghost {
@@ -7422,12 +7426,13 @@ html.dark .msg-avatar.ai {
 }
 .sched-btn-ghost:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
 .sched-btn-primary {
-  background: var(--blue);
+  background: linear-gradient(135deg, var(--blue), var(--purple));
   color: #fff;
-  border: 1px solid var(--blue);
-  box-shadow: 0 2px 8px rgba(21, 94, 239, .22);
+  border: none;
+  box-shadow: 0 4px 14px rgba(21, 94, 239, .26);
 }
-.sched-btn-primary:hover { background: var(--blue-hover); }
+.sched-btn-primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.sched-btn-primary:active { transform: scale(.97); }
 .sched-btn-danger {
   background: #fef2f2;
   color: #dc2626;
@@ -7435,22 +7440,26 @@ html.dark .msg-avatar.ai {
 }
 .sched-btn-danger:hover { background: #fee2e2; }
 
+/* 桌面端主双栏 */
 .sched-d-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 330px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 16px;
   align-items: start;
+}
+@media (max-width: 1220px) and (min-width: 961px) {
+  .sched-d-grid { grid-template-columns: minmax(0, 1fr) 296px; gap: 12px; }
 }
 .sched-matrix-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
 }
 .sched-matrix {
   display: grid;
-  grid-template-columns: 72px repeat(7, minmax(0, 1fr));
+  grid-template-columns: 68px repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 .sched-m-head {
@@ -7462,10 +7471,13 @@ html.dark .msg-avatar.ai {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
 }
+.sched-m-head:hover { border-color: var(--blue-border); color: var(--blue); }
 .sched-m-head small {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--muted);
   margin-top: 2px;
@@ -7489,13 +7501,14 @@ html.dark .msg-avatar.ai {
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-.sched-m-period b { font-size: 12.5px; color: var(--ink); }
-.sched-m-period span { font-size: 10.5px; color: var(--muted); line-height: 1.35; }
+.sched-m-period b { font-size: 12.5px; color: var(--ink); margin-bottom: 2px; }
+.sched-m-period span { font-size: 10px; color: var(--muted); line-height: 1.35; }
 
 .sched-m-cell {
-  min-height: 86px;
+  position: relative;
+  min-height: 88px;
   padding: 5px;
-  border-radius: 10px;
+  border-radius: 11px;
   background: var(--surface);
   border: 1px dashed transparent;
   display: flex;
@@ -7506,37 +7519,53 @@ html.dark .msg-avatar.ai {
 }
 .sched-m-cell:hover {
   border-color: var(--blue-border);
-  background: #f8faff;
+  background: #f4f7ff;
 }
+.sched-m-cell:empty::after {
+  content: "+";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--blue);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.sched-m-cell:empty:hover::after { opacity: .55; }
 .sched-m-cell.today { background: #f3f7ff; }
 
 .sched-card-item {
   padding: 7px 8px;
-  border-radius: 8px;
+  border-radius: 9px;
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, .08);
-  transition: transform .12s, filter .12s;
+  box-shadow: 0 3px 10px rgba(16, 24, 40, .10);
+  transition: transform .14s, filter .14s;
 }
-.sched-card-item:hover { transform: translateY(-1px); filter: brightness(1.04); }
+.sched-card-item:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.sched-card-item:active { transform: scale(.97); }
 .sched-card-item .sc-n {
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.32;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .sched-card-item .sc-r {
-  font-size: 10.5px;
-  opacity: .9;
+  font-size: 10px;
+  opacity: .92;
   margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* 右侧边栏 & 原版质感 Hero 倒计时卡 */
 .sched-side-col {
   display: flex;
   flex-direction: column;
@@ -7545,55 +7574,70 @@ html.dark .msg-avatar.ai {
 .sched-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
-  padding: 18px;
-  background: linear-gradient(135deg, #eff4ff 0%, #f8faff 100%);
+  border-radius: 18px;
+  padding: 18px 16px;
+  background: linear-gradient(135deg, #e8f0ff 0%, #f3f6ff 55%, #f5f3ff 100%);
   border: 1px solid var(--blue-border);
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 8px 24px rgba(21, 94, 239, .08);
+}
+.sched-hero::before {
+  content: "";
+  position: absolute;
+  inset: -42% -35% auto auto;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(21, 94, 239, .18), transparent 66%);
+  pointer-events: none;
 }
 .sched-hero.empty {
-  background: var(--surface);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-color: var(--line);
+  box-shadow: var(--shadow-xs);
 }
+.sched-hero.empty::before { opacity: .35; }
 .sched-hero-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: .03em;
   padding: 3px 10px;
   border-radius: 999px;
-  background: #fff;
+  background: rgba(255, 255, 255, .85);
   color: var(--blue);
   border: 1px solid var(--blue-border);
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 .sched-hero-tag .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--blue);
+  animation: schedPulse 1.6s ease-in-out infinite;
+}
+.sched-hero.empty .sched-hero-tag .dot { animation: none; opacity: .6; }
+@keyframes schedPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.82); }
 }
 .sched-hero-title {
   margin: 0 0 6px;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--ink);
-  line-height: 1.35;
+  line-height: 1.32;
 }
 .sched-hero-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--muted);
   margin-bottom: 12px;
 }
-.sched-hero-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
+.sched-hero-meta span { display: inline-flex; align-items: center; gap: 4px; }
 .sched-hero-meta .ico { width: 13.5px; height: 13.5px; color: var(--blue); }
 .sched-hero-count {
   display: flex;
@@ -7602,9 +7646,13 @@ html.dark .msg-avatar.ai {
   gap: 6px;
 }
 .sched-hero-count .num {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 800;
-  color: var(--blue);
+  letter-spacing: -.02em;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -7616,16 +7664,16 @@ html.dark .msg-avatar.ai {
   gap: 4px;
   font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 8px;
-  background: #fff;
+  background: rgba(255, 255, 255, .9);
   color: var(--blue);
   border: 1px solid var(--blue-border);
 }
 .sched-hero-endtime .ico { width: 12.5px; height: 12.5px; }
 .sched-hero-progress {
-  margin-top: 10px;
-  height: 5px;
+  margin-top: 11px;
+  height: 4.5px;
   border-radius: 999px;
   background: rgba(21, 94, 239, .14);
   overflow: hidden;
@@ -7634,16 +7682,16 @@ html.dark .msg-avatar.ai {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: var(--blue);
+  background: linear-gradient(90deg, var(--blue), var(--purple));
   transition: width .8s ease;
 }
 
 .sched-today-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
 }
 .sched-today-head {
   display: flex;
@@ -7657,7 +7705,7 @@ html.dark .msg-avatar.ai {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 5px 11px;
   border-radius: 999px;
   background: var(--blue-light);
   color: var(--blue);
@@ -7665,9 +7713,12 @@ html.dark .msg-avatar.ai {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform .12s, background .15s;
 }
+.sched-ai-chip:hover { background: #e0ebff; transform: translateY(-1px); }
 .sched-ai-chip .ico { width: 14px; height: 14px; }
 
+/* 原版时间轴卡片 */
 .sched-timeline {
   display: flex;
   flex-direction: column;
@@ -7675,35 +7726,39 @@ html.dark .msg-avatar.ai {
 }
 .sched-lesson {
   display: flex;
-  gap: 11px;
-  padding: 12px;
-  border-radius: 12px;
+  gap: 12px;
+  padding: 12px 13px;
+  border-radius: 14px;
   background: var(--card);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
   transition: border-color .15s, transform .12s, box-shadow .15s;
 }
-.sched-lesson:hover { border-color: var(--blue-border); box-shadow: var(--shadow-xs); }
+.sched-lesson:hover { border-color: var(--blue-border); box-shadow: var(--shadow-sm); }
 .sched-lesson:active { transform: scale(.985); }
 .sched-lesson.active {
-  border-color: var(--blue);
-  background: #f5f8ff;
+  border-color: rgba(21, 94, 239, .48);
+  background: linear-gradient(135deg, rgba(21, 94, 239, .08), rgba(105, 56, 239, .02));
+  box-shadow: 0 6px 20px rgba(21, 94, 239, .12);
 }
-.sched-lesson.past { opacity: .55; }
+.sched-lesson.past { opacity: .48; }
 .sched-lesson-time {
-  flex: 0 0 56px;
+  flex: 0 0 60px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  gap: 2px;
   font-variant-numeric: tabular-nums;
 }
-.sched-lesson-time .t { font-size: 13.5px; font-weight: 700; color: var(--ink); }
-.sched-lesson-time .p { font-size: 11px; color: var(--muted); }
+.sched-lesson-time .t { font-size: 14px; font-weight: 700; color: var(--ink); }
+.sched-lesson-time .p { font-size: 11px; color: var(--muted); line-height: 1.25; text-align: right; }
+.sched-lesson-time .p b { display: block; font-size: 9.5px; font-weight: 600; opacity: .7; }
 .sched-lesson-bar { flex: 0 0 3.5px; border-radius: 3px; }
 .sched-lesson-body { flex: 1; min-width: 0; }
 .sched-lesson-name {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 4px;
@@ -7715,8 +7770,8 @@ html.dark .msg-avatar.ai {
 .sched-badge {
   font-size: 10px;
   font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 2px 6px;
+  border-radius: 5px;
   color: #fff;
 }
 .sched-lesson-info {
@@ -7731,8 +7786,8 @@ html.dark .msg-avatar.ai {
 
 .sched-empty-box {
   text-align: center;
-  padding: 28px 14px;
-  border-radius: 12px;
+  padding: 34px 16px;
+  border-radius: 14px;
   background: var(--surface);
   border: 1px dashed var(--border);
   color: var(--muted);
@@ -7740,10 +7795,10 @@ html.dark .msg-avatar.ai {
   line-height: 1.7;
 }
 .sched-empty-box .ico-big {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   color: var(--blue);
-  opacity: .75;
+  opacity: .72;
   margin-bottom: 6px;
 }
 
@@ -7753,13 +7808,13 @@ html.dark .msg-avatar.ai {
 .sched-field label { font-size: 12px; font-weight: 600; color: var(--ink-secondary); }
 .sched-field input, .sched-field select {
   width: 100%;
-  height: 42px;
+  height: 44px;
   padding: 0 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--ink);
-  font-size: 14px;
+  font-size: 15px;
 }
 .sched-field input:focus, .sched-field select:focus {
   border-color: var(--blue);
@@ -7799,7 +7854,7 @@ html.dark .msg-avatar.ai {
   align-items: center;
   gap: 10px;
   padding: 9px 11px;
-  border-radius: 10px;
+  border-radius: 11px;
   border: 1px solid var(--line);
   background: var(--surface);
 }
@@ -7830,14 +7885,15 @@ html.dark .msg-avatar.ai {
   margin-top: 12px;
 }
 .sched-tt-card {
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--card);
   overflow: hidden;
   margin-bottom: 12px;
+  box-shadow: var(--shadow-xs);
 }
 .sched-tt-head {
-  padding: 11px 14px;
+  padding: 12px 14px;
   font-size: 13.5px;
   font-weight: 700;
   background: var(--surface);
@@ -7864,7 +7920,7 @@ html.dark .msg-avatar.ai {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 14px;
+  padding: 9px 14px;
   font-size: 12.5px;
   border-bottom: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
@@ -7876,33 +7932,37 @@ html.dark .msg-avatar.ai {
 .sched-tt-row.active { background: var(--blue-light); }
 .sched-tt-row.active .n, .sched-tt-row.active .t { color: var(--blue); font-weight: 700; }
 
-/* ==================== 移动端专属体验 ==================== */
+/* ==================== 移动端专属体验（还原原版顺滑手感） ==================== */
 @media (max-width: 960px) {
   .mobile-tabbar {
-    gap: 1px;
-    padding: 4px 4px env(safe-area-inset-bottom, 0px);
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 0 !important;
+    padding: 4px 2px env(safe-area-inset-bottom, 0px) !important;
   }
   .mobile-tabbar .tab-item {
     min-width: 0;
-    padding: 4px 2px;
+    padding: 4px 1px;
   }
   .mobile-tabbar .tab-item span {
-    font-size: 10.5px;
+    font-size: 10px;
+    white-space: nowrap;
   }
 
   .sched-desktop-wrap { display: none; }
-  .sched-mobile-wrap { display: block; padding-bottom: 24px; }
+  .sched-mobile-wrap { display: block; padding-bottom: 84px; }
 
   .sched-m-sticky {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(255, 255, 255, .94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    margin: -12px -12px 12px;
-    padding: 10px 12px 8px;
-    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 18px;
+    padding: 12px 12px 10px;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
   }
   .sched-m-toprow {
     display: flex;
@@ -7913,7 +7973,7 @@ html.dark .msg-avatar.ai {
   .sched-m-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     min-width: 0;
   }
   .sched-m-title b { font-size: 16px; color: var(--ink); white-space: nowrap; }
@@ -7929,19 +7989,27 @@ html.dark .msg-avatar.ai {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: transform .12s;
   }
+  .sched-m-ibtn:active { transform: scale(.92); }
   .sched-m-ibtn .ico { width: 16px; height: 16px; }
+  .sched-m-ibtn.is-ai {
+    background: var(--blue-light);
+    border-color: var(--blue-border);
+    color: var(--blue);
+  }
   .sched-m-ibtn.is-primary {
-    background: var(--blue);
-    border-color: var(--blue);
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-color: transparent;
     color: #fff;
+    box-shadow: 0 3px 10px rgba(21, 94, 239, .24);
   }
 
   .sched-week-strip {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    padding: 8px 0 4px;
+    padding: 10px 0 4px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
@@ -7949,8 +8017,8 @@ html.dark .msg-avatar.ai {
   .sched-week-chip {
     flex: 0 0 auto;
     min-width: 52px;
-    padding: 5px 10px;
-    border-radius: 9px;
+    padding: 5px 11px;
+    border-radius: 10px;
     font-size: 12.5px;
     font-weight: 500;
     color: var(--muted);
@@ -7958,13 +8026,15 @@ html.dark .msg-avatar.ai {
     border: 1px solid var(--line);
     text-align: center;
     cursor: pointer;
+    transition: transform .12s;
   }
+  .sched-week-chip:active { transform: scale(.94); }
   .sched-week-chip.on {
-    background: var(--blue);
+    background: linear-gradient(135deg, var(--blue), var(--purple));
     color: #fff;
-    border-color: var(--blue);
+    border-color: transparent;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(21, 94, 239, .24);
+    box-shadow: 0 4px 12px rgba(21, 94, 239, .24);
   }
   .sched-week-chip.cur::after {
     content: "";
@@ -7982,24 +8052,26 @@ html.dark .msg-avatar.ai {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    padding: 12px 2px 2px;
+    padding: 16px 2px 3px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
   .sched-date-strip::-webkit-scrollbar { display: none; }
   .sched-date-chip {
     flex: 1 0 44px;
-    padding: 6px 3px 5px;
-    border-radius: 11px;
+    padding: 7px 3px 6px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     background: var(--surface);
-    border: 1px solid var(--line);
+    border: 1.5px solid var(--line);
     position: relative;
     cursor: pointer;
+    transition: transform .12s;
   }
+  .sched-date-chip:active { transform: scale(.93); }
   .sched-date-chip .dw { font-size: 10.5px; color: var(--muted); }
   .sched-date-chip .dd { font-size: 13.5px; font-weight: 700; color: var(--ink); }
   .sched-date-chip.today { border-color: var(--blue-border); background: var(--blue-light); }
@@ -8012,18 +8084,21 @@ html.dark .msg-avatar.ai {
     transform: translateX(-50%);
     font-size: 9px;
     font-weight: 700;
+    line-height: 1.35;
     padding: 1px 5px;
-    border-radius: 6px;
+    border-radius: 7px;
     background: var(--blue);
     color: #fff;
+    box-shadow: 0 2px 5px rgba(21, 94, 239, .26);
   }
   .sched-date-chip.on {
-    background: var(--blue);
-    border-color: var(--blue);
-    box-shadow: 0 3px 10px rgba(21, 94, 239, .24);
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(21, 94, 239, .24);
+    transform: translateY(-1px);
   }
   .sched-date-chip.on .dw, .sched-date-chip.on .dd { color: #fff; }
-  .sched-date-chip.on.today::before { background: #fff; color: var(--blue); border: 1px solid var(--blue-border); }
+  .sched-date-chip.on.today::before { background: #fff; color: var(--blue); }
 
   .sched-m-seg {
     display: grid;
@@ -8031,13 +8106,13 @@ html.dark .msg-avatar.ai {
     gap: 4px;
     padding: 3px;
     margin-top: 6px;
-    border-radius: 11px;
+    border-radius: 12px;
     background: var(--surface);
     border: 1px solid var(--line);
   }
   .sched-seg-btn {
-    height: 32px;
-    border-radius: 8px;
+    height: 33px;
+    border-radius: 9px;
     border: none;
     background: transparent;
     color: var(--muted);
@@ -8048,12 +8123,13 @@ html.dark .msg-avatar.ai {
     justify-content: center;
     gap: 5px;
     cursor: pointer;
+    transition: all .15s;
   }
   .sched-seg-btn .ico { width: 14px; height: 14px; }
   .sched-seg-btn.on {
-    background: var(--card);
-    color: var(--blue);
-    box-shadow: var(--shadow-xs);
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(21, 94, 239, .22);
   }
 
   .sched-m-sec-head {
@@ -8082,6 +8158,7 @@ html.dark .msg-avatar.ai {
     left: 0;
     z-index: 4;
     background: var(--card);
+    box-shadow: 2px 0 6px rgba(16, 24, 40, .05);
   }
   .sched-tt-grid { grid-template-columns: 1fr; }
 }

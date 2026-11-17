@@ -4176,7 +4176,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
     }
     const color = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
     html += `<div class="${cls}" data-edit-idx="${c._idx}">
-      <div class="sched-lesson-time"><span class="t">${s.s}</span><span class="p">${e.e}</span></div>
+      <div class="sched-lesson-time"><span class="t">${s.s}</span><span class="p"><b>下课</b>${e.e}</span></div>
       <div class="sched-lesson-bar" style="background:${color}"></div>
       <div class="sched-lesson-body">
         <div class="sched-lesson-name"><span>${schedEsc(c.name)}</span><span class="sched-badge" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
@@ -4217,7 +4217,7 @@ function render_schedule_desktop(now) {
     for (let d = 1; d <= 7; d++) {
       const cd = schedGetDateOf(weekNo, d, schedState.startDate);
       const isT = weekNo === todayWeek && d === todayDay;
-      html += `<div class="sched-m-head${isT ? " today" : ""}">${SCHED_DAY_SHORT[d]}<small>${cd.getMonth() + 1}/${cd.getDate()}</small></div>`;
+      html += `<div class="sched-m-head${isT ? " today" : ""}" data-desk-day="${d}">${SCHED_DAY_SHORT[d]}<small>${cd.getMonth() + 1}/${cd.getDate()}</small></div>`;
     }
     for (const pair of SCHED_BLOCKS) {
       const ps = periods.find(p => p.n === pair[0]);
@@ -4243,8 +4243,8 @@ function render_schedule_desktop(now) {
   }
 
   // 右侧边栏：永远显示今天（若不在本学期则显示选中周当日）
-  const sideDay = todayDay;
-  const sideWeek = (todayWeek >= 1 && todayWeek <= schedState.totalWeeks) ? todayWeek : weekNo;
+  const sideDay = schedState.selectedDay || todayDay;
+  const sideWeek = weekNo;
   const sideIsToday = sideWeek === todayWeek && sideDay === todayDay;
   const sideCourses = schedCoursesOfDay(sideWeek, sideDay);
   const heroObj = schedBuildHeroHtml(now, sideCourses, sideWeek, sideDay, sideIsToday);
@@ -4487,6 +4487,17 @@ function bind_schedule_events() {
     $("scheduleTimetableDialog")?.showModal();
   });
 
+  const askAiSchedule = () => {
+    go("ai");
+    setTimeout(() => {
+      const q = $("question");
+      if (q) {
+        q.value = "请结合我录入的课表，告诉我今天和明天有哪些课、几点在哪个教室上？";
+        q.focus();
+      }
+    }, 80);
+  };
+  $("schedMobAskAi")?.addEventListener("click", askAiSchedule);
   $("schedAskAiBtn")?.addEventListener("click", () => {
     go("ai");
     setTimeout(() => {
@@ -4525,6 +4536,12 @@ function bind_schedule_events() {
 
   // 点击课表卡片/格子事件委托
   $("schedulePage")?.addEventListener("click", e => {
+    const deskDay = e.target.closest("[data-desk-day]");
+    if (deskDay) {
+      schedState.selectedDay = Number(deskDay.dataset.deskDay);
+      render_schedule_all();
+      return;
+    }
     const jump = e.target.closest("[data-jump-day]");
     if (jump) {
       schedState.selectedDay = Number(jump.dataset.jumpDay);

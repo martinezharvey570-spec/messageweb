@@ -10442,3 +10442,53 @@ html.dark .lg-slide-pill.is-nav-glass {
   box-shadow: none !important;
   border-color: transparent !important;
 }
+
+
+/* ==================== v1.076 全站 GPU 合成层抗锯齿精修 & 扩展滑动玻璃 ==================== */
+.panel,
+.welcome,
+.notice-card,
+.taskrow,
+.user-row,
+#knowledgeGrid .knowledge-card,
+.stats article,
+.sched-d-header,
+.sched-d-right-panel,
+.sched-today-card,
+.sched-card-item,
+.sched-lesson,
+.school-item,
+.mobile-tabbar,
+#sidebar,
+main > header,
+.lg-slide-pill {
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* 增强课程宝石卡片与统计卡的 GPU 3D 悬停动效 */
+#schedulePage .sched-card-item {
+  will-change: transform, filter;
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0.25, 1), filter 0.18s ease, box-shadow 0.22s ease !important;
+}
+#schedulePage .sched-card-item:hover {
+  transform: translate3d(0, -2px, 0) scale(1.015) !important;
+  filter: brightness(1.06);
+}
+#schedulePage .sched-card-item:active {
+  transform: scale3d(0.96, 0.96, 1) !important;
+}
+
+/* 课表周次/日期滑动胶囊宿主保证相对定位 */
+.cat-pills,
+#knowledgePills,
+#schedDeskDateStrip,
+#schedDateStrip,
+#schedWeekStrip,
+#schedDeskWeekStrip {
+  position: relative;
+}

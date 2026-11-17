@@ -12074,3 +12074,176 @@ html.dark #auth .authbox #password { background:rgba(15,23,42,.62) !important; b
 .sched-m-seg,
 .sched-d-seg { cursor:grab; touch-action:pan-y; }
 .is-grab-scrolling { cursor:grabbing !important; }
+
+
+/* ==================== v1.093 全站显示稳定性 + AI 气泡可读性修复 ==================== */
+
+/* AI 对话的真实 DOM 是 .bubble-wrap.msg-ai > .bubble.msg-ai。
+   旧版针对 .msg.ai .msg-bubble 的透明规则并未命中真实节点；这里用明确选择器统一覆盖。 */
+body.on-ai-page #messages .bubble-wrap.msg-ai,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
+  width: fit-content;
+  background: #ffffff !important;
+  color: #182230 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 18px 18px 18px 6px !important;
+  padding: 15px 18px !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .065), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  font-size: 14px;
+  line-height: 1.82;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
+  background: #172235 !important;
+  color: #e8eef8 !important;
+  border-color: #33445d !important;
+  box-shadow: 0 7px 22px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai a {
+  color: #175cd3 !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(23,92,211,.35);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai a {
+  color: #8dbbff !important;
+  text-decoration-color: rgba(141,187,255,.48);
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai p { margin: 0 0 10px; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai p:last-child { margin-bottom: 0; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai h1,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai h2,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai h3,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai h4 {
+  color: inherit !important;
+  line-height: 1.45;
+  margin: 15px 0 8px;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai ul,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai ol {
+  padding-left: 1.45em;
+  margin: 7px 0 11px;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai li { padding-left: 2px; margin: 3px 0; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-left: 3px solid #7aa7f8;
+  border-radius: 0 9px 9px 0;
+  background: #f3f7ff;
+  color: #344054;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote {
+  background: #202f46;
+  color: #d5deec;
+  border-left-color: #6699f5;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px 14px;
+  border: 1px solid #e3eaf4;
+  border-radius: 11px;
+  background: #f6f8fc !important;
+  color: #263449 !important;
+  white-space: pre;
+  scrollbar-width: none;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai pre::-webkit-scrollbar { display:none; }
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai pre {
+  background: #0d1728 !important;
+  border-color: #34445b;
+  color: #e4ecf7 !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai code {
+  overflow-wrap: anywhere;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai pre code { overflow-wrap: normal; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  scrollbar-width: none;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai table::-webkit-scrollbar { display:none; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai th,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai td {
+  padding: 8px 10px;
+  border: 1px solid #e3eaf2;
+  text-align: left;
+  vertical-align: top;
+  min-width: 84px;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai th,
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai td { border-color: #3a4a61; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai img,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai svg { max-width: 100%; height: auto; }
+
+/* 欢迎卡片与普通 AI 回复采用相同的实底，不再透出复杂背景影响文字。 */
+body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble {
+  background: #ffffff !important;
+  color: #182230 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble {
+  background: #172235 !important;
+  color: #e8eef8 !important;
+  border-color: #33445d !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble .welcome-bubble-head b { color: inherit !important; }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble .welcome-bubble-head p { color: #667085 !important; }
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble .welcome-bubble-head p { color: #aebbd0 !important; }
+
+/* 全站弹性布局防护：避免长文本、表格和图片把卡片/网格撑出视口。 */
+#app, main, main > header, #sidebar, .page, .panel, .panelhead,
+.chat, .chat-topbar, .chatintro, .chatintro-text, .messages,
+.bubble-wrap, .bubble, .stat-dash, .stat-ring-box, .stat-metrics,
+.knowledge-grid, #knowledgeGrid, #noticeList, #taskList {
+  min-width: 0;
+}
+.page img, .panel img, dialog img, .bubble img, .notice-card img {
+  max-width: 100%;
+}
+.page pre, .panel pre, dialog pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.page table, .panel table, dialog table {
+  max-width: 100%;
+}
+button, a, input, select, textarea { max-width: 100%; }
+:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, .72);
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  body.on-ai-page #messages { min-width: 0; }
+  body.on-ai-page #messages .bubble-wrap.msg-ai { width: 100%; }
+  body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
+    width: fit-content;
+    max-width: 100% !important;
+    padding: 13px 14px !important;
+    border-radius: 16px 16px 16px 5px !important;
+    font-size: 14px;
+    line-height: 1.78;
+  }
+  body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble { width: 100%; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai,
+  body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}

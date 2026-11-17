@@ -1,11 +1,11 @@
-const CACHE_NAME = "xiaowu-zhili-v1092";
+const CACHE_NAME = "xiaowu-zhili-v1093";
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css?v=1.092",
-  "/app.js?v=1.092",
-  "/config.js?v=1.092",
-  "/android-bridge.js?v=1.092",
+  "/style.css?v=1.093",
+  "/app.js?v=1.093",
+  "/config.js?v=1.093",
+  "/android-bridge.js?v=1.093",
   "/icon-192.png",
   "/icon-512.png"
 ];

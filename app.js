@@ -4161,7 +4161,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
     const emptyHint = !schedState.courses.length
       ? `<div class="sched-empty-actions">
            <button type="button" class="sched-btn-primary" data-empty-act="add"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加第一门课</span></button>
-           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>AI 导课表</span></button>
+           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico ico-star" aria-hidden="true"><use href="#i-sparkles"/></svg><span>AI 导课表</span></button>
          </div>`
       : `<div style="font-size:12px;opacity:.8">可以去自习或点击上方“+”添加课程</div>`;
     return `<div class="sched-empty-box">
@@ -4870,6 +4870,7 @@ async function compress_sched_image(file) {
     pendingAiFile = null;
     if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = "支持教务系统截图、导出 PDF、课表表格等任意格式";
     if ($("schedAiPasteText")) $("schedAiPasteText").value = "";
+    set_ai_import_status("");
     $("scheduleAiImportDialog")?.showModal();
   };
 
@@ -4918,33 +4919,56 @@ async function compress_sched_image(file) {
     if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = `已选择：${file.name}（${Math.max(1, Math.round(file.size / 1024))} KB）`;
   });
 
-  function load_ext_script(url) {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${url}"]`)) { resolve(); return; }
-      const s = document.createElement("script");
-      s.src = url;
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("加载解析组件失败，请检查网络"));
-      document.head.appendChild(s);
+  function load_ext_script_any(urls) {
+    return new Promise(async (resolve, reject) => {
+      for (const url of urls) {
+        if (document.querySelector(`script[src="${url}"]`)) { resolve(); return; }
+        const ok = await new Promise(res => {
+          const s = document.createElement("script");
+          s.src = url;
+          s.onload = () => res(true);
+          s.onerror = () => { s.remove(); res(false); };
+          document.head.appendChild(s);
+        });
+        if (ok) { resolve(); return; }
+      }
+      reject(new Error("解析组件加载失败，请检查网络连接"));
     });
   }
 
+  function set_ai_import_status(msg, isErr) {
+    const el = $("schedAiStatus");
+    if (!el) return;
+    if (!msg) { el.classList.add("hide"); return; }
+    el.textContent = msg;
+    el.classList.toggle("is-err", !!isErr);
+    el.classList.remove("hide");
+  }
+
   async function extract_pdf_for_schedule(file) {
-    await load_ext_script("https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js");
+    set_ai_import_status("正在加载 PDF 解析引擎…");
+    await load_ext_script_any([
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
+      "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"
+    ]);
     const pdfjsLib = window.pdfjsLib;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+    if (!pdfjsLib) throw new Error("PDF 引擎初始化失败");
     const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    // 禁用跨域 Worker，彻底避免浏览器安全策略拦截
+    const pdf = await pdfjsLib.getDocument({ data: buf, disableWorker: true }).promise;
+    set_ai_import_status(`正在读取 PDF（共 ${pdf.numPages} 页）…`);
     let fullText = "";
-    for (let i = 1; i <= Math.min(pdf.numPages, 6); i++) {
+    for (let i = 1; i <= Math.min(pdf.numPages, 8); i++) {
       const page = await pdf.getPage(i);
       const tc = await page.getTextContent();
-      fullText += tc.items.map(it => it.str).join(" ") + "\n";
+      const line = tc.items.map(it => it.str).join(" ").trim();
+      if (line) fullText += line + "\n";
     }
-    if (fullText.trim().length > 40) {
+    if (fullText.trim().length >= 30) {
       return { text: fullText.trim() };
     }
-    // 扫描版 PDF：渲染第 1 页成高清图片走视觉识图
+    set_ai_import_status("检测到扫描版 PDF，正在转成高清图片识别…");
     const page1 = await pdf.getPage(1);
     const vp = page1.getViewport({ scale: 1.8 });
     const canvas = document.createElement("canvas");
@@ -4954,7 +4978,12 @@ async function compress_sched_image(file) {
   }
 
   async function extract_xlsx_for_schedule(file) {
-    await load_ext_script("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+    set_ai_import_status("正在加载表格解析引擎…");
+    await load_ext_script_any([
+      "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+      "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+      "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"
+    ]);
     const buf = await file.arrayBuffer();
     const wb = window.XLSX.read(buf, { type: "array" });
     let txt = "";
@@ -4964,26 +4993,45 @@ async function compress_sched_image(file) {
     return { text: txt };
   }
 
+  // 拖拽文件支持
+  const dropEl = $("schedAiPickFileBtn");
+  if (dropEl) {
+    dropEl.addEventListener("dragover", e => { e.preventDefault(); dropEl.style.borderColor = "var(--blue)"; });
+    dropEl.addEventListener("dragleave", () => { dropEl.style.borderColor = ""; });
+    dropEl.addEventListener("drop", e => {
+      e.preventDefault();
+      dropEl.style.borderColor = "";
+      const f = e.dataTransfer?.files?.[0];
+      if (f) {
+        pendingAiFile = f;
+        set_ai_import_status("");
+        if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = `已选择：${f.name}（${Math.max(1, Math.round(f.size / 1024))} KB）`;
+      }
+    });
+  }
+
   $("schedAiRunBtn")?.addEventListener("click", async () => {
     const pasted = ($("schedAiPasteText")?.value || "").trim();
     if (!pendingAiFile && !pasted) {
-      toast("请先选择课表文件，或粘贴课表文字");
+      set_ai_import_status("请先选择课表文件，或粘贴课表文字", true);
       return;
     }
     const mode = document.querySelector('input[name="schedImportMode"]:checked')?.value || "merge";
     const btn = $("schedAiRunBtn");
     btn.disabled = true;
-    toast("正在解析课表，请稍候…");
+    set_ai_import_status("正在准备解析课表…");
     schedSetSyncLabel("AI 解析中…", true);
 
     try {
       let payload = {};
       if (pendingAiFile) {
         const fname = (pendingAiFile.name || "").toLowerCase();
-        if (pendingAiFile.type.startsWith("image/")) {
+        const ftype = (pendingAiFile.type || "").toLowerCase();
+        if (ftype.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/.test(fname)) {
+          set_ai_import_status("正在压缩图片并上传识别…");
           payload.image = await compress_sched_image(pendingAiFile);
           if (pasted) payload.text = pasted;
-        } else if (fname.endsWith(".pdf")) {
+        } else if (ftype === "application/pdf" || fname.endsWith(".pdf")) {
           payload = await extract_pdf_for_schedule(pendingAiFile);
           if (pasted) payload.text = (payload.text ? payload.text + "\n" : "") + pasted;
         } else if (fname.endsWith(".xlsx") || fname.endsWith(".xls")) {
@@ -5013,21 +5061,26 @@ async function compress_sched_image(file) {
         payload.text = pasted;
       }
 
+      set_ai_import_status("正在调用 AI 提取课程信息（约需 5-10 秒）…");
       const res = await api("/schedule/parse", {
         method: "POST",
         body: JSON.stringify(payload)
       });
       const parsed = Array.isArray(res?.courses) ? res.courses : [];
-      if (!parsed.length) { toast("未识别到有效课程，请换一份更清晰的课表"); return; }
+      if (!parsed.length) {
+        set_ai_import_status("未识别到有效课程，请确认内容清晰或尝试直接粘贴文字", true);
+        return;
+      }
 
       schedState.courses = mode === "replace" ? parsed : [...schedState.courses, ...parsed];
       schedQueueSync();
       render_schedule_all();
+      set_ai_import_status("");
       $("scheduleAiImportDialog")?.close();
       toast(`成功导入 ${parsed.length} 条课程并同步云端`);
     } catch (err) {
       schedSetSyncLabel("导入失败", false);
-      toast(err?.message || "课表解析失败，请重试");
+      set_ai_import_status(err?.message || "课表解析失败，请重试", true);
     } finally {
       btn.disabled = false;
     }

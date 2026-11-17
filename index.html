@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.040">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.040">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.041">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.041">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.040" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.041" fetchpriority="high">
 </head>
 <body>
 
@@ -229,6 +229,8 @@
           </div>
           <div class="date"><small>今天日期</small><b id="dateBig">—</b></div>
         </div>
+
+        <div id="homeScheduleStrip" class="home-sched-strip hide" role="button" tabindex="0" title="点击进入超级课表"></div>
 
         <div class="stats stats-4">
           <article class="clickable-card" data-goto="notices" title="点击查看全部通知">
@@ -592,6 +594,7 @@
               <button type="button" id="schedDesktopToday" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg><span>回到本周</span></button>
               <button type="button" id="schedOpenTimetable" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>作息对照</span></button>
               <button type="button" id="schedOpenSettings" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>设置与备份</span></button>
+              <button type="button" id="schedImportImgBtn" class="sched-btn-ghost" title="上传教务课表截图自动识别"><svg class="ico ico-star" aria-hidden="true"><use href="#i-image"/></svg><span>AI 截图导课表</span></button>
               <button type="button" id="schedDesktopAdd" class="sched-btn-primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加课程</span></button>
             </div>
           </div>
@@ -630,6 +633,7 @@
                 <button type="button" id="schedMobAskAi" class="sched-m-ibtn is-ai" title="问智办 AI 课表" aria-label="问智办 AI 课表"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg></button>
                 <button type="button" id="schedMobToday" class="sched-m-ibtn" title="回到今天" aria-label="回到今天"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg></button>
                 <button type="button" id="schedMobSettings" class="sched-m-ibtn" title="课表设置" aria-label="课表设置"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></button>
+                <button type="button" id="schedMobImportImgBtn" class="sched-m-ibtn is-ai" title="AI 截图导课表" aria-label="AI 截图导课表"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></button>
                 <button type="button" id="schedMobAdd" class="sched-m-ibtn is-primary" title="添加课程" aria-label="添加课程"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></button>
               </div>
             </div>
@@ -674,7 +678,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.040</span>
+        <span>校务智理校园事务服务平台 · v1.041</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -892,9 +896,9 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=1.040"></script>
-<script src="config.js?v=1.040"></script>
-<script src="app.js?v=1.040"></script>
+<script src="android-bridge.js?v=1.041"></script>
+<script src="config.js?v=1.041"></script>
+<script src="app.js?v=1.041"></script>
 
 <dialog id="scheduleCourseDialog" class="task-dialog">
   <div class="dialoghead">
@@ -939,7 +943,16 @@
       </div>
     </div>
     <div class="sched-field">
-      <label for="scWeeks">上课周次（支持 1-16、1-8(单)、2-14(双)）</label>
+      <div class="sched-weeks-head">
+        <label for="scWeeks">上课周次（点选或手动输入）</label>
+        <div class="sched-weeks-quick">
+          <button type="button" data-wq="all">全选</button>
+          <button type="button" data-wq="odd">单周</button>
+          <button type="button" data-wq="even">双周</button>
+          <button type="button" data-wq="none">清空</button>
+        </div>
+      </div>
+      <div id="scWeeksGrid" class="sched-weeks-grid"></div>
       <input id="scWeeks" type="text" placeholder="例如：1-16 或 1-8,10-16(双)" maxlength="60" value="1-18">
     </div>
     <div class="sched-field-row">
@@ -951,6 +964,10 @@
         <label for="scTeacher">任课教师</label>
         <input id="scTeacher" type="text" placeholder="例如：张老师" maxlength="40">
       </div>
+    </div>
+    <div id="schedEditToolsRow" class="sched-edit-tools hide">
+      <button type="button" id="btnSchedDuplicateCourse" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span>复制为新课程</span></button>
+      <button type="button" id="btnSchedToTask" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>记为待办</span></button>
     </div>
     <div class="sched-dlg-actions">
       <button type="button" id="btnSchedDeleteCourse" class="sched-btn-danger hide"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>删除</span></button>
@@ -985,7 +1002,9 @@
       <button type="button" id="schedImportBtn" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg><span>导入 JSON</span></button>
     </div>
     <button type="button" id="schedClearBtn" class="sched-btn-danger" style="width:100%;margin-top:8px"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空所有课程</span></button>
+    <button type="button" id="schedSettingImportImgBtn" class="sched-btn-ghost" style="width:100%;margin-top:8px"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>AI 截图一键导入课表</span></button>
     <input type="file" id="schedImportFile" accept=".json,application/json" style="display:none">
+    <input type="file" id="schedImgFile" accept="image/*" style="display:none">
   </div>
 </dialog>
 

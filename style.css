@@ -12247,3 +12247,275 @@ button, a, input, select, textarea { max-width: 100%; }
     -webkit-backdrop-filter: none !important;
   }
 }
+
+
+/* ==================== v1.094 全站玻璃胶囊补齐 + 桌面登录页轻量重构 ==================== */
+
+/* 通知公告：原生“全部类别”下拉框此前未纳入胶囊玻璃组件，补齐与分类按钮一致的视觉语言 */
+#noticesPage .toolbar {
+  align-items: center;
+  min-width: 0;
+}
+#noticesPage #category,
+#tasksPage #taskFilter,
+#knowledgePage #knowledgeDept {
+  min-height: 42px !important;
+  max-width: 100%;
+  border-radius: 999px !important;
+  padding: 9px 38px 9px 15px !important;
+  color: var(--ink) !important;
+  background-color: rgba(255,255,255,.78) !important;
+  background-image: linear-gradient(180deg,rgba(255,255,255,.96),rgba(237,243,253,.82)) !important;
+  border: 1px solid rgba(59,130,246,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.96), 0 4px 12px rgba(15,23,42,.055) !important;
+  backdrop-filter: blur(18px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(185%) !important;
+  outline: none;
+  cursor: pointer;
+}
+#noticesPage #category:focus-visible,
+#tasksPage #taskFilter:focus-visible,
+#knowledgePage #knowledgeDept:focus-visible {
+  border-color: rgba(37,99,235,.58) !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.14), inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+html.dark #noticesPage #category,
+html.dark #tasksPage #taskFilter,
+html.dark #knowledgePage #knowledgeDept {
+  color: var(--ink) !important;
+  background-color: rgba(23,34,54,.88) !important;
+  background-image: linear-gradient(180deg,rgba(51,65,85,.90),rgba(30,41,59,.88)) !important;
+  border-color: rgba(148,163,184,.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 4px 12px rgba(0,0,0,.22) !important;
+}
+
+/* 补齐遗漏的轻量标签/快捷筛选：不改变其交互尺寸和布局，只统一玻璃底、描边与圆角 */
+.mini-chips button,
+.quick-tags button,
+.filter-chip,
+.filter-chips button,
+.toolbar .pill,
+.toolbar button:not(.primary):not(.clear-btn),
+#noticesPage .cat-pills > .pill-btn,
+#knowledgePage .cat-pills > .pill-btn {
+  border-radius: 999px !important;
+  background: linear-gradient(180deg,rgba(255,255,255,.94),rgba(237,243,253,.82)) !important;
+  border: 1px solid rgba(59,130,246,.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.96), 0 3px 9px rgba(15,23,42,.045) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+}
+.mini-chips button:hover,
+.quick-tags button:hover,
+.filter-chip:hover,
+.filter-chips button:hover,
+.toolbar button:not(.primary):not(.clear-btn):hover {
+  border-color: rgba(37,99,235,.34) !important;
+  transform: translateY(-1px);
+}
+html.dark .mini-chips button,
+html.dark .quick-tags button,
+html.dark .filter-chip,
+html.dark .filter-chips button,
+html.dark .toolbar .pill,
+html.dark .toolbar button:not(.primary):not(.clear-btn),
+html.dark #noticesPage .cat-pills > .pill-btn,
+html.dark #knowledgePage .cat-pills > .pill-btn {
+  background: linear-gradient(180deg,rgba(51,65,85,.88),rgba(30,41,59,.84)) !important;
+  color: var(--ink) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.22) !important;
+}
+/* 当前选中项继续使用蓝色高亮，不被通用玻璃规则覆盖 */
+#noticesPage .cat-pills > .pill-btn.active,
+#knowledgePage .cat-pills > .pill-btn.active,
+.mini-chips button.active,
+.filter-chip.active,
+.filter-chips button.active {
+  color: #fff !important;
+  background: linear-gradient(155deg,#3b82f6 0%,#2563eb 58%,#4f46e5 100%) !important;
+  border-color: rgba(255,255,255,.36) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 5px 14px rgba(37,99,235,.24) !important;
+}
+
+/* 桌面登录页：小改为“柔和品牌背景 + 清晰双栏 + 浮起登录卡”，不动移动端构图 */
+@media (min-width: 901px) {
+  #auth.auth {
+    grid-template-columns: minmax(0,1.04fr) minmax(440px,.96fr) !important;
+    align-items: stretch;
+    gap: clamp(28px,4vw,72px);
+    padding: clamp(28px,4.2vw,68px) clamp(28px,5vw,84px) !important;
+    min-height: 100dvh;
+    background:
+      radial-gradient(ellipse at 12% 12%,rgba(96,165,250,.18),transparent 38%),
+      radial-gradient(ellipse at 88% 82%,rgba(99,102,241,.10),transparent 34%),
+      linear-gradient(135deg,#f5f8ff 0%,#edf3ff 52%,#f8faff 100%) !important;
+  }
+  #auth .hero {
+    width: 100%;
+    max-width: 760px;
+    min-height: min(760px, calc(100dvh - 56px));
+    justify-self: end;
+    align-self: center;
+    padding: clamp(42px,5vw,82px) clamp(34px,5vw,76px) !important;
+    border-radius: 34px !important;
+    color: #fff !important;
+    background:
+      radial-gradient(ellipse at 82% 12%,rgba(147,197,253,.38),transparent 36%),
+      radial-gradient(ellipse at 12% 92%,rgba(30,64,175,.52),transparent 48%),
+      linear-gradient(145deg,#102d72 0%,#1d5fe0 56%,#347ff0 100%) !important;
+    border: 1px solid rgba(255,255,255,.28) !important;
+    box-shadow: 0 28px 70px -28px rgba(30,64,175,.42), inset 0 1px 0 rgba(255,255,255,.24) !important;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  #auth .hero::before,
+  #auth .hero::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 50%;
+  }
+  #auth .hero::before {
+    width: min(34vw,440px);
+    aspect-ratio: 1;
+    right: -13%;
+    top: -18%;
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: 0 0 0 28px rgba(255,255,255,.035),0 0 0 58px rgba(255,255,255,.025);
+  }
+  #auth .hero::after {
+    width: min(24vw,300px);
+    aspect-ratio: 1;
+    right: 8%;
+    bottom: -20%;
+    background: radial-gradient(circle,rgba(147,197,253,.22),rgba(147,197,253,0) 70%);
+  }
+  #auth .hero h1 {
+    font-size: clamp(42px,4vw,58px);
+    line-height: 1.12;
+    letter-spacing: 1px;
+    margin: 26px 0 14px;
+  }
+  #auth .hero > p {
+    max-width: 430px;
+    color: rgba(239,246,255,.88) !important;
+    font-size: 16px;
+    line-height: 1.85;
+  }
+  #auth .hero-list {
+    width: min(100%,420px);
+    gap: 12px;
+    margin: 34px 0 52px;
+  }
+  #auth .hero-list p {
+    max-width: none;
+    padding: 13px 17px;
+    border-radius: 15px;
+    color: rgba(255,255,255,.96);
+    background: rgba(255,255,255,.105);
+    border: 1px solid rgba(255,255,255,.17);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  #auth .hero small {
+    color: rgba(219,234,254,.76) !important;
+    letter-spacing: 2.2px;
+  }
+  #auth .authbox {
+    width: min(100%,460px) !important;
+    justify-self: start;
+    align-self: center;
+    margin: auto 0 !important;
+    padding: clamp(34px,3.5vw,54px) !important;
+    gap: 19px !important;
+    border-radius: 30px !important;
+    background: rgba(255,255,255,.88) !important;
+    border: 1px solid rgba(255,255,255,.96) !important;
+    box-shadow: 0 26px 70px -28px rgba(30,64,175,.20), inset 0 1px 0 #fff !important;
+    backdrop-filter: blur(26px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+  }
+  #auth .authbox h2 {
+    font-size: clamp(27px,2.2vw,32px);
+    letter-spacing: -.5px;
+    margin: 8px 0 0;
+    color: #172554;
+  }
+  #auth .authbox > .muted {
+    margin-top: -10px;
+    line-height: 1.7;
+    color: #64748b !important;
+  }
+  #auth .authbox label {
+    gap: 9px;
+    color: #334155;
+  }
+  #auth .authbox label > input,
+  #auth .authbox .input-group input {
+    min-height: 48px;
+    border-radius: 15px !important;
+    background: rgba(246,249,255,.92) !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+    box-shadow: inset 0 1px 2px rgba(15,23,42,.025) !important;
+  }
+  #auth .authbox label > input:focus,
+  #auth .authbox .input-group input:focus {
+    background: #fff !important;
+    border-color: rgba(37,99,235,.55) !important;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.10) !important;
+  }
+  #auth .authbox .tabs {
+    gap: 12px;
+    border: 0;
+    padding: 4px;
+    width: max-content;
+    border-radius: 999px;
+    background: rgba(226,232,240,.58);
+  }
+  #auth .authbox .tabs button {
+    min-width: 76px;
+    padding: 9px 17px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #64748b !important;
+  }
+  #auth .authbox .tabs button.selected {
+    color: #fff !important;
+    background: linear-gradient(145deg,#3b82f6,#2563eb) !important;
+    box-shadow: 0 4px 11px rgba(37,99,235,.22) !important;
+  }
+  #auth .authbox .primary.wide {
+    min-height: 49px;
+    border-radius: 15px !important;
+    box-shadow: 0 9px 20px rgba(37,99,235,.20) !important;
+  }
+  html.dark #auth.auth {
+    background:
+      radial-gradient(ellipse at 12% 12%,rgba(37,99,235,.18),transparent 38%),
+      radial-gradient(ellipse at 88% 82%,rgba(79,70,229,.12),transparent 34%),
+      linear-gradient(135deg,#0b1220 0%,#111c31 55%,#0d1729 100%) !important;
+  }
+  html.dark #auth .authbox {
+    background: rgba(19,29,48,.92) !important;
+    border-color: rgba(148,163,184,.16) !important;
+    box-shadow: 0 28px 72px -28px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  }
+  html.dark #auth .authbox h2 { color: #eff6ff; }
+  html.dark #auth .authbox label { color: #dbeafe; }
+  html.dark #auth .authbox label > input,
+  html.dark #auth .authbox .input-group input {
+    color: #e2e8f0 !important;
+    background: rgba(8,15,29,.70) !important;
+    border-color: rgba(148,163,184,.20) !important;
+  }
+  html.dark #auth .authbox .tabs { background: rgba(8,15,29,.66); }
+}
+
+@media (max-width: 900px) {
+  #noticesPage #category { flex: 0 0 auto; width: auto; min-width: 128px; }
+  #noticesPage .toolbar { gap: 9px; }
+}

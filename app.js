@@ -4591,12 +4591,6 @@ function bind_schedule_events() {
   if (schedState.bound) return;
   schedState.bound = true;
 
-  $("schedPrevWeek")?.addEventListener("click", () => {
-    if (schedState.selectedWeek > 1) { schedState.selectedWeek--; render_schedule_all(); }
-  });
-  $("schedNextWeek")?.addEventListener("click", () => {
-    if (schedState.selectedWeek < schedState.totalWeeks) { schedState.selectedWeek++; render_schedule_all(); }
-  });
   const goToday = () => {
     const now = new Date();
     const w = schedGetWeekNumber(now, schedState.startDate);
@@ -4615,34 +4609,8 @@ function bind_schedule_events() {
   $("schedMobAdd")?.addEventListener("click", () => open_schedule_course_dlg(-1));
   $("schedOpenSettings")?.addEventListener("click", open_schedule_settings_dlg);
   $("schedMobSettings")?.addEventListener("click", open_schedule_settings_dlg);
-  $("schedOpenTimetable")?.addEventListener("click", () => {
-    render_timetable_cards($("schedDesktopTimetableContainer"), $("schedDlgSeasonTag"), new Date());
-    $("scheduleTimetableDialog")?.showModal();
-  });
 
-  const askAiSchedule = () => {
-    go("ai");
-    setTimeout(() => {
-      const q = $("question");
-      if (q) {
-        q.value = "请结合我录入的课表，告诉我今天和明天有哪些课、几点在哪个教室上？";
-        q.focus();
-      }
-    }, 80);
-  };
-  $("schedMobAskAi")?.addEventListener("click", () => { $("scheduleSettingDialog")?.close(); askAiSchedule(); });
-  $("schedAskAiBtn")?.addEventListener("click", () => {
-    go("ai");
-    setTimeout(() => {
-      const q = $("question");
-      if (q) {
-        q.value = "请结合我录入的课表，告诉我今天和明天有哪些课、几点在哪个教室上？";
-        q.focus();
-      }
-    }, 80);
-  });
-
-  // 移动端周条 & 日期条 & 分段切换
+    // 移动端周条 & 日期条 & 分段切换
   $("schedWeekStrip")?.addEventListener("click", e => {
     const btn = e.target.closest("[data-w]");
     if (!btn) return;
@@ -4719,7 +4687,6 @@ function bind_schedule_events() {
 
   // 对话框关闭与提交
   $("closeSchedCourseDlg")?.addEventListener("click", () => $("scheduleCourseDialog")?.close());
-  $("closeSchedSettingDlg")?.addEventListener("click", () => $("scheduleSettingDialog")?.close());
   $("closeSchedTimetableDlg")?.addEventListener("click", () => $("scheduleTimetableDialog")?.close());
 
   $("schedCourseForm")?.addEventListener("submit", e => {
@@ -4761,83 +4728,6 @@ function bind_schedule_events() {
     render_schedule_all();
     render_setting_course_list();
     toast("已删除课程");
-  });
-
-  // 设置面板交互
-  $("schedStartInput")?.addEventListener("change", e => {
-    if (!e.target.value) return;
-    schedState.startDate = e.target.value;
-    schedQueueSync();
-    render_schedule_all();
-    toast("开学日期已更新");
-  });
-  $("schedTotalWeeksInput")?.addEventListener("change", e => {
-    const v = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 18));
-    schedState.totalWeeks = v;
-    e.target.value = String(v);
-    if (schedState.selectedWeek > v) schedState.selectedWeek = v;
-    schedQueueSync();
-    render_schedule_all();
-  });
-  $("schedSettingAddBtn")?.addEventListener("click", () => {
-    $("scheduleSettingDialog")?.close();
-    open_schedule_course_dlg(-1);
-  });
-  $("schedSettingCourseList")?.addEventListener("click", e => {
-    const del = e.target.closest("[data-del-idx]");
-    if (del) {
-      const idx = Number(del.dataset.delIdx);
-      if (!confirm("确定删除这门课程吗？")) return;
-      schedState.courses.splice(idx, 1);
-      schedQueueSync();
-      render_setting_course_list();
-      render_schedule_all();
-      toast("已删除");
-      return;
-    }
-    const ed = e.target.closest("[data-edit-idx]");
-    if (ed) {
-      $("scheduleSettingDialog")?.close();
-      open_schedule_course_dlg(Number(ed.dataset.editIdx));
-    }
-  });
-  $("schedExportBtn")?.addEventListener("click", () => {
-    const data = { startDate: schedState.startDate, totalWeeks: schedState.totalWeeks, courses: schedState.courses };
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-    a.download = "超级课表备份_" + schedFmtDate(new Date()) + ".json";
-    a.click();
-    toast("已导出 JSON 备份");
-  });
-  $("schedImportBtn")?.addEventListener("click", () => $("schedImportFile")?.click());
-  $("schedImportFile")?.addEventListener("change", e => {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if (data.startDate) schedState.startDate = data.startDate;
-        if (data.totalWeeks) schedState.totalWeeks = Math.min(30, Math.max(1, Number(data.totalWeeks) || 18));
-        if (Array.isArray(data.courses)) schedState.courses = data.courses;
-        schedQueueSync();
-        render_setting_course_list();
-        render_schedule_all();
-        toast("导入成功，已同步云端");
-      } catch {
-        toast("导入失败：JSON 格式有误");
-      }
-    };
-    reader.readAsText(f);
-    e.target.value = "";
-  });
-  $("schedClearBtn")?.addEventListener("click", () => {
-    if (!confirm("确定清空所有已录入的课程吗？")) return;
-    schedState.courses = [];
-    schedQueueSync();
-    render_setting_course_list();
-    render_schedule_all();
-    toast("已清空课表");
   });
 
   // 滚动静默 + 分钟级实时刷新
@@ -4980,10 +4870,6 @@ async function compress_sched_image(file) {
   };
 
   $("schedImportImgBtn")?.addEventListener("click", openAiImportModal);
-  $("schedSettingImportImgBtn")?.addEventListener("click", () => {
-    $("scheduleSettingDialog")?.close();
-    openAiImportModal();
-  });
   $("closeSchedAiImportDlg")?.addEventListener("click", () => $("scheduleAiImportDialog")?.close());
   ["scheduleCourseDialog", "scheduleSettingDialog", "scheduleTimetableDialog", "scheduleAiImportDialog"].forEach(id => {
     const dlg = $(id);

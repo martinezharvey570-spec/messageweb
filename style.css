@@ -8136,33 +8136,6 @@ html.dark .home-sched-strip {
 }
 
 
-/* ==================== v1.042 桌面端扁平横幅 Hero & 次级菜单样式 ==================== */
-.sched-hero-banner {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "tag count"
-    "title count"
-    "meta count"
-    "prog prog";
-  align-items: center;
-  column-gap: 20px;
-  padding: 13px 18px !important;
-  margin-bottom: 14px !important;
-}
-.sched-hero-banner .sched-hero-tag { grid-area: tag; margin-bottom: 4px; }
-.sched-hero-banner .sched-hero-title { grid-area: title; font-size: 17px; margin-bottom: 3px; }
-.sched-hero-banner .sched-hero-meta { grid-area: meta; margin-bottom: 0; }
-.sched-hero-banner .sched-hero-count {
-  grid-area: count;
-  justify-content: flex-end;
-  align-items: baseline;
-  margin-top: 0;
-}
-.sched-hero-banner .sched-hero-count .num { font-size: 28px; }
-.sched-hero-banner .sched-hero-endtime { margin-left: 8px; }
-.sched-hero-banner .sched-hero-progress { grid-area: prog; margin-top: 9px; }
-
 .sched-sub-tools {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -8396,7 +8369,6 @@ html.dark .sched-field textarea { background: var(--surface); color: var(--ink);
 
 /* 解决移动端弹窗（15690.jpg）空间太小及不能单指顺滑滚动的问题 */
 @media (max-width: 960px) {
-  #scheduleSettingDialog,
   #scheduleCourseDialog,
   #scheduleAiImportDialog {
     max-height: 92dvh !important;
@@ -8405,12 +8377,10 @@ html.dark .sched-field textarea { background: var(--surface); color: var(--ink);
     display: flex !important;
     flex-direction: column !important;
   }
-  #scheduleSettingDialog:not([open]),
   #scheduleCourseDialog:not([open]),
   #scheduleAiImportDialog:not([open]) {
     display: none !important;
   }
-  #scheduleSettingDialog .dialoghead,
   #scheduleCourseDialog .dialoghead,
   #scheduleAiImportDialog .dialoghead {
     flex: 0 0 auto;
@@ -8418,7 +8388,6 @@ html.dark .sched-field textarea { background: var(--surface); color: var(--ink);
     border-bottom: 1px solid var(--line);
     margin: 0;
   }
-  #scheduleSettingDialog .sched-setting-body,
   #scheduleCourseDialog .sched-dlg-form,
   #scheduleAiImportDialog .sched-ai-import-body {
     flex: 1 1 auto;
@@ -8427,10 +8396,6 @@ html.dark .sched-field textarea { background: var(--surface); color: var(--ink);
     overscroll-behavior: contain;
     padding: 14px 18px calc(22px + env(safe-area-inset-bottom, 0px));
     margin: 0;
-  }
-  #scheduleSettingDialog .sched-clist {
-    max-height: none !important;
-    overflow: visible !important;
   }
 }
 
@@ -10253,4 +10218,23 @@ html.dark body.on-ai-page .msg.ai .msg-bubble {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.11),
     0 8px 24px -6px rgba(0, 0, 0, 0.36) !important;
+}
+
+
+/* ==================== v1.071 蓝宝石液态玻璃“校”徽 & 冗余清理 ==================== */
+.sidebrand .logo,
+.auth .logo {
+  background:
+    radial-gradient(120% 85% at 24% 8%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.06) 48%, transparent 66%),
+    linear-gradient(155deg, #3b82f6 0%, #2563eb 54%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 7px rgba(15, 23, 42, 0.25),
+    0 6px 16px -3px rgba(37, 99, 235, 0.40) !important;
+}
+.desktop-rail-toggle:hover {
+  background: var(--lg-surface-2) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 2px 8px rgba(15, 23, 42, 0.06);
 }

@@ -8134,3 +8134,58 @@ html.dark .home-sched-strip {
   padding: 0 4px; border-radius: 4px; margin-left: 4px;
   background: rgba(255, 255, 255, .24); color: #fff; vertical-align: middle;
 }
+
+
+/* ==================== v1.042 桌面端扁平横幅 Hero & 次级菜单样式 ==================== */
+.sched-hero-banner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "tag count"
+    "title count"
+    "meta count"
+    "prog prog";
+  align-items: center;
+  column-gap: 20px;
+  padding: 13px 18px !important;
+  margin-bottom: 14px !important;
+}
+.sched-hero-banner .sched-hero-tag { grid-area: tag; margin-bottom: 4px; }
+.sched-hero-banner .sched-hero-title { grid-area: title; font-size: 17px; margin-bottom: 3px; }
+.sched-hero-banner .sched-hero-meta { grid-area: meta; margin-bottom: 0; }
+.sched-hero-banner .sched-hero-count {
+  grid-area: count;
+  justify-content: flex-end;
+  align-items: baseline;
+  margin-top: 0;
+}
+.sched-hero-banner .sched-hero-count .num { font-size: 28px; }
+.sched-hero-banner .sched-hero-endtime { margin-left: 8px; }
+.sched-hero-banner .sched-hero-progress { grid-area: prog; margin-top: 9px; }
+
+.sched-sub-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.sched-sub-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.sched-sub-card:hover { border-color: var(--blue-border); background: var(--blue-light); }
+.sched-sub-card.is-accent {
+  background: var(--blue-light);
+  border-color: var(--blue-border);
+}
+.sched-sub-card .ico { width: 20px; height: 20px; color: var(--blue); flex: 0 0 auto; }
+.sched-sub-card b { display: block; font-size: 13px; color: var(--ink); line-height: 1.25; }
+.sched-sub-card small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }

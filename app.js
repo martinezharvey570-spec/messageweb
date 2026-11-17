@@ -3959,10 +3959,11 @@ function schedGetSeason(date) {
   const m = date.getMonth() + 1;
   return (m >= 5 && m <= 9) ? "summer" : "winter";
 }
-function schedSeasonHtml(seasonKey) {
+function schedSeasonHtml(seasonKey, short) {
   const isW = seasonKey === "winter";
   const ico = isW ? "#i-snowflake" : "#i-sun";
-  return `<svg class="ico" aria-hidden="true"><use href="${ico}"/></svg><span>${SCHED_TIMES[seasonKey].label}</span>`;
+  const txt = short ? (isW ? "秋冬季" : "春夏季") : SCHED_TIMES[seasonKey].label;
+  return `<svg class="ico" aria-hidden="true"><use href="${ico}"/></svg><span>${txt}</span>`;
 }
 function schedParseWeeks(str) {
   const set = new Set();
@@ -4249,15 +4250,15 @@ function render_schedule_desktop(now) {
     matrix.innerHTML = html;
   }
 
-  // 右侧边栏：永远显示今天（若不在本学期则显示选中周当日）
-  const sideDay = schedState.selectedDay || todayDay;
-  const sideWeek = weekNo;
+  // 桌面端顶部扁平状态横幅（方案A：固定紧凑高度，不挤占周课表）
+  const sideDay = todayDay;
+  const sideWeek = (todayWeek >= 1 && todayWeek <= schedState.totalWeeks) ? todayWeek : weekNo;
   const sideIsToday = sideWeek === todayWeek && sideDay === todayDay;
   const sideCourses = schedCoursesOfDay(sideWeek, sideDay);
   const heroObj = schedBuildHeroHtml(now, sideCourses, sideWeek, sideDay, sideIsToday);
   const heroEl = $("schedDesktopHero");
   if (heroEl) {
-    heroEl.className = "sched-hero" + (heroObj.empty ? " empty" : "");
+    heroEl.className = "sched-hero sched-hero-banner" + (heroObj.empty ? " empty" : "");
     heroEl.innerHTML = heroObj.html;
   }
   const tTitle = $("schedDesktopTodayTitle");
@@ -4280,7 +4281,7 @@ function render_schedule_mobile(now) {
   const mb = $("schedMobSeasonBadge");
   if (mb) {
     mb.className = "sched-season-badge" + (season === "winter" ? " is-winter" : "");
-    mb.innerHTML = schedSeasonHtml(season);
+    mb.innerHTML = schedSeasonHtml(season, true);
   }
 
   // Week strip
@@ -4507,7 +4508,7 @@ function bind_schedule_events() {
       }
     }, 80);
   };
-  $("schedMobAskAi")?.addEventListener("click", askAiSchedule);
+  $("schedMobAskAi")?.addEventListener("click", () => { $("scheduleSettingDialog")?.close(); askAiSchedule(); });
   $("schedAskAiBtn")?.addEventListener("click", () => {
     go("ai");
     setTimeout(() => {

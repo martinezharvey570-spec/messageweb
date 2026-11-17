@@ -9615,7 +9615,6 @@ html.dark .scroll-bottom-btn {
 /* ==================== v1.065 深度审查补全：高校弹窗、公文工具栏、全部表单与四层逻辑闭环 ==================== */
 
 /* 【Layer 1：全站所有弹窗内输入槽 & 字号切换槽 & 高校搜索槽】 */
-.school-search-wrap input,
 dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
 dialog:not(#docDialog) select,
 #docDialog .doc-font-group,
@@ -9635,8 +9634,7 @@ dialog:not(#docDialog) textarea {
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
   box-shadow: inset 0 1.5px 4px rgba(15, 23, 42, 0.06) !important;
 }
-html.dark .school-search-wrap input,
-html.dark dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
+html.dark html.dark dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
 html.dark dialog:not(#docDialog) select,
 html.dark dialog:not(#docDialog) textarea,
 html.dark #docDialog .doc-font-group,
@@ -10311,7 +10309,6 @@ html.dark #userProfileBtn.user {
   border-color: var(--blue) !important;
   box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
-.school-search-wrap input,
 dialog:not(#docDialog) .school-search-wrap input {
   flex: 1 !important;
   min-width: 0 !important;
@@ -10374,12 +10371,15 @@ html.dark dialog:not(#docDialog) {
 button, .pill, .pill-btn, .sched-week-chip, .sched-date-chip, #avatar, #themeToggle {
   -webkit-font-smoothing: antialiased;
   backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 /* 2. 通用丝滑滑动液态玻璃胶囊指示器（.lg-slide-host + .lg-slide-pill） */
-.lg-slide-host {
-  position: relative !important;
+.lg-slide-host:not(#sidebar):not(.mobile-tabbar) {
+  position: relative;
+}
+#sidebar,
+.mobile-tabbar {
+  position: fixed !important;
 }
 .lg-slide-host > .lg-slide-item {
   position: relative;
@@ -10393,12 +10393,24 @@ button, .pill, .pill-btn, .sched-week-chip, .sched-date-chip, #avatar, #themeTog
   pointer-events: none;
   border-radius: 999px;
   opacity: 0;
-  will-change: transform, width, height, opacity;
+  will-change: transform, width, height, opacity, filter;
   transition:
-    transform 0.34s cubic-bezier(0.32, 0.72, 0.25, 1),
-    width 0.34s cubic-bezier(0.32, 0.72, 0.25, 1),
-    height 0.34s cubic-bezier(0.32, 0.72, 0.25, 1),
-    opacity 0.18s ease;
+    transform 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
+    width 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
+    height 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
+    opacity 0.16s ease,
+    filter 0.22s ease;
+}
+.lg-slide-pill.is-gliding {
+  filter: brightness(1.08) saturate(1.16);
+}
+.lg-slide-pill.is-pressing {
+  transition:
+    transform 0.12s cubic-bezier(0.32, 0.72, 0.25, 1),
+    width 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
+    height 0.34s cubic-bezier(0.26, 1.10, 0.36, 1),
+    filter 0.12s ease !important;
+  filter: brightness(1.06) saturate(1.12);
 }
 .lg-slide-pill.is-ready {
   opacity: 1;
@@ -10465,7 +10477,6 @@ main > header,
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
   isolation: isolate;
-  transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
@@ -10491,4 +10502,363 @@ main > header,
 #schedWeekStrip,
 #schedDeskWeekStrip {
   position: relative;
+}
+
+
+/* ==================== v1.077 移动端高阶 GPU 全量液态玻璃（释放GPU渲染力） ==================== */
+@media (max-width: 960px) {
+  /* 1. 移动端所有列表子卡片全面开启真·实时 GPU 模糊折射（blur(22px) saturate(200%)） */
+  .notice-card,
+  .taskrow,
+  .user-row,
+  #knowledgeGrid .knowledge-card,
+  .sched-lesson,
+  .sched-clist-item,
+  .welcome-item,
+  .school-item {
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: blur(22px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.90) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+      0 6px 20px -6px rgba(15, 23, 42, 0.08) !important;
+  }
+  html.dark .notice-card,
+  html.dark .taskrow,
+  html.dark .user-row,
+  html.dark #knowledgeGrid .knowledge-card,
+  html.dark .sched-lesson,
+  html.dark .sched-clist-item,
+  html.dark .welcome-item,
+  html.dark .school-item {
+    background: rgba(24, 33, 50, 0.70) !important;
+    border-color: rgba(255, 255, 255, 0.13) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 8px 22px -6px rgba(0, 0, 0, 0.42) !important;
+  }
+
+  /* 2. 移动端悬浮岛底栏、顶栏、AI输入胶囊、弹窗开启超强高饱和折射（blur(38px) saturate(225%)） */
+  .mobile-tabbar,
+  main > header,
+  .sched-m-sticky,
+  body.on-ai-page .ask .ask-input-wrap,
+  dialog:not(#docDialog) {
+    backdrop-filter: blur(38px) saturate(225%) contrast(1.03) !important;
+    -webkit-backdrop-filter: blur(38px) saturate(225%) contrast(1.03) !important;
+  }
+  .mobile-tabbar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(244, 248, 255, 0.66) 100%) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06),
+      0 14px 38px -6px rgba(15, 23, 42, 0.18) !important;
+  }
+  html.dark .mobile-tabbar {
+    background: linear-gradient(180deg, rgba(24, 33, 52, 0.78) 0%, rgba(15, 23, 42, 0.72) 100%) !important;
+  }
+
+  /* 3. 移动端触控液态阻尼回弹（Touch Spring Feedback） */
+  .notice-card:active,
+  .taskrow:active,
+  .stats article:active,
+  .sched-lesson:active,
+  .quick:active,
+  .home-sched-strip:active,
+  .mobile-tabbar .tab-item:active {
+    transform: scale3d(0.965, 0.965, 1) !important;
+    filter: brightness(1.03);
+    transition: transform 0.12s cubic-bezier(0.32, 0.72, 0.25, 1), filter 0.12s ease !important;
+  }
+}
+
+
+/* ==================== v1.079 滑动胶囊与按钮点击/按压一体同步（消除脱节） ==================== */
+/* 1. 彻底压制所有滑动宿主内部按钮的静态激活底色，杜绝点击瞬间双层背景闪烁 */
+#sidebar.lg-slide-host > .lg-slide-item.active,
+#sidebar.lg-slide-host > .lg-slide-item.active:hover,
+.mobile-tabbar.lg-slide-host > .lg-slide-item.active,
+.mobile-tabbar.lg-slide-host > .lg-slide-item.active:hover,
+#knowledgePills.lg-slide-host > .lg-slide-item.active,
+#knowledgePills.lg-slide-host > .lg-slide-item.active:hover,
+#schedulePage .lg-slide-host > .lg-slide-item.on,
+#schedulePage .lg-slide-host > .lg-slide-item.on:hover,
+#docDialog .lg-slide-host > .lg-slide-item.active,
+.authbox .tabs.lg-slide-host > .lg-slide-item.selected,
+.lg-slide-host > .lg-slide-item.active,
+.lg-slide-host > .lg-slide-item.on,
+.lg-slide-host > .lg-slide-item.selected,
+.lg-slide-host > .lg-slide-active-clean {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* 2. 让按钮文字、图标颜色与底层滑动胶囊的 0.34s 曲线完全同步渐入渐出 */
+.lg-slide-host > .lg-slide-item,
+.lg-slide-host > .lg-slide-item > svg,
+.lg-slide-host > .lg-slide-item > i,
+.lg-slide-host > .lg-slide-item > span,
+#schedulePage .lg-slide-host > .lg-slide-item .dw,
+#schedulePage .lg-slide-host > .lg-slide-item .dd {
+  transition:
+    color 0.28s cubic-bezier(0.26, 1.10, 0.36, 1),
+    opacity 0.22s ease,
+    transform 0.14s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+
+/* 3. 统一按压态：禁止底栏/按钮自己单独缩放脱离胶囊，改为由 JS .is-pressing 同步缩放 */
+.mobile-tabbar.lg-slide-host .tab-item:active {
+  transform: none !important;
+  filter: none !important;
+}
+.lg-slide-host > .lg-slide-item.is-pressing {
+  transform: scale3d(0.955, 0.955, 1) !important;
+}
+.lg-slide-host > .lg-slide-item:not(.active):not(.on):not(.selected).is-pressing {
+  opacity: 0.72;
+}
+
+
+/* ==================== v1.080 统一整条下挖式毛玻璃搜索框 & iOS级 GPU 液态玻璃折射系统 ==================== */
+
+/* 1. 彻底清除高校搜索框 & 全站所有 .search-box 内部 input 的任何边框/背景/outline，杜绝框中框 */
+#schoolDialog .school-search-wrap input,
+#schoolDialog .school-search-wrap input:focus,
+#schoolDialog .school-search-wrap input:focus-visible,
+.school-search-wrap input,
+.school-search-wrap input:focus,
+.school-search-wrap input:focus-visible,
+.search-box input,
+.search-box input:focus,
+.search-box input:focus-visible {
+  border: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  padding: 10px 4px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* 2. 将整个 .school-search-wrap 与 .search-box 统一做成一整条 iOS 下挖式凹陷毛玻璃胶囊 */
+#schoolDialog .school-search-wrap,
+.school-search-wrap,
+.search-box {
+  width: 100% !important;
+  border-radius: 999px !important;
+  padding: 2px 16px !important;
+  background:
+    linear-gradient(180deg, rgba(203, 213, 225, 0.36) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
+  backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow:
+    inset 0 2.5px 6px rgba(15, 23, 42, 0.10),
+    inset 0 1px 2px rgba(15, 23, 42, 0.06),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.94),
+    0 1px 0 rgba(255, 255, 255, 0.72) !important;
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+#schoolDialog .school-search-wrap:focus-within,
+.school-search-wrap:focus-within,
+.search-box:focus-within {
+  background:
+    linear-gradient(180deg, rgba(241, 245, 249, 0.72) 0%, rgba(255, 255, 255, 0.88) 100%) !important;
+  border-color: rgba(37, 99, 235, 0.55) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(37, 99, 235, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 3.5px rgba(37, 99, 235, 0.14),
+    0 6px 18px -4px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark #schoolDialog .school-search-wrap,
+html.dark .school-search-wrap,
+html.dark .search-box {
+  background:
+    linear-gradient(180deg, rgba(9, 14, 26, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    inset 0 2.5px 7px rgba(0, 0, 0, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+html.dark #schoolDialog .school-search-wrap:focus-within,
+html.dark .school-search-wrap:focus-within,
+html.dark .search-box:focus-within {
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(30, 41, 59, 0.68) 100%) !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.36),
+    0 0 0 3.5px rgba(59, 130, 246, 0.22) !important;
+}
+
+/* 3. iOS 系统级背景环境光场（让全站毛玻璃与液态透镜始终有柔和色彩可折射） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(48vw 42vh at 14% 12%, rgba(59, 130, 246, 0.11) 0%, transparent 70%),
+    radial-gradient(42vw 38vh at 86% 18%, rgba(99, 102, 241, 0.09) 0%, transparent 72%),
+    radial-gradient(52vw 46vh at 72% 84%, rgba(14, 165, 233, 0.08) 0%, transparent 70%),
+    radial-gradient(38vw 34vh at 22% 82%, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+}
+html.dark body::before {
+  background:
+    radial-gradient(50vw 44vh at 16% 14%, rgba(37, 99, 235, 0.18) 0%, transparent 70%),
+    radial-gradient(44vw 40vh at 84% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 72%),
+    radial-gradient(50vw 44vh at 68% 86%, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
+}
+
+/* 4. 模仿 iOS CABackdropLayer 的高阶 GPU 多重折射层：浮层、顶栏、侧栏、底栏、弹窗 */
+main > header,
+#sidebar,
+.mobile-tabbar,
+dialog:not(#docDialog),
+.xz-select-menu,
+.sched-m-sticky,
+body.on-ai-page .ask .ask-input-wrap {
+  backdrop-filter: blur(36px) saturate(230%) contrast(1.04) brightness(1.02) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(230%) contrast(1.04) brightness(1.02) !important;
+}
+html.dark main > header,
+html.dark #sidebar,
+html.dark .mobile-tabbar,
+html.dark dialog:not(#docDialog),
+html.dark .xz-select-menu,
+html.dark .sched-m-sticky,
+html.dark body.on-ai-page .ask .ask-input-wrap {
+  backdrop-filter: blur(36px) saturate(215%) contrast(1.06) brightness(0.97) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(215%) contrast(1.06) brightness(0.97) !important;
+}
+
+/* 5. 卡片与内容块统一开启高饱和 GPU 实时模糊折射（桌面 + 移动全量覆盖） */
+.panel,
+.welcome,
+.stats article,
+.notice-card,
+.taskrow,
+.user-row,
+#knowledgeGrid .knowledge-card,
+.sched-d-header,
+.sched-d-right-panel,
+.sched-today-card,
+.sched-lesson,
+.school-item {
+  backdrop-filter: blur(26px) saturate(205%) contrast(1.02) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(205%) contrast(1.02) !important;
+}
+
+/* 6. 滑动玻璃胶囊升级为双层镜面折射高光 */
+.lg-slide-pill.is-nav-glass {
+  backdrop-filter: blur(26px) saturate(225%) contrast(1.06) brightness(1.04) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(225%) contrast(1.06) brightness(1.04) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.78),
+    inset 0 -2px 5px rgba(21, 94, 239, 0.12),
+    0 6px 18px rgba(21, 94, 239, 0.16) !important;
+}
+.lg-slide-pill.is-blue {
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.52),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.30),
+    inset 0 -3px 8px rgba(15, 23, 42, 0.24),
+    0 8px 20px -4px rgba(37, 99, 235, 0.42) !important;
+}
+
+
+/* ==================== v1.081 全站同心圆角与胶囊边缘对齐精修 ==================== */
+
+/* 1. 首页今日课程胶囊条：修复左侧蓝底方框与外层 999px 胶囊边缘不匹配的问题，改为同心正圆球体 */
+.home-sched-strip {
+  padding: 8px 12px 8px 8px !important;
+  gap: 12px !important;
+}
+.home-sched-ico {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(120% 90% at 28% 12%, rgba(255, 255, 255, 0.42) 0%, transparent 56%),
+    linear-gradient(155deg, #3b82f6 0%, #2563eb 55%, #4f46e5 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.22),
+    0 4px 12px rgba(37, 99, 235, 0.30) !important;
+}
+.home-sched-pill {
+  border-radius: 999px !important;
+  padding: 6px 14px !important;
+}
+
+/* 2. 统计卡片图标框、快捷入口图标、列表头像/AI图标：统一正圆（与外层 22px 卡片/胶囊同心和谐） */
+.stats article span,
+.stats.stats-4 article span,
+.quick .ico-wrap,
+.hero-list p .ico,
+.msg-avatar,
+.aiicon {
+  border-radius: 50% !important;
+}
+
+/* 3. 全站所有弹窗关闭按钮、顶部图标按钮、搜索清除按钮、输入框内发送/附件按钮：统一正圆胶囊 */
+.dialoghead button,
+dialog .dialoghead button,
+#docDialog #docOutlineToggle,
+#docDialog .doc-icon-btn,
+#docDialog .doc-close,
+#menu,
+.icon-btn,
+.clear-btn,
+.ask button,
+#sendBtn,
+#askAttachBtn,
+.ask-thumb-remove,
+.task-del-btn,
+.sched-step-btn,
+.xz-cal-head button {
+  border-radius: 50% !important;
+}
+
+/* 4. 弹窗底部确认/取消按钮、标签胶囊、来源按钮、附件芯片、分类胶囊：统一 999px 全圆角胶囊 */
+dialog:not(#docDialog) .actions button,
+.due-tag,
+.src-read-btn,
+.src-badge,
+.nav-badge,
+#knowledgeGrid .knowledge-card .tag,
+#docDialog .doc-dialog-badges .tag,
+#knowledgePills .pill,
+.ask-file-chip,
+.ask-attach-opt,
+.mini-chips button,
+.bubble-tools button,
+.notice-actions .ai-btn,
+.notice-actions .outline,
+.notice-actions .danger,
+.school-custom-action button {
+  border-radius: 999px !important;
+}
+
+/* 5. 多行文本输入框与表格容器：与外层弹窗 26px–28px 圆角保持同心（18px–20px） */
+.ask-attach-pop,
+.ask-thumb-item,
+.md-table-wrap,
+.doc-paper .doc-table {
+  border-radius: 18px !important;
 }

@@ -5457,7 +5457,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
 })();
 
 
-// ==================== v1.076 全站 GPU 液态玻璃胶囊滑动切换引擎（支持动态重绘容器） ====================
+// ==================== v1.079 全站 GPU 液态玻璃胶囊滑动+按压一体联动引擎 ====================
 (function init_sliding_glass_pills() {
   function bindSlider(container, itemSel, activeSel, pillVariant) {
     if (!container || container.dataset.lgSlideBound) return;
@@ -5476,80 +5476,145 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     };
 
     let rafId = 0;
+    let glideTimer = 0;
     let isInternal = false;
-    const sync = (instant) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        isInternal = true;
-        try {
-          const pill = ensurePill();
-          const items = container.querySelectorAll(itemSel);
-          items.forEach(el => {
-            el.classList.add("lg-slide-item");
-            el.classList.remove("lg-slide-active-clean");
+    let pressingActive = false;
+
+    const applyTransform = (pill, x, y, press) => {
+      pill.style.transform = press
+        ? `translate3d(${x}px, ${y}px, 0) scale3d(0.955, 0.955, 1)`
+        : `translate3d(${x}px, ${y}px, 0)`;
+    };
+
+    const syncNow = (instant) => {
+      isInternal = true;
+      try {
+        const pill = ensurePill();
+        const items = container.querySelectorAll(itemSel);
+        items.forEach(el => {
+          el.classList.add("lg-slide-item");
+          el.classList.remove("lg-slide-active-clean");
+        });
+        const active = container.querySelector(activeSel);
+        if (!active || active.offsetWidth === 0 || active.offsetHeight === 0) {
+          pill.classList.remove("is-ready", "is-gliding", "is-pressing");
+          return;
+        }
+        active.classList.add("lg-slide-active-clean");
+        const x = active.offsetLeft;
+        const y = active.offsetTop;
+        const w = active.offsetWidth;
+        const h = active.offsetHeight;
+
+        const hasPrev = container.dataset.lgPrevW !== undefined;
+        const prevX = Number(container.dataset.lgPrevX || x);
+        const prevY = Number(container.dataset.lgPrevY || y);
+        const prevW = Number(container.dataset.lgPrevW || w);
+        const prevH = Number(container.dataset.lgPrevH || h);
+        const moved = hasPrev && (prevX !== x || prevY !== y || prevW !== w || prevH !== h);
+
+        // 仅当容器刚被 innerHTML 重绘重建了 pill 时，先瞬移到旧坐标再下一帧滑向新坐标
+        if (!instant && moved && pill.style.width === "") {
+          pill.style.transition = "none";
+          pill.style.width = prevW + "px";
+          pill.style.height = prevH + "px";
+          applyTransform(pill, prevX, prevY, false);
+          pill.classList.add("is-ready");
+          void pill.offsetWidth;
+          requestAnimationFrame(() => {
+            pill.style.transition = "";
+            pill.style.width = w + "px";
+            pill.style.height = h + "px";
+            applyTransform(pill, x, y, false);
+            pill.classList.add("is-gliding");
+            clearTimeout(glideTimer);
+            glideTimer = setTimeout(() => pill.classList.remove("is-gliding"), 350);
           });
-          const active = container.querySelector(activeSel);
-          if (!active || active.offsetWidth === 0 || active.offsetHeight === 0) {
-            pill.classList.remove("is-ready");
-            return;
-          }
-          active.classList.add("lg-slide-active-clean");
-          const x = active.offsetLeft;
-          const y = active.offsetTop;
-          const w = active.offsetWidth;
-          const h = active.offsetHeight;
-
-          const hasPrev = container.dataset.lgPrevW !== undefined;
-          const prevX = Number(container.dataset.lgPrevX || x);
-          const prevY = Number(container.dataset.lgPrevY || y);
-          const prevW = Number(container.dataset.lgPrevW || w);
-          const prevH = Number(container.dataset.lgPrevH || h);
-
-          // 如果容器刚被 innerHTML 重绘导致 pill 重建，先瞬移到上一个坐标，下一帧再滑向新坐标！
-          if (!instant && hasPrev && (prevX !== x || prevY !== y || prevW !== w) && pill.style.width === "") {
-            pill.style.transition = "none";
-            pill.style.width = prevW + "px";
-            pill.style.height = prevH + "px";
-            pill.style.transform = `translate3d(${prevX}px, ${prevY}px, 0)`;
-            pill.classList.add("is-ready");
-            void pill.offsetWidth;
-          } else if (instant) {
+        } else {
+          if (instant) {
             pill.style.transition = "none";
           } else {
             pill.style.transition = "";
           }
-
-          requestAnimationFrame(() => {
-            pill.style.transition = instant ? "none" : "";
-            pill.style.width = w + "px";
-            pill.style.height = h + "px";
-            pill.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-            pill.classList.add("is-ready");
-            if (instant) {
-              void pill.offsetWidth;
-              pill.style.transition = "";
-            }
-          });
-
-          container.dataset.lgPrevX = String(x);
-          container.dataset.lgPrevY = String(y);
-          container.dataset.lgPrevW = String(w);
-          container.dataset.lgPrevH = String(h);
-        } finally {
-          setTimeout(() => { isInternal = false; }, 0);
+          pill.style.width = w + "px";
+          pill.style.height = h + "px";
+          applyTransform(pill, x, y, pressingActive && active.classList.contains("is-pressing"));
+          pill.classList.add("is-ready");
+          if (!instant && moved) {
+            pill.classList.add("is-gliding");
+            clearTimeout(glideTimer);
+            glideTimer = setTimeout(() => pill.classList.remove("is-gliding"), 350);
+          }
+          if (instant) {
+            void pill.offsetWidth;
+            pill.style.transition = "";
+          }
         }
-      });
+
+        container.dataset.lgPrevX = String(x);
+        container.dataset.lgPrevY = String(y);
+        container.dataset.lgPrevW = String(w);
+        container.dataset.lgPrevH = String(h);
+      } finally {
+        setTimeout(() => { isInternal = false; }, 0);
+      }
     };
 
+    const sync = (instant, immediate) => {
+      cancelAnimationFrame(rafId);
+      if (immediate) {
+        syncNow(instant);
+      } else {
+        rafId = requestAnimationFrame(() => syncNow(instant));
+      }
+    };
+
+    // 按压联动：点击/按住时，胶囊与按钮文字同步缩放高亮，消除脱节感
+    const clearPress = () => {
+      if (!pressingActive) return;
+      pressingActive = false;
+      container.querySelectorAll(".lg-slide-item.is-pressing").forEach(el => el.classList.remove("is-pressing"));
+      const pill = container.querySelector(":scope > .lg-slide-pill");
+      if (pill) {
+        pill.classList.remove("is-pressing");
+        const x = Number(container.dataset.lgPrevX || 0);
+        const y = Number(container.dataset.lgPrevY || 0);
+        if (container.dataset.lgPrevW !== undefined) applyTransform(pill, x, y, false);
+      }
+    };
+
+    container.addEventListener("pointerdown", (e) => {
+      const item = e.target && e.target.closest ? e.target.closest(itemSel) : null;
+      if (!item || !container.contains(item)) return;
+      pressingActive = true;
+      item.classList.add("is-pressing");
+      const active = container.querySelector(activeSel);
+      const pill = container.querySelector(":scope > .lg-slide-pill");
+      if (pill && active === item && container.dataset.lgPrevW !== undefined) {
+        pill.classList.add("is-pressing");
+        applyTransform(pill, Number(container.dataset.lgPrevX || 0), Number(container.dataset.lgPrevY || 0), true);
+      }
+    }, { passive: true });
+
+    container.addEventListener("pointerup", clearPress, { passive: true });
+    container.addEventListener("pointercancel", clearPress, { passive: true });
+    container.addEventListener("pointerleave", clearPress, { passive: true });
+
+    // 点击后在同帧微任务立即触发滑动，确保胶囊滑动与文字变色 0ms 同步启动
+    container.addEventListener("click", () => {
+      clearPress();
+      queueMicrotask(() => sync(false, true));
+    }, { passive: true });
+
     const mo = new MutationObserver(() => {
-      if (!isInternal) sync(false);
+      if (!isInternal) sync(false, false);
     });
     mo.observe(container, { attributes: true, childList: true, subtree: true, attributeFilter: ["class"] });
-    window.addEventListener("resize", () => sync(true), { passive: true });
+    window.addEventListener("resize", () => sync(true, false), { passive: true });
     if (window.ResizeObserver) {
-      new ResizeObserver(() => sync(true)).observe(container);
+      new ResizeObserver(() => sync(true, false)).observe(container);
     }
-    sync(true);
+    sync(true, true);
   }
 
   const setupAll = () => {
@@ -5562,7 +5627,6 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     document.querySelectorAll("#docDialog .doc-font-group, .doc-m-font-seg").forEach(el =>
       bindSlider(el, "button", "button.active", "is-blue")
     );
-    // 新增：通知分类胶囊、制度库分类胶囊、超级课表桌面/移动日期条与周次条
     bindSlider(document.querySelector(".cat-pills"), ".pill-btn", ".pill-btn.active", "is-blue");
     bindSlider(document.getElementById("knowledgePills"), ".pill", ".pill.active", "is-blue");
     bindSlider(document.getElementById("schedDeskDateStrip"), ".sched-date-chip", ".sched-date-chip.on", "is-blue");

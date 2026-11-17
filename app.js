@@ -5455,3 +5455,80 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
     dlg.addEventListener("touchcancel", finishDrag, { passive: true });
   });
 })();
+
+
+// ==================== v1.075 全站液态玻璃胶囊滑动切换引擎 ====================
+(function init_sliding_glass_pills() {
+  function bindSlider(container, itemSel, activeSel, pillVariant) {
+    if (!container || container.dataset.lgSlideBound) return;
+    container.dataset.lgSlideBound = "1";
+    container.classList.add("lg-slide-host");
+
+    const pill = document.createElement("span");
+    pill.className = "lg-slide-pill " + pillVariant;
+    pill.setAttribute("aria-hidden", "true");
+    container.insertBefore(pill, container.firstChild);
+
+    let rafId = 0;
+    const sync = (instant) => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const items = container.querySelectorAll(itemSel);
+        items.forEach(el => {
+          el.classList.add("lg-slide-item");
+          el.classList.remove("lg-slide-active-clean");
+        });
+        const active = container.querySelector(activeSel);
+        if (!active || active.offsetWidth === 0 || active.offsetHeight === 0) {
+          pill.classList.remove("is-ready");
+          return;
+        }
+        active.classList.add("lg-slide-active-clean");
+        const x = active.offsetLeft;
+        const y = active.offsetTop;
+        const w = active.offsetWidth;
+        const h = active.offsetHeight;
+        if (instant) pill.style.transition = "none";
+        pill.style.width = w + "px";
+        pill.style.height = h + "px";
+        pill.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        pill.classList.add("is-ready");
+        if (instant) {
+          void pill.offsetWidth;
+          pill.style.transition = "";
+        }
+      });
+    };
+
+    const mo = new MutationObserver(() => sync(false));
+    mo.observe(container, { attributes: true, subtree: true, attributeFilter: ["class"] });
+    window.addEventListener("resize", () => sync(true), { passive: true });
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => sync(true)).observe(container);
+    }
+    sync(true);
+  }
+
+  const setupAll = () => {
+    // 1. 移动端底部 6-Tab 悬浮液态玻璃胶囊
+    bindSlider(document.querySelector(".mobile-tabbar"), ".tab-item", ".tab-item.active", "is-nav-glass");
+    // 2. 桌面端左侧边栏导航胶囊
+    bindSlider(document.getElementById("sidebar"), ".nav", ".nav.active", "is-nav-glass");
+    // 3. AI 模型/思考/深度分段器
+    document.querySelectorAll(".ai-seg").forEach(el => bindSlider(el, ".ai-seg-btn", ".ai-seg-btn.active", "is-blue"));
+    // 4. 超级课表移动端 & 桌面端分段器
+    bindSlider(document.querySelector(".sched-m-seg"), ".sched-seg-btn", ".sched-seg-btn.on", "is-blue");
+    bindSlider(document.querySelector(".sched-d-seg"), ".sched-dseg-btn", ".sched-dseg-btn.on", "is-blue");
+    // 5. 登录/注册 Tab 槽 & 公文阅读器字号分段器
+    bindSlider(document.querySelector(".authbox .tabs"), "button", "button.selected", "is-blue");
+    document.querySelectorAll("#docDialog .doc-font-group, .doc-m-font-seg").forEach(el =>
+      bindSlider(el, "button", "button.active", "is-blue")
+    );
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupAll);
+  } else {
+    setupAll();
+  }
+})();

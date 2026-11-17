@@ -9235,3 +9235,413 @@ button.primary,
 .sched-btn-primary {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 6px 18px rgba(21, 94, 239, 0.26) !important;
 }
+
+
+/* ==================== v1.062 实体液态玻璃按钮质感 & 上下完美对齐 ==================== */
+
+/* 1. 桌面端右栏统一成一张完整玻璃大卡，让“周课表矩阵”胶囊与下方“节次”左边缘100%对齐，且与左栏Hero齐平 */
+.sched-d-right-panel {
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(24px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(195%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 22px !important;
+  padding: 16px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    0 10px 30px -8px rgba(15, 23, 42, 0.07),
+    0 2px 6px rgba(15, 23, 42, 0.03) !important;
+}
+html.dark .sched-d-right-panel {
+  background: rgba(17, 24, 39, 0.76) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 32px -6px rgba(0, 0, 0, 0.42) !important;
+}
+.sched-d-right-panel .sched-d-stage-head {
+  margin-bottom: 12px;
+}
+
+/* 2. 彻底修复“周”胶囊和所有次级按钮像“白色虚线框”的问题 → 立体3D液态玻璃按钮质感 */
+button.secondary,
+button.outline,
+.sched-btn-ghost,
+.pill:not(.active),
+.quick,
+.bubble-tools button,
+.todo-action-btn,
+.icon-btn,
+.sched-m-ibtn:not(.is-primary),
+.sched-step-btn,
+#schedulePage .sched-week-chip:not(.on),
+#schedulePage .sched-date-chip:not(.on):not(.today) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 241, 252, 0.80) 100%) !important;
+  backdrop-filter: blur(16px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(185%) !important;
+  border: 1px solid rgba(21, 94, 239, 0.13) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+    0 3px 10px rgba(15, 23, 42, 0.06) !important;
+  transition: transform 0.15s var(--lg-spring), box-shadow 0.15s ease, border-color 0.15s ease !important;
+}
+button.secondary:hover,
+button.outline:hover,
+.sched-btn-ghost:hover,
+.pill:not(.active):hover,
+.quick:hover,
+.bubble-tools button:hover,
+#schedulePage .sched-week-chip:not(.on):hover,
+#schedulePage .sched-date-chip:not(.on):hover {
+  border-color: rgba(21, 94, 239, 0.30) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 5px 14px rgba(21, 94, 239, 0.12) !important;
+  transform: translateY(-1px);
+}
+
+html.dark button.secondary,
+html.dark button.outline,
+html.dark .sched-btn-ghost,
+html.dark .pill:not(.active),
+html.dark .quick,
+html.dark .bubble-tools button,
+html.dark .todo-action-btn,
+html.dark .icon-btn,
+html.dark .sched-m-ibtn:not(.is-primary),
+html.dark .sched-step-btn,
+html.dark #schedulePage .sched-week-chip:not(.on),
+html.dark #schedulePage .sched-date-chip:not(.on):not(.today) {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.85) 0%, rgba(30, 41, 59, 0.78) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* 3. 主按钮与选中态液态玻璃按钮：顶部折射高光 + 底部微暗沉折射 */
+button.primary,
+.sched-btn-primary,
+.sched-m-ibtn.is-primary,
+.ai-seg-btn.active,
+.sched-seg-btn.on,
+.sched-dseg-btn.on,
+.pill.active,
+#schedulePage .sched-week-chip.on,
+#schedulePage .sched-date-chip.on {
+  background: linear-gradient(160deg, #2563eb 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.16),
+    0 6px 18px rgba(21, 94, 239, 0.28) !important;
+}
+
+/* 4. 作息徽章与云端状态胶囊也加上液态玻璃光泽 */
+.sched-season-badge,
+.sched-sync-badge,
+.tag {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+
+/* ==================== v1.063 四层级液态玻璃深度体系 × 全站搜索/表单全量胶囊化 ==================== */
+
+/* 【Layer 1：凹陷磨砂玻璃槽】所有搜索框（通知/待办/制度库/用户管理）+ 分段切换槽 + 进度条底槽 */
+.search-box,
+.search-box input,
+.toolbar input,
+.user-row select,
+.xz-select,
+.xz-select-btn,
+.xz-select-trigger {
+  border-radius: 999px !important;
+}
+
+.search-box input,
+.ai-seg,
+.sched-m-seg,
+.sched-d-seg,
+#schedulePage .sched-week-stepper {
+  background: rgba(226, 232, 240, 0.44) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(15, 23, 42, 0.07),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88) !important;
+}
+.search-box input:focus {
+  background: rgba(255, 255, 255, 0.90) !important;
+  border-color: var(--blue) !important;
+  box-shadow:
+    0 0 0 3px rgba(21, 94, 239, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+html.dark .search-box input,
+html.dark .ai-seg,
+html.dark .sched-m-seg,
+html.dark .sched-d-seg,
+html.dark #schedulePage .sched-week-stepper {
+  background: rgba(15, 23, 42, 0.56) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    inset 0 1.5px 5px rgba(0, 0, 0, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+html.dark .search-box input:focus {
+  background: rgba(30, 41, 59, 0.88) !important;
+}
+
+/* 【Layer 2：中层磨砂玻璃大面板】背景略半透，用来承托上面浮起的亮面卡片 */
+.panel,
+.welcome,
+.sched-d-header,
+.sched-d-right-panel,
+.sched-today-card,
+.sched-manage-card,
+.sched-tt-card,
+.welcome-card,
+#auth form {
+  background: rgba(255, 255, 255, 0.66) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.86) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 10px 30px -10px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark .panel,
+html.dark .welcome,
+html.dark .sched-d-header,
+html.dark .sched-d-right-panel,
+html.dark .sched-today-card,
+html.dark .sched-manage-card,
+html.dark .sched-tt-card,
+html.dark .welcome-card,
+html.dark #auth form {
+  background: rgba(17, 24, 39, 0.68) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    0 12px 34px -8px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* 【Layer 3：浮起亮面交互卡片】从 Layer 2 面板上明显“浮”出来，形成清晰前后纵深 */
+.taskrow,
+.user-row,
+.notice-card,
+#knowledgeGrid .knowledge-card,
+.stats article,
+.sched-lesson,
+.sched-clist-item,
+.welcome-item {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 248, 255, 0.86) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 4px 14px -3px rgba(15, 23, 42, 0.06),
+    0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  transition: transform 0.18s var(--lg-spring), box-shadow 0.18s ease, border-color 0.18s ease !important;
+}
+.taskrow:hover,
+.user-row:hover,
+.notice-card:hover,
+#knowledgeGrid .knowledge-card:hover,
+.stats article:hover,
+.sched-lesson:hover,
+.welcome-item:hover {
+  transform: translateY(-1.5px);
+  border-color: rgba(21, 94, 239, 0.28) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 10px 24px -6px rgba(21, 94, 239, 0.12) !important;
+}
+
+html.dark .taskrow,
+html.dark .user-row,
+html.dark .notice-card,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark .stats article,
+html.dark .sched-lesson,
+html.dark .sched-clist-item,
+html.dark .welcome-item {
+  background: linear-gradient(180deg, rgba(38, 49, 68, 0.88) 0%, rgba(24, 33, 50, 0.82) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 6px 18px -4px rgba(0, 0, 0, 0.36) !important;
+}
+
+/* 全站小标签、状态徽章、下拉按钮、弹窗内按钮全量胶囊化 */
+.tag,
+.due-tag,
+.badge,
+.status-pill,
+.doc-dialog-badges .tag,
+.doc-mobile-hero-meta .tag,
+.actions button,
+.notice-actions button {
+  border-radius: 999px !important;
+}
+
+
+/* ==================== v1.064 全站深度审查与四层液态玻璃逻辑统一 ==================== */
+
+/* 【Layer 1 补全：所有凹陷玻璃槽】进度条底槽、统计条底槽、登录页Tab槽、输入框 */
+.progress-track,
+.stat-bar-track,
+.authbox .tabs,
+.input-group input {
+  border-radius: 999px !important;
+  background: rgba(226, 232, 240, 0.46) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(15, 23, 42, 0.07),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88) !important;
+}
+html.dark .progress-track,
+html.dark .stat-bar-track,
+html.dark .authbox .tabs,
+html.dark .input-group input {
+  background: rgba(15, 23, 42, 0.56) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    inset 0 1.5px 5px rgba(0, 0, 0, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.progress-fill,
+.stat-bar-fill {
+  border-radius: 999px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(21, 94, 239, 0.25) !important;
+}
+
+/* 【Layer 2 补全：登录页主卡、公文阅读器目录卡】 */
+.authbox,
+#docDialog .doc-outline {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(26px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(195%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  border-radius: 24px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    0 14px 36px -10px rgba(15, 23, 42, 0.09) !important;
+}
+#docDialog .doc-outline {
+  padding: 14px !important;
+  border-radius: 20px !important;
+}
+html.dark .authbox,
+html.dark #docDialog .doc-outline {
+  background: rgba(17, 24, 39, 0.74) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 16px 40px -8px rgba(0, 0, 0, 0.46) !important;
+}
+
+/* 登录页右侧/顶部介绍玻璃展示卡 */
+.auth .hero {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(235, 244, 255, 0.80) 100%) !important;
+  backdrop-filter: blur(22px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 24px !important;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.96), 0 10px 28px -8px rgba(21, 94, 239, 0.09) !important;
+}
+html.dark .auth .hero {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(23, 37, 84, 0.72) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* 【Layer 3 补全：通知分类胶囊 .pill-btn、登录Tab高亮、公文目录高亮、AI结构化模块卡、统计图标徽章】 */
+.pill-btn,
+.clear-btn,
+.chat-top-actions button,
+.authbox .tabs button {
+  border-radius: 999px !important;
+}
+
+.pill-btn:not(.active),
+.chat-top-actions button {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 241, 252, 0.80) 100%) !important;
+  backdrop-filter: blur(16px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(185%) !important;
+  border: 1px solid rgba(21, 94, 239, 0.13) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+    0 3px 10px rgba(15, 23, 42, 0.05) !important;
+}
+html.dark .pill-btn:not(.active),
+html.dark .chat-top-actions button {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.85) 0%, rgba(30, 41, 59, 0.78) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+.pill-btn.active,
+.authbox .tabs button.selected,
+#docDialog .doc-outline-item.active {
+  background: linear-gradient(160deg, #2563eb 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.50),
+    0 4px 12px rgba(21, 94, 239, 0.26) !important;
+}
+
+/* 统计卡内图标徽章：微光圆润玻璃块 */
+.stats article span {
+  border-radius: 14px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+html.dark .stats article span {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+/* AI 回答里的结构化卡片（材料清单/办理流程/制度依据/关键提醒）圆润玻璃化 */
+.md-section-decision,
+.md-section-materials,
+.md-section-flow,
+.md-section-warn,
+.md-section-action,
+.md-section-ask {
+  border-radius: 18px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 3px 12px rgba(15, 23, 42, 0.03) !important;
+}
+html.dark .md-section-decision,
+html.dark .md-section-materials,
+html.dark .md-section-flow,
+html.dark .md-section-warn,
+html.dark .md-section-action,
+html.dark .md-section-ask {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* 【Layer 4 补全：AI 聊天回到底部悬浮胶囊按钮 & 附件预览胶囊】 */
+.scroll-bottom-btn {
+  background: rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(22px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 8px 24px rgba(15, 23, 42, 0.12) !important;
+}
+html.dark .scroll-bottom-btn {
+  background: rgba(30, 41, 59, 0.90) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+.ask-attach-chip,
+.ask-attach-preview > div {
+  border-radius: 999px !important;
+}

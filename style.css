@@ -13663,8 +13663,12 @@ body.on-ai-page #messages > .bubble-wrap.user > .bubble.user {
   body.on-ai-page::after {
     display: none !important;
   }
-  body.on-ai-page .scroll-bottom-btn {
+  body.on-ai-page .scroll-bottom-btn,
+  body.on-ai-page #scrollBottomBtn {
+    position: fixed !important;
     bottom: calc(134px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+    z-index: 26 !important;
   }
 }
 
@@ -13705,4 +13709,154 @@ body.on-ai-page #messages > .bubble-wrap.user > .bubble.user {
 html.dark .sched-wg .sched-m-period,
 html.dark .sched-wg > .sched-m-head:first-child {
   background: rgba(20, 29, 46, 0.96) !important;
+}
+
+
+/* ==================== v1.100 移动端 390px 全场景深度精修 ==================== */
+
+/* 1. 移动端全站统一贴底导航栏 .mobile-tabbar：彻底消除各页面底栏下方 8px 缝隙漏字及切页跳动 */
+@media (max-width: 960px) {
+  .mobile-tabbar {
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 4px 8px env(safe-area-inset-bottom, 0px) !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88), 0 -4px 18px rgba(15, 23, 42, 0.05) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 248, 255, 0.97) 100%) !important;
+  }
+  html.dark .mobile-tabbar {
+    border-top-color: rgba(255, 255, 255, 0.10) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 -4px 20px rgba(0, 0, 0, 0.38) !important;
+    background: linear-gradient(180deg, rgba(20, 29, 46, 0.94) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
+  }
+  body:not(.on-ai-page) main {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* 2. 移动端 AI 欢迎卡片保持紧凑 2x2 双列四卡布局（340px 以上均不折叠成冗长单列）+ 参数抽屉自适应换行 */
+@media (max-width: 760px) {
+  body.on-ai-page #messages .welcome-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+  body.on-ai-page #messages .welcome-item {
+    padding: 8px 9px !important;
+    gap: 7px !important;
+    border-radius: 15px !important;
+  }
+  body.on-ai-page #messages .welcome-item > span {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    border-radius: 9px !important;
+  }
+  body.on-ai-page #messages .welcome-item b {
+    font-size: 12.5px !important;
+  }
+  body.on-ai-page #messages .welcome-item small {
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+  }
+  body.on-ai-page #aiPage .ai-options.open {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px 10px !important;
+    padding: 10px 14px !important;
+  }
+}
+@media (max-width: 339px) {
+  body.on-ai-page #messages .welcome-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* 3. 修复高校选择弹窗 #schoolDialog 搜索框双层胶囊套娃问题 */
+dialog:not(#docDialog) .school-search-wrap input,
+#schoolDialog .school-search-wrap input,
+.search-box input {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 6px 4px !important;
+  min-height: 36px !important;
+}
+dialog:not(#docDialog) .school-search-wrap input:focus,
+#schoolDialog .school-search-wrap input:focus {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 4. 移动端日历弹窗居中对齐 + 浮层/菜单再度削减透字感 */
+.xz-cal-pop,
+.xz-select-menu,
+.ask-attach-pop,
+.doc-m-pop {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 255, 0.95) 100%) !important;
+  backdrop-filter: blur(26px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(155%) !important;
+}
+html.dark .xz-cal-pop,
+html.dark .xz-select-menu,
+html.dark .ask-attach-pop,
+html.dark .doc-m-pop {
+  background: linear-gradient(155deg, rgba(22, 31, 48, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+@media (max-width: 760px) {
+  #addTaskForm .xz-date-wrap {
+    position: relative !important;
+  }
+  .xz-cal-pop {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(320px, calc(100vw - 28px)) !important;
+  }
+}
+
+/* 5. 移动端超级课表：周一至周日 7 天胶囊一屏等分完整显示（不裁切周日）+ 周视图列宽优化 */
+@media (max-width: 760px) {
+  #schedDateStrip {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    overflow-x: visible !important;
+    padding: 12px 1px 3px !important;
+  }
+  #schedDateStrip .sched-date-chip {
+    flex: initial !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 6px 2px 5px !important;
+  }
+  #schedDateStrip .sched-date-chip .dd {
+    font-size: 12.5px !important;
+  }
+  .sched-wg {
+    grid-template-columns: 48px repeat(7, minmax(86px, 1fr)) !important;
+    min-width: 660px !important;
+    gap: 5px !important;
+  }
+}
+
+.sched-seg-btn.on,
+.sched-seg-btn.on *,
+.sched-dseg-btn.on,
+.sched-dseg-btn.on * {
+  color: #ffffff !important;
+  transition: none !important;
+}
+.sched-seg-btn:not(.on),
+.sched-seg-btn:not(.on) *,
+.sched-dseg-btn:not(.on),
+.sched-dseg-btn:not(.on) * {
+  color: var(--ink-secondary) !important;
+  transition: none !important;
 }

@@ -12688,3 +12688,153 @@ body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai .ai-reasoning {
     -webkit-backdrop-filter: none !important;
   }
 }
+
+
+/* ================= v1.096 精准回归修复：恢复原始欢迎卡片结构与桌面登录视觉 ================= */
+
+/*
+ * 欢迎气泡沿用项目最初的结构：一个主气泡 + 内部四张功能卡。
+ * 不对 welcome-item 使用全局气泡宽度规则，也不让子卡片继承消息气泡的盒模型。
+ */
+body.on-ai-page #messages .bubble-wrap.msg-ai {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(100%, 860px);
+  max-width: 860px;
+  min-width: 0;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
+  display: block;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  contain: none;
+  overflow: visible;
+}
+
+body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble {
+  width: min(100%, 740px);
+  max-width: 100%;
+  min-width: 0;
+  padding: 18px 20px;
+  border-radius: 4px 18px 18px 18px;
+}
+
+/* 四张默认功能卡严格恢复原始两列布局、内边距和卡片层级 */
+body.on-ai-page #messages .welcome-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 12px;
+}
+
+body.on-ai-page #messages .welcome-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 10px 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible;
+}
+
+body.on-ai-page #messages .welcome-item > span {
+  display: inline-flex;
+  flex: 0 0 22px;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+body.on-ai-page #messages .welcome-item > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.on-ai-page #messages .welcome-item b,
+body.on-ai-page #messages .welcome-item small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+body.on-ai-page #messages .welcome-foot {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.6;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html.dark body.on-ai-page #messages .welcome-item {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 560px) {
+  body.on-ai-page #messages .bubble-wrap.msg-ai {
+    width: 100%;
+    max-width: 100%;
+  }
+  body.on-ai-page #messages .bubble-wrap.msg-ai > .welcome-bubble {
+    width: 100%;
+    padding: 14px !important;
+  }
+  body.on-ai-page #messages .welcome-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+}
+
+/* AI 页面使用与全站相同的底色变量；紫灰蓝只作为轻微氛围，不染色内容卡片 */
+body.on-ai-page #aiPage,
+body.on-ai-page #aiPage .chat {
+  background-color: var(--bg) !important;
+}
+html:not(.dark) body.on-ai-page #aiPage .chat {
+  background-image:
+    radial-gradient(ellipse at 3% 0%, rgba(151,137,184,.075), transparent 38%),
+    radial-gradient(ellipse at 100% 8%, rgba(119,157,210,.045), transparent 34%) !important;
+}
+html.dark body.on-ai-page #aiPage .chat {
+  background-image:
+    radial-gradient(ellipse at 3% 0%, rgba(128,111,174,.11), transparent 38%),
+    radial-gradient(ellipse at 100% 8%, rgba(66,112,169,.07), transparent 34%) !important;
+}
+
+/* 桌面登录页移除无语义的大型圆环装饰，保留原有蓝色品牌渐变与内容 */
+@media (min-width: 901px) {
+  #auth .hero::before,
+  #auth .hero::after {
+    display: none !important;
+    content: none !important;
+    box-shadow: none !important;
+    background: none !important;
+  }
+  #auth .hero {
+    background:
+      linear-gradient(145deg, #102d72 0%, #1d5fe0 56%, #347ff0 100%) !important;
+  }
+}

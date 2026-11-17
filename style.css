@@ -8623,3 +8623,203 @@ dialog:not(#docDialog) {
     padding-bottom: 10px;
   }
 }
+
+
+/* ==================== v1.056 全站 Apple Liquid Glass（三级毛玻璃）统一视觉系统 ==================== */
+:root {
+  --lg-bg-ambient:
+    radial-gradient(960px 580px at 6% -6%, rgba(21, 94, 239, 0.085), transparent 62%),
+    radial-gradient(880px 520px at 96% 4%, rgba(105, 56, 239, 0.075), transparent 60%),
+    radial-gradient(760px 480px at 50% 102%, rgba(14, 165, 233, 0.06), transparent 64%);
+  --lg-surface-1: rgba(255, 255, 255, 0.76);
+  --lg-surface-2: rgba(255, 255, 255, 0.80);
+  --lg-surface-3: rgba(255, 255, 255, 0.88);
+  --lg-item-bg: rgba(255, 255, 255, 0.86);
+  --lg-pill-bg: rgba(241, 245, 249, 0.78);
+  --lg-border-outer: rgba(15, 23, 42, 0.07);
+  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  --lg-shadow-card: 0 8px 28px -6px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
+  --lg-shadow-float: 0 20px 48px -10px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.06);
+  --lg-spring: cubic-bezier(0.32, 0.72, 0.3, 1);
+}
+
+html.dark body, body.dark {
+  --lg-bg-ambient:
+    radial-gradient(960px 580px at 6% -6%, rgba(59, 130, 246, 0.13), transparent 62%),
+    radial-gradient(880px 520px at 96% 4%, rgba(139, 92, 246, 0.11), transparent 60%),
+    radial-gradient(760px 480px at 50% 102%, rgba(14, 165, 233, 0.08), transparent 64%);
+  --lg-surface-1: rgba(17, 24, 39, 0.75);
+  --lg-surface-2: rgba(17, 24, 39, 0.78);
+  --lg-surface-3: rgba(17, 24, 39, 0.88);
+  --lg-item-bg: rgba(30, 41, 59, 0.76);
+  --lg-pill-bg: rgba(30, 41, 59, 0.72);
+  --lg-border-outer: rgba(255, 255, 255, 0.085);
+  --lg-border-inner: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --lg-shadow-card: 0 10px 30px -6px rgba(0, 0, 0, 0.36), 0 2px 8px rgba(0, 0, 0, 0.22);
+  --lg-shadow-float: 0 24px 54px -8px rgba(0, 0, 0, 0.58), 0 6px 18px rgba(0, 0, 0, 0.32);
+}
+
+/* 1. 全站通透环境光晕底纹与丝滑切页过渡 */
+body {
+  background-image: var(--lg-bg-ambient);
+  background-attachment: fixed;
+}
+
+.page {
+  animation: lgPageEnter 0.22s var(--lg-spring);
+}
+@keyframes lgPageEnter {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. 一级导航层（左侧边栏、顶部 Header、移动端底部 6-Tab 栏、课表吸顶区） */
+#sidebar {
+  background: var(--lg-surface-1) !important;
+  backdrop-filter: blur(24px) saturate(185%);
+  -webkit-backdrop-filter: blur(24px) saturate(185%);
+  border-right: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner);
+}
+
+#sidebar .nav {
+  border-radius: 12px;
+  transition: background 0.18s var(--lg-spring), color 0.18s var(--lg-spring), transform 0.15s var(--lg-spring);
+}
+#sidebar .nav:active {
+  transform: scale(0.975);
+}
+#sidebar .nav.active {
+  box-shadow: 0 4px 14px rgba(21, 94, 239, 0.14), var(--lg-border-inner);
+}
+
+main > header {
+  background: var(--lg-surface-1) !important;
+  backdrop-filter: blur(24px) saturate(185%);
+  -webkit-backdrop-filter: blur(24px) saturate(185%);
+  border-bottom: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner);
+}
+
+@media (max-width: 960px) {
+  .mobile-tabbar {
+    background: var(--lg-surface-1) !important;
+    backdrop-filter: blur(26px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+    border-top: 1px solid var(--lg-border-outer) !important;
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05), var(--lg-border-inner);
+  }
+  .sched-m-sticky {
+    background: var(--lg-surface-1) !important;
+    backdrop-filter: blur(24px) saturate(185%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(185%) !important;
+    border-bottom: 1px solid var(--lg-border-outer) !important;
+    box-shadow: var(--lg-border-inner);
+  }
+}
+
+/* 3. 二级容器与内容卡片层（全站 7 大页面统一毛玻璃质感） */
+.panel,
+.stats article,
+.welcome .date,
+.sched-d-header,
+.sched-today-card,
+.sched-matrix-card,
+.sched-manage-card,
+.sched-tt-card,
+.auth-card,
+#auth form {
+  background: var(--lg-surface-2) !important;
+  backdrop-filter: blur(18px) saturate(175%);
+  -webkit-backdrop-filter: blur(18px) saturate(175%);
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
+}
+
+/* 列表子卡片（兼顾高帧率滚动与玻璃高光边） */
+.notice-card,
+#knowledgeGrid .knowledge-card,
+.sched-lesson,
+.sched-clist-item {
+  background: var(--lg-item-bg) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04), var(--lg-border-inner);
+  transition: transform 0.18s var(--lg-spring), border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.notice-card:hover,
+#knowledgeGrid .knowledge-card:hover,
+.sched-lesson:hover {
+  border-color: var(--blue-border) !important;
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+}
+.sched-lesson.active {
+  background: linear-gradient(135deg, rgba(59, 108, 255, 0.11), rgba(105, 56, 239, 0.04)) !important;
+  border-color: rgba(59, 108, 255, 0.48) !important;
+}
+html.dark .sched-lesson.active {
+  background: linear-gradient(135deg, rgba(91, 140, 255, 0.18), rgba(91, 140, 255, 0.05)) !important;
+  border-color: rgba(91, 140, 255, 0.55) !important;
+}
+
+/* 统计卡与首页下一节课胶囊微光升级 */
+.stats article {
+  transition: transform 0.18s var(--lg-spring), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.stats article:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue-border) !important;
+}
+.home-sched-strip {
+  backdrop-filter: blur(16px) saturate(175%);
+  -webkit-backdrop-filter: blur(16px) saturate(175%);
+  border-radius: 16px !important;
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+}
+
+/* 4. 三级浮层、弹窗与 AI 悬浮输入胶囊（Apple Sheet 级通透感） */
+dialog:not(#docDialog) {
+  background: var(--lg-surface-3) !important;
+  backdrop-filter: blur(28px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(195%) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
+}
+dialog::backdrop {
+  background: rgba(15, 23, 42, 0.36);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+}
+
+.ask-input-wrap,
+.ask-attach-pop,
+.doc-m-pop {
+  background: var(--lg-surface-3) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
+}
+
+/* 公文阅读器：外栏与目录卡升级毛玻璃，中间公文纸张严格保留 GB/T 9704 实体纸感 */
+#docDialog .doc-reader-bar,
+#docDialog .doc-outline,
+#docDialog .doc-mobile-nav {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* 5. 全站胶囊、分段切换器与表单控件统一圆角与阻尼 */
+.pill,
+.sched-m-seg,
+.sched-d-seg {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  border-radius: 12px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}

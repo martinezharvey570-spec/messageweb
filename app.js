@@ -5046,14 +5046,14 @@ async function compress_sched_image(file) {
       if (act === "back") { switch_desk_sched_tab("matrix"); switch_mob_sched_tab("today"); }
       else if (act === "ai-import") openAiImportModal();
       else if (act === "add") open_schedule_course_dlg(-1);
-      else if (act === "export") $("schedExportBtn")?.click() || (() => {
+      else if (act === "export") {
         const data = { startDate: schedState.startDate, totalWeeks: schedState.totalWeeks, courses: schedState.courses };
         const a = document.createElement("a");
         a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
         a.download = "超级课表备份_" + schedFmtDate(new Date()) + ".json";
         a.click();
         toast("已导出 JSON 备份");
-      })();
+      }
       else if (act === "import") $("schedImportFile")?.click();
       else if (act === "clear") {
         if (!confirm("确定清空所有已录入的课程吗？")) return;

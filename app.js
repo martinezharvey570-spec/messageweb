@@ -5314,80 +5314,187 @@ async function compress_sched_image(file) {
   });
 })();
 
-function apply_ai_schedule_action(rawText, toolsEl) {
-  const m = String(rawText || "").match(/<!--SCHEDULE_ACTION\s*([\s\S]*?)\s*SCHEDULE_ACTION-->/);
-  if (!m || !toolsEl || toolsEl.dataset.schedRendered) return;
-  let act = null;
-  try { act = JSON.parse(m[1]); } catch { return; }
-  if (!act || !act.mode) return;
-  toolsEl.dataset.schedRendered = "1";
-
+async function execute_single_schedule_act(act) {
   const courses = Array.isArray(act.courses) ? act.courses : [];
   const hasStart = /^\d{4}-\d{2}-\d{2}$/.test(String(act.start_date || ""));
   const hasWeeks = Number(act.total_weeks) >= 1 && Number(act.total_weeks) <= 30;
+  if (hasStart) schedState.startDate = act.start_date;
+  if (hasWeeks) schedState.totalWeeks = Number(act.total_weeks);
 
-  let summary = "";
-  if (act.mode === "merge") summary = `拟追加 ${courses.length} 条课程`;
-  else if (act.mode === "replace") summary = `拟替换为 ${courses.length} 条新课程`;
-  else if (act.mode === "delete") summary = `拟删除匹配「${act.match?.name || "指定"}」的课程`;
-  else if (act.mode === "config") summary = "拟更新课表学期设置";
-  if (hasStart) summary += ` · 开学日期 ${act.start_date}`;
-  if (hasWeeks) summary += ` · 共 ${act.total_weeks} 周`;
-
-  const previewLines = courses.slice(0, 4).map(c =>
-    `• ${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节《${schedEsc(c.name)}》${c.room ? " @ " + schedEsc(c.room) : ""}`
-  ).join("<br>");
-
-  const card = document.createElement("div");
-  card.className = "sched-chat-confirm";
-  card.innerHTML = `
-    <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>课表修改待确认：${schedEsc(summary)}</span></div>
-    ${previewLines ? `<div class="sched-chat-confirm-list">${previewLines}${courses.length > 4 ? `<br>…等共 ${courses.length} 条` : ""}</div>` : ""}
-    <div class="sched-chat-confirm-actions">
-      <button type="button" class="sched-btn-primary" data-act="confirm">确认执行并同步</button>
-      <button type="button" class="sched-btn-ghost" data-act="cancel">暂不应用</button>
-    </div>
-  `;
-
-  const btnConfirm = card.querySelector('[data-act="confirm"]');
-  const btnCancel = card.querySelector('[data-act="cancel"]');
-
-  btnConfirm.onclick = () => {
-    if (hasStart) schedState.startDate = act.start_date;
-    if (hasWeeks) schedState.totalWeeks = Number(act.total_weeks);
-
-    if (act.mode === "merge" && courses.length) {
-      schedState.courses = [...schedState.courses, ...courses];
-    } else if (act.mode === "replace" && courses.length) {
-      schedState.courses = courses;
-    } else if (act.mode === "delete" && act.match) {
-      const targetName = String(act.match.name || "").trim();
-      const targetDay = act.match.day ? Number(act.match.day) : 0;
-      const targetStart = act.match.start ? Number(act.match.start) : 0;
-      schedState.courses = schedState.courses.filter(c => {
-        const nameOk = !targetName || String(c.name || "").includes(targetName);
-        const dayOk = !targetDay || Number(c.day) === targetDay;
-        const startOk = !targetStart || Number(c.start) === targetStart;
-        return !(nameOk && dayOk && startOk);
-      });
-    }
-
-    schedQueueSync();
-    render_schedule_all();
-    toast("已按你的确认更新课表并同步云端");
-    card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入超级课表并同步云端</span></div>
-      <div class="sched-chat-confirm-actions"><button type="button" class="sched-btn-ghost" data-act="view">打开超级课表查看</button></div>`;
-    card.querySelector('[data-act="view"]').onclick = () => go("schedule");
-  };
-
-  btnCancel.onclick = () => {
-    card.remove();
-    toast("已取消本次课表更改");
-  };
-
-  toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
+  if (act.mode === "merge" && courses.length) {
+    schedState.courses = [...schedState.courses, ...courses];
+  } else if (act.mode === "replace" && courses.length) {
+    schedState.courses = courses;
+  } else if (act.mode === "delete" && act.match) {
+    const targetName = String(act.match.name || "").trim();
+    const targetDay = act.match.day ? Number(act.match.day) : 0;
+    const targetStart = act.match.start ? Number(act.match.start) : 0;
+    schedState.courses = schedState.courses.filter(c => {
+      const nameOk = !targetName || String(c.name || "").includes(targetName);
+      const dayOk = !targetDay || Number(c.day) === targetDay;
+      const startOk = !targetStart || Number(c.start) === targetStart;
+      return !(nameOk && dayOk && startOk);
+    });
+  }
+  schedQueueSync();
+  render_schedule_all();
 }
 
+async function apply_ai_schedule_action(rawText, toolsEl) {
+  if (!toolsEl || toolsEl.dataset.schedRendered) return;
+  const txt = String(rawText || "");
+  const actions = [];
+
+  const agentMatch = txt.match(/<!--AGENT_ACTIONS\s*([\s\S]*?)\s*AGENT_ACTIONS-->/);
+  if (agentMatch) {
+    try {
+      const arr = JSON.parse(agentMatch[1]);
+      if (Array.isArray(arr)) actions.push(...arr);
+    } catch {}
+  }
+  const schedMatch = txt.match(/<!--SCHEDULE_ACTION\s*([\s\S]*?)\s*SCHEDULE_ACTION-->/);
+  if (schedMatch) {
+    try {
+      const obj = JSON.parse(schedMatch[1]);
+      if (obj && obj.mode) actions.push({ type: "schedule", ...obj });
+    } catch {}
+  }
+
+  if (!actions.length) return;
+  toolsEl.dataset.schedRendered = "1";
+
+  const autoLogs = [];
+  const confirmActs = [];
+
+  for (const act of actions) {
+    if (!act || !act.type) continue;
+    if (act.type === "add_tasks" && Array.isArray(act.items) && act.items.length) {
+      let added = 0;
+      for (const it of act.items.slice(0, 6)) {
+        const title = String(it?.title || "").trim();
+        if (!title) continue;
+        try {
+          await api("/tasks", {
+            method: "POST",
+            body: JSON.stringify({ title, due_date: String(it?.due_date || "").trim() })
+          });
+          added++;
+        } catch {}
+      }
+      if (added > 0) {
+        if (typeof load_tasks === "function") load_tasks();
+        autoLogs.push(`已自动添加 ${added} 条待办`);
+      }
+    } else if (act.type === "complete_task" && act.id) {
+      try {
+        await api("/tasks/" + Number(act.id), {
+          method: "PATCH",
+          body: JSON.stringify({ status: "completed" })
+        });
+        if (typeof load_tasks === "function") load_tasks();
+        autoLogs.push(`已将待办「${act.title || act.id}」标记为完成`);
+      } catch {}
+    } else if (act.type === "navigate" && act.page) {
+      const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule"]);
+      if (allowedPages.has(act.page)) {
+        autoLogs.push(`已为你准备跳转至「${act.page}」`);
+        setTimeout(() => go(act.page), 450);
+      }
+    } else if (act.type === "schedule") {
+      // 小规模增删改配置可直接自动执行（带撤销）；整表替换 replace 需确认
+      if (act.mode === "replace") {
+        confirmActs.push(act);
+      } else {
+        const snapshot = JSON.parse(JSON.stringify(schedState.courses));
+        const prevStart = schedState.startDate;
+        const prevWeeks = schedState.totalWeeks;
+        await execute_single_schedule_act(act);
+        const card = document.createElement("div");
+        card.className = "sched-chat-confirm";
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>AI 已自动执行课表更新并同步云端</span></div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-ghost" data-act="view">查看超级课表</button>
+            <button type="button" class="sched-btn-ghost" data-act="undo">撤销本次修改</button>
+          </div>`;
+        card.querySelector('[data-act="view"]').onclick = () => go("schedule");
+        card.querySelector('[data-act="undo"]').onclick = () => {
+          schedState.courses = snapshot;
+          schedState.startDate = prevStart;
+          schedState.totalWeeks = prevWeeks;
+          schedQueueSync();
+          render_schedule_all();
+          card.remove();
+          toast("已撤销本次 AI 课表修改");
+        };
+        toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
+      }
+    } else if (act.type === "publish_notice" && me?.role === "admin") {
+      confirmActs.push(act);
+    }
+  }
+
+  if (autoLogs.length) {
+    const noteEl = document.createElement("div");
+    noteEl.className = "sched-chat-confirm";
+    noteEl.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>AI 已自主执行：${schedEsc(autoLogs.join("；"))}</span></div>`;
+    toolsEl.parentElement?.insertBefore(noteEl, toolsEl.nextSibling);
+    toast(autoLogs[0]);
+  }
+
+  for (const act of confirmActs) {
+    const card = document.createElement("div");
+    card.className = "sched-chat-confirm";
+    if (act.type === "schedule") {
+      const courses = Array.isArray(act.courses) ? act.courses : [];
+      const previewLines = courses.slice(0, 4).map(c =>
+        `• ${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节《${schedEsc(c.name)}》${c.room ? " @ " + schedEsc(c.room) : ""}`
+      ).join("<br>");
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>高权限操作待确认：将整套替换为 ${courses.length} 条新课程</span></div>
+        ${previewLines ? `<div class="sched-chat-confirm-list">${previewLines}${courses.length > 4 ? `<br>…等共 ${courses.length} 条` : ""}</div>` : ""}
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认覆盖并同步</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">暂不应用</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = async () => {
+        await execute_single_schedule_act(act);
+        toast("已确认替换课表并同步云端");
+        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已覆盖写入超级课表</span></div>`;
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消替换"); };
+    } else if (act.type === "publish_notice") {
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-bell"/></svg><span>管理员公告待确认：《${schedEsc(act.title || "校园通知")}》</span></div>
+        <div class="sched-chat-confirm-list">${schedEsc(String(act.body || "").slice(0, 120))}</div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认发布全校公告</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = async () => {
+        try {
+          await api("/notices", {
+            method: "POST",
+            body: JSON.stringify({
+              title: act.title || "校园通知",
+              category: act.category || "校园通知",
+              audience: act.audience || "全体学生",
+              body: act.body || "",
+              deadline: act.deadline || ""
+            })
+          });
+          if (typeof load_notices === "function") load_notices();
+          toast("公告已正式发布");
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已正式发布通知公告</span></div>`;
+        } catch (err) {
+          toast(err?.message || "发布失败");
+        }
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消发布"); };
+    }
+    toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
+  }
+}
 
 (function init_all_dialog_swipe_to_close() {
   document.querySelectorAll("dialog:not(#docDialog)").forEach(dlg => {

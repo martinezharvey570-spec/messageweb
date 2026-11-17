@@ -8876,3 +8876,163 @@ textarea {
     background: transparent !important;
   }
 }
+
+
+/* ==================== v1.059 全局液态玻璃 × 全量胶囊（999px）终极统一 ==================== */
+
+/* 1. 搜索框、自研下拉选择框、AI分段器 → 999px 液态玻璃胶囊 */
+.search,
+.toolbar input[type="search"],
+.toolbar input[type="text"],
+.xz-select-trigger,
+.xz-select-btn,
+.ai-seg,
+.ai-seg-btn,
+.config-toggle-btn,
+.chat-topbar .icon-btn,
+.chat-topbar button,
+.doc-m-btn {
+  border-radius: 999px !important;
+}
+
+.ai-seg,
+.xz-select-trigger,
+.xz-select-btn,
+.toolbar input[type="search"],
+.toolbar input[type="text"] {
+  background: var(--lg-surface-2) !important;
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner), 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+.ai-seg-btn.active {
+  border-radius: 999px !important;
+  box-shadow: 0 2px 8px rgba(21, 94, 239, 0.22), var(--lg-border-inner);
+}
+.xz-select-menu,
+.xz-select-dropdown {
+  background: var(--lg-pop-bg) !important;
+  backdrop-filter: blur(26px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--lg-shadow-float), var(--lg-border-inner) !important;
+}
+
+/* 2. 首页快捷入口（.quick）与欢迎区玻璃大卡 */
+.welcome {
+  background: var(--lg-surface-2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--lg-border-outer);
+  border-radius: 24px;
+  padding: 20px 22px;
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner);
+}
+.quick {
+  border-radius: 999px !important;
+  background: var(--lg-surface-2) !important;
+  backdrop-filter: blur(16px) saturate(175%);
+  -webkit-backdrop-filter: blur(16px) saturate(175%);
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner), 0 3px 10px rgba(15, 23, 42, 0.04) !important;
+  transition: transform 0.16s var(--lg-spring), border-color 0.16s ease !important;
+}
+.quick:hover {
+  border-color: var(--blue-border) !important;
+  transform: translateY(-1px);
+}
+.quick:active { transform: scale(0.985); }
+
+/* 3. 我的待办行 → 独立 18px 微玻璃卡片 */
+.taskrow {
+  background: var(--lg-item-bg) !important;
+  border: 1px solid var(--lg-border-outer) !important;
+  border-radius: 18px !important;
+  padding: 13px 16px !important;
+  margin-bottom: 8px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03), var(--lg-border-inner);
+  transition: transform 0.16s var(--lg-spring), border-color 0.16s ease !important;
+}
+.taskrow:hover { border-color: var(--blue-border) !important; }
+.taskrow:last-child { margin-bottom: 0; }
+
+/* 4. AI 气泡工具栏、用户气泡与灵动岛 Toast → 液态玻璃胶囊 */
+.bubble-tools button,
+.todo-action-btn {
+  border-radius: 999px !important;
+  background: var(--lg-surface-2) !important;
+  backdrop-filter: blur(14px) saturate(175%);
+  -webkit-backdrop-filter: blur(14px) saturate(175%);
+  border: 1px solid var(--lg-border-outer) !important;
+  box-shadow: var(--lg-border-inner), 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+.msg.user .msg-bubble {
+  border-radius: 22px 22px 6px 22px !important;
+  box-shadow: 0 6px 18px rgba(21, 94, 239, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+.toast {
+  border-radius: 999px !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+/* 5. 移动端底部 6-Tab 栏 → 整体药丸形液态玻璃高亮胶囊 */
+@media (max-width: 960px) {
+  .mobile-tabbar .tab-item.active i {
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  .mobile-tabbar .tab-item {
+    border-radius: 999px;
+    margin: 2px 1px;
+    transition: background 0.18s var(--lg-spring), color 0.18s ease, transform 0.14s var(--lg-spring);
+  }
+  .mobile-tabbar .tab-item.active {
+    background: var(--blue-light);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 8px rgba(21, 94, 239, 0.10);
+  }
+  html.dark .mobile-tabbar .tab-item.active {
+    background: rgba(59, 130, 246, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+}
+
+/* 6. 超级课表内部元素全量胶囊化与玻璃高光 */
+#schedulePage .sched-week-chip {
+  border-radius: 999px !important;
+  box-shadow: var(--lg-border-inner);
+}
+#schedulePage .sched-date-chip {
+  border-radius: 16px !important;
+  box-shadow: var(--lg-border-inner);
+}
+#schedulePage .sched-m-ibtn,
+#schedulePage .sched-step-btn,
+#schedulePage .sched-wk-btn,
+#schedulePage .sched-radio-pill {
+  border-radius: 999px !important;
+}
+#schedulePage .sched-week-stepper {
+  border-radius: 999px !important;
+  background: var(--lg-surface-2) !important;
+}
+#schedulePage .sched-m-cell {
+  border-radius: 14px !important;
+}
+#schedulePage .sched-card-item {
+  border-radius: 11px !important;
+  box-shadow: 0 3px 10px rgba(16, 24, 40, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+#schedulePage .sched-lesson {
+  border-radius: 16px !important;
+}
+#schedulePage .sched-hero {
+  border-radius: 22px !important;
+  backdrop-filter: blur(20px) saturate(185%);
+  -webkit-backdrop-filter: blur(20px) saturate(185%);
+  box-shadow: var(--lg-shadow-card), var(--lg-border-inner) !important;
+}

@@ -626,7 +626,10 @@ function go(p) {
     setTimeout(sync_hot_nav, 60);
   }
   if (p === "knowledge") load_knowledge();
-  if (p === "schedule" && typeof render_schedule_all === "function") render_schedule_all();
+  if (p === "schedule") {
+    if (typeof bind_schedule_events === "function") bind_schedule_events();
+    if (typeof render_schedule_all === "function") render_schedule_all();
+  }
   if (p === "users") load_users();
   if (p === "analytics") load_stats();
 }
@@ -1046,7 +1049,7 @@ $("noticeForm").onsubmit = async e => {
   const selector = [
     '#knowledgePage .cat-pills', '#noticesPage #catPills', '#knowledgePills',
     '#schedDeskDateStrip', '#schedDateStrip', '#schedDeskWeekStrip', '#schedWeekStrip',
-    '.sched-week-strip', '.sched-date-strip', '.sched-wg-wrap',
+    '.sched-week-strip', '.sched-date-strip', '.sched-wg-wrap', '.sched-matrix-inner',
     '.doc-font-group', '.doc-m-font-seg', '.sched-m-seg', '.sched-d-seg'
   ].join(',');
   let active = null;
@@ -4455,7 +4458,10 @@ function render_schedule_mobile(now) {
     }
     wStrip.innerHTML = wh;
     const sel = wStrip.querySelector(".sched-week-chip.on");
-    if (sel) sel.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
+    if (sel) {
+      const targetLeft = sel.offsetLeft - (wStrip.clientWidth - sel.offsetWidth) / 2;
+      wStrip.scrollLeft = Math.max(0, targetLeft);
+    }
   }
 
   // Date strip

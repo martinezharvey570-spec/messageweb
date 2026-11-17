@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.045">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.045">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.050">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.050">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.045" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.050" fetchpriority="high">
 </head>
 <body>
 
@@ -480,7 +480,7 @@
             </div>
             <input type="file" id="askCamInput" accept="image/*" capture="environment" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
             <input type="file" id="askImgInput" accept="image/*" multiple style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
-            <input type="file" id="askFileInput" accept=".txt,.md,.csv,.json,.log,.xml,.html" multiple style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
+            <input type="file" id="askFileInput" accept="*/*" multiple style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1">
             <div class="ask-input-wrap">
               <div id="askAttachPreview" class="ask-attach-preview hide"></div>
               <div class="ask-input-row">
@@ -624,6 +624,9 @@
               <div id="schedDeskViewTimetable" class="hide">
                 <div id="schedDesktopInlineTimetable" class="sched-tt-grid"></div>
               </div>
+              <div id="schedDeskViewManage" class="hide">
+                <div id="schedDeskManageHost" class="sched-manage-page"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -679,11 +682,15 @@
             </div>
             <div id="schedMobTimetableContainer"></div>
           </div>
+
+          <div id="schedMobViewManage" class="sched-m-view hide">
+            <div id="schedMobManageHost" class="sched-manage-page"></div>
+          </div>
         </div>
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.045</span>
+        <span>校务智理校园事务服务平台 · v1.050</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -977,42 +984,7 @@
   </form>
 </dialog>
 
-<dialog id="scheduleSettingDialog" class="task-dialog">
-  <div class="dialoghead">
-    <div><h2>课表设置与管理</h2><small>支持自定义开学日期、云端同步及 JSON 备份</small></div>
-    <button type="button" id="closeSchedSettingDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
-  </div>
-  <div class="sched-setting-body">
-    <div class="sched-sub-tools sched-sub-tools-single">
-      <button type="button" id="schedSettingImportImgBtn" class="sched-sub-card is-accent">
-        <svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>
-        <div><b>AI 导课表</b><small>支持 PDF、表格、截图或直接粘贴文本导入</small></div>
-      </button>
-    </div>
-    <div class="sched-field-row">
-      <div class="sched-field">
-        <label for="schedStartInput">第 1 周周一日期</label>
-        <input id="schedStartInput" type="date">
-      </div>
-      <div class="sched-field">
-        <label for="schedTotalWeeksInput">学期总周数</label>
-        <input id="schedTotalWeeksInput" type="number" min="1" max="30" value="18">
-      </div>
-    </div>
-    <div class="sched-list-head">
-      <b>已录入课程（<span id="schedCourseCount">0</span>）</b>
-      <button type="button" id="schedSettingAddBtn" class="sched-link-btn"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加课程</span></button>
-    </div>
-    <div id="schedSettingCourseList" class="sched-clist"></div>
-    <div class="sched-dlg-actions" style="margin-top:14px">
-      <button type="button" id="schedExportBtn" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出 JSON</span></button>
-      <button type="button" id="schedImportBtn" class="sched-btn-ghost" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg><span>导入 JSON</span></button>
-    </div>
-    <button type="button" id="schedClearBtn" class="sched-btn-danger" style="width:100%;margin-top:8px"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空所有课程</span></button>
-    <input type="file" id="schedImportFile" accept=".json,application/json" style="display:none">
-    
-  </div>
-</dialog>
+<input type="file" id="schedImportFile" accept=".json,application/json" style="display:none">
 
 <dialog id="scheduleTimetableDialog" class="task-dialog wide-dialog">
   <div class="dialoghead">
@@ -1050,14 +1022,18 @@
     </div>
     <div class="sched-dlg-actions" style="margin-top:14px">
       <div id="schedAiStatus" class="sched-ai-status hide"></div>
-    <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="width:100%"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 识别并导入</span></button>
+    <div id="schedAiPreview" class="sched-ai-preview hide"></div>
+    <div style="display:flex;gap:8px;width:100%">
+      <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="flex:1"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 识别</span></button>
+      <button type="button" id="schedAiConfirmBtn" class="sched-btn-primary hide" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>确认导入课表</span></button>
+    </div>
     </div>
   </div>
 </dialog>
 
-<script src="android-bridge.js?v=1.045"></script>
-<script src="config.js?v=1.045"></script>
-<script src="app.js?v=1.045"></script>
+<script src="android-bridge.js?v=1.050"></script>
+<script src="config.js?v=1.050"></script>
+<script src="app.js?v=1.050"></script>
 
 
 </body>

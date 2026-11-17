@@ -8457,3 +8457,150 @@ html.dark .sched-ai-status.is-err {
   color: #fca5a5;
   border-color: rgba(239, 68, 68, .32);
 }
+
+
+/* ==================== v1.048 AI导课表预览 & 聊天确认执行卡片 ==================== */
+.sched-ai-preview {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+.sched-ai-preview b { display: block; color: var(--ink); margin-bottom: 5px; font-size: 12.5px; }
+.sched-ai-preview-item {
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--line);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sched-ai-preview-item:last-child { border-bottom: none; }
+
+.sched-chat-confirm {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: var(--blue-light);
+  border: 1px solid var(--blue-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sched-chat-confirm-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.sched-chat-confirm-head .ico { width: 16px; height: 16px; color: var(--blue); }
+.sched-chat-confirm-list {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  line-height: 1.55;
+}
+.sched-chat-confirm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+.sched-chat-confirm-actions button {
+  min-height: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* ==================== v1.049 全站弹窗一致丝滑下拉 & 课表管理页内嵌化 ==================== */
+.sched-m-seg-4 {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+.sched-manage-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sched-manage-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-xs);
+}
+.sched-manage-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sched-manage-card-head b { font-size: 14.5px; color: var(--ink); }
+.sched-manage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+@media (max-width: 960px) {
+  .sched-manage-grid { grid-template-columns: 1fr; }
+}
+.sched-manage-page .sched-clist {
+  max-height: none;
+  overflow: visible;
+}
+
+/* 全站所有弹窗风格统一 + 移动端底部弹窗触控丝滑下拉关闭 */
+dialog:not(#docDialog) {
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+}
+@media (max-width: 760px) {
+  dialog:not(#docDialog),
+  dialog.wide-dialog:not(#docDialog) {
+    border-radius: 22px 22px 0 0 !important;
+    will-change: transform;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+  dialog:not(#docDialog)::before {
+    content: "";
+    display: block;
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border);
+    margin: -6px auto 12px;
+    opacity: .85;
+  }
+  #scheduleCourseDialog,
+  #scheduleAiImportDialog {
+    max-height: 90dvh !important;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important;
+    display: block !important;
+  }
+  #scheduleCourseDialog:not([open]),
+  #scheduleAiImportDialog:not([open]) {
+    display: none !important;
+  }
+  #scheduleCourseDialog .dialoghead,
+  #scheduleAiImportDialog .dialoghead {
+    padding: 0 0 12px !important;
+    margin-bottom: 10px !important;
+    border-bottom: 1px solid var(--line);
+  }
+  #scheduleCourseDialog .sched-dlg-form,
+  #scheduleAiImportDialog .sched-ai-import-body {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}

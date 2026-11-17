@@ -7293,39 +7293,48 @@ html.dark .msg-avatar.ai {
 
 
 
-/* ==================== 超级课表（v1.037 · 原版质感 × 校务智理风格） ==================== */
+
+/* ==================== 超级课表（v1.039 · 原版扁平舒展比例 × 校务智理黑白双模） ==================== */
 #sidebar .nav[data-page="schedule"] .ico,
 .tab-item[data-page="schedule"] .ico {
   color: #0ea5e9 !important;
 }
 
 #schedulePage {
-  --sc-theory: #2563eb;
+  --sc-theory: #3b6cff;
   --sc-lab: #10b981;
   --sc-pc: #f59e0b;
   --sc-online: #06b6d4;
   --sc-sport: #ef4444;
-  --sc-other: #7c3aed;
+  --sc-other: #8b5cf6;
+}
+
+#schedulePage .sched-step-btn,
+#schedulePage .sched-m-ibtn,
+#schedulePage .sched-week-chip,
+#schedulePage .sched-date-chip,
+#schedulePage .sched-seg-btn,
+#schedulePage .sched-ai-chip,
+.sched-clist-item .del {
+  min-height: 0;
 }
 
 .sched-mobile-wrap { display: none; }
 .sched-desktop-wrap { display: block; }
 
-/* 桌面端顶部工具栏（对齐校务智理玻璃卡片） */
+/* 桌面端工具栏 */
 .sched-d-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 14px 18px;
-  background: var(--glass-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 18px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 16px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 12px;
 }
 .sched-d-left {
   display: flex;
@@ -7336,16 +7345,16 @@ html.dark .msg-avatar.ai {
 .sched-week-stepper {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 3px;
+  border-radius: 10px;
+  padding: 2px;
 }
 .sched-step-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7353,46 +7362,44 @@ html.dark .msg-avatar.ai {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background .15s, color .15s, transform .12s;
 }
-.sched-step-btn:hover { background: var(--card); color: var(--blue); box-shadow: var(--shadow-xs); }
-.sched-step-btn:active { transform: scale(.93); }
-.sched-step-btn .ico { width: 16px; height: 16px; }
+.sched-step-btn:hover { background: var(--card); color: var(--blue); }
+.sched-step-btn .ico { width: 15px; height: 15px; }
 .sched-week-label {
-  min-width: 76px;
+  min-width: 68px;
   text-align: center;
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 .sched-range-text {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .sched-season-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   background: var(--blue-light);
   color: var(--blue);
   border: 1px solid var(--blue-border);
 }
-.sched-season-badge .ico { width: 13px; height: 13px; }
+.sched-season-badge .ico { width: 12.5px; height: 12.5px; }
 .sched-season-badge.is-winter {
   background: #f0f9ff;
   color: #0284c7;
   border-color: #bae6fd;
 }
 .sched-sync-badge {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--muted);
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -7409,16 +7416,15 @@ html.dark .msg-avatar.ai {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 11px;
-  font-size: 13px;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform .12s, background .15s, border-color .15s, box-shadow .15s;
 }
-.sched-btn-ghost .ico, .sched-btn-primary .ico, .sched-btn-danger .ico { width: 15px; height: 15px; }
+.sched-btn-ghost .ico, .sched-btn-primary .ico, .sched-btn-danger .ico { width: 14px; height: 14px; }
 .sched-btn-ghost {
   background: var(--card);
   color: var(--ink-secondary);
@@ -7429,59 +7435,310 @@ html.dark .msg-avatar.ai {
   background: linear-gradient(135deg, var(--blue), var(--purple));
   color: #fff;
   border: none;
-  box-shadow: 0 4px 14px rgba(21, 94, 239, .26);
+  box-shadow: 0 3px 10px rgba(21, 94, 239, .22);
 }
-.sched-btn-primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
-.sched-btn-primary:active { transform: scale(.97); }
+.sched-btn-primary:hover { filter: brightness(1.05); }
 .sched-btn-danger {
   background: #fef2f2;
   color: #dc2626;
   border: 1px solid #fecaca;
 }
-.sched-btn-danger:hover { background: #fee2e2; }
 
-/* 桌面端主双栏 */
-.sched-d-grid {
+/* 桌面端：上方扁平概览 + 下方全宽矩阵 */
+.sched-d-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 16px;
-  align-items: start;
+  grid-template-columns: 350px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 12px;
 }
-@media (max-width: 1220px) and (min-width: 961px) {
-  .sched-d-grid { grid-template-columns: minmax(0, 1fr) 296px; gap: 12px; }
+@media (max-width: 1120px) and (min-width: 961px) {
+  .sched-d-overview { grid-template-columns: 1fr; }
 }
+
+/* 原版扁平 Hero 卡片 */
+.sched-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #e8f0ff 0%, #f3f6ff 60%, #f5f3ff 100%);
+  border: 1px solid var(--blue-border);
+  box-shadow: 0 4px 16px rgba(21, 94, 239, .06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sched-hero::before {
+  content: "";
+  position: absolute;
+  inset: -45% -35% auto auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(21, 94, 239, .16), transparent 65%);
+  pointer-events: none;
+}
+.sched-hero.empty {
+  background: var(--card);
+  border-color: var(--line);
+  box-shadow: var(--shadow-xs);
+}
+.sched-hero.empty::before { opacity: .25; }
+.sched-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .85);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+  margin-bottom: 7px;
+}
+.sched-hero-tag .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: schedPulse 1.6s ease-in-out infinite;
+}
+.sched-hero.empty .sched-hero-tag .dot { animation: none; opacity: .55; }
+@keyframes schedPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.82); }
+}
+.sched-hero-title {
+  margin: 0 0 4px;
+  font-size: 17.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.sched-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sched-hero-meta span { display: inline-flex; align-items: center; gap: 3px; }
+.sched-hero-meta .ico { width: 13px; height: 13px; color: var(--blue); }
+.sched-hero-count {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.sched-hero-count .num {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sched-hero-count .unit { font-size: 12.5px; color: var(--ink-secondary); font-weight: 600; }
+.sched-hero-endtime {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, .9);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+.sched-hero-endtime .ico { width: 12px; height: 12px; }
+.sched-hero-progress {
+  margin-top: 8px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(21, 94, 239, .14);
+  overflow: hidden;
+}
+.sched-hero-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+}
+
+/* 桌面端右侧今日横排卡片区 */
+.sched-today-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 13px 15px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sched-today-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sched-today-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.sched-today-head b { font-size: 14.5px; color: var(--ink); }
+.sched-today-head small { font-size: 12px; color: var(--muted); }
+.sched-ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--blue-light);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sched-ai-chip .ico { width: 13.5px; height: 13.5px; }
+
+.sched-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sched-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 8px;
+}
+
+/* 原版扁平时间轴卡片（严格锁定相同宽度，正在上的课绝不膨胀） */
+.sched-lesson {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .12s;
+}
+.sched-lesson:hover { border-color: var(--blue-border); }
+.sched-lesson:active { transform: scale(.985); }
+.sched-lesson.active {
+  border-color: var(--blue);
+  background: var(--blue-light);
+}
+.sched-lesson.past { opacity: .48; }
+
+.sched-lesson-time {
+  flex: 0 0 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.sched-lesson-time .t { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.sched-lesson-time .p { font-size: 10.5px; color: var(--muted); line-height: 1.25; text-align: right; }
+.sched-lesson-time .p b { display: inline; font-size: 9.5px; font-weight: 500; opacity: .75; margin-right: 2px; }
+.sched-lesson-bar { flex: 0 0 3px; align-self: stretch; border-radius: 2px; }
+.sched-lesson-body { flex: 1; min-width: 0; }
+.sched-lesson-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  margin-bottom: 3px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.sched-badge {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #fff;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+.sched-lesson-info {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sched-lesson-info span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  margin-right: 8px;
+}
+.sched-lesson-info .ico { width: 11.5px; height: 11.5px; }
+
+.sched-empty-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 22px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.sched-empty-box .ico-big {
+  width: 30px;
+  height: 30px;
+  color: var(--blue);
+  opacity: .7;
+  margin-bottom: 4px;
+}
+
+/* 桌面端全宽周矩阵（扁平比例：宽 ~145px × 高 ~58px） */
 .sched-matrix-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 14px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: var(--shadow-xs);
 }
 .sched-matrix {
   display: grid;
-  grid-template-columns: 68px repeat(7, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: 64px repeat(7, minmax(0, 1fr));
+  gap: 5px;
 }
 .sched-m-head {
   text-align: center;
-  padding: 8px 4px;
-  border-radius: 10px;
+  padding: 6px 4px;
+  border-radius: 8px;
   background: var(--surface);
   border: 1px solid var(--line);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--ink-secondary);
   cursor: pointer;
-  transition: background .15s, border-color .15s;
 }
 .sched-m-head:hover { border-color: var(--blue-border); color: var(--blue); }
-.sched-m-head small {
-  display: block;
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-top: 2px;
-}
+.sched-m-head small { display: block; font-size: 10px; font-weight: 500; color: var(--muted); margin-top: 1px; }
 .sched-m-head.today {
   background: var(--blue-light);
   border-color: var(--blue-border);
@@ -7494,33 +7751,29 @@ html.dark .msg-avatar.ai {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
-  border-radius: 10px;
+  padding: 6px 2px;
+  border-radius: 8px;
   background: var(--surface);
   border: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-.sched-m-period b { font-size: 12.5px; color: var(--ink); margin-bottom: 2px; }
-.sched-m-period span { font-size: 10px; color: var(--muted); line-height: 1.35; }
+.sched-m-period b { font-size: 12px; color: var(--ink); line-height: 1.2; }
+.sched-m-period span { font-size: 9.5px; color: var(--muted); line-height: 1.25; }
 
 .sched-m-cell {
   position: relative;
-  min-height: 88px;
-  padding: 5px;
-  border-radius: 11px;
+  min-height: 58px;
+  padding: 4px;
+  border-radius: 8px;
   background: var(--surface);
   border: 1px dashed transparent;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
-  transition: border-color .15s, background .15s;
 }
-.sched-m-cell:hover {
-  border-color: var(--blue-border);
-  background: #f4f7ff;
-}
+.sched-m-cell:hover { border-color: var(--blue-border); background: var(--blue-light); }
 .sched-m-cell:empty::after {
   content: "+";
   position: absolute;
@@ -7528,278 +7781,36 @@ html.dark .msg-avatar.ai {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 16px;
   color: var(--blue);
   opacity: 0;
-  transition: opacity .15s;
 }
-.sched-m-cell:empty:hover::after { opacity: .55; }
-.sched-m-cell.today { background: #f3f7ff; }
+.sched-m-cell:empty:hover::after { opacity: .5; }
+.sched-m-cell.today { background: rgba(21, 94, 239, .04); }
 
 .sched-card-item {
-  padding: 7px 8px;
-  border-radius: 9px;
+  padding: 5px 7px;
+  border-radius: 6px;
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 3px 10px rgba(16, 24, 40, .10);
-  transition: transform .14s, filter .14s;
 }
-.sched-card-item:hover { transform: translateY(-1px); filter: brightness(1.05); }
-.sched-card-item:active { transform: scale(.97); }
+.sched-card-item:hover { filter: brightness(1.06); }
 .sched-card-item .sc-n {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
-  line-height: 1.32;
+  line-height: 1.28;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .sched-card-item .sc-r {
-  font-size: 10px;
-  opacity: .92;
-  margin-top: 3px;
+  font-size: 9.5px;
+  opacity: .9;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* 右侧边栏 & 原版质感 Hero 倒计时卡 */
-.sched-side-col {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.sched-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  padding: 18px 16px;
-  background: linear-gradient(135deg, #e8f0ff 0%, #f3f6ff 55%, #f5f3ff 100%);
-  border: 1px solid var(--blue-border);
-  box-shadow: 0 8px 24px rgba(21, 94, 239, .08);
-}
-.sched-hero::before {
-  content: "";
-  position: absolute;
-  inset: -42% -35% auto auto;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(21, 94, 239, .18), transparent 66%);
-  pointer-events: none;
-}
-.sched-hero.empty {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: var(--line);
-  box-shadow: var(--shadow-xs);
-}
-.sched-hero.empty::before { opacity: .35; }
-.sched-hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .03em;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .85);
-  color: var(--blue);
-  border: 1px solid var(--blue-border);
-  margin-bottom: 9px;
-}
-.sched-hero-tag .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: schedPulse 1.6s ease-in-out infinite;
-}
-.sched-hero.empty .sched-hero-tag .dot { animation: none; opacity: .6; }
-@keyframes schedPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .45; transform: scale(.82); }
-}
-.sched-hero-title {
-  margin: 0 0 6px;
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.32;
-}
-.sched-hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-.sched-hero-meta span { display: inline-flex; align-items: center; gap: 4px; }
-.sched-hero-meta .ico { width: 13.5px; height: 13.5px; color: var(--blue); }
-.sched-hero-count {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.sched-hero-count .num {
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -.02em;
-  background: linear-gradient(135deg, var(--blue), var(--purple));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.sched-hero-count .unit { font-size: 13px; color: var(--ink-secondary); font-weight: 600; }
-.sched-hero-endtime {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11.5px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .9);
-  color: var(--blue);
-  border: 1px solid var(--blue-border);
-}
-.sched-hero-endtime .ico { width: 12.5px; height: 12.5px; }
-.sched-hero-progress {
-  margin-top: 11px;
-  height: 4.5px;
-  border-radius: 999px;
-  background: rgba(21, 94, 239, .14);
-  overflow: hidden;
-}
-.sched-hero-progress i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--blue), var(--purple));
-  transition: width .8s ease;
-}
-
-.sched-today-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-}
-.sched-today-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.sched-today-head b { display: block; font-size: 15px; color: var(--ink); }
-.sched-today-head small { font-size: 12px; color: var(--muted); }
-.sched-ai-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: var(--blue-light);
-  color: var(--blue);
-  border: 1px solid var(--blue-border);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform .12s, background .15s;
-}
-.sched-ai-chip:hover { background: #e0ebff; transform: translateY(-1px); }
-.sched-ai-chip .ico { width: 14px; height: 14px; }
-
-/* 原版时间轴卡片 */
-.sched-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.sched-lesson {
-  display: flex;
-  gap: 12px;
-  padding: 12px 13px;
-  border-radius: 14px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-xs);
-  cursor: pointer;
-  transition: border-color .15s, transform .12s, box-shadow .15s;
-}
-.sched-lesson:hover { border-color: var(--blue-border); box-shadow: var(--shadow-sm); }
-.sched-lesson:active { transform: scale(.985); }
-.sched-lesson.active {
-  border-color: rgba(21, 94, 239, .48);
-  background: linear-gradient(135deg, rgba(21, 94, 239, .08), rgba(105, 56, 239, .02));
-  box-shadow: 0 6px 20px rgba(21, 94, 239, .12);
-}
-.sched-lesson.past { opacity: .48; }
-.sched-lesson-time {
-  flex: 0 0 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-  font-variant-numeric: tabular-nums;
-}
-.sched-lesson-time .t { font-size: 14px; font-weight: 700; color: var(--ink); }
-.sched-lesson-time .p { font-size: 11px; color: var(--muted); line-height: 1.25; text-align: right; }
-.sched-lesson-time .p b { display: block; font-size: 9.5px; font-weight: 600; opacity: .7; }
-.sched-lesson-bar { flex: 0 0 3.5px; border-radius: 3px; }
-.sched-lesson-body { flex: 1; min-width: 0; }
-.sched-lesson-name {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.sched-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 5px;
-  color: #fff;
-}
-.sched-lesson-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.sched-lesson-info span { display: inline-flex; align-items: center; gap: 3px; }
-.sched-lesson-info .ico { width: 12px; height: 12px; }
-
-.sched-empty-box {
-  text-align: center;
-  padding: 34px 16px;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1px dashed var(--border);
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.7;
-}
-.sched-empty-box .ico-big {
-  width: 36px;
-  height: 36px;
-  color: var(--blue);
-  opacity: .72;
-  margin-bottom: 6px;
 }
 
 /* 对话框表单与列表 */
@@ -7823,106 +7834,49 @@ html.dark .msg-avatar.ai {
 }
 .sched-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sched-dlg-actions { display: flex; gap: 10px; margin-top: 6px; }
-.sched-list-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 14px 0 8px;
-  font-size: 13px;
-}
+.sched-list-head { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 8px; font-size: 13px; }
 .sched-link-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--blue);
-  font-weight: 600;
-  font-size: 13px;
-  background: none;
-  border: none;
-  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--blue); font-weight: 600; font-size: 13px;
+  background: none; border: none; cursor: pointer;
 }
 .sched-link-btn .ico { width: 14px; height: 14px; }
-.sched-clist {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  max-height: 260px;
-  overflow-y: auto;
-}
+.sched-clist { display: flex; flex-direction: column; gap: 7px; max-height: 260px; overflow-y: auto; }
 .sched-clist-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  border-radius: 11px;
-  border: 1px solid var(--line);
-  background: var(--surface);
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 11px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface);
 }
 .sched-clist-item .bar { width: 3.5px; height: 28px; border-radius: 2px; flex: 0 0 auto; }
 .sched-clist-item .body { flex: 1; min-width: 0; cursor: pointer; }
 .sched-clist-item .n { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sched-clist-item .m { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sched-clist-item .del {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  width: 30px; height: 30px; border-radius: 8px; border: none; background: transparent;
+  color: var(--muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
 }
 .sched-clist-item .del:hover { background: #fee2e2; color: #dc2626; }
 .sched-clist-item .del .ico { width: 14px; height: 14px; }
 
 /* 作息对照双卡 */
-.sched-tt-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 12px;
-}
+.sched-tt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
 .sched-tt-card {
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  overflow: hidden;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow-xs);
+  border-radius: 14px; border: 1px solid var(--line); background: var(--card);
+  overflow: hidden; margin-bottom: 12px;
 }
 .sched-tt-head {
-  padding: 12px 14px;
-  font-size: 13.5px;
-  font-weight: 700;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 10px 14px; font-size: 13.5px; font-weight: 700;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
 }
 .sched-tt-head .tag {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--card);
-  color: var(--muted);
-  border: 1px solid var(--line);
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  background: var(--card); color: var(--muted); border: 1px solid var(--line);
 }
-.sched-tt-head .tag.on {
-  background: var(--blue-light);
-  color: var(--blue);
-  border-color: var(--blue-border);
-}
+.sched-tt-head .tag.on { background: var(--blue-light); color: var(--blue); border-color: var(--blue-border); }
 .sched-tt-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 14px;
-  font-size: 12.5px;
-  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; font-size: 12.5px; border-bottom: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
 }
 .sched-tt-row:last-child { border-bottom: none; }
@@ -7932,266 +7886,136 @@ html.dark .msg-avatar.ai {
 .sched-tt-row.active { background: var(--blue-light); }
 .sched-tt-row.active .n, .sched-tt-row.active .t { color: var(--blue); font-weight: 700; }
 
-/* ==================== 移动端专属体验（还原原版顺滑手感） ==================== */
+/* ==================== 移动端专属体验（通栏吸顶 × 原版扁平卡片） ==================== */
 @media (max-width: 960px) {
   .mobile-tabbar {
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 0 !important;
     padding: 4px 2px env(safe-area-inset-bottom, 0px) !important;
   }
-  .mobile-tabbar .tab-item {
-    min-width: 0;
-    padding: 4px 1px;
-  }
-  .mobile-tabbar .tab-item span {
-    font-size: 10px;
-    white-space: nowrap;
-  }
+  .mobile-tabbar .tab-item { min-width: 0; padding: 4px 1px; }
+  .mobile-tabbar .tab-item span { font-size: 10px; white-space: nowrap; }
 
   .sched-desktop-wrap { display: none; }
   .sched-mobile-wrap { display: block; padding-bottom: 84px; }
 
+  /* 取消外框套娃，直接通栏吸顶贴边 */
   .sched-m-sticky {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(255, 255, 255, .92);
+    background: var(--header-bg);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    border-radius: 18px;
-    padding: 12px 12px 10px;
-    margin-bottom: 12px;
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-sm);
+    margin: -14px -14px 12px;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--line);
   }
-  .sched-m-toprow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .sched-m-title {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-width: 0;
-  }
-  .sched-m-title b { font-size: 16px; color: var(--ink); white-space: nowrap; }
+  .sched-m-toprow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .sched-m-title { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .sched-m-title b { font-size: 15.5px; color: var(--ink); white-space: nowrap; }
   .sched-m-actions { display: flex; gap: 6px; }
   .sched-m-ibtn {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--ink-secondary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform .12s;
+    width: 32px; height: 32px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-secondary);
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
   }
-  .sched-m-ibtn:active { transform: scale(.92); }
-  .sched-m-ibtn .ico { width: 16px; height: 16px; }
-  .sched-m-ibtn.is-ai {
-    background: var(--blue-light);
-    border-color: var(--blue-border);
-    color: var(--blue);
-  }
-  .sched-m-ibtn.is-primary {
-    background: linear-gradient(135deg, var(--blue), var(--purple));
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(21, 94, 239, .24);
-  }
+  .sched-m-ibtn .ico { width: 15px; height: 15px; }
+  .sched-m-ibtn.is-ai { background: var(--blue-light); border-color: var(--blue-border); color: var(--blue); }
+  .sched-m-ibtn.is-primary { background: linear-gradient(135deg, var(--blue), var(--purple)); border-color: transparent; color: #fff; }
 
   .sched-week-strip {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 10px 0 4px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 3px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
   .sched-week-strip::-webkit-scrollbar { display: none; }
   .sched-week-chip {
-    flex: 0 0 auto;
-    min-width: 52px;
-    padding: 5px 11px;
-    border-radius: 10px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--line);
-    text-align: center;
-    cursor: pointer;
-    transition: transform .12s;
+    flex: 0 0 auto; min-width: 48px; padding: 5px 10px; border-radius: 9px;
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--line); text-align: center; cursor: pointer;
   }
-  .sched-week-chip:active { transform: scale(.94); }
   .sched-week-chip.on {
     background: linear-gradient(135deg, var(--blue), var(--purple));
-    color: #fff;
-    border-color: transparent;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(21, 94, 239, .24);
+    color: #fff; border-color: transparent; font-weight: 600;
   }
   .sched-week-chip.cur::after {
-    content: "";
-    display: block;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: #10b981;
-    margin: 2px auto 0;
+    content: ""; display: block; width: 4px; height: 4px; border-radius: 50%;
+    background: #10b981; margin: 2px auto 0;
   }
   .sched-week-chip.on.cur::after { background: #fff; }
 
-  .sched-date-strip-wrap { padding: 2px 0 4px; }
+  .sched-date-strip-wrap { padding: 1px 0 3px; }
   .sched-date-strip {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 16px 2px 3px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    display: flex; gap: 6px; overflow-x: auto; padding: 14px 2px 2px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
   .sched-date-strip::-webkit-scrollbar { display: none; }
   .sched-date-chip {
-    flex: 1 0 44px;
-    padding: 7px 3px 6px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    background: var(--surface);
-    border: 1.5px solid var(--line);
-    position: relative;
-    cursor: pointer;
-    transition: transform .12s;
+    flex: 0 0 48px; padding: 6px 3px 5px; border-radius: 11px;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    background: var(--surface); border: 1px solid var(--line); position: relative; cursor: pointer;
   }
-  .sched-date-chip:active { transform: scale(.93); }
-  .sched-date-chip .dw { font-size: 10.5px; color: var(--muted); }
-  .sched-date-chip .dd { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .sched-date-chip .dw { font-size: 10px; color: var(--muted); }
+  .sched-date-chip .dd { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.15; }
   .sched-date-chip.today { border-color: var(--blue-border); background: var(--blue-light); }
   .sched-date-chip.today .dw, .sched-date-chip.today .dd { color: var(--blue); }
   .sched-date-chip.today::before {
-    content: "今";
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1.35;
-    padding: 1px 5px;
-    border-radius: 7px;
-    background: var(--blue);
-    color: #fff;
-    box-shadow: 0 2px 5px rgba(21, 94, 239, .26);
+    content: "今"; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; font-weight: 700; line-height: 1.3; padding: 1px 5px; border-radius: 6px;
+    background: var(--blue); color: #fff;
   }
   .sched-date-chip.on {
     background: linear-gradient(135deg, var(--blue), var(--purple));
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(21, 94, 239, .24);
-    transform: translateY(-1px);
+    border-color: transparent; box-shadow: 0 3px 10px rgba(21, 94, 239, .22);
   }
   .sched-date-chip.on .dw, .sched-date-chip.on .dd { color: #fff; }
-  .sched-date-chip.on.today::before { background: #fff; color: var(--blue); }
+  .sched-date-chip.on.today::before { background: var(--card); color: var(--blue); }
 
   .sched-m-seg {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 3px;
-    margin-top: 6px;
-    border-radius: 12px;
-    background: var(--surface);
-    border: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+    padding: 3px; margin-top: 5px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--line);
   }
   .sched-seg-btn {
-    height: 33px;
-    border-radius: 9px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-size: 12.5px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    cursor: pointer;
-    transition: all .15s;
+    height: 30px; border-radius: 8px; border: none; background: transparent;
+    color: var(--muted); font-size: 12px; font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
   }
-  .sched-seg-btn .ico { width: 14px; height: 14px; }
+  .sched-seg-btn .ico { width: 13.5px; height: 13.5px; }
   .sched-seg-btn.on {
     background: linear-gradient(135deg, var(--blue), var(--purple));
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(21, 94, 239, .22);
+    color: #fff; box-shadow: 0 2px 8px rgba(21, 94, 239, .2);
   }
 
   .sched-m-sec-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 14px 2px 8px;
-    font-size: 12.5px;
-    color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 12px 2px 8px; font-size: 12px; color: var(--muted);
   }
-  .sched-m-sec-head b { font-size: 14px; color: var(--ink); }
+  .sched-m-sec-head b { font-size: 13.5px; color: var(--ink); }
 
-  .sched-wg-wrap {
-    overflow-x: auto;
-    padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
-  }
+  .sched-wg-wrap { overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
   .sched-wg {
-    display: grid;
-    grid-template-columns: 54px repeat(7, minmax(96px, 1fr));
-    gap: 5px;
-    min-width: 750px;
+    display: grid; grid-template-columns: 54px repeat(7, minmax(98px, 1fr));
+    gap: 5px; min-width: 760px;
   }
   .sched-wg .sched-m-period {
-    position: sticky;
-    left: 0;
-    z-index: 4;
-    background: var(--card);
-    box-shadow: 2px 0 6px rgba(16, 24, 40, .05);
+    position: sticky; left: 0; z-index: 4; background: var(--card);
+    box-shadow: 2px 0 6px rgba(0, 0, 0, .04);
   }
   .sched-tt-grid { grid-template-columns: 1fr; }
 }
 
-
-/* 紧凑课表控件不受全局 button{min-height:40px} 拉伸 */
-#schedulePage .sched-step-btn,
-#schedulePage .sched-m-ibtn,
-#schedulePage .sched-week-chip,
-#schedulePage .sched-date-chip,
-#schedulePage .sched-seg-btn,
-#schedulePage .sched-ai-chip,
-.sched-clist-item .del {
-  min-height: 0;
-}
-
-/* ==================== 超级课表深色模式适配（html.dark） ==================== */
-html.dark .sched-m-cell:hover {
-  background: rgba(59, 130, 246, .10);
-}
-html.dark .sched-m-cell.today {
-  background: rgba(59, 130, 246, .08);
-}
+/* ==================== 白色/黑色模式完整适配（html.dark） ==================== */
 html.dark .sched-hero {
   background: linear-gradient(135deg, #1b2544 0%, #151c33 60%, #1d1b38 100%);
   border-color: rgba(91, 140, 255, .28);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .32);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .3);
 }
 html.dark .sched-hero::before {
-  background: radial-gradient(circle, rgba(91, 140, 255, .26), transparent 65%);
+  background: radial-gradient(circle, rgba(91, 140, 255, .24), transparent 65%);
 }
 html.dark .sched-hero.empty {
-  background: linear-gradient(135deg, #161d2f 0%, #111827 100%);
+  background: var(--card);
   border-color: var(--line);
 }
 html.dark .sched-hero-tag,
@@ -8205,42 +8029,20 @@ html.dark .sched-hero-count .num {
   -webkit-background-clip: text;
   background-clip: text;
 }
-html.dark .sched-lesson.active {
-  border-color: rgba(91, 140, 255, .55);
-  background: linear-gradient(135deg, rgba(59, 130, 246, .16), rgba(59, 130, 246, .04));
-  box-shadow: 0 6px 22px rgba(0, 0, 0, .28);
-}
+html.dark .sched-m-cell.today { background: rgba(59, 130, 246, .08); }
 html.dark .sched-btn-danger {
   background: rgba(239, 68, 68, .15);
   color: #fca5a5;
   border-color: rgba(239, 68, 68, .32);
-}
-html.dark .sched-btn-danger:hover {
-  background: rgba(239, 68, 68, .24);
 }
 html.dark .sched-season-badge.is-winter {
   background: rgba(14, 165, 233, .16);
   color: #38bdf8;
   border-color: rgba(14, 165, 233, .32);
 }
-html.dark .sched-ai-chip:hover {
-  background: rgba(59, 130, 246, .24);
-}
-html.dark .sched-m-sticky {
-  background: var(--header-bg);
-}
-html.dark .sched-date-chip.on.today::before {
-  background: var(--card);
-  color: #93c5fd;
-  border-color: rgba(59, 130, 246, .35);
-}
 html.dark .sched-field input,
 html.dark .sched-field select {
   background: var(--surface);
   color: var(--ink);
   border-color: var(--border);
-}
-html.dark .sched-clist-item .del:hover {
-  background: rgba(239, 68, 68, .18);
-  color: #fca5a5;
 }

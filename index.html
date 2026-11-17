@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#155eef">
 
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.038">
-  <link rel="apple-touch-icon" href="icon-192.png?v=1.038">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.039">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.039">
   <meta name="format-detection" content="telephone=no,email=no">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.038" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.039" fetchpriority="high">
 </head>
 <body>
 
@@ -596,26 +596,25 @@
             </div>
           </div>
 
-          <div class="sched-d-grid">
-            <div class="sched-matrix-card">
-              <div id="schedDesktopMatrix" class="sched-matrix"></div>
-            </div>
-            <aside class="sched-side-col">
-              <div id="schedDesktopHero" class="sched-hero"></div>
-              <div class="sched-today-card">
-                <div class="sched-today-head">
-                  <div>
-                    <b id="schedDesktopTodayTitle">今日课程</b>
-                    <small id="schedDesktopTodayDate"></small>
-                  </div>
-                  <button type="button" id="schedAskAiBtn" class="sched-ai-chip" title="让文理智办 AI 结合课表回答">
-                    <svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>
-                    <span>问 AI</span>
-                  </button>
+          <div class="sched-d-overview">
+            <div id="schedDesktopHero" class="sched-hero"></div>
+            <div class="sched-today-card">
+              <div class="sched-today-head">
+                <div class="sched-today-title-row">
+                  <b id="schedDesktopTodayTitle">今日课程</b>
+                  <small id="schedDesktopTodayDate"></small>
                 </div>
-                <div id="schedDesktopTimeline" class="sched-timeline"></div>
+                <button type="button" id="schedAskAiBtn" class="sched-ai-chip" title="让文理智办 AI 结合课表回答">
+                  <svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>
+                  <span>问 AI</span>
+                </button>
               </div>
-            </aside>
+              <div id="schedDesktopTimeline" class="sched-timeline sched-timeline-grid"></div>
+            </div>
+          </div>
+
+          <div class="sched-matrix-card">
+            <div id="schedDesktopMatrix" class="sched-matrix"></div>
           </div>
         </div>
 
@@ -675,7 +674,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.038</span>
+        <span>校务智理校园事务服务平台 · v1.039</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -893,9 +892,9 @@
   </form>
 </dialog>
 
-<script src="android-bridge.js?v=1.038"></script>
-<script src="config.js?v=1.038"></script>
-<script src="app.js?v=1.038"></script>
+<script src="android-bridge.js?v=1.039"></script>
+<script src="config.js?v=1.039"></script>
+<script src="app.js?v=1.039"></script>
 
 <dialog id="scheduleCourseDialog" class="task-dialog">
   <div class="dialoghead">

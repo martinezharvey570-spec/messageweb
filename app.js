@@ -4179,7 +4179,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
       <div class="sched-lesson-time"><span class="t">${s.s}</span><span class="p"><b>下课</b>${e.e}</span></div>
       <div class="sched-lesson-bar" style="background:${color}"></div>
       <div class="sched-lesson-body">
-        <div class="sched-lesson-name"><span>${schedEsc(c.name)}</span><span class="sched-badge" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
+        <div class="sched-lesson-name">${schedEsc(c.name)}<span class="sched-badge" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
         <div class="sched-lesson-info">
           ${c.room ? `<span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(c.room)}</span>` : ""}
           ${c.teacher ? `<span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(c.teacher)}</span>` : ""}

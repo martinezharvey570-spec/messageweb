@@ -4571,6 +4571,8 @@ function switch_desk_sched_tab(t) {
   $("schedDeskViewTimetable")?.classList.toggle("hide", t !== "timetable");
   $("schedDeskViewManage")?.classList.toggle("hide", t !== "manage");
   $("schedOpenSettings")?.classList.toggle("is-active", t === "manage");
+  $("schedDeskWeekStrip")?.classList.toggle("hide", t === "manage");
+  $("schedDeskDateStrip")?.classList.toggle("hide", t === "manage");
 }
 
 function switch_mob_sched_tab(t) {
@@ -4581,6 +4583,8 @@ function switch_mob_sched_tab(t) {
   $("schedMobViewTimetable")?.classList.toggle("hide", t !== "timetable");
   $("schedMobViewManage")?.classList.toggle("hide", t !== "manage");
   $("schedMobSettings")?.classList.toggle("is-ai", t === "manage");
+  document.querySelector(".sched-m-sticky")?.classList.toggle("is-manage-mode", t === "manage");
+  if (t === "manage") window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function bind_schedule_events() {

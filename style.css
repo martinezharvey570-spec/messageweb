@@ -8604,3 +8604,22 @@ dialog:not(#docDialog) {
     overflow: visible !important;
   }
 }
+
+
+/* ==================== v1.051 移动端设置页防穿模 & 自动隐藏顶部周次日期条 ==================== */
+@media (max-width: 960px) {
+  .sched-mobile-wrap {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  #schedMobViewManage {
+    padding-bottom: 18px;
+  }
+  .sched-m-sticky.is-manage-mode #schedWeekStrip,
+  .sched-m-sticky.is-manage-mode .sched-date-strip-wrap,
+  .sched-m-sticky.is-manage-mode .sched-m-seg {
+    display: none !important;
+  }
+  .sched-m-sticky.is-manage-mode {
+    padding-bottom: 10px;
+  }
+}

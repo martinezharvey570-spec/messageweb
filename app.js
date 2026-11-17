@@ -4161,7 +4161,7 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
     const emptyHint = !schedState.courses.length
       ? `<div class="sched-empty-actions">
            <button type="button" class="sched-btn-primary" data-empty-act="add"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加第一门课</span></button>
-           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico ico-star" aria-hidden="true"><use href="#i-sparkles"/></svg><span>AI 导课表</span></button>
+           <button type="button" class="sched-btn-ghost" data-empty-act="img"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>AI 导课表</span></button>
          </div>`
       : `<div style="font-size:12px;opacity:.8">可以去自习或点击上方“+”添加课程</div>`;
     return `<div class="sched-empty-box">
@@ -4880,7 +4880,12 @@ async function compress_sched_image(file) {
     openAiImportModal();
   });
   $("closeSchedAiImportDlg")?.addEventListener("click", () => $("scheduleAiImportDialog")?.close());
-  $("schedAiPickFileBtn")?.addEventListener("click", () => $("schedImgFile")?.click());
+  ["scheduleCourseDialog", "scheduleSettingDialog", "scheduleTimetableDialog", "scheduleAiImportDialog"].forEach(id => {
+    const dlg = $(id);
+    dlg?.addEventListener("click", e => {
+      if (e.target === dlg) dlg.close();
+    });
+  });
 
   // 桌面端周次条、日期条、分段切换
   $("schedDeskWeekStrip")?.addEventListener("click", e => {

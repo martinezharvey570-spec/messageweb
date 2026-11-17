@@ -224,10 +224,11 @@ function sync_theme_icon(is_dark) {
 function sync_theme_root(is_dark) {
   const root = document.documentElement;
   root.classList.toggle("dark", is_dark);
-  root.style.background = is_dark ? "#0b1120" : "";
+  const on_auth = $("auth") && !$("auth").classList.contains("hide");
+  root.style.background = on_auth ? "" : (is_dark ? "#0b1120" : "");
   root.style.colorScheme = is_dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", is_dark ? "#0b1120" : "#155eef");
+  if (meta) meta.setAttribute("content", on_auth ? "#0b2566" : (is_dark ? "#0b1120" : "#155eef"));
 }
 
 function init_theme() {
@@ -369,6 +370,7 @@ $("logout").onclick = () => {
   document.body.classList.remove("on-ai-page");
   $("app").classList.add("hide");
   $("auth").classList.remove("hide");
+  sync_theme_root(document.body.classList.contains("dark"));
   auth_mode("login");
 };
 
@@ -600,6 +602,7 @@ async function enter() {
       } catch {}
       $("auth").classList.remove("hide");
       $("app").classList.add("hide");
+      sync_theme_root(document.body.classList.contains("dark"));
       try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
       return;
     }
@@ -609,6 +612,7 @@ async function enter() {
   }
   $("auth").classList.add("hide");
   $("app").classList.remove("hide");
+  sync_theme_root(document.body.classList.contains("dark"));
   $("userName").textContent = me.display_name;
   $("welcomeName").textContent = me.display_name;
   $("avatar").textContent = me.display_name.slice(0, 1);

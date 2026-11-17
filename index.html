@@ -43,7 +43,8 @@
           root.style.colorScheme = "dark";
         }
         var m = document.querySelector('meta[name="theme-color"]');
-        if (m) m.setAttribute("content", dark ? "#0b1120" : "#155eef");
+        var hasAuth = root.classList.contains("has-saved-auth");
+        if (m) m.setAttribute("content", !hasAuth ? "#0b2566" : (dark ? "#0b1120" : "#155eef"));
       } catch (e) {}
     })();
   </script>

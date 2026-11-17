@@ -9865,15 +9865,18 @@ button.danger,
 [data-delete-user],
 #btnSchedDeleteCourse {
   background:
-    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.06) 46%, transparent 65%),
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 46%, transparent 65%),
     linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.34) !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
   border-radius: 999px !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
-    inset 0 -3px 8px rgba(127, 29, 29, 0.34),
-    0 6px 18px -4px rgba(220, 38, 38, 0.38) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -2px 6px rgba(127, 29, 29, 0.30),
+    0 0 0 1px rgba(220, 38, 38, 0.22),
+    0 6px 16px -4px rgba(220, 38, 38, 0.34) !important;
   transition: transform 0.16s var(--lg-spring), box-shadow 0.16s ease, filter 0.16s ease !important;
 }
 button.danger:hover,
@@ -9939,27 +9942,31 @@ button.danger:hover:not(:disabled),
 .sched-btn-danger:hover:not(:disabled),
 .notice-actions .icon-only.danger:hover:not(:disabled) {
   background:
-    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 46%, transparent 65%),
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.06) 46%, transparent 65%),
     linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+  border: 0 !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.34),
-    inset 0 -3px 8px rgba(127, 29, 29, 0.38),
-    0 8px 22px -4px rgba(220, 38, 38, 0.48) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    inset 0 -2px 6px rgba(127, 29, 29, 0.34),
+    0 0 0 1px rgba(220, 38, 38, 0.28),
+    0 8px 20px -4px rgba(220, 38, 38, 0.42) !important;
 }
 
-/* 1. 用户名蓝色圆圈（#avatar）→ 3D 蓝宝石液态玻璃质感 */
+/* 1. 用户名蓝色圆圈（#avatar）→ 3D 蓝宝石液态玻璃质感（去双叠边防锯齿） */
 #avatar {
   background:
-    radial-gradient(120% 85% at 28% 12%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.06) 48%, transparent 68%),
+    radial-gradient(120% 85% at 28% 12%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 68%),
     linear-gradient(155deg, #3b82f6 0%, #2563eb 52%, #4f46e5 100%) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.40) !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
-    inset 0 -3px 6px rgba(15, 23, 42, 0.24),
-    0 5px 14px -2px rgba(37, 99, 235, 0.40) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.44),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(37, 99, 235, 0.18),
+    0 4px 12px -2px rgba(37, 99, 235, 0.34) !important;
 }
 
 /* 2. 主题切换按钮（#themeToggle）→ 极简风格化“日光琥珀 / 午夜星蓝”宝石胶囊 */
@@ -10097,34 +10104,42 @@ html.dark #themeToggle {
 
 /* 1. 整个置顶栏（main > header）与用户胶囊（#userProfileBtn） */
 main > header {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(242, 247, 255, 0.72) 100%) !important;
-  backdrop-filter: blur(28px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.88) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(249, 251, 254, 0.78) 100%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
   box-shadow:
-    inset 0 -1px 0 rgba(15, 23, 42, 0.055),
-    0 6px 24px -6px rgba(15, 23, 42, 0.065) !important;
+    inset 0 -1px 0 rgba(255, 255, 255, 0.80),
+    0 4px 18px -6px rgba(15, 23, 42, 0.05) !important;
 }
 html.dark main > header {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.86) 0%, rgba(15, 23, 42, 0.74) 100%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.35), 0 8px 26px -6px rgba(0, 0, 0, 0.42) !important;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.86) 0%, rgba(15, 23, 42, 0.76) 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.30), 0 8px 24px -6px rgba(0, 0, 0, 0.38) !important;
 }
 
 #userProfileBtn.user {
   border-radius: 999px !important;
   padding: 4px 12px 4px 4px !important;
   background:
-    radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(235, 242, 253, 0.76) 100%) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), 0 3px 10px rgba(15, 23, 42, 0.05) !important;
+    radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.94) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(241, 245, 249, 0.72) 100%) !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.07),
+    0 3px 10px rgba(15, 23, 42, 0.05) !important;
 }
 html.dark #userProfileBtn.user {
   background:
     radial-gradient(120% 80% at 25% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(51, 65, 85, 0.84) 0%, rgba(30, 41, 59, 0.76) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
+    linear-gradient(180deg, rgba(51, 65, 85, 0.82) 0%, rgba(30, 41, 59, 0.74) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.28) !important;
 }
 
 /* 2. 切换学校按钮（#aiSchoolBtn / .ai-seg-school）→ 蓝宝石微光液态玻璃胶囊 */
@@ -10472,9 +10487,6 @@ main > header,
 .lg-slide-pill {
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  isolation: isolate;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 /* 增强课程宝石卡片与统计卡的 GPU 3D 悬停动效 */
@@ -10658,18 +10670,16 @@ main > header,
   border-radius: 999px !important;
   padding: 2px 16px !important;
   background:
-    linear-gradient(180deg, rgba(203, 213, 225, 0.36) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
-  backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    linear-gradient(180deg, rgba(203, 213, 225, 0.34) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
+  backdrop-filter: blur(20px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
+  border: 0 !important;
   box-shadow:
-    inset 0 2.5px 6px rgba(15, 23, 42, 0.10),
-    inset 0 1px 2px rgba(15, 23, 42, 0.06),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.94),
-    0 1px 0 rgba(255, 255, 255, 0.72) !important;
+    inset 0 2px 5px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(15, 23, 42, 0.07) !important;
   transition:
     background 0.24s ease,
-    border-color 0.24s ease,
     box-shadow 0.24s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
 }
 #schoolDialog .school-search-wrap:focus-within,
@@ -10677,35 +10687,33 @@ main > header,
 .search-box:focus-within {
   background:
     linear-gradient(180deg, rgba(241, 245, 249, 0.72) 0%, rgba(255, 255, 255, 0.88) 100%) !important;
-  border-color: rgba(37, 99, 235, 0.55) !important;
   box-shadow:
-    inset 0 1.5px 4px rgba(37, 99, 235, 0.08),
+    inset 0 1px 3px rgba(37, 99, 235, 0.08),
     inset 0 -1px 0 rgba(255, 255, 255, 0.98),
-    0 0 0 3.5px rgba(37, 99, 235, 0.14),
-    0 6px 18px -4px rgba(37, 99, 235, 0.16) !important;
+    0 0 0 2.5px rgba(37, 99, 235, 0.26),
+    0 6px 18px -4px rgba(37, 99, 235, 0.14) !important;
 }
 html.dark #schoolDialog .school-search-wrap,
 html.dark .school-search-wrap,
 html.dark .search-box {
   background:
     linear-gradient(180deg, rgba(9, 14, 26, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.10) !important;
   box-shadow:
-    inset 0 2.5px 7px rgba(0, 0, 0, 0.52),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.10) !important;
+    inset 0 2px 6px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
 }
 html.dark #schoolDialog .school-search-wrap:focus-within,
 html.dark .school-search-wrap:focus-within,
 html.dark .search-box:focus-within {
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(30, 41, 59, 0.68) 100%) !important;
-  border-color: rgba(96, 165, 250, 0.55) !important;
   box-shadow:
-    inset 0 1.5px 4px rgba(0, 0, 0, 0.36),
-    0 0 0 3.5px rgba(59, 130, 246, 0.22) !important;
+    inset 0 1px 4px rgba(0, 0, 0, 0.36),
+    0 0 0 2.5px rgba(59, 130, 246, 0.34) !important;
 }
 
-/* 3. iOS 系统级背景环境光场（让全站毛玻璃与液态透镜始终有柔和色彩可折射） */
+/* 3. iOS 系统级背景环境光场（上部淡蓝灰大幅减淡，更清透均匀） */
 body::before {
   content: "";
   position: fixed;
@@ -10713,19 +10721,19 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(48vw 42vh at 14% 12%, rgba(59, 130, 246, 0.11) 0%, transparent 70%),
-    radial-gradient(42vw 38vh at 86% 18%, rgba(99, 102, 241, 0.09) 0%, transparent 72%),
-    radial-gradient(52vw 46vh at 72% 84%, rgba(14, 165, 233, 0.08) 0%, transparent 70%),
-    radial-gradient(38vw 34vh at 22% 82%, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+    radial-gradient(48vw 42vh at 14% 12%, rgba(59, 130, 246, 0.045) 0%, transparent 72%),
+    radial-gradient(42vw 38vh at 86% 18%, rgba(99, 102, 241, 0.035) 0%, transparent 74%),
+    radial-gradient(52vw 46vh at 72% 84%, rgba(14, 165, 233, 0.045) 0%, transparent 72%),
+    radial-gradient(38vw 34vh at 22% 82%, rgba(245, 158, 11, 0.03) 0%, transparent 72%);
 }
 html.dark body::before {
   background:
-    radial-gradient(50vw 44vh at 16% 14%, rgba(37, 99, 235, 0.18) 0%, transparent 70%),
-    radial-gradient(44vw 40vh at 84% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 72%),
-    radial-gradient(50vw 44vh at 68% 86%, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
+    radial-gradient(50vw 44vh at 16% 14%, rgba(37, 99, 235, 0.11) 0%, transparent 72%),
+    radial-gradient(44vw 40vh at 84% 20%, rgba(99, 102, 241, 0.09) 0%, transparent 74%),
+    radial-gradient(50vw 44vh at 68% 86%, rgba(14, 165, 233, 0.08) 0%, transparent 72%);
 }
 
-/* 4. 模仿 iOS CABackdropLayer 的高阶 GPU 多重折射层：浮层、顶栏、侧栏、底栏、弹窗 */
+/* 4. 模仿 iOS CABackdropLayer 的平滑 GPU 折射层（去掉 contrast() 避免圆角边缘黑线/亮晕抗锯齿畸变） */
 main > header,
 #sidebar,
 .mobile-tabbar,
@@ -10733,8 +10741,8 @@ dialog:not(#docDialog),
 .xz-select-menu,
 .sched-m-sticky,
 body.on-ai-page .ask .ask-input-wrap {
-  backdrop-filter: blur(36px) saturate(230%) contrast(1.04) brightness(1.02) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(230%) contrast(1.04) brightness(1.02) !important;
+  backdrop-filter: blur(28px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(185%) !important;
 }
 html.dark main > header,
 html.dark #sidebar,
@@ -10743,36 +10751,31 @@ html.dark dialog:not(#docDialog),
 html.dark .xz-select-menu,
 html.dark .sched-m-sticky,
 html.dark body.on-ai-page .ask .ask-input-wrap {
-  backdrop-filter: blur(36px) saturate(215%) contrast(1.06) brightness(0.97) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(215%) contrast(1.06) brightness(0.97) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
 }
 
-/* 5. 卡片与内容块统一开启高饱和 GPU 实时模糊折射（桌面 + 移动全量覆盖） */
+/* 5. 外层玻璃卡片平滑模糊（去掉内嵌子卡片的嵌套 backdrop-filter 与 contrast 畸变） */
 .panel,
 .welcome,
 .stats article,
-.notice-card,
-.taskrow,
-.user-row,
-#knowledgeGrid .knowledge-card,
 .sched-d-header,
 .sched-d-right-panel,
 .sched-today-card,
-.sched-lesson,
 .school-item {
-  backdrop-filter: blur(26px) saturate(205%) contrast(1.02) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(205%) contrast(1.02) !important;
+  backdrop-filter: blur(22px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%) !important;
 }
 
-/* 6. 滑动玻璃胶囊升级为双层镜面折射高光 */
+/* 6. 滑动玻璃胶囊：整数 1px 内高光 + 平滑模糊，消除圆角锯齿 */
 .lg-slide-pill.is-nav-glass {
-  backdrop-filter: blur(26px) saturate(225%) contrast(1.06) brightness(1.04) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(225%) contrast(1.06) brightness(1.04) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.78),
-    inset 0 -2px 5px rgba(21, 94, 239, 0.12),
-    0 6px 18px rgba(21, 94, 239, 0.16) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    inset 0 -2px 4px rgba(21, 94, 239, 0.10),
+    0 6px 16px rgba(21, 94, 239, 0.14) !important;
 }
 .lg-slide-pill.is-blue {
   box-shadow:
@@ -12019,50 +12022,62 @@ html.dark #auth .authbox #username,
 html.dark #auth .authbox #displayName,
 html.dark #auth .authbox #password { background:rgba(15,23,42,.62) !important; border-color:rgba(148,163,184,.22) !important; color:var(--ink); box-shadow:inset 0 1px 2px rgba(0,0,0,.16) !important; }
 
-/* 移动端：顶部蓝色弧面上移并加高，形成更完整的向下延展弧线 */
+/* 移动端：顶部蓝色弧面顶满最上方状态栏，并增大半圆直径、让弧线更舒展地向下延伸 */
 @media (max-width:1000px) {
-  #auth.auth { position:relative; isolation:isolate; overflow:hidden; grid-template-rows:auto 1fr; background:var(--bg); }
+  html:has(#auth:not(.hide)),
+  body:has(#auth:not(.hide)) {
+    background: linear-gradient(180deg, #0b2566 0%, #0b2566 190px, var(--bg) 190px) !important;
+  }
+  #auth.auth {
+    position:relative; isolation:isolate; overflow-x:clip; overflow-y:visible;
+    grid-template-columns:1fr !important; grid-template-rows:auto 1fr;
+    margin:0 !important; padding:0 !important;
+    background:var(--bg);
+  }
   #auth .hero {
     position:relative; z-index:0; overflow:hidden;
-    min-height:clamp(230px,31vh,290px);
-    padding:calc(18px + env(safe-area-inset-top,0px)) 22px 58px !important;
-    border-radius:0 0 50% 50% / 0 0 18% 18% !important;
+    width:124% !important; max-width:none !important; margin-left:-12% !important;
+    margin-top:calc(-1 * env(safe-area-inset-top, 0px)) !important;
+    min-height:clamp(295px, 39vh, 360px) !important;
+    padding:calc(36px + env(safe-area-inset-top, 0px)) calc(12% + 22px) 92px !important;
+    border:0 !important;
+    border-radius:0 0 50% 50% / 0 0 38% 38% !important;
     background:
-      radial-gradient(145% 138% at 50% -22%, rgba(147,197,253,.50) 0%, rgba(96,165,250,.22) 42%, transparent 72%),
-      radial-gradient(100% 90% at 88% 84%, rgba(99,102,241,.38) 0%, transparent 64%),
-      linear-gradient(150deg,#0b2566 0%,#1d4ed8 48%,#2563eb 76%,#4f46e5 100%) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.36),0 16px 34px rgba(37,99,235,.20) !important;
+      radial-gradient(145% 138% at 50% -22%, rgba(147,197,253,.42) 0%, rgba(96,165,250,.18) 42%, transparent 72%),
+      radial-gradient(100% 90% at 88% 84%, rgba(99,102,241,.36) 0%, transparent 64%),
+      linear-gradient(160deg,#0b2566 0%,#163ca3 34%,#1d4ed8 60%,#2563eb 82%,#4f46e5 100%) !important;
+    box-shadow:0 16px 36px rgba(37,99,235,.22) !important;
   }
   #auth .hero::before {
     content:""; position:absolute; z-index:-1; pointer-events:none;
-    width:150%; height:245%; left:50%; top:-174%; transform:translateX(-50%);
+    width:140%; height:240%; left:50%; top:-172%; transform:translateX(-50%);
     border-radius:50%;
-    background:radial-gradient(ellipse at 50% 54%,rgba(96,165,250,.30),rgba(37,99,235,.08) 56%,transparent 72%);
+    background:radial-gradient(ellipse at 50% 54%,rgba(96,165,250,.26),rgba(37,99,235,.06) 56%,transparent 72%);
   }
   #auth .hero .logo { margin:0 auto 10px; }
   #auth .hero h1 { margin:8px 0 5px; font-size:29px; letter-spacing:1px; }
   #auth .hero > p { margin:0; line-height:1.65; }
   #auth .authbox {
     z-index:2; width:min(460px,calc(100% - 32px));
-    margin:-34px auto calc(22px + env(safe-area-inset-bottom,0px)) !important;
+    margin:-54px auto calc(22px + env(safe-area-inset-bottom,0px)) !important;
     padding:25px 22px 23px !important; gap:15px;
     border-radius:26px !important;
     background:rgba(255,255,255,.88) !important;
-    backdrop-filter:blur(26px) saturate(185%) !important;
-    -webkit-backdrop-filter:blur(26px) saturate(185%) !important;
-    border:1px solid rgba(255,255,255,.88) !important;
-    box-shadow:0 18px 44px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.98) !important;
+    backdrop-filter:blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter:blur(24px) saturate(180%) !important;
+    border:0 !important;
+    box-shadow:0 18px 44px rgba(15,23,42,.12),0 0 0 1px rgba(255,255,255,.85),inset 0 1px 0 rgba(255,255,255,.98) !important;
   }
   #auth .authbox h2 { margin:2px 0 0; font-size:24px; letter-spacing:-.35px; }
   #auth .authbox > .muted { margin-top:-7px; line-height:1.6; }
   #auth .authbox #username,
   #auth .authbox #displayName,
   #auth .authbox #password { min-height:49px; height:49px; }
-  html.dark #auth .authbox { background:rgba(17,24,39,.88) !important; border-color:rgba(255,255,255,.12) !important; }
+  html.dark #auth .authbox { background:rgba(17,24,39,.88) !important; box-shadow:0 18px 44px rgba(0,0,0,.48),0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 rgba(255,255,255,.14) !important; }
 }
 @media (max-width:380px) {
   #auth .authbox { width:calc(100% - 24px); padding-inline:17px !important; }
-  #auth .hero { min-height:220px; }
+  #auth .hero { min-height:275px !important; }
 }
 
 /* v1.092 补充：桌面抓取提示 + 移动端优先保留纵向页面手势 */
@@ -12509,60 +12524,20 @@ html.dark .toolbar .pill {
 }
 
 
-/* ==================== v1.095 AI 聊天气泡结构修复 + 紫灰蓝界面协调 ==================== */
+/* ==================== v1.095 AI 聊天气泡结构修复（背景色回归与全站统一） ==================== */
 /* 只作用于 AI 页面；选择器严格匹配 app.js 实际生成的
    .bubble-wrap.msg-ai > .bubble.msg-ai 结构，避免旧版 .msg.ai .msg-bubble 规则漏命中。 */
-body.on-ai-page #aiPage {
-  --ai-tint: #f1eff8;
-  --ai-tint-soft: #f7f6fb;
-  --ai-line: rgba(117, 105, 153, .15);
-  --ai-shadow: 0 10px 28px rgba(61, 54, 92, .055);
-}
-html:not(.dark) body.on-ai-page #aiPage .chat {
-  background: #fbfaff !important;
-  border-color: rgba(129, 116, 166, .16) !important;
-  box-shadow: 0 12px 34px rgba(58, 49, 92, .055) !important;
-}
-html:not(.dark) body.on-ai-page #aiPage .chat-topbar {
-  background:
-    radial-gradient(ellipse at 4% 0%, rgba(151, 137, 184, .14), transparent 48%),
-    linear-gradient(110deg, #f5f3fa 0%, #f8f9fd 58%, #f3f6fc 100%) !important;
-  border-bottom-color: var(--ai-line) !important;
-}
-html:not(.dark) body.on-ai-page #aiPage .ai-options,
-html:not(.dark) body.on-ai-page #aiPage .suggestions-bar {
-  background: rgba(246, 245, 251, .92) !important;
-  border-bottom-color: var(--ai-line) !important;
-}
-html:not(.dark) body.on-ai-page #messages.messages {
-  background:
-    radial-gradient(ellipse at 0% 0%, rgba(157, 145, 190, .105), transparent 42%),
-    radial-gradient(ellipse at 100% 12%, rgba(119, 157, 210, .075), transparent 38%),
-    #f8f9fc !important;
-}
+html:not(.dark) body.on-ai-page #aiPage .chat,
 html.dark body.on-ai-page #aiPage .chat {
-  background: #111827 !important;
-  border-color: rgba(159, 146, 196, .16) !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
-html.dark body.on-ai-page #aiPage .chat-topbar {
-  background:
-    radial-gradient(ellipse at 4% 0%, rgba(128, 111, 174, .20), transparent 48%),
-    linear-gradient(110deg, #1b1b31 0%, #172033 62%, #142033 100%) !important;
-  border-bottom-color: rgba(180, 169, 211, .13) !important;
-}
-html.dark body.on-ai-page #aiPage .ai-options,
-html.dark body.on-ai-page #aiPage .suggestions-bar {
-  background: rgba(24, 29, 47, .96) !important;
-  border-bottom-color: rgba(180, 169, 211, .12) !important;
-}
+html:not(.dark) body.on-ai-page #messages.messages,
 html.dark body.on-ai-page #messages.messages {
-  background:
-    radial-gradient(ellipse at 0% 0%, rgba(128, 111, 174, .15), transparent 42%),
-    radial-gradient(ellipse at 100% 12%, rgba(66, 112, 169, .10), transparent 38%),
-    #101827 !important;
+  background: transparent !important;
 }
 
-/* 统一普通回复、流式生成中气泡与欢迎气泡的盒模型和宽度算法。 */
+/* 统一普通回复、流式生成中气泡与欢迎气泡的盒模型，并恢复 1090 左对齐。 */
 body.on-ai-page #messages.messages {
   min-width: 0 !important;
   box-sizing: border-box !important;
@@ -12570,11 +12545,11 @@ body.on-ai-page #messages.messages {
 }
 body.on-ai-page #messages > .bubble-wrap.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-user {
-  width: min(100%, 860px) !important;
-  max-width: 860px !important;
+  width: 100% !important;
+  max-width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
-  margin-inline: auto !important;
+  margin-inline: 0 !important;
 }
 body.on-ai-page #messages > .bubble-wrap.msg-ai {
   align-items: flex-start !important;
@@ -12689,10 +12664,10 @@ body.on-ai-page #messages .bubble-wrap.msg-ai {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: min(100%, 860px);
-  max-width: 860px;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
-  margin-inline: auto;
+  margin-inline: 0;
   box-sizing: border-box;
 }
 
@@ -12878,20 +12853,39 @@ html.dark body.on-ai-page #messages .welcome-foot {
   }
 }
 
-/* AI 页面使用与全站相同的底色变量；紫灰蓝只作为轻微氛围，不染色内容卡片 */
+/* AI 页面与全站保持一致的干净容器底色，消除色差 */
 body.on-ai-page #aiPage,
-body.on-ai-page #aiPage .chat {
-  background-color: var(--bg) !important;
+body.on-ai-page #aiPage .chat,
+html:not(.dark) body.on-ai-page #aiPage .chat,
+html.dark body.on-ai-page #aiPage .chat {
+  background: transparent !important;
+  background-image: none !important;
 }
-html:not(.dark) body.on-ai-page #aiPage .chat {
-  background-image:
-    radial-gradient(ellipse at 3% 0%, rgba(151,137,184,.075), transparent 38%),
-    radial-gradient(ellipse at 100% 8%, rgba(119,157,210,.045), transparent 34%) !important;
+body.on-ai-page #aiPage .chat {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(22px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%) !important;
 }
 html.dark body.on-ai-page #aiPage .chat {
-  background-image:
-    radial-gradient(ellipse at 3% 0%, rgba(128,111,174,.11), transparent 38%),
-    radial-gradient(ellipse at 100% 8%, rgba(66,112,169,.07), transparent 34%) !important;
+  background: rgba(17, 24, 39, 0.74) !important;
+}
+body.on-ai-page #aiPage .chat-topbar,
+body.on-ai-page #aiPage .ai-options,
+body.on-ai-page #aiPage .suggestions-bar {
+  background: rgba(255, 255, 255, 0.52) !important;
+}
+html.dark body.on-ai-page #aiPage .chat-topbar,
+html.dark body.on-ai-page #aiPage .ai-options,
+html.dark body.on-ai-page #aiPage .suggestions-bar {
+  background: rgba(15, 23, 42, 0.56) !important;
+}
+@media (max-width: 760px) {
+  body.on-ai-page #aiPage .chat,
+  html.dark body.on-ai-page #aiPage .chat {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
 
 /* 桌面登录页移除无语义的大型圆环装饰，保留原有蓝色品牌渐变与内容 */
@@ -12977,13 +12971,13 @@ html.dark #menu {
   border-radius: 999px !important;
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.76) 0%, rgba(240, 246, 255, 0.60) 100%) !important;
-  backdrop-filter: blur(28px) saturate(220%) contrast(1.03) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(220%) contrast(1.03) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.78) 0%, rgba(240, 246, 255, 0.62) 100%) !important;
+  backdrop-filter: blur(24px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(185%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
     0 0 0 1px rgba(255, 255, 255, 0.76),
-    0 12px 30px -6px rgba(15, 23, 42, 0.14) !important;
+    0 12px 28px -6px rgba(15, 23, 42, 0.14) !important;
 }
 .doc-back-top {
   border-radius: 50% !important;
@@ -12998,7 +12992,7 @@ html.dark #scrollBottomBtn {
     0 14px 34px -6px rgba(0, 0, 0, 0.50) !important;
 }
 
-/* 3. 统一全站遗漏按钮：待办删除钮 .task-del-btn、课表删除钮 .sched-clist-item .del 同步红宝石液态玻璃；
+/* 3. 统一全站遗漏按钮：待办删除钮 .task-del-btn、课表删除钮 .sched-clist-item .del 同步红宝石液态玻璃（去双边框防锯齿）；
       AI 解读钮 .ai-btn、周次方格 .sched-wk-btn、课表管理小卡 .sched-sub-card 同步 Layer 3 玻璃 */
 .task-del-btn,
 .sched-clist-item .del {
@@ -13012,15 +13006,18 @@ html.dark #scrollBottomBtn {
   place-items: center !important;
   opacity: 1 !important;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.34) !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
   background:
-    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.06) 46%, transparent 65%),
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 46%, transparent 65%),
     linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
   color: #ffffff !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
-    inset 0 -3px 8px rgba(127, 29, 29, 0.34),
-    0 6px 18px -4px rgba(220, 38, 38, 0.38) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -2px 6px rgba(127, 29, 29, 0.30),
+    0 0 0 1px rgba(220, 38, 38, 0.22),
+    0 6px 16px -4px rgba(220, 38, 38, 0.34) !important;
   transition: transform 0.16s var(--lg-spring, ease), box-shadow 0.16s ease, filter 0.16s ease !important;
 }
 .task-del-btn:hover,
@@ -13029,9 +13026,10 @@ html.dark #scrollBottomBtn {
   filter: brightness(1.06);
   color: #ffffff !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
-    inset 0 -3px 8px rgba(127, 29, 29, 0.38),
-    0 8px 22px -4px rgba(220, 38, 38, 0.48) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    inset 0 -2px 6px rgba(127, 29, 29, 0.34),
+    0 0 0 1px rgba(220, 38, 38, 0.28),
+    0 8px 20px -4px rgba(220, 38, 38, 0.42) !important;
 }
 .task-del-btn:active,
 .sched-clist-item .del:active {
@@ -13045,11 +13043,9 @@ html.dark #scrollBottomBtn {
   -webkit-background-clip: padding-box !important;
   background:
     radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, transparent 62%),
-    linear-gradient(180deg, rgba(245, 243, 255, 0.86) 0%, rgba(237, 233, 254, 0.68) 100%) !important;
-  backdrop-filter: blur(18px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(190%) !important;
+    linear-gradient(180deg, rgba(245, 243, 255, 0.88) 0%, rgba(237, 233, 254, 0.72) 100%) !important;
   box-shadow:
-    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
     0 0 0 1px rgba(124, 58, 237, 0.18),
     0 3px 10px -2px rgba(124, 58, 237, 0.12) !important;
 }
@@ -13057,7 +13053,7 @@ html.dark #scrollBottomBtn {
   filter: none;
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1.25px 0 rgba(255, 255, 255, 0.98),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
     0 0 0 1px rgba(124, 58, 237, 0.32),
     0 6px 16px -3px rgba(124, 58, 237, 0.18) !important;
 }
@@ -13079,11 +13075,9 @@ html.dark .ai-btn {
   -webkit-background-clip: padding-box !important;
   background:
     radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.72) 0%, transparent 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(241, 245, 249, 0.46) 100%) !important;
-  backdrop-filter: blur(18px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(190%) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(241, 245, 249, 0.50) 100%) !important;
   box-shadow:
-    inset 0 1.25px 0 rgba(255, 255, 255, 0.92),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
     0 0 0 1px rgba(15, 23, 42, 0.07),
     0 3px 10px -2px rgba(15, 23, 42, 0.06) !important;
 }
@@ -13160,7 +13154,7 @@ html.dark .xz-cal-pop {
   }
 }
 
-/* 统一待办“添加个人待办事项”、搜索待办等非 .search-box 文本输入框 → Layer 1 下挖凹陷玻璃胶囊 */
+/* 统一待办“添加个人待办事项”、搜索待办等非 .search-box 文本输入框 → Layer 1 下挖凹陷玻璃胶囊（去掉嵌套 backdrop-filter 防锯齿） */
 #newTaskTitle,
 #taskSearch.mini-input,
 .task-controls .mini-input,
@@ -13169,18 +13163,19 @@ html.dark .xz-cal-pop {
   border-radius: 999px !important;
   padding: 9px 16px !important;
   background:
-    linear-gradient(180deg, rgba(203, 213, 225, 0.36) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
-  backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) contrast(1.03) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    linear-gradient(180deg, rgba(203, 213, 225, 0.34) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
   box-shadow:
-    inset 0 2.5px 6px rgba(15, 23, 42, 0.10),
-    inset 0 1px 2px rgba(15, 23, 42, 0.06),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.94),
-    0 1px 0 rgba(255, 255, 255, 0.72) !important;
+    inset 0 2px 5px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(15, 23, 42, 0.07) !important;
   color: var(--ink) !important;
   outline: none;
-  transition: background 0.24s ease, border-color 0.24s ease, box-shadow 0.24s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+  transition: background 0.24s ease, box-shadow 0.24s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
 }
 #newTaskTitle:focus,
 #taskSearch.mini-input:focus,
@@ -13188,12 +13183,11 @@ html.dark .xz-cal-pop {
 .sched-field input:not([type="checkbox"]):not([type="radio"]):focus {
   background:
     linear-gradient(180deg, rgba(241, 245, 249, 0.72) 0%, rgba(255, 255, 255, 0.88) 100%) !important;
-  border-color: rgba(37, 99, 235, 0.55) !important;
   box-shadow:
-    inset 0 1.5px 4px rgba(37, 99, 235, 0.08),
+    inset 0 1px 3px rgba(37, 99, 235, 0.08),
     inset 0 -1px 0 rgba(255, 255, 255, 0.98),
-    0 0 0 3.5px rgba(37, 99, 235, 0.14),
-    0 6px 18px -4px rgba(37, 99, 235, 0.16) !important;
+    0 0 0 2.5px rgba(37, 99, 235, 0.26),
+    0 6px 18px -4px rgba(37, 99, 235, 0.14) !important;
 }
 html.dark #newTaskTitle,
 html.dark #taskSearch.mini-input,
@@ -13201,10 +13195,10 @@ html.dark .task-controls .mini-input,
 html.dark .sched-field input:not([type="checkbox"]):not([type="radio"]) {
   background:
     linear-gradient(180deg, rgba(9, 14, 26, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.10) !important;
   box-shadow:
-    inset 0 2.5px 7px rgba(0, 0, 0, 0.52),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.10) !important;
+    inset 0 2px 6px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
   color: var(--ink) !important;
 }
 html.dark #newTaskTitle:focus,
@@ -13213,13 +13207,12 @@ html.dark .task-controls .mini-input:focus,
 html.dark .sched-field input:not([type="checkbox"]):not([type="radio"]):focus {
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(30, 41, 59, 0.68) 100%) !important;
-  border-color: rgba(96, 165, 250, 0.55) !important;
   box-shadow:
-    inset 0 1.5px 4px rgba(0, 0, 0, 0.36),
-    0 0 0 3.5px rgba(59, 130, 246, 0.22) !important;
+    inset 0 1px 4px rgba(0, 0, 0, 0.36),
+    0 0 0 2.5px rgba(59, 130, 246, 0.34) !important;
 }
 
-/* “选择日期（选填）”触发按钮 .xz-date-trigger → 同步 .xz-select-trigger Layer 3 通透玻璃胶囊 */
+/* “选择日期（选填）”触发按钮 .xz-date-trigger → 同步 .xz-select-trigger Layer 3 通透玻璃胶囊（无嵌套模糊畸变） */
 .xz-date-trigger {
   min-height: 42px !important;
   padding: 0 14px !important;
@@ -13229,29 +13222,29 @@ html.dark .sched-field input:not([type="checkbox"]):not([type="radio"]):focus {
   -webkit-background-clip: padding-box !important;
   background:
     radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, transparent 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(241, 245, 249, 0.46) 100%) !important;
-  backdrop-filter: blur(18px) saturate(195%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(195%) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(241, 245, 249, 0.50) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   box-shadow:
-    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
     0 0 0 1px rgba(15, 23, 42, 0.08),
     0 3px 10px -2px rgba(15, 23, 42, 0.06) !important;
 }
 .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger {
   box-shadow:
-    inset 0 1.25px 0 rgba(255, 255, 255, 0.98),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
     0 0 0 2px rgba(37, 99, 235, 0.24),
     0 6px 16px -3px rgba(37, 99, 235, 0.14) !important;
 }
 html.dark .xz-date-trigger {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.66) 0%, rgba(15, 23, 42, 0.54) 100%) !important;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.68) 0%, rgba(15, 23, 42, 0.56) 100%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
     0 0 0 1px rgba(255, 255, 255, 0.11),
     0 4px 12px rgba(0, 0, 0, 0.30) !important;
 }
 
-/* 5. AI 输入舱 .ask .ask-input-wrap：移除底栏实底遮挡，恢复与全站悬浮胶囊一致的 Layer 4 通透折射玻璃 */
+/* 5. AI 输入舱 .ask .ask-input-wrap：移除底栏实底遮挡，恢复 Layer 4 平滑折射玻璃（去掉 contrast 边缘锯齿） */
 body.on-ai-page .ask,
 html.dark body.on-ai-page .ask {
   background: transparent !important;
@@ -13261,27 +13254,43 @@ body.on-ai-page .ask .ask-input-wrap {
   border: 0 !important;
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.66) 0%, rgba(240, 246, 255, 0.46) 100%) !important;
-  backdrop-filter: blur(36px) saturate(230%) contrast(1.04) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(230%) contrast(1.04) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.68) 0%, rgba(240, 246, 255, 0.48) 100%) !important;
+  backdrop-filter: blur(28px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(185%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
     0 0 0 1px rgba(255, 255, 255, 0.78),
-    0 16px 40px -8px rgba(15, 23, 42, 0.14) !important;
+    0 14px 36px -8px rgba(15, 23, 42, 0.12) !important;
 }
 body.on-ai-page .ask .ask-input-wrap:focus-within {
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
     0 0 0 2px rgba(37, 99, 235, 0.28),
-    0 16px 42px -8px rgba(37, 99, 235, 0.20) !important;
+    0 16px 40px -8px rgba(37, 99, 235, 0.18) !important;
 }
 html.dark body.on-ai-page .ask .ask-input-wrap {
   background: linear-gradient(155deg, rgba(24, 33, 52, 0.74) 0%, rgba(15, 23, 42, 0.62) 100%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
     0 0 0 1px rgba(255, 255, 255, 0.11),
-    0 16px 42px -8px rgba(0, 0, 0, 0.54) !important;
+    0 16px 40px -8px rgba(0, 0, 0, 0.50) !important;
+}
+
+/* 6. 修复移动端/桌面端卡片嵌套 backdrop-filter 导致圆角锯齿或矩形模糊框的问题 */
+.panel .taskrow,
+.panel .user-row,
+.panel .notice-card,
+.panel .sched-lesson,
+.panel .sched-clist-item,
+.panel .pill-btn:not(.active),
+.panel .outline,
+.panel .secondary,
+.notice-card .outline,
+.notice-card .ai-btn,
+.knowledge-card .outline,
+.knowledge-card .ai-btn {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 body.on-ai-page .ask #askSubmitBtn.is-idle {
   background: rgba(15, 23, 42, 0.07) !important;

@@ -8162,3 +8162,85 @@ html.dark .msg-avatar.ai {
   }
   .sched-tt-grid { grid-template-columns: 1fr; }
 }
+
+
+/* 紧凑课表控件不受全局 button{min-height:40px} 拉伸 */
+#schedulePage .sched-step-btn,
+#schedulePage .sched-m-ibtn,
+#schedulePage .sched-week-chip,
+#schedulePage .sched-date-chip,
+#schedulePage .sched-seg-btn,
+#schedulePage .sched-ai-chip,
+.sched-clist-item .del {
+  min-height: 0;
+}
+
+/* ==================== 超级课表深色模式适配（html.dark） ==================== */
+html.dark .sched-m-cell:hover {
+  background: rgba(59, 130, 246, .10);
+}
+html.dark .sched-m-cell.today {
+  background: rgba(59, 130, 246, .08);
+}
+html.dark .sched-hero {
+  background: linear-gradient(135deg, #1b2544 0%, #151c33 60%, #1d1b38 100%);
+  border-color: rgba(91, 140, 255, .28);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .32);
+}
+html.dark .sched-hero::before {
+  background: radial-gradient(circle, rgba(91, 140, 255, .26), transparent 65%);
+}
+html.dark .sched-hero.empty {
+  background: linear-gradient(135deg, #161d2f 0%, #111827 100%);
+  border-color: var(--line);
+}
+html.dark .sched-hero-tag,
+html.dark .sched-hero-endtime {
+  background: rgba(59, 130, 246, .16);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, .32);
+}
+html.dark .sched-hero-count .num {
+  background: linear-gradient(135deg, #93c5fd, #c4b5fd);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+html.dark .sched-lesson.active {
+  border-color: rgba(91, 140, 255, .55);
+  background: linear-gradient(135deg, rgba(59, 130, 246, .16), rgba(59, 130, 246, .04));
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .28);
+}
+html.dark .sched-btn-danger {
+  background: rgba(239, 68, 68, .15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, .32);
+}
+html.dark .sched-btn-danger:hover {
+  background: rgba(239, 68, 68, .24);
+}
+html.dark .sched-season-badge.is-winter {
+  background: rgba(14, 165, 233, .16);
+  color: #38bdf8;
+  border-color: rgba(14, 165, 233, .32);
+}
+html.dark .sched-ai-chip:hover {
+  background: rgba(59, 130, 246, .24);
+}
+html.dark .sched-m-sticky {
+  background: var(--header-bg);
+}
+html.dark .sched-date-chip.on.today::before {
+  background: var(--card);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, .35);
+}
+html.dark .sched-field input,
+html.dark .sched-field select {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html.dark .sched-clist-item .del:hover {
+  background: rgba(239, 68, 68, .18);
+  color: #fca5a5;
+}

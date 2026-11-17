@@ -11296,3 +11296,370 @@ html.dark .authbox {
     0 0 0 1px rgba(255, 255, 255, 0.10),
     0 18px 46px -10px rgba(0, 0, 0, 0.50) !important;
 }
+
+
+/* ==================== v1.089 圆环、进度线、聊天气泡、输入框及全站白色卡片强存在感液态玻璃 ==================== */
+
+/* 1. 数据统计圆环 .stat-ring：悬浮中心磨砂圆盘 + 蓝宝石发光圆弧 */
+.stat-ring {
+  border-radius: 50% !important;
+  padding: 6px;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.42) 0%, rgba(226, 232, 240, 0.22) 100%) !important;
+  box-shadow:
+    inset 0 2px 6px rgba(15, 23, 42, 0.06),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.90),
+    0 8px 24px -6px rgba(37, 99, 235, 0.14) !important;
+}
+.stat-ring .ring-track {
+  stroke: rgba(148, 163, 184, 0.24) !important;
+}
+.stat-ring .ring-fill {
+  stroke: #2563eb !important;
+  filter: drop-shadow(0 0 7px rgba(37, 99, 235, 0.42)) !important;
+}
+.stat-ring .ring-label {
+  inset: 24px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 246, 255, 0.66) 100%) !important;
+  backdrop-filter: blur(22px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(200%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 3px rgba(15, 23, 42, 0.05),
+    0 6px 18px -4px rgba(15, 23, 42, 0.10) !important;
+}
+html.dark .stat-ring {
+  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.56) 0%, rgba(15, 23, 42, 0.42) 100%) !important;
+}
+html.dark .stat-ring .ring-label {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.70) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 20px rgba(0, 0, 0, 0.40) !important;
+}
+
+/* 2. 数据统计“任务构成”进度线 & 进度条：凹陷玻璃槽 + 立体光泽分段条 */
+.stat-bar-track,
+.progress-track {
+  height: 11px !important;
+  padding: 1.5px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(203, 213, 225, 0.36) !important;
+  backdrop-filter: blur(14px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(170%) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(15, 23, 42, 0.10),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88) !important;
+}
+.stat-bar-fill,
+.progress-fill {
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.55),
+    0 2px 8px rgba(15, 23, 42, 0.14) !important;
+}
+html.dark .stat-bar-track,
+html.dark .progress-track {
+  background: rgba(9, 14, 26, 0.58) !important;
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 3. 数据统计子卡片（账号总数/任务总数/制度库/任务构成）升级为高存在感液态玻璃卡 */
+.stat-metric,
+.stat-bars {
+  border: 0 !important;
+  border-radius: 18px !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.72) 0%, rgba(241, 246, 255, 0.54) 100%) !important;
+  backdrop-filter: blur(24px) saturate(205%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(205%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 8px 22px -6px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark .stat-metric,
+html.dark .stat-bars {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.62) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 10px 24px -6px rgba(0, 0, 0, 0.40) !important;
+}
+
+/* 4. AI 聊天气泡、欢迎卡片内4小卡、底部提示条、AI 聊天输入框 */
+.bubble,
+.bubble.msg-ai,
+.welcome-bubble {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.78) 0%, rgba(240, 246, 255, 0.60) 100%) !important;
+  backdrop-filter: blur(28px) saturate(215%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(215%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.03),
+    0 0 0 1px rgba(255, 255, 255, 0.76),
+    0 14px 34px -10px rgba(15, 23, 42, 0.10) !important;
+}
+html.dark .bubble,
+html.dark .bubble.msg-ai,
+html.dark .welcome-bubble {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.76) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 14px 34px -10px rgba(0, 0, 0, 0.45) !important;
+}
+.msg.me .bubble,
+.bubble.msg-me {
+  border: 0 !important;
+  background:
+    radial-gradient(125% 90% at 24% 0%, rgba(255, 255, 255, 0.34) 0%, transparent 62%),
+    linear-gradient(155deg, #3b82f6 0%, #2563eb 56%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.48),
+    0 10px 26px -6px rgba(37, 99, 235, 0.36) !important;
+}
+.welcome-item {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.70) 0%, rgba(241, 245, 249, 0.52) 100%) !important;
+  backdrop-filter: blur(18px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(190%) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 6px 16px -4px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .welcome-item {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.68) 0%, rgba(15, 23, 42, 0.56) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.09) !important;
+}
+.welcome-foot {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(226, 232, 240, 0.42) !important;
+  backdrop-filter: blur(14px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(175%) !important;
+  box-shadow:
+    inset 0 1.5px 3px rgba(15, 23, 42, 0.06),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.86) !important;
+}
+html.dark .welcome-foot {
+  background: rgba(15, 23, 42, 0.52) !important;
+  box-shadow: inset 0 1.5px 4px rgba(0, 0, 0, 0.36) !important;
+}
+.ask .ask-input-wrap,
+body.on-ai-page .ask .ask-input-wrap {
+  border: 0 !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 255, 0.64) 100%) !important;
+  backdrop-filter: blur(32px) saturate(225%) contrast(1.03) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(225%) contrast(1.03) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.78),
+    0 14px 36px -8px rgba(15, 23, 42, 0.14) !important;
+}
+html.dark .ask .ask-input-wrap,
+html.dark body.on-ai-page .ask .ask-input-wrap {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.80) 0%, rgba(15, 23, 42, 0.72) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 14px 38px -8px rgba(0, 0, 0, 0.50) !important;
+}
+
+/* 5. 全站所有普通白色卡片统一增强通透度与镜面高光存在感 */
+.panel,
+.welcome,
+.stats article,
+.notice-card,
+.taskrow,
+.user-row,
+#knowledgeGrid .knowledge-card,
+.sched-today-card,
+.sched-lesson,
+.sched-clist-item,
+.school-item,
+.sched-d-header,
+.sched-d-right-panel {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.72) 0%, rgba(243, 247, 255, 0.56) 100%) !important;
+  backdrop-filter: blur(26px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(210%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.03),
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 12px 30px -8px rgba(15, 23, 42, 0.09) !important;
+}
+html.dark .panel,
+html.dark .welcome,
+html.dark .stats article,
+html.dark .notice-card,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark .sched-today-card,
+html.dark .sched-lesson,
+html.dark .sched-clist-item,
+html.dark .school-item,
+html.dark .sched-d-header,
+html.dark .sched-d-right-panel {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.62) 100%) !important;
+}
+
+
+/* ==================== v1.090 全站下拉菜单、日历弹层、附件菜单及选中项强存在感液态玻璃 ==================== */
+
+/* 1. 下拉触发按钮 .xz-select-btn：通透玻璃胶囊 */
+.xz-select-btn {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(241, 245, 249, 0.46) 100%) !important;
+  backdrop-filter: blur(18px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(195%) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 3px 10px -2px rgba(15, 23, 42, 0.06) !important;
+}
+.xz-select.open .xz-select-btn {
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 2px rgba(37, 99, 235, 0.24),
+    0 6px 16px -3px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark .xz-select-btn {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.66) 0%, rgba(15, 23, 42, 0.54) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 4px 12px rgba(0, 0, 0, 0.30) !important;
+}
+
+/* 2. 全站弹出浮层（下拉菜单 .xz-select-menu、日历弹层 .xz-cal-pop、AI附件菜单 .ask-attach-pop） */
+.xz-select-menu,
+.xz-cal-pop,
+.ask-attach-pop {
+  border: 0 !important;
+  border-radius: 22px !important;
+  padding: 6px !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.78) 0%, rgba(240, 246, 255, 0.62) 100%) !important;
+  backdrop-filter: blur(34px) saturate(230%) contrast(1.04) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(230%) contrast(1.04) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.76),
+    0 18px 44px -8px rgba(15, 23, 42, 0.18) !important;
+}
+.xz-cal-pop {
+  padding: 14px !important;
+}
+html.dark .xz-select-menu,
+html.dark .xz-cal-pop,
+html.dark .ask-attach-pop {
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.82) 0%, rgba(15, 23, 42, 0.74) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 20px 46px -8px rgba(0, 0, 0, 0.54) !important;
+}
+
+/* 3. 下拉选项 .xz-select-opt：未选中悬停为轻度凹陷毛玻璃，选中项为悬浮液态玻璃胶囊 */
+.xz-select-opt {
+  border-radius: 999px !important;
+  padding: 8px 12px !important;
+  transition: background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease !important;
+}
+.xz-select-opt:not(.active):hover,
+.ask-attach-opt:hover {
+  background: linear-gradient(180deg, rgba(203, 213, 225, 0.24) 0%, rgba(241, 245, 249, 0.38) 100%) !important;
+  box-shadow:
+    inset 0 1.5px 3px rgba(15, 23, 42, 0.05),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.80) !important;
+}
+.xz-select-opt.active {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.82) 0%, transparent 62%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(99, 102, 241, 0.10)) !important;
+  color: var(--blue) !important;
+  font-weight: 700 !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 4px 12px -2px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark .xz-select-opt:not(.active):hover,
+html.dark .ask-attach-opt:hover {
+  background: linear-gradient(180deg, rgba(9, 14, 26, 0.38) 0%, rgba(15, 23, 42, 0.28) 100%) !important;
+  box-shadow: inset 0 1.5px 4px rgba(0, 0, 0, 0.34) !important;
+}
+html.dark .xz-select-opt.active {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.18) 0%, transparent 62%),
+    linear-gradient(135deg, rgba(59, 130, 246, 0.30), rgba(99, 102, 241, 0.20)) !important;
+  color: #93c5fd !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(96, 165, 250, 0.30) !important;
+}
+
+/* 4. 日历弹层日期格 & 高校弹窗选中行 & 悬浮回到底部按钮：同步液态玻璃选中态 */
+.xz-cal-day {
+  border-radius: 50% !important;
+}
+.xz-cal-day.selected {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.36) 0%, transparent 62%),
+    linear-gradient(160deg, #3b82f6 0%, #2563eb 56%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    0 4px 12px rgba(37, 99, 235, 0.34) !important;
+}
+.xz-cal-day.today:not(.selected) {
+  background: rgba(37, 99, 235, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(37, 99, 235, 0.26) !important;
+}
+.school-item.active,
+.school-item.selected {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.82) 0%, transparent 62%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(99, 102, 241, 0.08)) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(37, 99, 235, 0.26),
+    0 6px 16px -4px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark .school-item.active,
+html.dark .school-item.selected {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.26), rgba(99, 102, 241, 0.16)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(96, 165, 250, 0.34) !important;
+}
+#scrollBottomBtn,
+.toast {
+  border: 0 !important;
+  border-radius: 999px !important;
+  backdrop-filter: blur(28px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(220%) !important;
+}

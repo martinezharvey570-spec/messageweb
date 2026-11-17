@@ -1,4 +1,4 @@
-const CACHE_NAME = "xiaowu-zhili-v93";
+const CACHE_NAME = "xiaowu-zhili-v95";
 const ASSETS = [
   "/",
   "/index.html",

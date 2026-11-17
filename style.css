@@ -10609,11 +10609,16 @@ main > header,
   transform: none !important;
   filter: none !important;
 }
-.lg-slide-host > .lg-slide-item.is-pressing {
+.lg-slide-host > .lg-slide-item.active.is-pressing,
+.lg-slide-host > .lg-slide-item.on.is-pressing,
+.lg-slide-host > .lg-slide-item.selected.is-pressing {
   transform: scale3d(0.965, 0.965, 1) !important;
 }
-.lg-slide-host > .lg-slide-item:not(.active):not(.on):not(.selected).is-pressing {
-  opacity: 0.72;
+/* 未选中项按压时不预先变暗，避免造成视觉误判 */
+.lg-slide-host > .lg-slide-item:not(.active):not(.on):not(.selected).is-pressing,
+.lg-slide-host > .lg-slide-item:not(.active):not(.on):not(.selected):active {
+  opacity: 1 !important;
+  background: transparent !important;
 }
 
 
@@ -10856,4 +10861,438 @@ dialog:not(#docDialog) .actions button,
 .md-table-wrap,
 .doc-paper .doc-table {
   border-radius: 18px !important;
+}
+
+
+/* ==================== v1.084 侧边栏折叠液态玻璃横向胶囊 & 消除点击变暗误判 ==================== */
+/* 1. 电脑端“折叠收起侧边栏”按钮：44×28 横向液态玻璃胶囊（非圆润正方形、非正圆），契合全站苹果液态玻璃语言 */
+@media (min-width: 761px) {
+  #desktopSidebarToggle.desktop-rail-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    margin-left: auto !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background:
+      radial-gradient(120% 90% at 24% 8%, rgba(255, 255, 255, 0.92) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(241, 245, 249, 0.68) 100%) !important;
+    backdrop-filter: blur(22px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.92) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      inset 0 -1px 2px rgba(15, 23, 42, 0.05),
+      0 4px 12px -2px rgba(15, 23, 42, 0.10) !important;
+    color: var(--ink) !important;
+    transition:
+      transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      color 0.18s ease !important;
+  }
+  #desktopSidebarToggle.desktop-rail-toggle .ico {
+    width: 17px !important;
+    height: 17px !important;
+  }
+  #desktopSidebarToggle.desktop-rail-toggle:hover {
+    color: var(--blue) !important;
+    border-color: rgba(37, 99, 235, 0.28) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      0 6px 16px -3px rgba(37, 99, 235, 0.18) !important;
+    transform: translateY(-1px);
+  }
+  #desktopSidebarToggle.desktop-rail-toggle:active {
+    transform: scale3d(0.94, 0.94, 1) !important;
+  }
+  html.dark #desktopSidebarToggle.desktop-rail-toggle {
+    background:
+      radial-gradient(120% 90% at 24% 8%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 4px 14px rgba(0, 0, 0, 0.36) !important;
+    color: #e2e8f0 !important;
+  }
+  html.dark #desktopSidebarToggle.desktop-rail-toggle:hover {
+    color: #93c5fd !important;
+    border-color: rgba(96, 165, 250, 0.36) !important;
+  }
+  body.sidebar-collapsed #desktopSidebarToggle.desktop-rail-toggle {
+    margin: 0 auto !important;
+    width: 44px !important;
+    height: 28px !important;
+  }
+}
+
+/* 2. 桌面侧边栏悬停态：轻度“向下挖”凹陷毛玻璃效果（柔和指示鼠标当前位置，不抢夺选中胶囊焦点） */
+#sidebar.lg-slide-host > .nav:not(.active):hover,
+#sidebar .sidebottom button:hover {
+  background: linear-gradient(180deg, rgba(203, 213, 225, 0.22) 0%, rgba(241, 245, 249, 0.36) 100%) !important;
+  backdrop-filter: blur(14px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(165%) !important;
+  box-shadow:
+    inset 0 1.5px 3.5px rgba(15, 23, 42, 0.055),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.78) !important;
+}
+html.dark #sidebar.lg-slide-host > .nav:not(.active):hover,
+html.dark #sidebar .sidebottom button:hover {
+  background: linear-gradient(180deg, rgba(9, 14, 26, 0.34) 0%, rgba(15, 23, 42, 0.24) 100%) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+#sidebar.lg-slide-host > .nav:not(.active):active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+/* ==================== v1.086 消除抗锯齿边缘畸变（去双环叠边）& 课表真透亮液态玻璃 ==================== */
+
+/* 1. 解除 .panel / .sched-d-header 等外层容器的 isolation: isolate，避免嵌套 backdrop-filter 失效导致按钮变假 */
+.panel,
+.welcome,
+.sched-d-header,
+.sched-d-right-panel,
+.sched-today-card,
+.sched-m-sticky {
+  isolation: auto !important;
+}
+
+/* 2. 消除圆角胶囊“半透明border + inset 1px”双层叠边导致的 Skia 抗锯齿黑边/白晕畸变，改用 border:0 + 单层零渗色 box-shadow 细线 */
+button.primary,
+.sched-btn-primary,
+.sched-m-ibtn.is-primary,
+.lg-slide-pill.is-blue {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background:
+    radial-gradient(125% 90% at 24% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 68%),
+    linear-gradient(160deg, #3b82f6 0%, #2563eb 56%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.48),
+    inset 0 -2px 6px rgba(15, 23, 42, 0.18),
+    0 0 0 1px rgba(37, 99, 235, 0.20),
+    0 8px 18px -4px rgba(37, 99, 235, 0.34) !important;
+}
+
+/* 3. 次级玻璃按钮与桌面端超级课表按钮：去掉假白的 92% 不透明塑料感，改为真实通透毛玻璃折射 + 零锯齿外环 */
+button.secondary,
+button.outline,
+.sched-btn-ghost,
+.pill:not(.active),
+.pill-btn:not(.active),
+.quick,
+.bubble-tools button,
+.todo-action-btn,
+.icon-btn,
+.chat-top-actions button,
+.sched-m-ibtn:not(.is-primary),
+.sched-step-btn,
+.dialoghead button,
+.doc-tool-btn,
+.doc-m-btn:not(.is-ai),
+#schedulePage .sched-week-chip:not(.on),
+#schedulePage .sched-date-chip:not(.on):not(.today) {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56) 0%, rgba(241, 245, 249, 0.42) 100%) !important;
+  backdrop-filter: blur(18px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(190%) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 2px rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(15, 23, 42, 0.07),
+    0 3px 10px -2px rgba(15, 23, 42, 0.06) !important;
+}
+button.secondary:hover,
+button.outline:hover,
+.sched-btn-ghost:hover,
+.sched-step-btn:hover,
+#schedulePage .sched-week-chip:not(.on):hover,
+#schedulePage .sched-date-chip:not(.on):not(.today):hover {
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74) 0%, rgba(239, 246, 255, 0.60) 100%) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 6px 16px -3px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark button.secondary,
+html.dark button.outline,
+html.dark .sched-btn-ghost,
+html.dark .pill:not(.active),
+html.dark .pill-btn:not(.active),
+html.dark .quick,
+html.dark .bubble-tools button,
+html.dark .todo-action-btn,
+html.dark .icon-btn,
+html.dark .chat-top-actions button,
+html.dark .sched-m-ibtn:not(.is-primary),
+html.dark .sched-step-btn,
+html.dark .dialoghead button,
+html.dark .doc-tool-btn,
+html.dark .doc-m-btn:not(.is-ai),
+html.dark #schedulePage .sched-week-chip:not(.on),
+html.dark #schedulePage .sched-date-chip:not(.on):not(.today) {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(30, 41, 59, 0.58) 0%, rgba(15, 23, 42, 0.46) 100%) !important;
+  backdrop-filter: blur(18px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(185%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* 4. 课表周切换器槽位（#schedPrevWeek / #schedNextWeek 外框 .sched-week-stepper）同样改为通透无锯齿凹槽 */
+.sched-week-stepper,
+.sched-d-seg,
+.sched-m-seg,
+.ai-seg {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background: rgba(226, 232, 240, 0.46) !important;
+  backdrop-filter: blur(18px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(185%) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88),
+    0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .sched-week-stepper,
+html.dark .sched-d-seg,
+html.dark .sched-m-seg,
+html.dark .ai-seg {
+  background: rgba(15, 23, 42, 0.52) !important;
+  box-shadow:
+    inset 0 1.5px 5px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+
+
+/* ==================== v1.087 修复移动端当天日期胶囊变圆Bug & 全站抗锯齿边缘精修 ==================== */
+
+/* 1. 修复 #schedDateStrip 中滑动胶囊变成圆形的 Bug：与周一~周日保持一致的 16px 圆角矩形 */
+#schedDateStrip > .lg-slide-pill {
+  border-radius: 16px !important;
+}
+#schedDateStrip .sched-date-chip,
+#schedDateStrip .sched-date-chip.today {
+  border-radius: 16px !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+}
+#schedDateStrip .sched-date-chip.today:not(.on) {
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.80) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(219, 234, 254, 0.65) 0%, rgba(239, 246, 255, 0.52) 100%) !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 3px 10px -2px rgba(37, 99, 235, 0.12) !important;
+}
+html.dark #schedDateStrip .sched-date-chip.today:not(.on) {
+  background: linear-gradient(180deg, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.50) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(96, 165, 250, 0.34) !important;
+}
+
+/* 2. 修复移动端顶栏右上角头像按钮多出一截空白椭圆的问题，与左侧深色切换按钮同为 38×38 正圆 */
+@media (max-width: 960px) {
+  #userProfileBtn.user {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+/* 3. 全站卡片与浮层统一采用 border:0 + padding-box + 单层box-shadow细线，彻底消除圆角抗锯齿黑边与角部毛刺 */
+.panel,
+.welcome,
+.stats article,
+.notice-card,
+.taskrow,
+.user-row,
+#knowledgeGrid .knowledge-card,
+.sched-today-card,
+.sched-lesson,
+.sched-clist-item,
+.welcome-item,
+.school-item,
+.sched-d-header,
+.sched-d-right-panel {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  box-shadow:
+    inset 0 1.25px 0 rgba(255, 255, 255, 0.94),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.03),
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 10px 28px -8px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark .panel,
+html.dark .welcome,
+html.dark .stats article,
+html.dark .notice-card,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark .sched-today-card,
+html.dark .sched-lesson,
+html.dark .sched-clist-item,
+html.dark .welcome-item,
+html.dark .school-item,
+html.dark .sched-d-header,
+html.dark .sched-d-right-panel {
+  border: 0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 12px 30px -8px rgba(0, 0, 0, 0.44) !important;
+}
+
+/* 4. 移动端悬浮底栏、顶栏与弹窗同样消除双环叠边，保持 38px 超高饱和抗锯齿折射 */
+.mobile-tabbar,
+main > header,
+dialog:not(#docDialog) {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+}
+.mobile-tabbar {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 16px 40px -8px rgba(15, 23, 42, 0.18) !important;
+}
+html.dark .mobile-tabbar {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 16px 42px -8px rgba(0, 0, 0, 0.52) !important;
+}
+
+
+/* ==================== v1.088 登录页蓝宝石液态玻璃背景 & 登录/注册等分胶囊修复 ==================== */
+
+/* 1. 恢复登录页 .auth .hero 蓝宝石液态玻璃背景（高对比白字 + 多层宝石折射高光） */
+.auth .hero,
+html.dark .auth .hero {
+  background:
+    radial-gradient(110% 85% at 18% 8%, rgba(147, 197, 253, 0.42) 0%, transparent 54%),
+    radial-gradient(95% 85% at 88% 85%, rgba(99, 102, 241, 0.46) 0%, transparent 58%),
+    radial-gradient(60% 50% at 50% 42%, rgba(56, 189, 248, 0.22) 0%, transparent 64%),
+    linear-gradient(150deg, #0b2566 0%, #1d4ed8 46%, #2563eb 72%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -18px 40px rgba(10, 22, 62, 0.34),
+    0 16px 40px -10px rgba(21, 94, 239, 0.32) !important;
+}
+.auth .hero h1 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(10, 22, 62, 0.26);
+}
+.auth .hero > p {
+  color: rgba(224, 242, 254, 0.92) !important;
+}
+.auth .hero small {
+  color: #bae6fd !important;
+}
+.auth .hero .hero-list p {
+  background: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 0 0 1px rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* 2. 修复登录/注册 .authbox .tabs 按钮被挤成小椭圆的 Bug，改为 1:1 等分胶囊槽 */
+.authbox .tabs {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  border-bottom: 0 !important;
+  border: 0 !important;
+  background: rgba(226, 232, 240, 0.52) !important;
+  box-shadow:
+    inset 0 1.5px 4px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.88),
+    0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .authbox .tabs {
+  background: rgba(15, 23, 42, 0.58) !important;
+  box-shadow:
+    inset 0 1.5px 5px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+.authbox .tabs button {
+  width: 100% !important;
+  min-height: 40px !important;
+  padding: 9px 16px !important;
+  margin: 0 !important;
+  border-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+}
+.authbox .tabs button.selected {
+  color: #ffffff !important;
+  border-bottom: 0 !important;
+}
+
+/* 3. 登录主卡 .authbox 与输入框在蓝宝石背景下的通透边缘防锯齿 */
+.authbox {
+  border: 0 !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 18px 44px -10px rgba(15, 23, 42, 0.16) !important;
+}
+html.dark .authbox {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 18px 46px -10px rgba(0, 0, 0, 0.50) !important;
 }

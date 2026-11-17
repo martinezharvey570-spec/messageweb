@@ -1,11 +1,11 @@
-const CACHE_NAME = "xiaowu-zhili-v1098";
+const CACHE_NAME = "xiaowu-zhili-v1099";
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css?v=1.098",
-  "/app.js?v=1.098",
-  "/config.js?v=1.098",
-  "/android-bridge.js?v=1.098",
+  "/style.css?v=1.099",
+  "/app.js?v=1.099",
+  "/config.js?v=1.099",
+  "/android-bridge.js?v=1.099",
   "/icon-192.png",
   "/icon-512.png"
 ];
@@ -27,7 +27,7 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const req = event.request;
-  if (req.method !== "GET" || req.url.includes("/api/")) return;
+  if (req.method !== "GET" || req.url.includes("/api/") || req.url.includes("api.messageweb.xyz")) return;
   event.respondWith(
     fetch(req).catch(() => caches.match(req))
   );

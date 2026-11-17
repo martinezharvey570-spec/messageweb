@@ -60,6 +60,15 @@ let ai_abort_handler = null;
 let ai_todo_draft = [];
 let ai_todo_source_question = "";
 
+function clear_saved_auth(mark_manual_logout = false) {
+  try {
+    document.documentElement.classList.remove("has-saved-auth");
+    localStorage.removeItem("xz_token");
+    document.cookie = "xz_token_bak=; path=/; max-age=0";
+    if (mark_manual_logout) sessionStorage.setItem("xz_manual_logout_v1", "1");
+  } catch {}
+}
+
 const $ = id => document.getElementById(id);
 function debounce(fn, ms) {
   let t = 0;
@@ -286,7 +295,7 @@ async function api(path, opt = {}) {
     err.status = r.status;
     if ((r.status === 401 || r.status === 403) && token) {
       token = "";
-      try { localStorage.removeItem("xz_token"); } catch {}
+      clear_saved_auth(false);
       $("auth")?.classList.remove("hide");
       $("app")?.classList.add("hide");
       err.silent = true;
@@ -333,6 +342,7 @@ $("authForm").onsubmit = async e => {
     });
     token = d.token;
     try {
+      sessionStorage.removeItem("xz_manual_logout_v1");
       localStorage.setItem("xz_token", token);
     } catch {}
     await enter();
@@ -361,8 +371,8 @@ $("logout").onclick = () => {
   chat_restored = false;
   ai_todo_draft = [];
   starred_notice_ids = new Set();
+  clear_saved_auth(true);
   try {
-    localStorage.removeItem("xz_token");
     localStorage.removeItem(home_snap_last_key);
   } catch {}
   const msg_box = $("messages");
@@ -643,19 +653,24 @@ async function enter() {
   } catch (e) {
     if (e.status === 401 || e.status === 403) {
       token = "";
-      try {
-        localStorage.removeItem("xz_token");
-      } catch {}
+      clear_saved_auth(false);
       $("auth").classList.remove("hide");
       $("app").classList.add("hide");
       sync_theme_root(document.body.classList.contains("dark"));
       try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
       return;
     }
+    if (!me) {
+      document.documentElement.classList.remove("has-saved-auth");
+      $("auth").classList.remove("hide");
+      $("app").classList.add("hide");
+      sync_theme_root(document.body.classList.contains("dark"));
+    }
     toast(e.message);
     try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
     return;
   }
+  document.documentElement.classList.remove("has-saved-auth");
   $("auth").classList.add("hide");
   $("app").classList.remove("hide");
   sync_theme_root(document.body.classList.contains("dark"));

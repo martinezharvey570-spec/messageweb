@@ -10554,8 +10554,8 @@ main > header,
   .sched-m-sticky,
   body.on-ai-page .ask .ask-input-wrap,
   dialog:not(#docDialog) {
-    backdrop-filter: blur(38px) saturate(225%) contrast(1.03) !important;
-    -webkit-backdrop-filter: blur(38px) saturate(225%) contrast(1.03) !important;
+    backdrop-filter: blur(28px) saturate(185%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(185%) !important;
   }
   .mobile-tabbar {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(244, 248, 255, 0.66) 100%) !important;
@@ -11469,9 +11469,9 @@ html.dark .welcome-foot {
 .ask .ask-input-wrap,
 body.on-ai-page .ask .ask-input-wrap {
   border: 0 !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 255, 0.64) 100%) !important;
-  backdrop-filter: blur(32px) saturate(225%) contrast(1.03) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(225%) contrast(1.03) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(244, 248, 255, 0.78) 100%) !important;
+  backdrop-filter: blur(28px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(185%) !important;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
     inset 0 -1px 0 rgba(15, 23, 42, 0.04),
@@ -11571,9 +11571,9 @@ html.dark .xz-select-trigger {
   padding: 6px !important;
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.78) 0%, rgba(240, 246, 255, 0.62) 100%) !important;
-  backdrop-filter: blur(34px) saturate(230%) contrast(1.04) !important;
-  -webkit-backdrop-filter: blur(34px) saturate(230%) contrast(1.04) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.93) 0%, rgba(242, 247, 255, 0.86) 100%) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
     inset 0 -1px 0 rgba(15, 23, 42, 0.04),
@@ -13301,4 +13301,230 @@ html.dark body.on-ai-page .ask #askSubmitBtn.is-idle {
   background: rgba(255, 255, 255, 0.14) !important;
   color: #e2e8f0 !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+
+/* ==================== v1.098.1 移动端 AI 聊天滚动失控 & 输入框定位修复 + 全站半透明降透精修 ==================== */
+
+/* 1. 彻底防止 #aiPage 动画 transform / backdrop-filter 劫持 position: fixed 输入舱，造成输入框悬空盖在欢迎卡片中间 */
+@keyframes lgPageFadeOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+#aiPage,
+#aiPage:not(.hide) {
+  animation: lgPageFadeOnly 0.16s ease !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  contain: none !important;
+}
+
+/* 2. 移动端 AI 页面（对齐 v1.047 自然整页滚动并兼容悬浮 6-Tab 底栏，同时消除 761px~960px 断点冲突） */
+@media (max-width: 960px) {
+  html {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  body.on-ai-page,
+  html:has(body.on-ai-page) {
+    scroll-behavior: auto !important;
+    overscroll-behavior-y: contain;
+  }
+  body.on-ai-page main {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  body.on-ai-page .wrap {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  body.on-ai-page #aiPage,
+  body.on-ai-page .ai-shell,
+  body.on-ai-page .chat,
+  body.on-ai-page #aiPage .chat,
+  html.dark body.on-ai-page #aiPage .chat {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    display: block !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    contain: none !important;
+  }
+  body.on-ai-page .messages {
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    scroll-behavior: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 12px 14px calc(154px + env(safe-area-inset-bottom, 0px)) !important;
+    background: transparent !important;
+  }
+  body.on-ai-page .ask {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 6px 12px 8px !important;
+    z-index: 25 !important;
+    background: transparent !important;
+    border-top: 0 !important;
+    pointer-events: none;
+  }
+  body.on-ai-page .ask .ask-input-wrap {
+    pointer-events: auto;
+    width: 100% !important;
+    max-width: 720px !important;
+    margin: 0 auto !important;
+  }
+  body.on-ai-page:has(#sidebar.open) .ask,
+  body.on-ai-page.sidebar-open .ask {
+    z-index: 5 !important;
+    pointer-events: none !important;
+  }
+  body.on-ai-page .ask-footer-hint {
+    display: none !important;
+  }
+  body.on-ai-page .scroll-bottom-btn {
+    bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+    z-index: 26 !important;
+  }
+  /* 底部柔化遮罩：遮挡输入框与悬浮底栏间隙处露出的滚动聊天气泡文字 */
+  body.on-ai-page::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(132px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(to top, var(--bg) 50%, rgba(244, 247, 251, 0) 100%);
+    pointer-events: none;
+    z-index: 18;
+  }
+  html.dark body.on-ai-page::after {
+    background: linear-gradient(to top, var(--bg) 50%, rgba(11, 17, 32, 0) 100%);
+  }
+}
+
+/* 3. 略微削减全站过度通透的半透明浮层与玻璃卡片透明度（保留液态玻璃光泽，提升可读性与遮盖力） */
+.xz-cal-pop,
+.xz-select-menu,
+.ask-attach-pop,
+.doc-m-pop {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 247, 255, 0.88) 100%) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+}
+html.dark .xz-cal-pop,
+html.dark .xz-select-menu,
+html.dark .ask-attach-pop,
+html.dark .doc-m-pop {
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.94) 0%, rgba(15, 23, 42, 0.90) 100%) !important;
+}
+
+dialog:not(#docDialog) {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 248, 255, 0.89) 100%) !important;
+}
+html.dark dialog:not(#docDialog) {
+  background: linear-gradient(160deg, rgba(24, 33, 52, 0.94) 0%, rgba(15, 23, 42, 0.90) 100%) !important;
+}
+
+body.on-ai-page .ask .ask-input-wrap {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.86) 0%, rgba(242, 247, 255, 0.78) 100%) !important;
+}
+html.dark body.on-ai-page .ask .ask-input-wrap {
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.86) 0%, rgba(15, 23, 42, 0.78) 100%) !important;
+}
+
+.mobile-tabbar,
+main > header,
+.sched-m-sticky {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 248, 255, 0.80) 100%) !important;
+}
+html.dark .mobile-tabbar,
+html.dark main > header,
+html.dark .sched-m-sticky {
+  background: linear-gradient(180deg, rgba(24, 33, 52, 0.88) 0%, rgba(15, 23, 42, 0.80) 100%) !important;
+}
+
+.panel,
+.welcome,
+.stats article,
+.notice-card,
+.taskrow,
+.user-row,
+#knowledgeGrid .knowledge-card,
+.sched-today-card,
+.sched-lesson,
+.sched-clist-item,
+.school-item,
+.sched-d-header,
+.sched-d-right-panel,
+.stat-metric,
+.stat-bars {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.84) 0%, rgba(244, 248, 255, 0.76) 100%) !important;
+}
+html.dark .panel,
+html.dark .welcome,
+html.dark .stats article,
+html.dark .notice-card,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark .sched-today-card,
+html.dark .sched-lesson,
+html.dark .sched-clist-item,
+html.dark .school-item,
+html.dark .sched-d-header,
+html.dark .sched-d-right-panel,
+html.dark .stat-metric,
+html.dark .stat-bars {
+  background: linear-gradient(155deg, rgba(28, 39, 58, 0.84) 0%, rgba(15, 23, 42, 0.76) 100%) !important;
+}
+
+body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(242, 247, 255, 0.78) 100%) !important;
+}
+html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
+  background: linear-gradient(155deg, rgba(28, 39, 58, 0.86) 0%, rgba(15, 23, 42, 0.78) 100%) !important;
+}
+body.on-ai-page #messages .welcome-item {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.72) 100%) !important;
+}
+html.dark body.on-ai-page #messages .welcome-item {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
+}
+
+.xz-date-trigger,
+.xz-select-btn,
+.xz-select-trigger {
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.82) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.80) 0%, rgba(241, 245, 249, 0.68) 100%) !important;
+}
+html.dark .xz-date-trigger,
+html.dark .xz-select-btn,
+html.dark .xz-select-trigger {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
 }

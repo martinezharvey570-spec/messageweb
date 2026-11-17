@@ -479,19 +479,36 @@ document.querySelectorAll("[data-quick-ai]").forEach(b => {
   };
 });
 
-/* ---- 消息区滚动 ---- */
-function sync_scroll_btn() {
+/* ---- 消息区滚动（兼容桌面容器滚动与移动端整页自然滚动） ---- */
+function is_window_ai_scroll() {
   const msg_el = $("messages");
+  if (!msg_el || !document.body.classList.contains("on-ai-page")) return false;
+  return getComputedStyle(msg_el).overflowY === "visible";
+}
+function get_ai_scroll_metrics() {
+  if (is_window_ai_scroll()) {
+    const doc = document.scrollingElement || document.documentElement;
+    const top = window.scrollY || window.pageYOffset || doc.scrollTop || 0;
+    const client = window.innerHeight || doc.clientHeight || 0;
+    const total = doc.scrollHeight || 0;
+    return { isWindow: true, el: doc, top, client, total, dist: Math.max(0, total - top - client) };
+  }
+  const msg_el = $("messages");
+  if (!msg_el) return null;
+  const dist = Math.max(0, msg_el.scrollHeight - msg_el.scrollTop - msg_el.clientHeight);
+  return { isWindow: false, el: msg_el, top: msg_el.scrollTop, client: msg_el.clientHeight, total: msg_el.scrollHeight, dist };
+}
+function sync_scroll_btn() {
   const btn = $("scrollBottomBtn");
-  if (!msg_el || !btn) return;
-  const dist = msg_el.scrollHeight - msg_el.scrollTop - msg_el.clientHeight;
-  btn.classList.toggle("hide", dist < 80);
+  const m = get_ai_scroll_metrics();
+  if (!btn || !m) return;
+  btn.classList.toggle("hide", m.dist < 90 || m.total <= m.client + 20);
 }
 let auto_follow = true;
 let scroll_lock_until = 0;
 
-function near_bottom(el) {
-  return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+function near_bottom(m) {
+  return !m || m.dist < 60;
 }
 
 function stop_follow() {
@@ -499,55 +516,81 @@ function stop_follow() {
   sync_scroll_btn();
 }
 
-$("messages")?.addEventListener("scroll", () => {
-  const el = $("messages");
-  if (el && Date.now() > scroll_lock_until) auto_follow = near_bottom(el);
+const on_ai_scroll = () => {
+  if (!document.body.classList.contains("on-ai-page")) return;
+  const m = get_ai_scroll_metrics();
+  if (m && Date.now() > scroll_lock_until) auto_follow = near_bottom(m);
   sync_scroll_btn();
+};
+$("messages")?.addEventListener("scroll", on_ai_scroll, { passive: true });
+window.addEventListener("scroll", () => {
+  if (is_window_ai_scroll()) on_ai_scroll();
 }, { passive: true });
 
 $("messages")?.addEventListener("wheel", e => {
   if (e.deltaY < 0) stop_follow();
 }, { passive: true });
+window.addEventListener("wheel", e => {
+  if (is_window_ai_scroll() && e.deltaY < 0) stop_follow();
+}, { passive: true });
 
 let touch_start_y = 0;
-$("messages")?.addEventListener("touchstart", e => {
+const on_ai_touchstart = e => {
   touch_start_y = e.touches?.[0]?.clientY ?? 0;
-}, { passive: true });
-$("messages")?.addEventListener("touchmove", e => {
+};
+const on_ai_touchmove = e => {
   const y = e.touches?.[0]?.clientY ?? touch_start_y;
   if (y - touch_start_y > 8) stop_follow();
+};
+$("messages")?.addEventListener("touchstart", on_ai_touchstart, { passive: true });
+$("messages")?.addEventListener("touchmove", on_ai_touchmove, { passive: true });
+window.addEventListener("touchstart", e => {
+  if (is_window_ai_scroll()) on_ai_touchstart(e);
+}, { passive: true });
+window.addEventListener("touchmove", e => {
+  if (is_window_ai_scroll()) on_ai_touchmove(e);
 }, { passive: true });
 
 $("scrollBottomBtn")?.addEventListener("click", () => {
-  const msg_el = $("messages");
+  const m = get_ai_scroll_metrics();
   auto_follow = true;
-  if (!msg_el) return;
-  scroll_lock_until = Date.now() + 400;
-  msg_el.scrollTo({ top: msg_el.scrollHeight, behavior: "smooth" });
+  if (!m) return;
+  scroll_lock_until = Date.now() + 450;
+  if (m.isWindow) {
+    window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "smooth" });
+  } else {
+    m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
+  }
 });
 
 function follow_bottom() {
-  const msg_el = $("messages");
-  if (!msg_el) return;
-  if (auto_follow) {
+  const m = get_ai_scroll_metrics();
+  if (!m) return;
+  if (auto_follow && m.dist > 4) {
     scroll_lock_until = Date.now() + 150;
-    if (msg_el.scrollTop + msg_el.clientHeight < msg_el.scrollHeight - 4) {
-      const prev = msg_el.style.scrollBehavior;
-      msg_el.style.scrollBehavior = "auto";
-      msg_el.scrollTop = msg_el.scrollHeight;
-      msg_el.style.scrollBehavior = prev;
+    if (m.isWindow) {
+      window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "auto" });
+    } else {
+      const prev = m.el.style.scrollBehavior;
+      m.el.style.scrollBehavior = "auto";
+      m.el.scrollTop = m.el.scrollHeight;
+      m.el.style.scrollBehavior = prev;
     }
   }
   sync_scroll_btn();
 }
 
 function scroll_messages_to_bottom(force = false) {
-  const msg_el = $("messages");
-  if (!msg_el) return;
+  const m = get_ai_scroll_metrics();
+  if (!m) return;
   if (force) {
-    scroll_lock_until = Date.now() + 400;
+    scroll_lock_until = Date.now() + 450;
     auto_follow = true;
-    msg_el.scrollTo({ top: msg_el.scrollHeight, behavior: "smooth" });
+    if (m.isWindow) {
+      window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "smooth" });
+    } else {
+      m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
+    }
   } else {
     sync_scroll_btn();
   }

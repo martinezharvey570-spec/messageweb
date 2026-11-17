@@ -993,6 +993,54 @@ $("noticeForm").onsubmit = async e => {
   }
 };
 
+/* ---- 全站横向区域抓取拖动（不影响普通点击和纵向触摸滚动） ---- */
+(function init_global_grab_scroll() {
+  const selector = [
+    '#knowledgePage .cat-pills', '#noticesPage #catPills', '#knowledgePills',
+    '#schedDeskDateStrip', '#schedDateStrip', '#schedDeskWeekStrip', '#schedWeekStrip',
+    '.sched-week-strip', '.sched-date-strip', '.sched-wg-wrap',
+    '.doc-font-group', '.doc-m-font-seg', '.sched-m-seg', '.sched-d-seg'
+  ].join(',');
+  let active = null;
+  let suppressClickUntil = 0;
+
+  function eligible(el) {
+    if (!el || el.matches('.suggestions')) return false;
+    return el.scrollWidth > el.clientWidth + 4;
+  }
+  document.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const el = e.target.closest(selector);
+    if (!eligible(el)) return;
+    active = { el, id:e.pointerId, x:e.clientX, left:el.scrollLeft, moved:false };
+    el.classList.add('is-grab-scroll');
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+  }, {passive:true});
+  document.addEventListener('pointermove', e => {
+    if (!active || active.id !== e.pointerId) return;
+    const dx = e.clientX - active.x;
+    if (!active.moved && Math.abs(dx) < 7) return;
+    active.moved = true;
+    active.el.classList.add('is-grab-scrolling');
+    active.el.scrollLeft = active.left - dx;
+    if (e.cancelable) e.preventDefault();
+  }, {passive:false});
+  function finish(e) {
+    if (!active || (e && active.id !== e.pointerId)) return;
+    if (active.moved) suppressClickUntil = Date.now() + 420;
+    active.el.classList.remove('is-grab-scroll','is-grab-scrolling');
+    active = null;
+  }
+  document.addEventListener('pointerup', finish, {passive:true});
+  document.addEventListener('pointercancel', finish, {passive:true});
+  document.addEventListener('click', e => {
+    if (Date.now() < suppressClickUntil) {
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      suppressClickUntil = 0;
+    }
+  }, true);
+})();
+
 /* ---- 热门提问横向滚动 ---- */
 function sync_hot_nav() {
   const track = $("suggestionsTrack");

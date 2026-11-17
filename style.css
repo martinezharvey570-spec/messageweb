@@ -9965,3 +9965,142 @@ html.dark .due-tag {
 .sidebottom button:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 3px 10px rgba(15, 23, 42, 0.06);
 }
+
+
+/* ==================== v1.068 六色宝石课表 × 昼夜宝石主题钮 × 蓝宝石头像 × 修复删除悬停Bug ==================== */
+
+/* Bug 修复：覆盖高优先级的 .danger:hover:not(:disabled)，防止悬停时背景变浅粉白导致白字消失 */
+button.danger:hover:not(:disabled),
+.danger:hover:not(:disabled),
+.sched-btn-danger:hover:not(:disabled),
+.notice-actions .icon-only.danger:hover:not(:disabled) {
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 46%, transparent 65%),
+    linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.34),
+    inset 0 -3px 8px rgba(127, 29, 29, 0.38),
+    0 8px 22px -4px rgba(220, 38, 38, 0.48) !important;
+}
+
+/* 1. 用户名蓝色圆圈（#avatar）→ 3D 蓝宝石液态玻璃质感 */
+#avatar {
+  background:
+    radial-gradient(120% 85% at 28% 12%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.06) 48%, transparent 68%),
+    linear-gradient(155deg, #3b82f6 0%, #2563eb 52%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.40) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 6px rgba(15, 23, 42, 0.24),
+    0 5px 14px -2px rgba(37, 99, 235, 0.40) !important;
+}
+
+/* 2. 主题切换按钮（#themeToggle）→ 极简风格化“日光琥珀 / 午夜星蓝”宝石胶囊 */
+#themeToggle {
+  border-radius: 999px !important;
+  width: 40px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  background:
+    radial-gradient(120% 85% at 26% 10%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 70%),
+    linear-gradient(155deg, #fbbf24 0%, #f59e0b 52%, #ea580c 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.48) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 -3px 6px rgba(154, 52, 18, 0.28),
+    0 5px 16px -3px rgba(245, 158, 11, 0.45) !important;
+  transition: transform 0.2s var(--lg-spring), box-shadow 0.2s ease, filter 0.2s ease !important;
+}
+#themeToggle .ico {
+  width: 17px;
+  height: 17px;
+  transition: transform 0.35s var(--lg-spring);
+}
+#themeToggle:hover {
+  transform: translateY(-1px) scale(1.04);
+  filter: brightness(1.05);
+}
+#themeToggle:hover .ico {
+  transform: rotate(25deg);
+}
+#themeToggle:active {
+  transform: scale(0.93);
+}
+html.dark #themeToggle {
+  background:
+    radial-gradient(120% 85% at 26% 10%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 70%),
+    linear-gradient(155deg, #6366f1 0%, #4338ca 52%, #1e1b4b 100%) !important;
+  color: #f8fafc !important;
+  border-color: rgba(199, 210, 254, 0.36) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),
+    inset 0 -3px 6px rgba(15, 23, 42, 0.42),
+    0 5px 18px -3px rgba(99, 102, 241, 0.46) !important;
+}
+
+/* 3. 超级课表 6 色「宝石液态玻璃」课程卡片、色条与徽章 */
+#schedulePage .sched-card-item,
+#schedulePage .sched-badge {
+  border: 1px solid rgba(255, 255, 255, 0.34) !important;
+}
+#schedulePage .sched-card-item {
+  border-radius: 13px !important;
+  position: relative;
+}
+#schedulePage .sched-card-item[data-type="理论"],
+#schedulePage .sched-badge[data-type="理论"],
+#schedulePage .sched-lesson-bar[data-type="理论"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 -3px 7px rgba(15, 23, 42, 0.24), 0 6px 16px -4px rgba(37, 99, 235, 0.38) !important;
+}
+#schedulePage .sched-card-item[data-type="实验"],
+#schedulePage .sched-badge[data-type="实验"],
+#schedulePage .sched-lesson-bar[data-type="实验"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #34d399 0%, #10b981 52%, #047857 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 -3px 7px rgba(6, 78, 59, 0.26), 0 6px 16px -4px rgba(16, 185, 129, 0.38) !important;
+}
+#schedulePage .sched-card-item[data-type="上机"],
+#schedulePage .sched-badge[data-type="上机"],
+#schedulePage .sched-lesson-bar[data-type="上机"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #fbbf24 0%, #f59e0b 52%, #d97706 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24), inset 0 -3px 7px rgba(120, 53, 15, 0.25), 0 6px 16px -4px rgba(245, 158, 11, 0.38) !important;
+}
+#schedulePage .sched-card-item[data-type="线上"],
+#schedulePage .sched-badge[data-type="线上"],
+#schedulePage .sched-lesson-bar[data-type="线上"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #22d3ee 0%, #06b6d4 52%, #0e7490 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 -3px 7px rgba(22, 78, 99, 0.26), 0 6px 16px -4px rgba(6, 182, 212, 0.38) !important;
+}
+#schedulePage .sched-card-item[data-type="体育"],
+#schedulePage .sched-badge[data-type="体育"],
+#schedulePage .sched-lesson-bar[data-type="体育"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #fb7185 0%, #ef4444 50%, #dc2626 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24), inset 0 -3px 7px rgba(127, 29, 29, 0.30), 0 6px 16px -4px rgba(220, 38, 38, 0.38) !important;
+}
+#schedulePage .sched-card-item[data-type="其他"],
+#schedulePage .sched-badge[data-type="其他"],
+#schedulePage .sched-lesson-bar[data-type="其他"] {
+  background:
+    radial-gradient(120% 85% at 22% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 48%, transparent 66%),
+    linear-gradient(155deg, #a78bfa 0%, #8b5cf6 52%, #6d28d9 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 -3px 7px rgba(76, 29, 149, 0.28), 0 6px 16px -4px rgba(139, 92, 246, 0.38) !important;
+}
+#schedulePage .sched-lesson-bar {
+  box-shadow: none !important;
+  border: 0 !important;
+}

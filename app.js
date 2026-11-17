@@ -4214,9 +4214,9 @@ function schedBuildTimelineNodes(courses, now, weekNo, day, isToday) {
     const color = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
     html += `<div class="${cls}" data-edit-idx="${c._idx}">
       <div class="sched-lesson-time"><span class="t">${s.s}</span><span class="p"><b>下课</b>${e.e}</span></div>
-      <div class="sched-lesson-bar" style="background:${color}"></div>
+      <div class="sched-lesson-bar" data-type="${schedEsc(c.type || "理论")}" style="background:${color}"></div>
       <div class="sched-lesson-body">
-        <div class="sched-lesson-name">${schedEsc(c.name)}<span class="sched-badge" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
+        <div class="sched-lesson-name">${schedEsc(c.name)}<span class="sched-badge" data-type="${schedEsc(c.type || "理论")}" style="background:${color}">${schedEsc(c.type || "理论")}</span></div>
         <div class="sched-lesson-info">
           ${c.room ? `<span><svg class="ico" aria-hidden="true"><use href="#i-map-pin"/></svg>${schedEsc(c.room)}</span>` : ""}
           ${c.teacher ? `<span><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>${schedEsc(c.teacher)}</span>` : ""}
@@ -4308,7 +4308,7 @@ function render_schedule_desktop(now) {
         let cards = "";
         for (const c of matched) {
           const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
-          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" style="background:${col}">
+          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" data-type="${schedEsc(c.type || "理论")}" style="background:${col}">
             <div class="sc-n">${schedEsc(c.name)}${(c.end - c.start + 1) > 2 ? `<span class="sched-span-badge">${c.end - c.start + 1}节</span>` : ""}</div>
             <div class="sc-r">${schedEsc(c.room || c.teacher || "")}</div>
           </div>`;
@@ -4410,7 +4410,7 @@ function render_schedule_mobile(now) {
         let cards = "";
         for (const c of matched) {
           const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
-          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" style="background:${col}">
+          cards += `<div class="sched-card-item" data-edit-idx="${c._idx}" data-type="${schedEsc(c.type || "理论")}" style="background:${col}">
             <div class="sc-n">${schedEsc(c.name)}${(c.end - c.start + 1) > 2 ? `<span class="sched-span-badge">${c.end - c.start + 1}节</span>` : ""}</div>
             <div class="sc-r">${schedEsc(c.room || "")}</div>
           </div>`;

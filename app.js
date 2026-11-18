@@ -651,6 +651,7 @@ function go(p) {
     analytics: "数据统计"
   }[p] || "工作台总览";
   sidebar_el.classList.remove("open");
+  if (typeof window.sync_nav_sliders === "function") window.sync_nav_sliders();
   window.scrollTo(0, 0);
   if (p === "ai") {
     ensure_chat_restored();
@@ -5824,6 +5825,10 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
 
 // ==================== v1.083 全站 GPU 液态玻璃胶囊滑动+按压一体联动引擎（零误弹、高帧率） ====================
 (function init_sliding_glass_pills() {
+  const sliderSyncers = [];
+  window.sync_nav_sliders = () => {
+    sliderSyncers.forEach(fn => { try { fn(); } catch {} });
+  };
   function bindSlider(container, itemSel, activeSel, pillVariant) {
     if (!container || container.dataset.lgSlideBound) return;
     container.dataset.lgSlideBound = "1";
@@ -5919,7 +5924,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         container.dataset.lgPrevW = String(w);
         container.dataset.lgPrevH = String(h);
       } finally {
-        setTimeout(() => { isInternal = false; }, 0);
+        queueMicrotask(() => { isInternal = false; });
       }
     };
 
@@ -5986,6 +5991,7 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
       }).observe(container);
     }
     sync(true, true);
+    sliderSyncers.push(() => sync(false, false));
   }
 
   const setupAll = () => {

@@ -463,6 +463,8 @@ label {
   padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 40;
 }
 
@@ -7952,6 +7954,7 @@ html.dark .msg-avatar.ai {
   }
   .sched-week-strip::-webkit-scrollbar { display: none; }
   .sched-week-chip {
+    position: relative;
     flex: 0 0 auto; min-width: 48px; padding: 6px 11px; border-radius: 10px;
     font-size: 12.5px; font-weight: 500; color: var(--muted);
     background: var(--surface); border: 1px solid var(--line); text-align: center; cursor: pointer;
@@ -7961,8 +7964,8 @@ html.dark .msg-avatar.ai {
     color: #fff; border-color: transparent; font-weight: 600;
   }
   .sched-week-chip.cur::after {
-    content: ""; display: block; width: 4px; height: 4px; border-radius: 50%;
-    background: #10b981; margin: 2px auto 0;
+    content: ""; position: absolute; left: 50%; bottom: 2.5px; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: #10b981; margin: 0;
   }
   .sched-week-chip.on.cur::after { background: #fff; }
 
@@ -8214,6 +8217,7 @@ html.dark .home-sched-strip {
 }
 .sched-d-wstrip::-webkit-scrollbar { display: none; }
 .sched-d-wstrip .sched-week-chip {
+  position: relative;
   flex: 0 0 auto;
   min-width: 54px;
   padding: 6px 12px;
@@ -8234,12 +8238,15 @@ html.dark .home-sched-strip {
 }
 .sched-d-wstrip .sched-week-chip.cur::after {
   content: "";
-  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 2.5px;
+  transform: translateX(-50%);
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: #10b981;
-  margin: 2px auto 0;
+  margin: 0;
 }
 .sched-d-wstrip .sched-week-chip.on.cur::after { background: #fff; }
 
@@ -14173,21 +14180,23 @@ html.dark #analyticsPage .stat-bars {
     min-height: calc(58px + var(--safe-top)) !important;
     height: calc(58px + var(--safe-top)) !important;
     padding: calc(6px + var(--safe-top)) 16px 6px !important;
-    background: linear-gradient(180deg, rgba(238, 244, 255, 0.78) 0%, rgba(246, 249, 255, 0.62) 100%) !important;
+    background: linear-gradient(180deg, rgba(242, 246, 255, 0.90) 0%, rgba(248, 250, 255, 0.80) 100%) !important;
     backdrop-filter: blur(26px) saturate(190%) !important;
     -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
     border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
     box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.07) !important;
   }
   html.dark main > header {
-    background: linear-gradient(180deg, rgba(11, 17, 32, 0.84) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
+    background: linear-gradient(180deg, rgba(11, 17, 32, 0.90) 0%, rgba(15, 23, 42, 0.80) 100%) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.38) !important;
   }
-  /* 移动端侧边栏彻底避让顶部状态栏与底部悬浮导航 */
+  /* 移动端侧边栏避让顶部状态栏与底部系统安全区，同时让账号设置与退出按钮贴合抽屉底部 */
   #sidebar {
     padding-top: calc(20px + var(--safe-top)) !important;
-    padding-bottom: calc(74px + var(--safe-bottom)) !important;
+    padding-bottom: calc(16px + var(--safe-bottom)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
     z-index: 999 !important;
   }
   /* 移动端超级课表粘性顶栏紧贴应用顶栏下方，绝不穿透进系统状态栏 */
@@ -14331,5 +14340,29 @@ body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       0 0 0 1px rgba(255, 255, 255, 0.10),
       0 28px 64px -16px rgba(0, 0, 0, 0.56) !important;
+  }
+}
+
+/* v1.106: 窄屏通知卡片操作栏单行紧凑对齐，防止末尾删除按钮孤立换行 */
+@media (max-width: 480px) {
+  .notice-actions {
+    gap: 5px !important;
+  }
+  .notice-actions .ai-btn,
+  .notice-actions .added,
+  .notice-actions .outline:not(.icon-only) {
+    padding: 5px 9px !important;
+    font-size: 11.5px !important;
+    min-height: 32px !important;
+  }
+  .notice-actions .icon-only {
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+  }
+  .notice-actions .icon-only.danger {
+    margin-left: 0 !important;
   }
 }

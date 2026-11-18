@@ -12574,7 +12574,7 @@ body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai {
   box-sizing: border-box !important;
   width: fit-content !important;
   min-width: min(260px, 100%) !important;
-  max-width: 100% !important;
+  max-width: min(86%, 760px) !important;
   flex: 0 1 auto !important;
   padding: 15px 18px !important;
   margin: 0 !important;
@@ -12689,7 +12689,7 @@ body.on-ai-page #messages .bubble-wrap.msg-ai {
 body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai {
   display: block;
   min-width: 0;
-  max-width: 100%;
+  max-width: min(86%, 760px);
   box-sizing: border-box;
   contain: none;
   overflow: visible;

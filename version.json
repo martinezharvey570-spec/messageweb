@@ -1,7 +1,7 @@
 {
-  "versionCode": 88,
-  "versionName": "1.030",
+  "versionCode": 89,
+  "versionName": "1.031",
   "apkUrl": "https://messageweb.xyz/xiaowu-zhili.apk",
-  "notes": "优化桌面端文件阅读器排版与目录卡片，扩大阅读视野并升级公文视觉层次。",
-  "releaseNotes": "优化桌面端文件阅读器排版与目录卡片，扩大阅读视野并升级公文视觉层次。"
+  "notes": "修复移动端启动加载闸门与原生全面屏状态栏无感融合，完善认证续期与多端细节。",
+  "releaseNotes": "修复移动端启动加载闸门与原生全面屏状态栏无感融合，完善认证续期与多端细节。"
 }

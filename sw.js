@@ -1,34 +1,34 @@
-const CACHE_NAME = "xiaowu-zhili-v1101";
+const CACHE_NAME = "xiaowu-zhili-v1103";
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css?v=1.101",
-  "/app.js?v=1.101",
-  "/config.js?v=1.101",
-  "/android-bridge.js?v=1.101",
+  "/style.css?v=1.103",
+  "/app.js?v=1.103",
+  "/config.js?v=1.103",
+  "/android-bridge.js?v=1.103",
+  "/manifest.json",
   "/icon-192.png",
   "/icon-512.png"
 ];
 
-self.addEventListener("install", event => {
+self.addEventListener("install", e => {
   self.skipWaiting();
-  event.waitUntil(
+  e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(() => {}))
   );
 });
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
+self.addEventListener("activate", e => {
+  e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET" || req.url.includes("/api/") || req.url.includes("api.messageweb.xyz")) return;
-  event.respondWith(
-    fetch(req).catch(() => caches.match(req))
+self.addEventListener("fetch", e => {
+  if (e.request.method !== "GET" || e.request.url.includes("/api/")) return;
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });

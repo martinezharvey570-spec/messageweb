@@ -14002,3 +14002,270 @@ html.dark .doc-m-pop {
   color: var(--ink-secondary) !important;
   transition: none !important;
 }
+
+
+/* ==================== v1.102 状态栏无感融入、桌面登录重构与统计圆环零遮挡精修 ==================== */
+
+/* 1. 数据统计界面（#analyticsPage）：彻底消除圆环左侧方形白底残影与右侧三张卡片拥挤遮挡 */
+#analyticsPage .stat-dash {
+  display: grid !important;
+  grid-template-columns: minmax(196px, 240px) minmax(0, 1fr) !important;
+  gap: clamp(22px, 3vw, 38px) !important;
+  align-items: center !important;
+  padding: 10px 0 4px !important;
+}
+#analyticsPage .stat-ring-box {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px 16px !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.72) 0%, rgba(241, 246, 255, 0.54) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(255, 255, 255, 0.76),
+    0 6px 18px -6px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark #analyticsPage .stat-ring-box {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.62) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 8px 20px -6px rgba(0, 0, 0, 0.36) !important;
+}
+#analyticsPage .stat-ring {
+  position: relative !important;
+  width: clamp(144px, 14vw, 168px) !important;
+  height: clamp(144px, 14vw, 168px) !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  clip-path: circle(50% at 50% 50%) !important;
+  -webkit-clip-path: circle(50% at 50% 50%) !important;
+  isolation: isolate !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html.dark #analyticsPage .stat-ring {
+  background: transparent !important;
+}
+#analyticsPage .stat-ring svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+#analyticsPage .stat-ring .ring-track {
+  stroke: rgba(148, 163, 184, 0.24) !important;
+}
+#analyticsPage .stat-ring .ring-fill {
+  stroke: #2563eb !important;
+  filter: none !important;
+}
+#analyticsPage .stat-ring .ring-label {
+  position: absolute !important;
+  inset: 22px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: radial-gradient(circle at 32% 24%, #ffffff 0%, #f1f6ff 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 4px 12px -4px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark #analyticsPage .stat-ring .ring-label {
+  background: radial-gradient(circle at 32% 24%, #1e293b 0%, #0f172a 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 6px 16px -4px rgba(0, 0, 0, 0.44) !important;
+}
+#analyticsPage .stat-metrics,
+#analyticsPage .stat-metric {
+  position: relative !important;
+  z-index: 1 !important;
+  min-width: 0 !important;
+}
+#analyticsPage .stat-metric,
+#analyticsPage .stat-bars {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 6px 16px -6px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark #analyticsPage .stat-metric,
+html.dark #analyticsPage .stat-bars {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 8px 18px -6px rgba(0, 0, 0, 0.36) !important;
+}
+@media (max-width: 1080px) {
+  #analyticsPage .stat-dash {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 18px !important;
+  }
+}
+
+/* 2. 移动端状态栏零白条融入与安全区自适应：兼容 Android 边到边 (--xz-safe-top) 与 iOS env(safe-area-inset-top) */
+:root {
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--xz-safe-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--xz-safe-bottom, 0px));
+}
+
+#auth.hide,
+#auth.auth.hide {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  html:not(.app-booting):has(#auth:not(.hide)),
+  body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
+    background: #0b1120 !important;
+  }
+  #auth.auth:not(.hide) {
+    padding: 0 !important;
+    background: linear-gradient(180deg, #0b1120 0%, #0b1120 170px, #eef4ff 220px, #f4f7fc 100%) !important;
+  }
+  html.dark #auth.auth:not(.hide) {
+    background: linear-gradient(180deg, #0b1120 0%, #0d1f52 200px, #0b1120 100%) !important;
+  }
+  #auth.auth:not(.hide) .hero {
+    margin-top: 0 !important;
+    padding: calc(34px + var(--safe-top)) 24px 86px !important;
+    border-radius: 0 !important;
+    border-bottom-left-radius: 26px !important;
+    border-bottom-right-radius: 26px !important;
+    background:
+      radial-gradient(95% 80% at 86% 18%, rgba(99, 102, 241, 0.34) 0%, transparent 56%),
+      linear-gradient(180deg, #0b1120 0%, #102a6b 26%, #1d4ed8 68%, #2563eb 100%) !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  main > header {
+    min-height: calc(56px + var(--safe-top)) !important;
+    height: auto !important;
+    padding: calc(8px + var(--safe-top)) 16px 8px !important;
+    background: linear-gradient(180deg, rgba(238, 244, 255, 0.72) 0%, rgba(246, 249, 255, 0.50) 100%) !important;
+    backdrop-filter: blur(26px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.045) !important;
+    box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.07) !important;
+  }
+  html.dark main > header {
+    background: linear-gradient(180deg, rgba(11, 17, 32, 0.78) 0%, rgba(15, 23, 42, 0.60) 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.38) !important;
+  }
+  .mobile-tabbar,
+  body.on-ai-page .mobile-tabbar {
+    bottom: calc(8px + var(--safe-bottom)) !important;
+  }
+  body.on-ai-page .ask {
+    bottom: calc(76px + var(--safe-bottom)) !important;
+  }
+}
+
+/* 3. 桌面端登录页美学重构：等高双玻璃对称舞台 + 柔和氛围背景 + 精致质感细节 */
+@media (min-width: 901px) {
+  #auth.auth:not(.hide) {
+    display: grid !important;
+    grid-template-columns: minmax(380px, 500px) minmax(370px, 450px) !important;
+    justify-content: center !important;
+    align-content: center !important;
+    align-items: stretch !important;
+    gap: clamp(20px, 2.8vw, 32px) !important;
+    min-height: 100dvh !important;
+    padding: clamp(24px, 4vw, 52px) !important;
+    background:
+      radial-gradient(62% 58% at 18% 18%, rgba(59, 130, 246, 0.16) 0%, transparent 65%),
+      radial-gradient(56% 52% at 84% 82%, rgba(99, 102, 241, 0.14) 0%, transparent 62%),
+      linear-gradient(160deg, #ecf3ff 0%, #f7faff 54%, #edf2ff 100%) !important;
+  }
+  html.dark #auth.auth:not(.hide) {
+    background:
+      radial-gradient(62% 58% at 18% 18%, rgba(37, 99, 235, 0.24) 0%, transparent 65%),
+      radial-gradient(56% 52% at 84% 82%, rgba(79, 70, 229, 0.20) 0%, transparent 62%),
+      #0b1120 !important;
+  }
+  #auth.auth:not(.hide) .hero {
+    align-self: stretch !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    border-radius: 30px !important;
+    padding: clamp(36px, 4.2vw, 48px) clamp(32px, 3.8vw, 44px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background:
+      radial-gradient(115% 88% at 14% 8%, rgba(147, 197, 253, 0.34) 0%, transparent 52%),
+      radial-gradient(92% 80% at 92% 92%, rgba(99, 102, 241, 0.42) 0%, transparent 56%),
+      linear-gradient(148deg, #0d2666 0%, #1746b8 48%, #2563eb 100%) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
+      0 26px 60px -16px rgba(15, 23, 42, 0.24) !important;
+  }
+  #auth.auth:not(.hide) .hero h1 {
+    margin: 18px 0 8px !important;
+    font-size: clamp(32px, 2.8vw, 40px) !important;
+    letter-spacing: -0.5px !important;
+  }
+  #auth.auth:not(.hide) .hero > p {
+    margin: 0 0 26px !important;
+    font-size: 15.5px !important;
+    color: rgba(255, 255, 255, 0.86) !important;
+  }
+  #auth.auth:not(.hide) .hero-list {
+    margin: 0 !important;
+    gap: 12px !important;
+  }
+  #auth.auth:not(.hide) .hero-list p {
+    padding: 13px 16px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20) !important;
+    backdrop-filter: none !important;
+    font-size: 14.5px !important;
+  }
+  #auth.auth:not(.hide) .hero small {
+    margin-top: 28px !important;
+    opacity: 0.72 !important;
+    letter-spacing: 2px !important;
+  }
+  #auth.auth:not(.hide) .authbox {
+    align-self: stretch !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: clamp(34px, 3.8vw, 46px) clamp(28px, 3.4vw, 40px) !important;
+    border-radius: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    backdrop-filter: blur(28px) saturate(195%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(195%) !important;
+    border: 0 !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      0 0 0 1px rgba(255, 255, 255, 0.78),
+      0 26px 60px -16px rgba(15, 23, 42, 0.12) !important;
+  }
+  html.dark #auth.auth:not(.hide) .authbox {
+    background: rgba(17, 24, 39, 0.82) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 0 1px rgba(255, 255, 255, 0.10),
+      0 28px 64px -16px rgba(0, 0, 0, 0.56) !important;
+  }
+}

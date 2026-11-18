@@ -236,10 +236,10 @@
       var msgBox = document.getElementById("messages");
       if (msgBox) {
         new MutationObserver(function () {
-          msgBox.querySelectorAll(".msg.ai:not(.ai-welcome-msg) .msg-actions").forEach(function (actBar) {
+          msgBox.querySelectorAll(".bubble-wrap.msg-ai .bubble-tools").forEach(function (actBar) {
             if (actBar.querySelector(".app-share-msg-btn")) return;
-            var msgEl = actBar.closest(".msg");
-            var bubble = msgEl ? msgEl.querySelector(".msg-bubble") : null;
+            var msgEl = actBar.closest(".bubble-wrap");
+            var bubble = msgEl ? msgEl.querySelector(".bubble") : null;
             if (!bubble) return;
             var btn = document.createElement("button");
             btn.type = "button";
@@ -360,15 +360,16 @@
   })();
 })();
 
-  // 劫持 fetch，实现登录凭据自动捕获 & Token 过期静默续期
+  // 劫持 fetch，实现登录凭据自动捕获 & Token 过期无缝静默续期并重放请求
   var origFetch = window.fetch ? window.fetch.bind(window) : null;
   var lastSubmittedCred = null;
-  var silentRenewing = false;
+  var renewPromise = null;
 
   if (origFetch) {
     window.fetch = function (input, init) {
       var url = typeof input === "string" ? input : (input && input.url ? input.url : "");
       var isAuthEndpoint = /\/api\/auth\/(login|register)$/.test(url);
+      var alreadyRetried = !!(init && init.__xzRetried);
 
       if (isAuthEndpoint && init && typeof init.body === "string") {
         try {
@@ -387,7 +388,6 @@
           resp.clone().json().then(function (data) {
             if (data && data.token) {
               sessionStorage.removeItem(LOGOUT_FLAG);
-              document.documentElement.classList.add("has-saved-auth");
               saveCredEverywhere({
                 username: lastSubmittedCred.username,
                 password: lastSubmittedCred.password,
@@ -396,29 +396,45 @@
               });
             }
           }).catch(function () {});
-        } else if ((resp.status === 401 || resp.status === 403) && !isAuthEndpoint && !silentRenewing && !sessionStorage.getItem(LOGOUT_FLAG)) {
-          // 如果 Token 过期，尝试用已保存的凭据静默重登一次
+          return resp;
+        }
+        if ((resp.status === 401 || resp.status === 403) && !isAuthEndpoint && !alreadyRetried && !sessionStorage.getItem(LOGOUT_FLAG)) {
           var saved = loadCredFromAny();
           if (saved && saved.remember && saved.username && saved.password) {
-            silentRenewing = true;
-            var apiBase = (window.XZ_CONFIG && window.XZ_CONFIG.API_BASE) ? window.XZ_CONFIG.API_BASE : "https://api.messageweb.xyz/api";
-            origFetch(apiBase + "/auth/login", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username: saved.username, password: saved.password })
-            }).then(function (r2) { return r2.ok ? r2.json() : null; })
-              .then(function (d2) {
-                silentRenewing = false;
-                if (d2 && d2.token) {
-                  saveCredEverywhere({
-                    username: saved.username,
-                    password: saved.password,
-                    token: d2.token,
-                    remember: true
-                  });
-                  location.reload();
-                }
-              }).catch(function () { silentRenewing = false; });
+            if (!renewPromise) {
+              var apiBase = (window.XZ_CONFIG && window.XZ_CONFIG.API_BASE) ? window.XZ_CONFIG.API_BASE : "https://api.messageweb.xyz/api";
+              renewPromise = origFetch(apiBase + "/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: saved.username, password: saved.password })
+              }).then(function (r2) { return r2.ok ? r2.json() : null; })
+                .then(function (d2) {
+                  renewPromise = null;
+                  if (d2 && d2.token) {
+                    saveCredEverywhere({
+                      username: saved.username,
+                      password: saved.password,
+                      token: d2.token,
+                      remember: true
+                    });
+                    return d2.token;
+                  }
+                  return null;
+                }).catch(function () {
+                  renewPromise = null;
+                  return null;
+                });
+            }
+            return renewPromise.then(function (newTok) {
+              if (!newTok) return resp;
+              var nextInit = Object.assign({}, init || {}, { __xzRetried: true });
+              var hdrs = new Headers((init && init.headers) || (typeof input !== "string" && input && input.headers) || undefined);
+              if (hdrs.has("Authorization") || typeof input === "string") {
+                hdrs.set("Authorization", "Bearer " + newTok);
+              }
+              nextInit.headers = hdrs;
+              return origFetch(input, nextInit);
+            });
           }
         }
         return resp;
@@ -525,9 +541,12 @@
   // ---------------------------------------------------------
   function syncNativeTheme() {
     if (isAndroidApp && window.AndroidBridge && window.AndroidBridge.syncTheme) {
+      var isBooting = document.documentElement.classList.contains("app-booting");
+      var authEl = document.getElementById("auth");
+      var onAuth = !isBooting && authEl ? !authEl.classList.contains("hide") : false;
       var isDark = document.documentElement.classList.contains("dark") || localStorage.getItem("xz_theme") === "dark";
       try {
-        window.AndroidBridge.syncTheme(!!isDark);
+        window.AndroidBridge.syncTheme(!!(onAuth || isDark));
       } catch (e) {}
     }
   }
@@ -593,6 +612,9 @@
   function onDomReady() {
     setupRememberUI();
     syncNativeTheme();
+    window.addEventListener("xz-theme-sync", function () {
+      setTimeout(syncNativeTheme, 20);
+    });
     var themeBtn = document.getElementById("themeToggle");
     if (themeBtn) {
       themeBtn.addEventListener("click", function () {

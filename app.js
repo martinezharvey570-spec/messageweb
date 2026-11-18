@@ -232,12 +232,19 @@ function sync_theme_icon(is_dark) {
 
 function sync_theme_root(is_dark) {
   const root = document.documentElement;
-  root.classList.toggle("dark", is_dark);
-  const on_auth = $("auth") && !$("auth").classList.contains("hide");
-  root.style.background = on_auth ? "" : (is_dark ? "#0b1120" : "");
-  root.style.colorScheme = is_dark ? "dark" : "light";
+  const dark = !!is_dark;
+  root.classList.toggle("dark", dark);
+  if (document.body) document.body.classList.toggle("dark", dark);
+  const booting = root.classList.contains("app-booting");
+  const on_auth = !booting && $("auth") && !$("auth").classList.contains("hide");
+  const topBg = booting ? (dark ? "#0b1120" : "#f8fafc") : (on_auth ? "#0b1e54" : (dark ? "#0b1120" : "#eef4ff"));
+  root.style.background = topBg;
+  root.style.colorScheme = dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", on_auth ? "#0b2566" : (is_dark ? "#0b1120" : "#155eef"));
+  if (meta) meta.setAttribute("content", topBg);
+  try {
+    window.dispatchEvent(new CustomEvent("xz-theme-sync", { detail: { isDark: dark, onAuth: !!on_auth, booting: !!booting } }));
+  } catch {}
 }
 
 function init_theme() {
@@ -380,7 +387,7 @@ $("logout").onclick = () => {
   document.body.classList.remove("on-ai-page");
   $("app").classList.add("hide");
   $("auth").classList.remove("hide");
-  sync_theme_root(document.body.classList.contains("dark"));
+  sync_theme_root(document.documentElement.classList.contains("dark"));
   auth_mode("login");
 };
 
@@ -461,6 +468,7 @@ document.addEventListener("keydown", e => {
 });
 
 $("toggleAiConfig")?.addEventListener("click", () => {
+  if (window.innerWidth >= 761) return;
   const bar = $("aiOptionsBar");
   if (!bar) return;
   const is_open = bar.classList.toggle("open");
@@ -660,7 +668,75 @@ function go(p) {
   if (p === "analytics") load_stats();
 }
 
-async function enter() {
+let boot_gate_done = false;
+function set_boot_progress(pct, text, isError = false) {
+  const splash = $("appBootSplash");
+  const bar = $("appBootBarFill");
+  const status = $("appBootStatus");
+  if (bar && Number.isFinite(pct)) bar.style.width = Math.max(8, Math.min(100, pct)) + "%";
+  if (status && text) status.textContent = text;
+  if (splash) splash.classList.toggle("is-error", !!isError);
+}
+
+function wait_assets_ready() {
+  const loadDone = document.readyState === "complete"
+    ? Promise.resolve()
+    : new Promise(resolve => {
+        const done = () => resolve();
+        window.addEventListener("load", done, { once: true });
+        setTimeout(done, 4500);
+      });
+  const fontsDone = (document.fonts && document.fonts.ready)
+    ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1800))])
+    : Promise.resolve();
+  return Promise.all([loadDone, fontsDone]).then(() =>
+    new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+  );
+}
+
+async function finish_boot_gate(showAuth) {
+  const authEl = $("auth");
+  const appEl = $("app");
+  if (authEl) authEl.classList.toggle("hide", !showAuth);
+  if (appEl) appEl.classList.toggle("hide", !!showAuth);
+  document.documentElement.classList.remove("app-booting", "has-saved-auth");
+  sync_theme_root(document.documentElement.classList.contains("dark"));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const splash = $("appBootSplash");
+  if (splash && !splash.classList.contains("is-done")) {
+    splash.classList.add("is-done");
+    setTimeout(() => {
+      if (splash.classList.contains("is-done")) splash.style.display = "none";
+    }, 260);
+  }
+  boot_gate_done = true;
+  try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+}
+
+$("appBootRetryBtn")?.addEventListener("click", async () => {
+  set_boot_progress(25, "正在重新连接服务…", false);
+  if (!token) {
+    try { token = localStorage.getItem("xz_token") || ""; } catch {}
+  }
+  if (token) {
+    await enter(true);
+  } else {
+    await Promise.allSettled([
+      Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]),
+      wait_assets_ready()
+    ]);
+    set_boot_progress(100, "准备就绪", false);
+    await finish_boot_gate(true);
+  }
+});
+
+async function enter(isBoot = false) {
+  if (!token) {
+    try { token = localStorage.getItem("xz_token") || ""; } catch {}
+  }
+  if (isBoot && !boot_gate_done) {
+    set_boot_progress(45, "正在验证身份与同步校园数据…", false);
+  }
   const me_req = api("/me");
   const data_req = Promise.all([api("/notices"), api("/tasks")]);
   data_req.catch(() => {});
@@ -670,26 +746,53 @@ async function enter() {
     if (e.status === 401 || e.status === 403) {
       token = "";
       clear_saved_auth(false);
-      $("auth").classList.remove("hide");
-      $("app").classList.add("hide");
-      sync_theme_root(document.body.classList.contains("dark"));
-      try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+      await wait_assets_ready();
+      if (isBoot && !boot_gate_done) {
+        set_boot_progress(100, "请先登录账号", false);
+        await finish_boot_gate(true);
+      } else {
+        $("auth").classList.remove("hide");
+        $("app").classList.add("hide");
+        sync_theme_root(document.documentElement.classList.contains("dark"));
+        try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+      }
+      return;
+    }
+    if (isBoot && !boot_gate_done) {
+      set_boot_progress(35, (e && e.message ? e.message : "网络连接异常") + "，请点击重试", true);
       return;
     }
     if (!me) {
       document.documentElement.classList.remove("has-saved-auth");
       $("auth").classList.remove("hide");
       $("app").classList.add("hide");
-      sync_theme_root(document.body.classList.contains("dark"));
+      sync_theme_root(document.documentElement.classList.contains("dark"));
     }
     toast(e.message);
     try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
     return;
   }
-  document.documentElement.classList.remove("has-saved-auth");
-  $("auth").classList.add("hide");
-  $("app").classList.remove("hide");
-  sync_theme_root(document.body.classList.contains("dark"));
+
+  try {
+    if (isBoot && !boot_gate_done) {
+      set_boot_progress(72, "正在加载通知、待办与课表…", false);
+    }
+    const sched_req = (typeof load_schedule === "function")
+      ? Promise.race([Promise.resolve(load_schedule()), new Promise(r => setTimeout(r, 4500))]).catch(() => {})
+      : Promise.resolve();
+    const ai_req = Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]).catch(() => {});
+
+    const [[n, t]] = await Promise.all([data_req, sched_req, ai_req, wait_assets_ready()]);
+    notices = Array.isArray(n) ? n : [];
+    tasks = Array.isArray(t) ? t : [];
+  } catch (e) {
+    if (isBoot && !boot_gate_done) {
+      set_boot_progress(60, (e && e.message ? e.message : "数据同步失败") + "，请点击重试", true);
+      return;
+    }
+    toast(e.message);
+  }
+
   $("userName").textContent = me.display_name;
   $("welcomeName").textContent = me.display_name;
   $("avatar").textContent = me.display_name.slice(0, 1);
@@ -710,23 +813,22 @@ async function enter() {
     .querySelectorAll(".admin-only")
     .forEach(el => el.classList.toggle("hide", me.role !== "admin"));
   load_starred_notices();
-  if (typeof load_schedule === "function") load_schedule();
-  restore_home_snap();
-  try {
-    const [n, t] = await data_req;
-    if (me) {
-      notices = n;
-      tasks = t;
-      render_home();
-      render_notices();
-      render_tasks();
-    }
-  } catch (e) {
-    toast(e.message);
-  }
-  check_ai();
+  render_home();
+  render_notices();
+  render_tasks();
+  if (typeof render_schedule_all === "function") render_schedule_all();
   if (cur_page === "home") go("home");
-  try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+
+  if (!boot_gate_done) {
+    set_boot_progress(100, "加载完成", false);
+    await finish_boot_gate(false);
+  } else {
+    document.documentElement.classList.remove("has-saved-auth");
+    $("auth").classList.add("hide");
+    $("app").classList.remove("hide");
+    sync_theme_root(document.documentElement.classList.contains("dark"));
+    try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+  }
 }
 
 async function refresh() {
@@ -3186,13 +3288,20 @@ $("aiThinking")?.addEventListener("change", () => {
 });
 
 (async () => {
+  if (!token) {
+    try { token = localStorage.getItem("xz_token") || ""; } catch {}
+  }
   if (token) {
-    restore_home_snap(true);
-    enter();
+    await enter(true);
     return;
   }
-  check_ai();
-  try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
+  set_boot_progress(45, "正在检查服务状态并加载界面…", false);
+  await Promise.allSettled([
+    Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]),
+    wait_assets_ready()
+  ]);
+  set_boot_progress(100, "准备就绪", false);
+  await finish_boot_gate(true);
 })();
 
 async function load_users() {

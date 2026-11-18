@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
-  <meta name="theme-color" content="#155eef">
+  <meta name="theme-color" content="#f8fafc">
 
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1.093">
   <link rel="apple-touch-icon" href="icon-192.png?v=1.093">
@@ -12,21 +12,129 @@
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="校务智理">
-  <style>
-    html.has-saved-auth #auth { display: none !important; }
-    html.has-saved-auth #app { display: block !important; }
+  <style id="bootGateStyles">
+    html.app-booting,
+    html.app-booting body {
+      overflow: hidden !important;
+      height: 100% !important;
+      margin: 0;
+      background: #f8fafc !important;
+    }
+    html.app-booting.dark,
+    html.app-booting.dark body {
+      background: #0b1120 !important;
+    }
+    html.app-booting #auth,
+    html.app-booting #app {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    #appBootSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    html.dark #appBootSplash {
+      background: #0b1120;
+      color: #f8fafc;
+    }
+    #appBootSplash.is-done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .boot-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #3b82f6, #155eef);
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 30px rgba(21, 94, 239, 0.26);
+      margin-bottom: 14px;
+    }
+    .boot-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin: 0 0 12px;
+    }
+    .boot-bar {
+      width: min(210px, 60vw);
+      height: 4px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    html.dark .boot-bar {
+      background: rgba(255, 255, 255, 0.14);
+    }
+    .boot-bar > i {
+      display: block;
+      width: 28%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #60a5fa, #2563eb, #155eef);
+      transition: width 0.28s cubic-bezier(.22, 1, .36, 1);
+    }
+    .boot-status {
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.5;
+    }
+    html.dark .boot-status {
+      color: #94a3b8;
+    }
+    .boot-retry {
+      margin-top: 16px;
+      padding: 9px 20px;
+      border-radius: 999px;
+      border: 0;
+      background: #155eef;
+      color: #fff;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+    #appBootSplash.is-error .boot-retry {
+      display: inline-flex;
+      align-items: center;
+    }
   </style>
   <script>
     (function () {
       try {
+        var root = document.documentElement;
+        root.classList.add("app-booting");
+        if (window.AndroidBridge && window.AndroidBridge.getSafeTopDp) {
+          var safeDp = Number(window.AndroidBridge.getSafeTopDp()) || 0;
+          if (safeDp > 0) root.style.setProperty("--xz-safe-top", safeDp + "px");
+        }
         if (sessionStorage.getItem("xz_manual_logout_v1")) return;
         var hasTok = !!localStorage.getItem("xz_token") || /(?:^|;\s*)xz_token_bak=[^;]+/.test(document.cookie);
         if (!hasTok && window.AndroidBridge && window.AndroidBridge.loadAuthData && window.AndroidBridge.loadAuthData()) {
           hasTok = true;
         }
-        if (hasTok) document.documentElement.classList.add("has-saved-auth");
+        if (hasTok) root.classList.add("has-saved-auth");
       } catch (e) {}
     })();
   </script>
@@ -39,12 +147,11 @@
         var root = document.documentElement;
         if (dark) {
           root.classList.add("dark");
-          root.style.background = "#0b1120";
           root.style.colorScheme = "dark";
         }
         var m = document.querySelector('meta[name="theme-color"]');
-        var hasAuth = root.classList.contains("has-saved-auth");
-        if (m) m.setAttribute("content", !hasAuth ? "#0b2566" : (dark ? "#0b1120" : "#155eef"));
+        root.style.background = dark ? "#0b1120" : "#f8fafc";
+        if (m) m.setAttribute("content", dark ? "#0b1120" : "#f8fafc");
       } catch (e) {}
     })();
   </script>
@@ -52,9 +159,17 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.101" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.103" fetchpriority="high">
 </head>
 <body>
+
+<div id="appBootSplash" role="status" aria-live="polite">
+  <div class="boot-logo">校</div>
+  <h2 class="boot-title">校务智理</h2>
+  <div class="boot-bar"><i id="appBootBarFill"></i></div>
+  <div id="appBootStatus" class="boot-status">正在连接服务并同步数据…</div>
+  <button type="button" id="appBootRetryBtn" class="boot-retry">重新加载</button>
+</div>
 
 <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -699,7 +814,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.101</span>
+        <span>校务智理校园事务服务平台 · v1.103</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -1038,9 +1153,9 @@
   </div>
 </dialog>
 
-<script src="android-bridge.js?v=1.101"></script>
-<script src="config.js?v=1.101"></script>
-<script src="app.js?v=1.101"></script>
+<script src="android-bridge.js?v=1.103"></script>
+<script src="config.js?v=1.103"></script>
+<script src="app.js?v=1.103"></script>
 
 
 </body>

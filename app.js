@@ -496,29 +496,39 @@ function is_window_ai_scroll() {
   return getComputedStyle(msg_el).overflowY === "visible";
 }
 function get_ai_scroll_metrics() {
+  const msg_el = $("messages");
   if (is_window_ai_scroll()) {
     const doc = document.scrollingElement || document.documentElement;
     const top = window.scrollY || window.pageYOffset || doc.scrollTop || 0;
-    const client = window.innerHeight || doc.clientHeight || 0;
-    const total = doc.scrollHeight || 0;
-    return { isWindow: true, el: doc, top, client, total, dist: Math.max(0, total - top - client) };
+    const vh = Math.max(window.innerHeight || 0, doc.clientHeight || 0, document.documentElement.clientHeight || 0);
+    const total = Math.max(doc.scrollHeight || 0, vh);
+    const maxTop = Math.max(0, total - vh);
+    let dist = Math.max(0, maxTop - top);
+    if (msg_el && msg_el.lastElementChild) {
+      const lastRect = msg_el.lastElementChild.getBoundingClientRect();
+      const visibleBottom = (window.innerHeight || vh) - 132;
+      const elDist = Math.max(0, Math.round(lastRect.bottom - visibleBottom));
+      dist = Math.min(dist, elDist);
+    }
+    return { isWindow: true, el: doc, top, client: vh, total, maxTop, dist };
   }
-  const msg_el = $("messages");
   if (!msg_el) return null;
-  const dist = Math.max(0, msg_el.scrollHeight - msg_el.scrollTop - msg_el.clientHeight);
-  return { isWindow: false, el: msg_el, top: msg_el.scrollTop, client: msg_el.clientHeight, total: msg_el.scrollHeight, dist };
+  const maxTop = Math.max(0, msg_el.scrollHeight - msg_el.clientHeight);
+  const dist = Math.max(0, maxTop - msg_el.scrollTop);
+  return { isWindow: false, el: msg_el, top: msg_el.scrollTop, client: msg_el.clientHeight, total: msg_el.scrollHeight, maxTop, dist };
 }
 function sync_scroll_btn() {
   const btn = $("scrollBottomBtn");
   const m = get_ai_scroll_metrics();
   if (!btn || !m) return;
-  btn.classList.toggle("hide", m.dist < 90 || m.total <= m.client + 20);
+  const shouldHide = auto_follow || m.dist < 110 || m.maxTop <= 110;
+  btn.classList.toggle("hide", shouldHide);
 }
 let auto_follow = true;
 let scroll_lock_until = 0;
 
 function near_bottom(m) {
-  return !m || m.dist < 60;
+  return !m || m.dist < 72;
 }
 
 function stop_follow() {
@@ -550,7 +560,7 @@ const on_ai_touchstart = e => {
 };
 const on_ai_touchmove = e => {
   const y = e.touches?.[0]?.clientY ?? touch_start_y;
-  if (y - touch_start_y > 8) stop_follow();
+  if (y - touch_start_y > 10) stop_follow();
 };
 $("messages")?.addEventListener("touchstart", on_ai_touchstart, { passive: true });
 $("messages")?.addEventListener("touchmove", on_ai_touchmove, { passive: true });
@@ -561,13 +571,18 @@ window.addEventListener("touchmove", e => {
   if (is_window_ai_scroll()) on_ai_touchmove(e);
 }, { passive: true });
 
-$("scrollBottomBtn")?.addEventListener("click", () => {
-  const m = get_ai_scroll_metrics();
+$("scrollBottomBtn")?.addEventListener("click", e => {
+  const btn = e.currentTarget || $("scrollBottomBtn");
   auto_follow = true;
+  if (btn) {
+    btn.classList.add("hide");
+    try { btn.blur(); } catch {}
+  }
+  const m = get_ai_scroll_metrics();
   if (!m) return;
-  scroll_lock_until = Date.now() + 450;
+  scroll_lock_until = Date.now() + 550;
   if (m.isWindow) {
-    window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "smooth" });
+    window.scrollTo({ top: m.total, behavior: "smooth" });
   } else {
     m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
   }
@@ -577,9 +592,9 @@ function follow_bottom() {
   const m = get_ai_scroll_metrics();
   if (!m) return;
   if (auto_follow && m.dist > 4) {
-    scroll_lock_until = Date.now() + 150;
+    scroll_lock_until = Date.now() + 180;
     if (m.isWindow) {
-      window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "auto" });
+      window.scrollTo({ top: m.total, behavior: "auto" });
     } else {
       const prev = m.el.style.scrollBehavior;
       m.el.style.scrollBehavior = "auto";
@@ -594,10 +609,11 @@ function scroll_messages_to_bottom(force = false) {
   const m = get_ai_scroll_metrics();
   if (!m) return;
   if (force) {
-    scroll_lock_until = Date.now() + 450;
+    scroll_lock_until = Date.now() + 550;
     auto_follow = true;
+    $("scrollBottomBtn")?.classList.add("hide");
     if (m.isWindow) {
-      window.scrollTo({ top: Math.max(0, m.total - m.client), behavior: "smooth" });
+      window.scrollTo({ top: m.total, behavior: "smooth" });
     } else {
       m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
     }
@@ -1686,6 +1702,28 @@ function md_anchor(url, text) {
   );
 }
 
+const emoji_svg_map = [
+  [/📌|📍/gu, "pin"],
+  [/📋|📝/gu, "clipboard"],
+  [/🧭|🔄/gu, "route"],
+  [/⚠️?|❗|❕|🚨/gu, "alert"],
+  [/✅|☑️?|✔️?/gu, "check-square"],
+  [/💡/gu, "bulb"],
+  [/🎯/gu, "target"],
+  [/🌐|📎|🔗/gu, "link"],
+  [/📄|📑|📃/gu, "file-text"],
+  [/📚|📖/gu, "book"],
+  [/🔍|🔎/gu, "search"],
+  [/⏰|⏳|🕒/gu, "clock"],
+  [/📅|🗓️?/gu, "calendar"],
+  [/🔔|📢/gu, "bell"],
+  [/🎓/gu, "graduation"],
+  [/🏆|🥇/gu, "award"],
+  [/🔑|🔒/gu, "key"],
+  [/✨|🤖/gu, "ai-brand"],
+  [/⭐|🌟/gu, "star"]
+];
+
 function parse_inline_markdown(raw) {
   const slots = [];
   const keep = html => {
@@ -1704,6 +1742,11 @@ function parse_inline_markdown(raw) {
     /(^|[^\w./@%-])((?:https?:\/\/)[^\s<>"'`()[\]{}）】》」』，。；：！？]+)/g,
     (m, pre, url) => pre + keep(md_anchor(url, ""))
   );
+
+  for (const [re, iconName] of emoji_svg_map) {
+    s = s.replace(re, () => keep(ico(iconName, "ico-xs")));
+  }
+  s = s.replace(/[\p{Extended_Pictographic}\u200d\uFE0F]+/gu, "");
 
   s = esc(s);
   s = s.replace(/`([^`]+)`/g, '<code class="md-code">$1</code>');
@@ -1726,9 +1769,9 @@ const md_section_kinds = [
   [/结论|依据|政策|适用|判断/, "decision", "target"],
   [/材料|表单|清单|证件|附件/, "materials", "clipboard"],
   [/流程|步骤|动线|顺序|程序/, "flow", "route"],
-  [/红线|注意|风险|警示|禁止|违规/, "warn", "alert"],
+  [/红线|注意|风险|警示|禁止|违规|提醒/, "warn", "alert"],
   [/行动|待办|下一步|要做|执行/, "action", "check-square"],
-  [/确认|追问|需要你|补充/, "ask", "bulb"],
+  [/确认|追问|需要你|补充|提示/, "ask", "bulb"],
 ];
 
 function md_section_kind(title) {
@@ -1737,7 +1780,9 @@ function md_section_kind(title) {
 }
 
 function format_markdown_safe(text) {
-  const raw = String(text ?? "").replace(/\r\n/g, "\n");
+  const raw = String(text ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION)-->|$)/g, "");
   if (!raw.trim()) return "";
 
   const lines = raw.split("\n");
@@ -1823,14 +1868,18 @@ function format_markdown_safe(text) {
       continue;
     }
 
-    const sec_match = trimmed.match(
-      /^(?:#{1,4}\s*)?\**\s*([\p{Extended_Pictographic}\u200d\uFE0F]*)\s*【([^】\n]{2,20})】\s*\**\s*[：:]?\s*(.*)$/u
-    );
+    const sec_match =
+      trimmed.match(
+        /^(?:[-*•]\s*)?(?:#{1,4}\s*)?\**\s*(?:[\p{Extended_Pictographic}\u200d\uFE0F✅☑️✔️⚠️❗❕🚨]*)\s*\**\s*【([^】\n]{2,24})】\s*\**\s*[：:]?\s*\**\s*(.*)$/u
+      ) ||
+      trimmed.match(
+        /^(?:[-*•]\s*)?(?:#{1,4}\s*|\*\*)\s*(?:[\p{Extended_Pictographic}\u200d\uFE0F✅☑️✔️⚠️❗❕🚨]+)\s*\**\s*([^：:*#\n【】]{2,20}?)\s*\**\s*(?:[：:]\s*\**\s*(.*)|$)$/u
+      );
     if (sec_match) {
       flush_list();
       flush_table();
-      const sec_title = sec_match[2].trim();
-      const sec_rest = (sec_match[3] || "").trim();
+      const sec_title = sec_match[1].replace(/\*+/g, "").trim();
+      const sec_rest = (sec_match[2] || "").replace(/^\*+\s*/, "").trim();
       const [kind, icon] = md_section_kind(sec_title);
       out.push(
         `<div class="md-section md-section-${kind}">${ico(icon)}` +
@@ -2190,7 +2239,10 @@ function add_sources(parent_el, sources, label) {
   const src = document.createElement("div");
   src.className = "ai-sources";
   const title = document.createElement("b");
-  title.innerHTML = label || `${ico("link", "ico-xs")}可直接打开的原文链接`;
+  const clean_label = String(label || "")
+    .replace(/^[\s\p{Extended_Pictographic}\u200d\uFE0F📎🌐🔗]+/gu, "")
+    .trim();
+  title.innerHTML = `${ico("link", "ico-xs")}${esc(clean_label || "可直接打开的原文链接")}`;
   src.appendChild(title);
   valid_sources.forEach((item, i) => {
     const row = document.createElement("div");
@@ -2724,6 +2776,8 @@ $("askForm").onsubmit = async e => {
   let follow_ups = [];
   let answer_docs = [];
   let streamed_content = false;
+  let delta_chunks = 0;
+  let is_cached_hit = false;
   let retried = false;
   let finish_reason = "";
   let truncated_flag = false;
@@ -2731,17 +2785,18 @@ $("askForm").onsubmit = async e => {
   let cut_by_timeout = false;
   let soft_error = "";
 
-  const paint_bubble = is_streaming => {
+  const paint_bubble = (is_streaming, custom_text) => {
     let html = "";
+    const text_to_show = custom_text !== undefined ? custom_text : full_answer;
     if (full_reasoning.trim()) {
       const summary_label =
-        !full_answer.trim() && is_streaming
+        !text_to_show.trim() && is_streaming
           ? `${ico("bulb", "ico-xs")}正在深度思考并核对学校条款（点击展开）…`
           : `${ico("bulb", "ico-xs")}已深度思考（点击查看推理过程）`;
       html += `<details class="ai-reasoning"><summary>${summary_label}</summary><div class="ai-reasoning-body">${esc(full_reasoning.trim())}</div></details>`;
     }
-    if (full_answer.trim()) {
-      html += format_markdown_safe(strip_meta_talk(full_answer));
+    if (text_to_show.trim()) {
+      html += format_markdown_safe(strip_meta_talk(text_to_show));
     } else if (is_streaming) {
       html += `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在生成办事指引</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
     }
@@ -2850,6 +2905,7 @@ $("askForm").onsubmit = async e => {
           sources = parsed.sources || [];
           sources_label = parsed.sources_label || "";
           confidence = parsed.confidence || "";
+          if (parsed.cached === true) is_cached_hit = true;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           if (Array.isArray(parsed.knowledge_docs)) answer_docs = parsed.knowledge_docs;
           return;
@@ -2877,10 +2933,13 @@ $("askForm").onsubmit = async e => {
         }
 
         if (delta_content) {
+          delta_chunks++;
           full_answer += delta_content;
           if (full_answer.trim()) {
             streamed_content = true;
-            render_streaming_bubble(true);
+            if (!is_cached_hit && delta_content.length <= 80) {
+              render_streaming_bubble(true);
+            }
           }
         }
       };
@@ -3023,6 +3082,22 @@ $("askForm").onsubmit = async e => {
       if (full_answer.length <= length_before + 5) break;
     }
     continuing_note?.remove();
+    if (!aborted && full_answer.length > 40 && (is_cached_hit || delta_chunks <= 2)) {
+      const total_len = full_answer.length;
+      const step = Math.max(14, Math.min(36, Math.ceil(total_len / 28)));
+      let pos = 0;
+      await new Promise(resolve => {
+        const tick = () => {
+          if (aborted) return resolve();
+          pos = Math.min(total_len, pos + step);
+          paint_bubble(pos < total_len, full_answer.slice(0, pos));
+          follow_bottom();
+          if (pos >= total_len) return resolve();
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }
   };
 
   const handle_stopped = () => {

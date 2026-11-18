@@ -530,108 +530,101 @@ function get_ai_scroll_metrics() {
   const dist = Math.max(0, maxTop - msg_el.scrollTop);
   return { isWindow: false, el: msg_el, top: msg_el.scrollTop, client: msg_el.clientHeight, total: msg_el.scrollHeight, maxTop, dist };
 }
-function sync_scroll_btn() {
+function sync_scroll_btn(respectLock = false) {
+  if (respectLock && Date.now() < scroll_btn_lock_until) return;
   const btn = $("scrollBottomBtn");
   const m = get_ai_scroll_metrics();
   if (!btn || !m) return;
-  const shouldHide = auto_follow || m.dist < 110 || m.maxTop <= 110;
+  const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 72 || m.maxTop <= 48;
   btn.classList.toggle("hide", shouldHide);
 }
-let auto_follow = true;
-let scroll_lock_until = 0;
+let scroll_btn_lock_until = 0;
 
-function near_bottom(m) {
-  return !m || m.dist < 72;
-}
-
-function stop_follow() {
-  auto_follow = false;
-  sync_scroll_btn();
+/**
+ * Scroll once right after sending so the user's bubble stays in the reading zone.
+ * Streaming chunks grow downward below it without pulling the viewport to the bottom.
+ */
+function scroll_to_message_anchor(targetEl) {
+  const m = get_ai_scroll_metrics();
+  if (!m) return;
+  if (!targetEl || !targetEl.isConnected) {
+    sync_scroll_btn(false);
+    return;
+  }
+  scroll_btn_lock_until = 0;
+  if (m.isWindow) {
+    const hdr = document.querySelector("main > header");
+    const hdrBottom = hdr ? Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) : 64;
+    const tRect = targetEl.getBoundingClientRect();
+    const curTop = window.scrollY || window.pageYOffset || m.el.scrollTop || 0;
+    const desiredTop = Math.max(0, Math.round(curTop + tRect.top - (hdrBottom + 12)));
+    const targetTop = Math.min(m.maxTop, desiredTop);
+    if (Math.abs(targetTop - curTop) > 4) {
+      window.scrollTo({ top: targetTop, behavior: "smooth" });
+    }
+  } else {
+    const cRect = m.el.getBoundingClientRect();
+    const tRect = targetEl.getBoundingClientRect();
+    const desiredTop = Math.max(0, Math.round(m.el.scrollTop + (tRect.top - cRect.top) - 14));
+    const targetTop = Math.min(m.maxTop, desiredTop);
+    if (Math.abs(targetTop - m.el.scrollTop) > 4) {
+      m.el.scrollTo({ top: targetTop, behavior: "smooth" });
+    }
+  }
+  sync_scroll_btn(false);
 }
 
 const on_ai_scroll = () => {
   if (!document.body.classList.contains("on-ai-page")) return;
-  const m = get_ai_scroll_metrics();
-  if (m && Date.now() > scroll_lock_until) auto_follow = near_bottom(m);
-  sync_scroll_btn();
+  sync_scroll_btn(true);
 };
 $("messages")?.addEventListener("scroll", on_ai_scroll, { passive: true });
 window.addEventListener("scroll", () => {
   if (is_window_ai_scroll()) on_ai_scroll();
 }, { passive: true });
 
-$("messages")?.addEventListener("wheel", e => {
-  if (e.deltaY < 0) stop_follow();
-}, { passive: true });
-window.addEventListener("wheel", e => {
-  if (is_window_ai_scroll() && e.deltaY < 0) stop_follow();
-}, { passive: true });
-
-let touch_start_y = 0;
-const on_ai_touchstart = e => {
-  touch_start_y = e.touches?.[0]?.clientY ?? 0;
-};
-const on_ai_touchmove = e => {
-  const y = e.touches?.[0]?.clientY ?? touch_start_y;
-  if (y - touch_start_y > 10) stop_follow();
-};
-$("messages")?.addEventListener("touchstart", on_ai_touchstart, { passive: true });
-$("messages")?.addEventListener("touchmove", on_ai_touchmove, { passive: true });
-window.addEventListener("touchstart", e => {
-  if (is_window_ai_scroll()) on_ai_touchstart(e);
-}, { passive: true });
-window.addEventListener("touchmove", e => {
-  if (is_window_ai_scroll()) on_ai_touchmove(e);
-}, { passive: true });
-
 $("scrollBottomBtn")?.addEventListener("click", e => {
   const btn = e.currentTarget || $("scrollBottomBtn");
-  auto_follow = true;
   if (btn) {
     btn.classList.add("hide");
     try { btn.blur(); } catch {}
   }
   const m = get_ai_scroll_metrics();
   if (!m) return;
-  scroll_lock_until = Date.now() + 550;
+  scroll_btn_lock_until = Date.now() + 700;
   if (m.isWindow) {
     window.scrollTo({ top: m.total, behavior: "smooth" });
   } else {
     m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
   }
+  setTimeout(() => {
+    scroll_btn_lock_until = 0;
+    sync_scroll_btn(false);
+  }, 720);
 });
 
 function follow_bottom() {
-  const m = get_ai_scroll_metrics();
-  if (!m) return;
-  if (auto_follow && m.dist > 4) {
-    scroll_lock_until = Date.now() + 180;
-    if (m.isWindow) {
-      window.scrollTo({ top: m.total, behavior: "auto" });
-    } else {
-      const prev = m.el.style.scrollBehavior;
-      m.el.style.scrollBehavior = "auto";
-      m.el.scrollTop = m.el.scrollHeight;
-      m.el.style.scrollBehavior = prev;
-    }
-  }
-  sync_scroll_btn();
+  // 流式输出期间禁止自动滚到底部；仅刷新“回到底部”按钮显隐，由用户点击决定何时回底
+  sync_scroll_btn(true);
 }
 
 function scroll_messages_to_bottom(force = false) {
   const m = get_ai_scroll_metrics();
   if (!m) return;
   if (force) {
-    scroll_lock_until = Date.now() + 550;
-    auto_follow = true;
+    scroll_btn_lock_until = Date.now() + 700;
     $("scrollBottomBtn")?.classList.add("hide");
     if (m.isWindow) {
       window.scrollTo({ top: m.total, behavior: "smooth" });
     } else {
       m.el.scrollTo({ top: m.el.scrollHeight, behavior: "smooth" });
     }
+    setTimeout(() => {
+      scroll_btn_lock_until = 0;
+      sync_scroll_btn(false);
+    }, 720);
   } else {
-    sync_scroll_btn();
+    sync_scroll_btn(true);
   }
 }
 
@@ -662,7 +655,12 @@ function go(p) {
   if (p === "ai") {
     ensure_chat_restored();
     check_ai();
-    setTimeout(sync_hot_nav, 60);
+    setTimeout(() => {
+      sync_hot_nav();
+      sync_scroll_btn(false);
+    }, 60);
+  } else {
+    $("scrollBottomBtn")?.classList.add("hide");
   }
   if (p === "knowledge") load_knowledge();
   if (p === "schedule") {
@@ -2575,11 +2573,8 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
   }
 
   $("messages").appendChild(wrap);
-  if (who === "user" && !is_restoring) {
-    scroll_messages_to_bottom(true);
-  } else {
-    scroll_messages_to_bottom(false);
-  }
+  sync_scroll_btn(true);
+  return wrap;
 }
 
 $("clearChat")?.addEventListener("click", () => {
@@ -2588,6 +2583,7 @@ $("clearChat")?.addEventListener("click", () => {
     localStorage.removeItem(chat_cache_key_for());
   } catch {}
   $("messages").innerHTML = welcome_html(true);
+  sync_scroll_btn(false);
   toast("对话记录已清空");
 });
 
@@ -2856,7 +2852,6 @@ $("askForm").onsubmit = async e => {
   $("aiOptionsBar")?.classList.remove("open");
   $("toggleAiConfig")?.classList.remove("added");
 
-  auto_follow = true;
   const userMsgEl = create_message(q, "user");
   if (imgs.length && userMsgEl) {
     const bubble = userMsgEl.querySelector(".bubble");
@@ -2890,7 +2885,7 @@ $("askForm").onsubmit = async e => {
   bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}${want_thinking ? "正在开启深度思考并检索校规库" : "正在检索校规库并生成回答"}</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
   wrap.appendChild(bubble);
   $("messages").appendChild(wrap);
-  scroll_messages_to_bottom(true);
+  scroll_to_message_anchor(userMsgEl);
 
   let full_answer = "";
   let full_reasoning = "";
@@ -2941,7 +2936,7 @@ $("askForm").onsubmit = async e => {
     paint_tick = requestAnimationFrame(() => {
       paint_tick = 0;
       paint_bubble(true);
-      follow_bottom();
+      sync_scroll_btn(true);
     });
   };
 
@@ -3211,6 +3206,7 @@ $("askForm").onsubmit = async e => {
       note.innerHTML = `${ico("alert", "ico-xs")}生成过程被中断，以上为已收到的内容`;
       bubble.appendChild(note);
     }
+    sync_scroll_btn(true);
   };
 
   const ask_with_continuation = async () => {
@@ -3249,7 +3245,7 @@ $("askForm").onsubmit = async e => {
           if (aborted) return resolve();
           pos = Math.min(total_len, pos + step);
           paint_bubble(pos < total_len, full_answer.slice(0, pos));
-          follow_bottom();
+          sync_scroll_btn(true);
           if (pos >= total_len) return resolve();
           requestAnimationFrame(tick);
         };
@@ -3334,7 +3330,7 @@ $("askForm").onsubmit = async e => {
     wrap.classList.remove("is-generating");
     ai_abort_handler = null;
     set_ask_busy(false);
-    follow_bottom();
+    sync_scroll_btn(true);
   }
 };
 

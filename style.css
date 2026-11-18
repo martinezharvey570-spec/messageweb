@@ -473,14 +473,18 @@ label {
   padding: 0 8px 26px;
 }
 
-.sidebrand > div:last-child {
+.sidebrand > div:last-child,
+.sidebrand > .sidebrand-text {
   display: grid;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .sidebrand b {
   font-size: 17px;
   letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
 .sidebrand small {
@@ -488,6 +492,8 @@ label {
   letter-spacing: 1.2px;
   color: var(--subtle);
   font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
 .navcaption {

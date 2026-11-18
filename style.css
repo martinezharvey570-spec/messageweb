@@ -423,27 +423,39 @@ label {
   display: none;
 }
 
-/* ---- Toast 全局提示 ---- */
+/* ---- Toast 全局提示（Layer 4 液态玻璃浮层） ---- */
 .toast {
   position: fixed;
-  z-index: 120;
+  z-index: 1200;
   top: calc(16px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%) translateY(-16px) scale(0.96);
-  background: rgba(16, 24, 40, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: #ffffff;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.92) 0%, rgba(242, 247, 255, 0.84) 100%);
+  backdrop-filter: blur(24px) saturate(185%);
+  -webkit-backdrop-filter: blur(24px) saturate(185%);
+  color: var(--ink);
+  border: 0;
   border-radius: 999px;
   padding: 10px 20px;
   font-size: 13px;
-  font-weight: 500;
-  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.24);
+  font-weight: 600;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 14px 36px -8px rgba(15, 23, 42, 0.18);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   max-width: 90vw;
   text-align: center;
+}
+html.dark .toast {
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.92) 0%, rgba(15, 23, 42, 0.86) 100%);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 16px 38px -8px rgba(0, 0, 0, 0.52);
 }
 
 .toast.show {
@@ -3547,7 +3559,7 @@ header .header-left small, header .header-left p { overflow-wrap:anywhere; }
  header .header-left small, header .header-left p { font-size:12px; }
  .tab-item { padding-inline:2px; }
 }
-@media (max-width:380px) { #knowledgePage .knowledge-card-foot > div { grid-template-columns:minmax(0,1fr); } #knowledgePage .knowledge-card-foot button { min-height:42px; } #knowledgePage .pill-btn { padding-inline:12px; } }
+@media (max-width:380px) { #knowledgePage .knowledge-card-foot > div { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px !important; } #knowledgePage .knowledge-card-foot button { min-height:38px; font-size:13px; } #knowledgePage .pill-btn { padding-inline:12px; } }
 
 /* ---- 唯一标题制度目录：序号、计数与窄屏胶囊优化 ---- */
 #knowledgePage .cat-pills {
@@ -7867,10 +7879,11 @@ html.dark .msg-avatar.ai {
   font-weight: 600; font-size: 13px; background: none; border: none; cursor: pointer;
 }
 .sched-link-btn .ico { width: 14px; height: 14px; }
-.sched-clist { display: flex; flex-direction: column; gap: 7px; max-height: 260px; overflow-y: auto; }
+.sched-clist { display: flex; flex-direction: column; gap: 7px; max-height: 260px; overflow-y: auto; width: 100%; min-width: 0; max-width: 100%; }
 .sched-clist-item {
   display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 10px;
   border: 1px solid var(--line); background: var(--surface);
+  width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; overflow: hidden;
 }
 .sched-clist-item .bar { width: 3.5px; height: 28px; border-radius: 2px; flex: 0 0 auto; }
 .sched-clist-item .body { flex: 1; min-width: 0; cursor: pointer; }
@@ -8517,6 +8530,10 @@ html.dark .sched-ai-status.is-err {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .sched-manage-card {
   background: var(--card);
@@ -8524,25 +8541,35 @@ html.dark .sched-ai-status.is-err {
   border-radius: 16px;
   padding: 14px 16px;
   box-shadow: var(--shadow-xs);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .sched-manage-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 10px;
 }
 .sched-manage-card-head b { font-size: 14.5px; color: var(--ink); }
 .sched-manage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 @media (max-width: 960px) {
-  .sched-manage-grid { grid-template-columns: 1fr; }
+  .sched-manage-grid { grid-template-columns: minmax(0, 1fr); }
 }
 .sched-manage-page .sched-clist {
   max-height: none;
   overflow: visible;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* 全站所有弹窗风格统一 + 移动端底部弹窗触控丝滑下拉关闭 */
@@ -13117,6 +13144,9 @@ html.dark .sched-sub-card {
 /* 4. 修复待办日历弹窗卡在“任务清单”下方的层叠 Bug + 统一待办/全站输入框与日期触发按钮毛玻璃 */
 .panel:has(.xz-cal-pop.open),
 .panel:has(.xz-select.open),
+.sched-manage-card:has(.xz-cal-pop.open),
+.sched-field:has(.xz-cal-pop.open),
+dialog:has(.xz-cal-pop.open),
 .add-task-bar:has(.xz-cal-pop.open) {
   position: relative !important;
   z-index: 120 !important;
@@ -13128,19 +13158,24 @@ html.dark .sched-sub-card {
 }
 .xz-cal-pop {
   z-index: 140 !important;
-  max-width: calc(100vw - 40px);
-  padding: 12px 14px !important;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 246, 255, 0.78) 100%) !important;
+  max-width: calc(100vw - 24px);
+  padding: 14px !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 247, 255, 0.88) 100%) !important;
 }
 html.dark .xz-cal-pop {
-  background: linear-gradient(155deg, rgba(24, 33, 52, 0.90) 0%, rgba(15, 23, 42, 0.82) 100%) !important;
+  background: linear-gradient(155deg, rgba(24, 33, 52, 0.94) 0%, rgba(15, 23, 42, 0.88) 100%) !important;
+}
+.xz-cal-nav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .xz-cal-head button {
-  width: 30px !important;
-  height: 30px !important;
-  min-width: 30px !important;
-  min-height: 30px !important;
-  flex: 0 0 30px !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  flex: 0 0 28px !important;
   padding: 0 !important;
   border-radius: 50% !important;
   display: inline-grid !important;
@@ -13974,14 +14009,13 @@ html.dark .doc-m-pop {
   background: linear-gradient(155deg, rgba(22, 31, 48, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
 }
 @media (max-width: 760px) {
-  #addTaskForm .xz-date-wrap {
+  #addTaskForm .xz-date-wrap,
+  .sched-field .xz-date-wrap {
     position: relative !important;
   }
   .xz-cal-pop {
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    width: min(320px, calc(100vw - 28px)) !important;
+    width: min(304px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
   }
 }
 
@@ -14154,21 +14188,23 @@ html.dark #analyticsPage .stat-bars {
   }
   #auth.auth:not(.hide) {
     padding: 0 !important;
-    background: linear-gradient(180deg, #164bc9 0%, #1d5eef 170px, #eef4ff 228px, #f4f7fc 100%) !important;
+    background:
+      radial-gradient(95% 42% at 18% 8%, rgba(147, 197, 253, 0.34) 0%, transparent 56%),
+      radial-gradient(88% 38% at 86% 24%, rgba(99, 102, 241, 0.28) 0%, transparent 56%),
+      linear-gradient(180deg, #164bc9 0%, #2563eb 190px, #dbeafe 280px, #f4f7fc 360px, #f4f7fc 100%) !important;
   }
   html.dark #auth.auth:not(.hide) {
-    background: linear-gradient(180deg, #123c9e 0%, #164bc9 180px, #0b1120 260px, #0b1120 100%) !important;
+    background:
+      radial-gradient(95% 42% at 18% 8%, rgba(96, 165, 250, 0.26) 0%, transparent 56%),
+      radial-gradient(88% 38% at 86% 24%, rgba(99, 102, 241, 0.24) 0%, transparent 56%),
+      linear-gradient(180deg, #123c9e 0%, #1d4ed8 185px, #122147 285px, #0b1120 370px, #0b1120 100%) !important;
   }
   #auth.auth:not(.hide) .hero {
     margin-top: 0 !important;
-    padding: calc(34px + var(--safe-top)) 24px 86px !important;
+    padding: calc(34px + var(--safe-top)) 24px 82px !important;
     border-radius: 0 !important;
-    border-bottom-left-radius: 26px !important;
-    border-bottom-right-radius: 26px !important;
-    background:
-      radial-gradient(95% 80% at 18% 14%, rgba(147, 197, 253, 0.36) 0%, transparent 56%),
-      radial-gradient(88% 76% at 86% 80%, rgba(99, 102, 241, 0.34) 0%, transparent 56%),
-      linear-gradient(160deg, #164bc9 0%, #1d5eef 44%, #2563eb 78%, #3b82f6 100%) !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 }
 
@@ -14343,26 +14379,223 @@ body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md
   }
 }
 
-/* v1.106: 窄屏通知卡片操作栏单行紧凑对齐，防止末尾删除按钮孤立换行 */
+/* v1.106 / v1.107: 窄屏通知卡片操作栏单行紧凑对齐（360px 屏亦不换行） */
 @media (max-width: 480px) {
   .notice-actions {
-    gap: 5px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 100%;
   }
   .notice-actions .ai-btn,
   .notice-actions .added,
   .notice-actions .outline:not(.icon-only) {
-    padding: 5px 9px !important;
-    font-size: 11.5px !important;
-    min-height: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    min-height: 30px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0;
   }
   .notice-actions .icon-only {
-    width: 32px !important;
-    min-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
+    width: 29px !important;
+    min-width: 29px !important;
+    height: 29px !important;
+    min-height: 29px !important;
     padding: 0 !important;
+    flex-shrink: 0;
   }
   .notice-actions .icon-only.danger {
-    margin-left: 0 !important;
+    margin-left: auto !important;
   }
+}
+
+/* ==================== v1.107 四层液态玻璃一致化精修 ==================== */
+/* 1. 表单行内日期触发按钮与同排数字/文本输入框统一为 Layer 1 凹陷玻璃输入槽，聚焦/展开时升为 Layer 3 高亮 */
+.sched-field .xz-date-trigger,
+#addTaskForm .xz-date-trigger {
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  background:
+    linear-gradient(180deg, rgba(203, 213, 225, 0.34) 0%, rgba(241, 245, 249, 0.56) 100%) !important;
+  box-shadow:
+    inset 0 2px 5px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(15, 23, 42, 0.07) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+}
+.sched-field .xz-date-trigger:hover,
+.sched-field .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger,
+#addTaskForm .xz-date-trigger:hover,
+#addTaskForm .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(241, 245, 249, 0.72) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 2.5px rgba(37, 99, 235, 0.22),
+    0 6px 16px -4px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark .sched-field .xz-date-trigger,
+html.dark #addTaskForm .xz-date-trigger {
+  background:
+    linear-gradient(180deg, rgba(9, 14, 26, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%) !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+html.dark .sched-field .xz-date-trigger:hover,
+html.dark .sched-field .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger,
+html.dark #addTaskForm .xz-date-trigger:hover,
+html.dark #addTaskForm .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger {
+  background:
+    linear-gradient(180deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.66) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 2.5px rgba(59, 130, 246, 0.34) !important;
+}
+
+/* 去除浏览器原生 number 上下微调箭头，对齐极简胶囊视觉 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 2. 强化 Layer 2 承载面板与 Layer 3 浮起交互卡的景深落差，让“已录入课程”卡片从容器上真正浮起来 */
+.sched-manage-card,
+.sched-today-card {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.74) 0%, rgba(240, 246, 255, 0.62) 100%) !important;
+}
+html.dark .sched-manage-card,
+html.dark .sched-today-card {
+  background: linear-gradient(155deg, rgba(22, 31, 48, 0.74) 0%, rgba(15, 23, 42, 0.64) 100%) !important;
+}
+.sched-clist-item {
+  border-radius: 16px !important;
+  padding: 10px 12px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 255, 0.88) 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(15, 23, 42, 0.055),
+    0 4px 12px -3px rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .sched-clist-item {
+  background: linear-gradient(180deg, rgba(38, 49, 68, 0.90) 0%, rgba(24, 33, 50, 0.84) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 6px 16px -4px rgba(0, 0, 0, 0.36) !important;
+}
+
+/* 3. “+ 添加课程”链接钮升级为 Layer 3 淡蓝高光玻璃胶囊；“AI 导课表”强化星辉玻璃高光 */
+.sched-link-btn {
+  padding: 5px 12px !important;
+  min-height: 30px !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.84) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(239, 246, 255, 0.92) 0%, rgba(219, 234, 254, 0.72) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(37, 99, 235, 0.16),
+    0 2px 8px -2px rgba(37, 99, 235, 0.14) !important;
+  transition: transform 0.16s var(--lg-spring, ease), box-shadow 0.16s ease !important;
+}
+.sched-link-btn:active {
+  transform: scale(0.96);
+}
+html.dark .sched-link-btn {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.24) 0%, rgba(30, 58, 138, 0.18) 100%) !important;
+  color: #93c5fd !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(96, 165, 250, 0.26) !important;
+}
+.sched-sub-card.is-accent {
+  background:
+    radial-gradient(110% 90% at 12% 0%, rgba(255, 255, 255, 0.86) 0%, transparent 56%),
+    radial-gradient(80% 80% at 92% 88%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(240, 246, 255, 0.88) 0%, rgba(255, 255, 255, 0.76) 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(37, 99, 235, 0.14),
+    0 8px 22px -6px rgba(37, 99, 235, 0.12) !important;
+}
+html.dark .sched-sub-card.is-accent {
+  background:
+    radial-gradient(110% 90% at 12% 0%, rgba(96, 165, 250, 0.18) 0%, transparent 56%),
+    linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(96, 165, 250, 0.22),
+    0 8px 24px -6px rgba(0, 0, 0, 0.40) !important;
+}
+
+/* ==================== v1.108 移动端深度精修（课程弹窗快捷钮、阅读器 AI 圆钮、登录渐隐过渡） ==================== */
+.sched-weeks-head {
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+.sched-weeks-quick {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 5px !important;
+  flex-shrink: 0;
+}
+.sched-weeks-quick button {
+  min-height: 26px !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  border: 0 !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.80) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(241, 245, 249, 0.62) 100%) !important;
+  color: var(--ink-secondary) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 2px 6px -2px rgba(15, 23, 42, 0.06) !important;
+}
+.sched-weeks-quick button:hover {
+  color: var(--blue) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(37, 99, 235, 0.24) !important;
+}
+html.dark .sched-weeks-quick button {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.72) 0%, rgba(30, 41, 59, 0.62) 100%) !important;
+  color: var(--ink) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.11) !important;
+}
+
+.doc-m-btn.is-ai {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.84) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(239, 246, 255, 0.94) 0%, rgba(219, 234, 254, 0.76) 100%) !important;
+  color: var(--blue) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(37, 99, 235, 0.16),
+    0 2px 8px -2px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark .doc-m-btn.is-ai {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.28) 0%, rgba(30, 58, 138, 0.22) 100%) !important;
+  color: #93c5fd !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(96, 165, 250, 0.28) !important;
 }

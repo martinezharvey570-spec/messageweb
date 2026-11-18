@@ -651,6 +651,8 @@ function go(p) {
     analytics: "数据统计"
   }[p] || "工作台总览";
   sidebar_el.classList.remove("open");
+  if (typeof window.close_all_date_pickers === "function") window.close_all_date_pickers();
+  document.querySelectorAll(".xz-select.open").forEach(s => s.classList.remove("open"));
   if (typeof window.sync_nav_sliders === "function") window.sync_nav_sliders();
   window.scrollTo(0, 0);
   if (p === "ai") {
@@ -4049,10 +4051,15 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
-/* ---- v1.007: 全站自定义日历组件 (替换所有系统 <input type="date">) ---- */
+/* ---- v1.007 / v1.107: 全站自定义液态玻璃日历组件 (替换所有静态与动态 <input type="date">) ---- */
 (function init_custom_date_pickers() {
-  document.querySelectorAll('input[type="date"]').forEach(inp => {
-    if (inp.dataset.xzDateDone) return;
+  const localTodayStr = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  };
+
+  function enhanceDateInput(inp) {
+    if (!inp || inp.dataset.xzDateDone) return;
     inp.dataset.xzDateDone = "1";
     inp.classList.add("xz-native-select-hidden");
 
@@ -4064,22 +4071,66 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
     const pop = document.createElement("div");
     pop.className = "xz-cal-pop";
 
-    let viewDate = new Date();
+    const placeholderText = inp.dataset.placeholder || "选择日期（选填）";
+    const noClear = inp.dataset.noClear === "1";
+
+    let viewDate = inp.value ? new Date(inp.value + "T00:00:00") : new Date();
+    if (Number.isNaN(viewDate.getTime())) viewDate = new Date();
+
     const syncText = () => {
       if (inp.value) {
         trig.classList.remove("is-empty");
         trig.innerHTML = `<span>${inp.value}</span><svg class="ico ico-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M8 2.8v3.4M16 2.8v3.4M3.5 9.5h17"/></svg>`;
       } else {
         trig.classList.add("is-empty");
-        trig.innerHTML = `<span>选择日期（选填）</span><svg class="ico ico-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M8 2.8v3.4M16 2.8v3.4M3.5 9.5h17"/></svg>`;
+        trig.innerHTML = `<span>${placeholderText}</span><svg class="ico ico-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M8 2.8v3.4M16 2.8v3.4M3.5 9.5h17"/></svg>`;
       }
+    };
+
+    const positionPop = () => {
+      const hostRoot = inp.closest("dialog") || document.body;
+      if (pop.parentNode !== hostRoot) hostRoot.appendChild(pop);
+      pop.style.position = "fixed";
+      pop.style.zIndex = "1100";
+      pop.style.right = "auto";
+      pop.style.bottom = "auto";
+      pop.style.transform = "none";
+      pop.style.left = "0px";
+      pop.style.top = "0px";
+      const tr = trig.getBoundingClientRect();
+      const pr = pop.getBoundingClientRect();
+      const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+      const vh = window.innerHeight || document.documentElement.clientHeight || 800;
+      const safeBottom = vw <= 760 && !inp.closest("dialog") ? 82 : 14;
+      const left = Math.max(12, Math.min(vw - pr.width - 12, tr.left));
+      let top = tr.bottom + 6;
+      if (top + pr.height > vh - safeBottom && tr.top - pr.height - 6 >= 12) {
+        top = tr.top - pr.height - 6;
+      } else if (top + pr.height > vh - 12) {
+        top = Math.max(12, vh - pr.height - 12);
+      }
+      pop.style.left = Math.round(left) + "px";
+      pop.style.top = Math.round(top) + "px";
+    };
+
+    const triggerPopUpdate = () => {
+      document.querySelectorAll(".xz-cal-pop.open").forEach(p => {
+        p.classList.remove("open");
+        if (p._ownerInp && !p._ownerInp.isConnected) p.remove();
+      });
+    };
+    pop._ownerInp = inp;
+
+    const closePop = () => {
+      pop.classList.remove("open");
+      if (wrap.isConnected && pop.parentNode !== wrap) wrap.appendChild(pop);
     };
 
     const renderCal = () => {
       const y = viewDate.getFullYear(), m = viewDate.getMonth();
       const firstDay = new Date(y, m, 1).getDay();
       const daysInMonth = new Date(y, m + 1, 0).getDate();
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayStr = localTodayStr();
       let cells = ["日", "一", "二", "三", "四", "五", "六"].map(w => `<div class="xz-cal-wd">${w}</div>`).join("");
       for (let i = 0; i < firstDay; i++) cells += `<div></div>`;
       for (let d = 1; d <= daysInMonth; d++) {
@@ -4089,26 +4140,37 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
       }
       pop.innerHTML = `
         <div class="xz-cal-head">
-          <button type="button" data-cal-prev>‹</button>
+          <div class="xz-cal-nav-group">
+            <button type="button" data-cal-prev-year title="上一年">«</button>
+            <button type="button" data-cal-prev title="上一月">‹</button>
+          </div>
           <span>${y} 年 ${m + 1} 月</span>
-          <button type="button" data-cal-next>›</button>
+          <div class="xz-cal-nav-group">
+            <button type="button" data-cal-next title="下一月">›</button>
+            <button type="button" data-cal-next-year title="下一年">»</button>
+          </div>
         </div>
         <div class="xz-cal-grid">${cells}</div>
         <div class="xz-cal-foot">
-          <button type="button" data-cal-clear>清空</button>
+          ${noClear ? `<span></span>` : `<button type="button" data-cal-clear>清空</button>`}
           <button type="button" data-cal-today>今天</button>
         </div>`;
 
+      pop.querySelector("[data-cal-prev-year]").onclick = e => { e.stopPropagation(); viewDate = new Date(y - 1, m, 1); renderCal(); };
       pop.querySelector("[data-cal-prev]").onclick = e => { e.stopPropagation(); viewDate = new Date(y, m - 1, 1); renderCal(); };
       pop.querySelector("[data-cal-next]").onclick = e => { e.stopPropagation(); viewDate = new Date(y, m + 1, 1); renderCal(); };
-      pop.querySelector("[data-cal-clear]").onclick = e => { e.stopPropagation(); inp.value = ""; syncText(); pop.classList.remove("open"); inp.dispatchEvent(new Event("change", { bubbles: true })); };
-      pop.querySelector("[data-cal-today]").onclick = e => { e.stopPropagation(); inp.value = todayStr; syncText(); pop.classList.remove("open"); inp.dispatchEvent(new Event("change", { bubbles: true })); };
+      pop.querySelector("[data-cal-next-year]").onclick = e => { e.stopPropagation(); viewDate = new Date(y + 1, m, 1); renderCal(); };
+      const clrBtn = pop.querySelector("[data-cal-clear]");
+      if (clrBtn) {
+        clrBtn.onclick = e => { e.stopPropagation(); inp.value = ""; syncText(); closePop(); inp.dispatchEvent(new Event("change", { bubbles: true })); };
+      }
+      pop.querySelector("[data-cal-today]").onclick = e => { e.stopPropagation(); inp.value = todayStr; syncText(); closePop(); inp.dispatchEvent(new Event("change", { bubbles: true })); };
       pop.querySelectorAll("[data-ds]").forEach(b => {
         b.onclick = e => {
           e.stopPropagation();
           inp.value = b.dataset.ds;
           syncText();
-          pop.classList.remove("open");
+          closePop();
           inp.dispatchEvent(new Event("change", { bubbles: true }));
         };
       });
@@ -4117,24 +4179,59 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
     trig.onclick = e => {
       e.stopPropagation();
       const willOpen = !pop.classList.contains("open");
-      document.querySelectorAll(".xz-cal-pop.open").forEach(p => p.classList.remove("open"));
+      triggerPopUpdate();
       if (willOpen) {
-        if (inp.value) viewDate = new Date(inp.value + "T00:00:00");
+        if (inp.value) {
+          const parsed = new Date(inp.value + "T00:00:00");
+          if (!Number.isNaN(parsed.getTime())) viewDate = parsed;
+        }
         renderCal();
         pop.classList.add("open");
+        positionPop();
+      } else {
+        closePop();
       }
     };
 
+    pop.addEventListener("click", e => e.stopPropagation());
     inp.addEventListener("change", syncText);
     wrap.appendChild(trig);
     wrap.appendChild(pop);
     inp.parentNode.insertBefore(wrap, inp.nextSibling);
     syncText();
-  });
+  }
 
-  document.addEventListener("click", () => {
+  window.enhance_date_pickers = (root = document) => {
+    document.querySelectorAll("body > .xz-cal-pop").forEach(p => {
+      if (p._ownerInp && !p._ownerInp.isConnected) p.remove();
+    });
+    const scope = root && typeof root.querySelectorAll === "function" ? root : document;
+    scope.querySelectorAll('input[type="date"]').forEach(enhanceDateInput);
+  };
+
+  window.enhance_date_pickers(document);
+
+  let scanQueued = false;
+  if (typeof MutationObserver === "function" && document.body) {
+    new MutationObserver(() => {
+      if (scanQueued) return;
+      scanQueued = true;
+      queueMicrotask(() => {
+        scanQueued = false;
+        window.enhance_date_pickers(document);
+      });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  window.close_all_date_pickers = () => {
     document.querySelectorAll(".xz-cal-pop.open").forEach(p => p.classList.remove("open"));
-  });
+  };
+  document.addEventListener("click", window.close_all_date_pickers);
+  window.addEventListener("resize", window.close_all_date_pickers, { passive: true });
+  window.addEventListener("scroll", e => {
+    if (e.target && e.target.closest && e.target.closest(".xz-cal-pop")) return;
+    window.close_all_date_pickers();
+  }, { passive: true });
 })();
 
 /* ---- v1.009: 移动端阅读器顶部纯符号按钮联动 ---- */
@@ -4892,7 +4989,7 @@ function render_schedule_manage() {
       <div class="sched-field-row">
         <div class="sched-field">
           <label>第 1 周周一日期</label>
-          <input type="date" data-manage-start value="${schedEsc(schedState.startDate)}">
+          <input type="date" data-manage-start data-no-clear="1" data-placeholder="选择开学日期" value="${schedEsc(schedState.startDate)}">
         </div>
         <div class="sched-field">
           <label>学期总周数</label>
@@ -4919,8 +5016,14 @@ function render_schedule_manage() {
     </div>
   `;
 
-  if ($("schedDeskManageHost")) $("schedDeskManageHost").innerHTML = html;
-  if ($("schedMobManageHost")) $("schedMobManageHost").innerHTML = html;
+  if ($("schedDeskManageHost")) {
+    $("schedDeskManageHost").innerHTML = html;
+    if (typeof window.enhance_date_pickers === "function") window.enhance_date_pickers($("schedDeskManageHost"));
+  }
+  if ($("schedMobManageHost")) {
+    $("schedMobManageHost").innerHTML = html;
+    if (typeof window.enhance_date_pickers === "function") window.enhance_date_pickers($("schedMobManageHost"));
+  }
 }
 
 function render_setting_course_list() { render_schedule_manage(); }

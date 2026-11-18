@@ -417,6 +417,9 @@
                       token: d2.token,
                       remember: true
                     });
+                    try {
+                      window.dispatchEvent(new CustomEvent("xz-token-renewed", { detail: { token: d2.token } }));
+                    } catch (e) {}
                     return d2.token;
                   }
                   return null;

@@ -60,6 +60,11 @@ let ai_abort_handler = null;
 let ai_todo_draft = [];
 let ai_todo_source_question = "";
 
+window.addEventListener("xz-token-renewed", e => {
+  const nt = e && e.detail && e.detail.token;
+  if (nt) token = String(nt);
+});
+
 function clear_saved_auth(mark_manual_logout = false) {
   try {
     document.documentElement.classList.remove("has-saved-auth");
@@ -237,7 +242,7 @@ function sync_theme_root(is_dark) {
   if (document.body) document.body.classList.toggle("dark", dark);
   const booting = root.classList.contains("app-booting");
   const on_auth = !booting && $("auth") && !$("auth").classList.contains("hide");
-  const topBg = booting ? (dark ? "#0b1120" : "#f8fafc") : (on_auth ? "#0b1e54" : (dark ? "#0b1120" : "#eef4ff"));
+  const topBg = booting ? (dark ? "#0b1120" : "#f8fafc") : (on_auth ? "#164bc9" : (dark ? "#0b1120" : "#eef4ff"));
   root.style.background = topBg;
   root.style.colorScheme = dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -678,6 +683,24 @@ function set_boot_progress(pct, text, isError = false) {
   if (splash) splash.classList.toggle("is-error", !!isError);
 }
 
+function next_paint() {
+  return new Promise(resolve => {
+    let settled = false;
+    const fin = () => {
+      if (!settled) {
+        settled = true;
+        resolve();
+      }
+    };
+    setTimeout(fin, 80);
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => requestAnimationFrame(fin));
+    } else {
+      setTimeout(fin, 16);
+    }
+  });
+}
+
 function wait_assets_ready() {
   const loadDone = document.readyState === "complete"
     ? Promise.resolve()
@@ -689,9 +712,7 @@ function wait_assets_ready() {
   const fontsDone = (document.fonts && document.fonts.ready)
     ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1800))])
     : Promise.resolve();
-  return Promise.all([loadDone, fontsDone]).then(() =>
-    new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
-  );
+  return Promise.all([loadDone, fontsDone]).then(() => next_paint());
 }
 
 async function finish_boot_gate(showAuth) {
@@ -701,7 +722,7 @@ async function finish_boot_gate(showAuth) {
   if (appEl) appEl.classList.toggle("hide", !!showAuth);
   document.documentElement.classList.remove("app-booting", "has-saved-auth");
   sync_theme_root(document.documentElement.classList.contains("dark"));
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  await next_paint();
   const splash = $("appBootSplash");
   if (splash && !splash.classList.contains("is-done")) {
     splash.classList.add("is-done");
@@ -2865,7 +2886,8 @@ $("askForm").onsubmit = async e => {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble msg-ai";
-  bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在检索校规库并思考中</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+  const want_thinking = $("aiThinking")?.checked !== false;
+  bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}${want_thinking ? "正在开启深度思考并检索校规库" : "正在检索校规库并生成回答"}</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
   wrap.appendChild(bubble);
   $("messages").appendChild(wrap);
   scroll_messages_to_bottom(true);
@@ -3022,8 +3044,14 @@ $("askForm").onsubmit = async e => {
           finish_reason = String(parsed.choices[0].finish_reason);
         }
 
-        const delta_reason = parsed.choices?.[0]?.delta?.reasoning_content || "";
-        const delta_content =
+        const delta_reason =
+          parsed.choices?.[0]?.delta?.reasoning_content ??
+          parsed.choices?.[0]?.delta?.reasoning ??
+          parsed.choices?.[0]?.delta?.thinking ??
+          parsed.choices?.[0]?.delta?.thinking_content ??
+          parsed.reasoning ??
+          "";
+        let delta_content =
           parsed.choices?.[0]?.delta?.content ??
           parsed.choices?.[0]?.message?.content ??
           parsed.answer ??
@@ -3037,6 +3065,32 @@ $("askForm").onsubmit = async e => {
         if (delta_content) {
           delta_chunks++;
           full_answer += delta_content;
+          if (/<think>/i.test(full_answer)) {
+            const closedRe = /<think>([\s\S]*?)<\/think>/gi;
+            let matchedClosed = false;
+            full_answer = full_answer.replace(closedRe, (_, inner) => {
+              if (inner && inner.trim()) {
+                full_reasoning += (full_reasoning ? "\n" : "") + inner.trim();
+              }
+              matchedClosed = true;
+              return "";
+            });
+            const openIdx = full_answer.search(/<think>/i);
+            if (openIdx !== -1) {
+              const liveThink = full_answer.slice(openIdx + 7);
+              const baseAns = full_answer.slice(0, openIdx);
+              const liveReasonDisplay = full_reasoning + (liveThink.trim() ? (full_reasoning ? "\n" : "") + liveThink : "");
+              if (liveReasonDisplay.trim()) {
+                const prevR = full_reasoning;
+                full_reasoning = liveReasonDisplay;
+                paint_bubble(true, baseAns);
+                full_reasoning = prevR;
+                return;
+              }
+            } else if (matchedClosed) {
+              render_streaming_bubble(true);
+            }
+          }
           if (full_answer.trim()) {
             streamed_content = true;
             if (!is_cached_hit && delta_content.length <= 80) {
@@ -3107,6 +3161,8 @@ $("askForm").onsubmit = async e => {
       if (!full_answer.trim() && raw_fallback.trim().startsWith("{")) {
         try {
           const d = JSON.parse(raw_fallback.trim());
+          const fbReason = d.reasoning || d.choices?.[0]?.message?.reasoning_content || d.choices?.[0]?.message?.reasoning || "";
+          if (fbReason && !full_reasoning.trim()) full_reasoning = String(fbReason).trim();
           full_answer = String(d.answer || d.choices?.[0]?.message?.content || "").trim();
           sources = d.sources || sources;
           if (full_answer) render_streaming_bubble(false);

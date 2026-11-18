@@ -14128,14 +14128,14 @@ html.dark #analyticsPage .stat-bars {
 @media (max-width: 900px) {
   html:not(.app-booting):has(#auth:not(.hide)),
   body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
-    background: #0b1120 !important;
+    background: #164bc9 !important;
   }
   #auth.auth:not(.hide) {
     padding: 0 !important;
-    background: linear-gradient(180deg, #0b1120 0%, #0b1120 170px, #eef4ff 220px, #f4f7fc 100%) !important;
+    background: linear-gradient(180deg, #164bc9 0%, #1d5eef 170px, #eef4ff 228px, #f4f7fc 100%) !important;
   }
   html.dark #auth.auth:not(.hide) {
-    background: linear-gradient(180deg, #0b1120 0%, #0d1f52 200px, #0b1120 100%) !important;
+    background: linear-gradient(180deg, #123c9e 0%, #164bc9 180px, #0b1120 260px, #0b1120 100%) !important;
   }
   #auth.auth:not(.hide) .hero {
     margin-top: 0 !important;
@@ -14144,26 +14144,48 @@ html.dark #analyticsPage .stat-bars {
     border-bottom-left-radius: 26px !important;
     border-bottom-right-radius: 26px !important;
     background:
-      radial-gradient(95% 80% at 86% 18%, rgba(99, 102, 241, 0.34) 0%, transparent 56%),
-      linear-gradient(180deg, #0b1120 0%, #102a6b 26%, #1d4ed8 68%, #2563eb 100%) !important;
+      radial-gradient(95% 80% at 18% 14%, rgba(147, 197, 253, 0.36) 0%, transparent 56%),
+      radial-gradient(88% 76% at 86% 80%, rgba(99, 102, 241, 0.34) 0%, transparent 56%),
+      linear-gradient(160deg, #164bc9 0%, #1d5eef 44%, #2563eb 78%, #3b82f6 100%) !important;
   }
 }
 
 @media (max-width: 1000px) {
   main > header {
-    min-height: calc(56px + var(--safe-top)) !important;
-    height: auto !important;
-    padding: calc(8px + var(--safe-top)) 16px 8px !important;
-    background: linear-gradient(180deg, rgba(238, 244, 255, 0.72) 0%, rgba(246, 249, 255, 0.50) 100%) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    min-height: calc(58px + var(--safe-top)) !important;
+    height: calc(58px + var(--safe-top)) !important;
+    padding: calc(6px + var(--safe-top)) 16px 6px !important;
+    background: linear-gradient(180deg, rgba(238, 244, 255, 0.78) 0%, rgba(246, 249, 255, 0.62) 100%) !important;
     backdrop-filter: blur(26px) saturate(190%) !important;
     -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.045) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
     box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.07) !important;
   }
   html.dark main > header {
-    background: linear-gradient(180deg, rgba(11, 17, 32, 0.78) 0%, rgba(15, 23, 42, 0.60) 100%) !important;
+    background: linear-gradient(180deg, rgba(11, 17, 32, 0.84) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.38) !important;
+  }
+  /* 移动端侧边栏彻底避让顶部状态栏与底部悬浮导航 */
+  #sidebar {
+    padding-top: calc(20px + var(--safe-top)) !important;
+    padding-bottom: calc(74px + var(--safe-bottom)) !important;
+    z-index: 999 !important;
+  }
+  /* 移动端超级课表粘性顶栏紧贴应用顶栏下方，绝不穿透进系统状态栏 */
+  .sched-m-sticky {
+    position: sticky !important;
+    top: calc(58px + var(--safe-top)) !important;
+    z-index: 18 !important;
+    margin: -14px -14px 14px !important;
+    padding: 10px 14px 8px !important;
+  }
+  /* 移动端公文阅读器顶部工具栏同样避让系统状态栏 */
+  dialog#docDialog.doc-dialog .doc-reader {
+    padding-top: calc(10px + var(--safe-top)) !important;
   }
   .mobile-tabbar,
   body.on-ai-page .mobile-tabbar {
@@ -14172,6 +14194,33 @@ html.dark #analyticsPage .stat-bars {
   body.on-ai-page .ask {
     bottom: calc(76px + var(--safe-bottom)) !important;
   }
+}
+
+/* 2b. 移动端与桌面端 AI 回复有序编号列表 (.md-ol) 修复：防止 v1.092 全局 li padding 覆写导致 "1234" 序号圈与首字重叠 */
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ol.md-ol {
+  padding-left: 0 !important;
+  list-style: none !important;
+  counter-reset: mdn !important;
+  margin: 8px 0 12px !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ol.md-ol > li {
+  position: relative !important;
+  padding-left: 30px !important;
+  margin: 5px 0 !important;
+  min-height: 22px;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ol.md-ol > li::before {
+  content: counter(mdn) !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 3px !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md-list {
+  padding-left: 20px !important;
+  margin: 6px 0 10px !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md-list > li {
+  padding-left: 4px !important;
 }
 
 /* 3. 桌面端登录页美学重构：等高双玻璃对称舞台 + 柔和氛围背景 + 精致质感细节 */

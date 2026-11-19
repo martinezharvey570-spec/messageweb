@@ -15072,135 +15072,128 @@ html.dark .sched-ai-refine-row input {
 }
 
 /* ================================================================
-   v1.110: 珠光液态玻璃（Pearlescent Liquid Glass）四层光学设计系统
-           + 桌面/移动端页面美学精修 + 移动端 AI 回复极简折叠底栏
+   v1.111: 冰蓝白（Ice-Blue-White）四层实感晶透玻璃系统
+           + 侧边栏/底栏统一淡冰蓝透镜 + 底部背景降噪 + AI底栏精简
    ================================================================ */
 
-/* ---- 0. 珠光光学色彩与四层变量体系 ---- */
+/* ---- 0. 冰蓝白四层光学变量体系（外实内亮双层切面，彻底去虚） ---- */
 :root {
+  /* Layer 0: 顶部微冷天光，中下部干净纯净冰灰白，彻底去除底部浓色块 */
   --pearl-canvas:
-    radial-gradient(64% 48% at 10% -4%, rgba(56, 189, 248, 0.11) 0%, transparent 62%),
-    radial-gradient(52% 44% at 92% 4%, rgba(167, 139, 250, 0.085) 0%, transparent 60%),
-    radial-gradient(58% 46% at 86% 96%, rgba(244, 114, 182, 0.055) 0%, transparent 62%),
-    radial-gradient(50% 42% at 14% 92%, rgba(96, 165, 250, 0.07) 0%, transparent 62%),
-    linear-gradient(168deg, #f3f7fe 0%, #f8faff 48%, #f2f5fc 100%);
+    radial-gradient(66% 40% at 16% -6%, rgba(56, 189, 248, 0.085) 0%, transparent 62%),
+    radial-gradient(50% 34% at 86% -4%, rgba(96, 165, 250, 0.055) 0%, transparent 58%),
+    linear-gradient(180deg, #eef4fc 0%, #f4f7fb 40%, #f5f7fa 100%);
 
-  /* Layer 1: 凹陷玻璃槽 */
-  --pearl-l1-bg: linear-gradient(180deg, rgba(219, 228, 242, 0.42) 0%, rgba(241, 245, 252, 0.68) 100%);
+  /* Layer 1: 凹陷玻璃槽（明确沉入卡片内部） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(214, 226, 242, 0.46) 0%, rgba(238, 244, 252, 0.72) 100%);
   --pearl-l1-shadow:
-    inset 0 1.5px 3.5px rgba(15, 23, 42, 0.065),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.90),
-    0 0 0 1px rgba(15, 23, 42, 0.055);
+    inset 0 1.5px 3px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(15, 23, 42, 0.07);
 
-  /* Layer 2: 珠光内容主卡（左上高光 + 极微冰蓝/丁香紫双边色散折射） */
+  /* Layer 2: 冰蓝白内容主卡（外实1px冷切边 + 内亮顶部镜面高光 + 贴底两段影） */
   --pearl-l2-bg:
-    radial-gradient(125% 78% at 10% -6%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0) 56%),
-    radial-gradient(90% 70% at 94% 4%, rgba(224, 231, 255, 0.42) 0%, rgba(243, 232, 255, 0.16) 40%, transparent 72%),
-    linear-gradient(156deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 251, 255, 0.74) 52%, rgba(246, 248, 255, 0.82) 100%);
+    radial-gradient(115% 62% at 12% -6%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 52%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 251, 255, 0.85) 100%);
   --pearl-l2-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-    inset 1px 0 0 rgba(191, 219, 254, 0.48),
-    inset -1px 0 0 rgba(233, 213, 255, 0.40),
-    inset 0 -1px 0 rgba(148, 163, 184, 0.14),
-    0 0 0 1px rgba(255, 255, 255, 0.76),
-    0 10px 28px -12px rgba(30, 58, 138, 0.10),
-    0 2px 6px rgba(15, 23, 42, 0.03);
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(219, 234, 254, 0.65),
+    inset -1px 0 0 rgba(219, 234, 254, 0.45),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 8px 20px -8px rgba(15, 23, 42, 0.08);
   --pearl-l2-shadow-hover:
     inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(147, 197, 253, 0.65),
-    inset -1px 0 0 rgba(216, 180, 254, 0.56),
-    inset 0 -1px 0 rgba(148, 163, 184, 0.14),
-    0 0 0 1px rgba(191, 219, 254, 0.68),
-    0 16px 36px -12px rgba(37, 99, 235, 0.14),
-    0 4px 10px rgba(15, 23, 42, 0.04);
+    inset 1px 0 0 rgba(147, 197, 253, 0.72),
+    inset -1px 0 0 rgba(147, 197, 253, 0.56),
+    inset 0 -1px 0 rgba(59, 130, 246, 0.16),
+    0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 2px 5px rgba(37, 99, 235, 0.08),
+    0 12px 26px -10px rgba(37, 99, 235, 0.15);
 
-  /* Layer 3: 悬浮珠光导航与晶透胶囊 */
+  /* Layer 3: 悬浮冰蓝白导航与晶透浮岛 */
   --pearl-l3-bg:
-    radial-gradient(120% 90% at 14% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 56%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(244, 248, 255, 0.76) 100%);
+    radial-gradient(115% 80% at 14% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(244, 249, 255, 0.84) 100%);
   --pearl-l3-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-    inset 1px 0 0 rgba(191, 219, 254, 0.44),
-    inset -1px 0 0 rgba(233, 213, 255, 0.36),
-    0 0 0 1px rgba(255, 255, 255, 0.78),
-    0 12px 32px -10px rgba(30, 58, 138, 0.13),
-    0 3px 10px rgba(15, 23, 42, 0.045);
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.20),
+    0 0 0 1px rgba(15, 23, 42, 0.09),
+    0 2px 5px rgba(15, 23, 42, 0.06),
+    0 10px 24px -8px rgba(15, 23, 42, 0.11);
 
   /* Layer 4: 顶层晶透弹窗/日历/浮层 */
   --pearl-l4-bg:
-    radial-gradient(110% 65% at 14% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 52%),
-    radial-gradient(80% 60% at 92% 4%, rgba(224, 231, 255, 0.36) 0%, transparent 66%),
-    linear-gradient(164deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 255, 0.90) 100%);
+    radial-gradient(110% 60% at 14% 0%, rgba(255, 255, 255, 0.99) 0%, transparent 50%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 255, 0.93) 100%);
   --pearl-l4-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(191, 219, 254, 0.56),
-    inset -1px 0 0 rgba(233, 213, 255, 0.48),
-    0 0 0 1px rgba(255, 255, 255, 0.85),
-    0 28px 64px -14px rgba(15, 23, 42, 0.20),
-    0 6px 18px rgba(30, 58, 138, 0.08);
+    inset 0 -1px 0 rgba(148, 163, 184, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.10),
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 24px 52px -12px rgba(15, 23, 42, 0.20);
 }
 
 html.dark,
 html.dark body {
+  /* Layer 0 暗黑：顶部克制深海蓝微光，底部沉静纯净深蓝黑 */
   --pearl-canvas:
-    radial-gradient(64% 48% at 12% -4%, rgba(59, 130, 246, 0.16) 0%, transparent 62%),
-    radial-gradient(54% 44% at 90% 6%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
-    radial-gradient(56% 46% at 84% 96%, rgba(34, 211, 238, 0.085) 0%, transparent 62%),
-    linear-gradient(168deg, #080d1a 0%, #0b1222 50%, #090e1c 100%);
+    radial-gradient(62% 38% at 14% -6%, rgba(59, 130, 246, 0.13) 0%, transparent 60%),
+    radial-gradient(46% 32% at 88% -2%, rgba(56, 189, 248, 0.055) 0%, transparent 56%),
+    linear-gradient(180deg, #0b1324 0%, #09101e 46%, #080d18 100%);
 
-  --pearl-l1-bg: linear-gradient(180deg, rgba(7, 11, 22, 0.62) 0%, rgba(15, 23, 42, 0.50) 100%);
+  --pearl-l1-bg: linear-gradient(180deg, rgba(6, 10, 20, 0.72) 0%, rgba(13, 21, 38, 0.56) 100%);
   --pearl-l1-shadow:
-    inset 0 1.5px 4px rgba(0, 0, 0, 0.42),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.09),
-    0 0 0 1px rgba(255, 255, 255, 0.07);
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(148, 197, 255, 0.12),
+    0 0 0 1px rgba(148, 197, 255, 0.09);
 
   --pearl-l2-bg:
-    radial-gradient(120% 76% at 12% -8%, rgba(147, 197, 253, 0.13) 0%, transparent 54%),
-    radial-gradient(88% 68% at 94% 4%, rgba(167, 139, 250, 0.10) 0%, transparent 68%),
-    linear-gradient(156deg, rgba(24, 34, 54, 0.80) 0%, rgba(15, 23, 42, 0.74) 55%, rgba(19, 27, 46, 0.82) 100%);
+    radial-gradient(115% 68% at 12% -8%, rgba(186, 230, 253, 0.11) 0%, transparent 52%),
+    linear-gradient(170deg, rgba(24, 36, 58, 0.86) 0%, rgba(15, 23, 42, 0.82) 100%);
   --pearl-l2-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 1px 0 0 rgba(147, 197, 253, 0.16),
-    inset -1px 0 0 rgba(196, 181, 253, 0.14),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(255, 255, 255, 0.09),
-    0 14px 34px -10px rgba(0, 0, 0, 0.48);
+    inset 0 1px 0 rgba(224, 242, 254, 0.22),
+    inset 1px 0 0 rgba(147, 197, 253, 0.15),
+    inset -1px 0 0 rgba(147, 197, 253, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.46),
+    0 0 0 1px rgba(148, 197, 255, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.30),
+    0 12px 28px -10px rgba(0, 0, 0, 0.48);
   --pearl-l2-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 1px 0 0 rgba(147, 197, 253, 0.28),
-    inset -1px 0 0 rgba(196, 181, 253, 0.24),
-    0 0 0 1px rgba(147, 197, 253, 0.24),
-    0 18px 42px -10px rgba(0, 0, 0, 0.56);
+    inset 0 1px 0 rgba(224, 242, 254, 0.30),
+    inset 1px 0 0 rgba(147, 197, 253, 0.26),
+    inset -1px 0 0 rgba(147, 197, 253, 0.20),
+    0 0 0 1px rgba(96, 165, 250, 0.34),
+    0 16px 36px -10px rgba(0, 0, 0, 0.56);
 
   --pearl-l3-bg:
-    radial-gradient(120% 90% at 14% 0%, rgba(191, 219, 254, 0.14) 0%, transparent 54%),
-    linear-gradient(180deg, rgba(22, 31, 50, 0.86) 0%, rgba(13, 19, 34, 0.78) 100%);
+    radial-gradient(115% 80% at 14% 0%, rgba(186, 230, 253, 0.13) 0%, transparent 52%),
+    linear-gradient(180deg, rgba(21, 32, 52, 0.90) 0%, rgba(13, 20, 36, 0.86) 100%);
   --pearl-l3-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 1px 0 0 rgba(147, 197, 253, 0.16),
-    inset -1px 0 0 rgba(196, 181, 253, 0.14),
-    0 0 0 1px rgba(255, 255, 255, 0.10),
-    0 16px 38px -10px rgba(0, 0, 0, 0.54);
+    inset 0 1px 0 rgba(224, 242, 254, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(148, 197, 255, 0.16),
+    0 3px 10px rgba(0, 0, 0, 0.34),
+    0 14px 32px -10px rgba(0, 0, 0, 0.54);
 
   --pearl-l4-bg:
-    radial-gradient(110% 65% at 14% 0%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-    radial-gradient(80% 60% at 92% 4%, rgba(167, 139, 250, 0.11) 0%, transparent 64%),
-    linear-gradient(164deg, rgba(22, 31, 52, 0.95) 0%, rgba(12, 18, 34, 0.93) 100%);
+    radial-gradient(110% 60% at 14% 0%, rgba(186, 230, 253, 0.14) 0%, transparent 50%),
+    linear-gradient(170deg, rgba(22, 33, 55, 0.96) 0%, rgba(12, 19, 34, 0.94) 100%);
   --pearl-l4-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 1px 0 0 rgba(147, 197, 253, 0.20),
-    inset -1px 0 0 rgba(196, 181, 253, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.13),
-    0 28px 66px -12px rgba(0, 0, 0, 0.68);
+    inset 0 1px 0 rgba(224, 242, 254, 0.26),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.46),
+    0 0 0 1px rgba(148, 197, 255, 0.18),
+    0 24px 56px -12px rgba(0, 0, 0, 0.68);
 }
 
-/* ---- 1. Layer 0: 珠光水波漫反射背景 ---- */
+/* ---- 1. Layer 0: 清爽冰蓝白基底 ---- */
 body {
   background-image: var(--pearl-canvas) !important;
   background-attachment: fixed;
 }
 
-/* ---- 2. Layer 2: 全站珠光主卡片一致性与微色散高光 ---- */
+/* ---- 2. Layer 2: 实感冰蓝白内容主卡（blur 14px/16px，切边清晰不发虚） ---- */
 .welcome,
 .panel,
 .stats article,
@@ -15213,16 +15206,30 @@ body {
 .sched-tt-card,
 #messages .bubble.msg-ai {
   background: var(--pearl-l2-bg) !important;
-  backdrop-filter: blur(22px) saturate(195%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(195%) !important;
+  backdrop-filter: blur(14px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(175%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l2-shadow) !important;
+}
+html.dark .welcome,
+html.dark .panel,
+html.dark .stats article,
+html.dark .notice-card,
+html.dark .knowledge-card,
+html.dark .sched-d-header,
+html.dark .sched-today-card,
+html.dark .sched-matrix-card,
+html.dark .sched-manage-card,
+html.dark .sched-tt-card,
+html.dark #messages .bubble.msg-ai {
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
 }
 
 .stats article,
 .notice-card,
 .knowledge-card {
-  transition: transform 0.22s var(--lg-spring), box-shadow 0.22s var(--lg-spring) !important;
+  transition: transform 0.2s var(--lg-spring), box-shadow 0.2s var(--lg-spring) !important;
 }
 @media (hover: hover) {
   .stats article:hover,
@@ -15233,7 +15240,7 @@ body {
   }
 }
 
-/* 首页欢迎卡：顶部母贝虹彩极细高光线 + 精致日期胶囊 */
+/* 首页欢迎卡：纯正冰白→淡冰蓝顶部高光线 + 晶透日期胶囊 */
 .welcome {
   position: relative;
   overflow: hidden;
@@ -15246,21 +15253,20 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(125, 211, 252, 0.70) 24%,
-    rgba(255, 255, 255, 0.96) 50%,
-    rgba(196, 181, 253, 0.66) 76%,
+    rgba(125, 211, 252, 0.72) 24%,
+    rgba(255, 255, 255, 0.98) 50%,
+    rgba(96, 165, 250, 0.68) 76%,
     transparent 100%
   );
   pointer-events: none;
-  opacity: 0.9;
 }
 html.dark .welcome::before {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(96, 165, 250, 0.55) 26%,
-    rgba(224, 242, 254, 0.72) 50%,
-    rgba(167, 139, 250, 0.52) 74%,
+    rgba(56, 189, 248, 0.56) 24%,
+    rgba(224, 242, 254, 0.80) 50%,
+    rgba(96, 165, 250, 0.58) 76%,
     transparent 100%
   );
 }
@@ -15269,29 +15275,28 @@ html.dark .welcome::before {
   box-shadow: var(--pearl-l3-shadow) !important;
 }
 
-/* 首页今日课程条：冷蓝母贝悬浮胶囊 */
+/* 首页今日课程条：纯正淡冰蓝晶透胶囊（去紫提纯） */
 .home-sched-strip {
   background:
-    radial-gradient(110% 90% at 10% 0%, rgba(255, 255, 255, 0.92) 0%, transparent 55%),
-    radial-gradient(75% 85% at 92% 100%, rgba(191, 219, 254, 0.42) 0%, transparent 65%),
-    linear-gradient(120deg, rgba(239, 246, 255, 0.88) 0%, rgba(245, 243, 255, 0.78) 54%, rgba(238, 246, 255, 0.86) 100%) !important;
+    radial-gradient(110% 85% at 12% 0%, rgba(255, 255, 255, 0.94) 0%, transparent 54%),
+    linear-gradient(125deg, rgba(235, 244, 255, 0.92) 0%, rgba(244, 249, 255, 0.88) 100%) !important;
   border: 0 !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-    inset 1px 0 0 rgba(147, 197, 253, 0.55),
-    inset -1px 0 0 rgba(216, 180, 254, 0.46),
-    0 0 0 1px rgba(147, 197, 253, 0.36),
-    0 10px 26px -10px rgba(37, 99, 235, 0.16) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(37, 99, 235, 0.14),
+    0 0 0 1px rgba(37, 99, 235, 0.20),
+    0 2px 5px rgba(37, 99, 235, 0.06),
+    0 8px 20px -8px rgba(37, 99, 235, 0.14) !important;
 }
 html.dark .home-sched-strip {
   background:
-    radial-gradient(110% 90% at 10% 0%, rgba(96, 165, 250, 0.22) 0%, transparent 56%),
-    radial-gradient(75% 85% at 92% 100%, rgba(167, 139, 250, 0.16) 0%, transparent 65%),
-    linear-gradient(120deg, rgba(23, 37, 74, 0.78) 0%, rgba(30, 27, 66, 0.68) 100%) !important;
+    radial-gradient(110% 85% at 12% 0%, rgba(147, 197, 253, 0.20) 0%, transparent 54%),
+    linear-gradient(125deg, rgba(23, 42, 82, 0.84) 0%, rgba(17, 30, 58, 0.80) 100%) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    0 0 0 1px rgba(96, 165, 250, 0.28),
-    0 12px 30px -10px rgba(0, 0, 0, 0.48) !important;
+    inset 0 1px 0 rgba(224, 242, 254, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(96, 165, 250, 0.30),
+    0 10px 26px -8px rgba(0, 0, 0, 0.50) !important;
 }
 
 /* 统计卡片数字排版与晶透图标底座 */
@@ -15304,14 +15309,16 @@ html.dark .home-sched-strip {
 .quick-item .ico,
 .welcome-item > span {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 3px 10px -3px rgba(37, 99, 235, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 2px 6px -2px rgba(37, 99, 235, 0.14);
 }
 html.dark .stats article .stat-ico,
 html.dark .welcome-item > span {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 4px 12px -3px rgba(0, 0, 0, 0.38);
+    inset 0 1px 0 rgba(224, 242, 254, 0.20),
+    0 0 0 1px rgba(148, 197, 255, 0.12),
+    0 3px 10px -2px rgba(0, 0, 0, 0.40);
 }
 
 /* ---- 3. Layer 1: 嵌套凹陷玻璃槽统一 ---- */
@@ -15328,7 +15335,7 @@ html.dark .welcome-item > span {
 }
 .quick-item {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(244, 247, 253, 0.64) 100%) !important;
+    linear-gradient(180deg, rgba(249, 251, 255, 0.88) 0%, rgba(241, 246, 253, 0.78) 100%) !important;
   transition: transform 0.18s var(--lg-spring), box-shadow 0.18s var(--lg-spring), background 0.18s ease !important;
 }
 .quick-item:hover {
@@ -15337,113 +15344,135 @@ html.dark .welcome-item > span {
   transform: translateY(-1px);
 }
 html.dark .quick-item {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.62) 0%, rgba(15, 23, 42, 0.56) 100%) !important;
+  background: linear-gradient(180deg, rgba(24, 35, 56, 0.74) 0%, rgba(15, 23, 42, 0.68) 100%) !important;
 }
 html.dark .quick-item:hover {
   background: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l2-shadow-hover) !important;
 }
 
-/* ---- 4. Layer 3: 悬浮珠光导航栏、顶栏、底栏与宝石级主按钮 ---- */
+/* ---- 4. Layer 3: 悬浮冰蓝白导航栏、顶栏、底栏与淡冰蓝选中透镜 ---- */
 #sidebar,
 main > header {
   background: var(--pearl-l3-bg) !important;
-  backdrop-filter: blur(30px) saturate(210%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
+  backdrop-filter: blur(20px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
 }
+html.dark #sidebar,
+html.dark main > header {
+  backdrop-filter: blur(22px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
+  border-color: rgba(148, 197, 255, 0.12) !important;
+}
+
 @media (max-width: 960px) {
   .mobile-tabbar {
     background:
-      radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 56%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(242, 247, 255, 0.80) 100%) !important;
-    backdrop-filter: blur(32px) saturate(215%) !important;
-    -webkit-backdrop-filter: blur(32px) saturate(215%) !important;
+      radial-gradient(115% 80% at 18% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 54%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(245, 249, 255, 0.88) 100%) !important;
+    backdrop-filter: blur(20px) saturate(185%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
+    border: 0 !important;
     box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-      inset 1px 0 0 rgba(191, 219, 254, 0.48),
-      inset -1px 0 0 rgba(233, 213, 255, 0.40),
-      0 0 0 1px rgba(255, 255, 255, 0.82),
-      0 14px 36px -8px rgba(30, 58, 138, 0.16),
-      0 4px 12px rgba(15, 23, 42, 0.06) !important;
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(148, 163, 184, 0.22),
+      0 0 0 1px rgba(15, 23, 42, 0.095),
+      0 2px 6px rgba(15, 23, 42, 0.06),
+      0 10px 24px -8px rgba(15, 23, 42, 0.12) !important;
   }
   html.dark .mobile-tabbar {
     background:
-      radial-gradient(120% 90% at 18% 0%, rgba(147, 197, 253, 0.16) 0%, transparent 56%),
-      linear-gradient(180deg, rgba(20, 29, 48, 0.88) 0%, rgba(11, 17, 32, 0.84) 100%) !important;
+      radial-gradient(115% 80% at 18% 0%, rgba(186, 230, 253, 0.14) 0%, transparent 54%),
+      linear-gradient(180deg, rgba(20, 31, 50, 0.92) 0%, rgba(12, 19, 34, 0.89) 100%) !important;
+    backdrop-filter: blur(22px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.22),
-      inset 1px 0 0 rgba(147, 197, 253, 0.18),
-      inset -1px 0 0 rgba(196, 181, 253, 0.14),
-      0 0 0 1px rgba(255, 255, 255, 0.11),
-      0 18px 44px -8px rgba(0, 0, 0, 0.62) !important;
+      inset 0 1px 0 rgba(224, 242, 254, 0.24),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(148, 197, 255, 0.16),
+      0 4px 12px rgba(0, 0, 0, 0.36),
+      0 14px 32px -8px rgba(0, 0, 0, 0.58) !important;
+  }
+  .mobile-tabbar .tab-item.active i {
+    background: transparent !important;
+    padding: 0 !important;
   }
 }
 
-/* 液态滑动胶囊透镜（珠光折射强化） */
-.lg-slide-pill {
+/* 侧边栏 + 底部 Tab 栏统一淡冰蓝晶体选中透镜（白天 & 黑夜同源纯正淡蓝，零紫偏） */
+.lg-slide-pill.is-nav-glass {
   background:
-    radial-gradient(120% 95% at 22% 0%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.16) 58%, transparent 100%),
-    linear-gradient(148deg, rgba(224, 242, 254, 0.72) 0%, rgba(239, 246, 255, 0.86) 52%, rgba(237, 233, 254, 0.68) 100%) !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.10) 52%, transparent 100%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.13) 0%, rgba(37, 99, 235, 0.20) 100%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(147, 197, 253, 0.60),
-    inset -1px 0 0 rgba(216, 180, 254, 0.50),
-    0 0 0 1px rgba(147, 197, 253, 0.34),
-    0 6px 18px -4px rgba(37, 99, 235, 0.20) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.94),
+    inset 0 -1px 0 rgba(37, 99, 235, 0.16),
+    0 0 0 1px rgba(37, 99, 235, 0.26),
+    0 1px 3px rgba(37, 99, 235, 0.10),
+    0 5px 14px -4px rgba(37, 99, 235, 0.22) !important;
 }
-html.dark .lg-slide-pill {
+html.dark .lg-slide-pill.is-nav-glass {
   background:
-    radial-gradient(120% 95% at 22% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 58%),
-    linear-gradient(148deg, rgba(37, 99, 235, 0.36) 0%, rgba(59, 130, 246, 0.26) 55%, rgba(124, 58, 237, 0.24) 100%) !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(191, 219, 254, 0.26) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.19) 100%) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    inset 1px 0 0 rgba(147, 197, 253, 0.28),
-    inset -1px 0 0 rgba(196, 181, 253, 0.24),
-    0 0 0 1px rgba(96, 165, 250, 0.34),
-    0 8px 20px -4px rgba(0, 0, 0, 0.44) !important;
+    inset 0 1px 0 rgba(224, 242, 254, 0.34),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.34),
+    0 0 0 1px rgba(147, 197, 253, 0.36),
+    0 4px 14px -4px rgba(37, 99, 235, 0.34) !important;
+}
+#sidebar .nav.active,
+.mobile-tabbar .tab-item.active {
+  color: #1d4ed8 !important;
+}
+html.dark #sidebar .nav.active,
+html.dark .mobile-tabbar .tab-item.active {
+  color: #93c5fd !important;
 }
 
-/* 宝石蓝高光主按钮与用户气泡（珠光蓝宝石穹顶） */
+/* 冰蓝宝石高光主按钮与用户气泡（纯正冰海蓝，去掉紫色尾偏） */
 .primary:not(#askSubmitBtn),
 .sched-btn-primary,
 #messages .bubble.msg-user {
   background:
-    radial-gradient(115% 85% at 18% -10%, rgba(191, 219, 254, 0.52) 0%, transparent 52%),
-    linear-gradient(135deg, #3b82f6 0%, #2563eb 52%, #4338ca 100%) !important;
+    radial-gradient(115% 82% at 18% -10%, rgba(186, 230, 253, 0.50) 0%, transparent 52%),
+    linear-gradient(145deg, #3b82f6 0%, #2563eb 56%, #1d4ed8 100%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.16),
-    0 10px 24px -8px rgba(37, 99, 235, 0.44) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.44),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.20),
+    0 2px 5px rgba(29, 78, 216, 0.22),
+    0 8px 20px -6px rgba(37, 99, 235, 0.42) !important;
 }
 #askSubmitBtn:not(.is-idle) {
   background:
-    radial-gradient(115% 85% at 22% 0%, rgba(191, 219, 254, 0.54) 0%, transparent 56%),
-    linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #4338ca 100%) !important;
+    radial-gradient(115% 82% at 22% 0%, rgba(186, 230, 253, 0.52) 0%, transparent 56%),
+    linear-gradient(145deg, #3b82f6 0%, #2563eb 58%, #1d4ed8 100%) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    0 6px 16px -4px rgba(37, 99, 235, 0.48) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.44),
+    0 4px 12px -3px rgba(37, 99, 235, 0.46) !important;
 }
 
-/* AI 底部输入胶囊（Layer 3 晶透浮岛） */
+/* AI 底部输入胶囊（Layer 3 冰蓝白晶透浮岛） */
 .ask-input-wrap {
   background: var(--pearl-l3-bg) !important;
-  backdrop-filter: blur(30px) saturate(215%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(215%) !important;
+  backdrop-filter: blur(20px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l3-shadow) !important;
-  transition: box-shadow 0.22s var(--lg-spring), transform 0.22s var(--lg-spring) !important;
+  transition: box-shadow 0.2s var(--lg-spring), transform 0.2s var(--lg-spring) !important;
 }
 .ask-input-wrap:focus-within {
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    0 0 0 1.5px rgba(59, 130, 246, 0.36),
-    0 14px 36px -10px rgba(37, 99, 235, 0.22) !important;
+    0 0 0 1.5px rgba(37, 99, 235, 0.38),
+    0 12px 28px -8px rgba(37, 99, 235, 0.18) !important;
 }
 html.dark .ask-input-wrap:focus-within {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 0 0 1.5px rgba(96, 165, 250, 0.46),
-    0 16px 40px -10px rgba(37, 99, 235, 0.34) !important;
+    inset 0 1px 0 rgba(224, 242, 254, 0.26),
+    0 0 0 1.5px rgba(96, 165, 250, 0.48),
+    0 14px 32px -8px rgba(37, 99, 235, 0.32) !important;
 }
 
 /* ---- 5. Layer 4: 顶层晶透弹窗 / 日历 / Toast ---- */
@@ -15451,8 +15480,8 @@ dialog.task-dialog,
 #docDialog,
 .xz-cal-pop {
   background: var(--pearl-l4-bg) !important;
-  backdrop-filter: blur(36px) saturate(225%) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(225%) !important;
+  backdrop-filter: blur(26px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(195%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l4-shadow) !important;
 }

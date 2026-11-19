@@ -5507,7 +5507,7 @@ html.dark .md-content .md-ol > li::before {
     align-items: center !important;
     font-size: 0 !important;
     gap: 0 !important;
-    border-radius: 12px !important;
+    border-radius: 999px !important;
     overflow: hidden;
   }
   body.sidebar-collapsed #sidebar .nav .ico,
@@ -14598,4 +14598,1131 @@ html.dark .doc-m-btn.is-ai {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 0 0 1px rgba(96, 165, 250, 0.28) !important;
+}
+
+/* ================================================================
+   v1.109: 桌面折叠侧边栏正圆悬停一致性 + AI 导课表交互核对工作台
+   ================================================================ */
+@media (min-width: 761px) {
+  body.sidebar-collapsed #sidebar .nav,
+  body.sidebar-collapsed #sidebar .nav:hover,
+  body.sidebar-collapsed #sidebar .nav:active,
+  body.sidebar-collapsed #sidebar .nav.active,
+  body.sidebar-collapsed #sidebar .sidebottom button,
+  body.sidebar-collapsed #sidebar .sidebottom button:hover,
+  body.sidebar-collapsed #sidebar .sidebottom a,
+  body.sidebar-collapsed #sidebar .sidebottom a:hover {
+    border-radius: 999px !important;
+  }
+  body.sidebar-collapsed #desktopSidebarToggle.desktop-rail-toggle {
+    border-radius: 999px !important;
+  }
+}
+
+#scheduleAiImportDialog {
+  width: min(600px, calc(100vw - 24px));
+  max-height: min(88dvh, 820px);
+}
+#scheduleAiImportDialog .sched-ai-preview {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(110% 80% at 15% 0%, rgba(255, 255, 255, 0.88) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.72) 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 6px 18px -6px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: none;
+  overflow: visible;
+}
+html.dark #scheduleAiImportDialog .sched-ai-preview {
+  background:
+    radial-gradient(110% 80% at 15% 0%, rgba(148, 163, 184, 0.14) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 8px 22px -6px rgba(0, 0, 0, 0.42);
+}
+
+.sched-ai-wb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sched-ai-wb-head b {
+  display: block;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.sched-ai-wb-head small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.sched-ai-wb-add {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--blue);
+  background:
+    radial-gradient(115% 85% at 24% 0%, rgba(255, 255, 255, 0.88) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(239, 246, 255, 0.96) 0%, rgba(219, 234, 254, 0.82) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(37, 99, 235, 0.18),
+    0 2px 6px -2px rgba(37, 99, 235, 0.14);
+}
+.sched-ai-wb-add:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(37, 99, 235, 0.30),
+    0 4px 10px -2px rgba(37, 99, 235, 0.22);
+}
+html.dark .sched-ai-wb-add {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.30) 0%, rgba(30, 58, 138, 0.24) 100%);
+  color: #93c5fd;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(96, 165, 250, 0.30);
+}
+
+.sched-ai-wb-notes {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+}
+.sched-ai-wb-notes span {
+  font-weight: 600;
+  color: var(--blue);
+}
+html.dark .sched-ai-wb-notes {
+  background: rgba(37, 99, 235, 0.14);
+  border-color: rgba(96, 165, 250, 0.24);
+  color: #cbd5e1;
+}
+html.dark .sched-ai-wb-notes span {
+  color: #93c5fd;
+}
+
+.sched-ai-warn-box {
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.sched-ai-warn-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sched-ai-warn-box ul {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+html.dark .sched-ai-warn-box {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(251, 191, 36, 0.28);
+  color: #fde68a;
+}
+
+.sched-ai-wb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 390px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.sched-ai-wb-item {
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 2px 6px -2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  overflow: hidden;
+}
+.sched-ai-wb-item.has-warn {
+  border-color: rgba(245, 158, 11, 0.46);
+  background: rgba(255, 251, 235, 0.90);
+}
+.sched-ai-wb-item.is-editing {
+  border-color: rgba(37, 99, 235, 0.42);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+html.dark .sched-ai-wb-item {
+  background: rgba(30, 41, 59, 0.72);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+html.dark .sched-ai-wb-item.has-warn {
+  border-color: rgba(251, 191, 36, 0.40);
+  background: rgba(120, 53, 15, 0.22);
+}
+html.dark .sched-ai-wb-item.is-editing {
+  border-color: rgba(96, 165, 250, 0.52);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.22);
+}
+
+.sched-ai-wb-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+}
+.sched-ai-wb-bar {
+  width: 4px;
+  align-self: stretch;
+  min-height: 30px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+.sched-ai-wb-main {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+.sched-ai-wb-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.3;
+  word-break: break-word;
+}
+.sched-ai-wb-type {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--muted);
+}
+html.dark .sched-ai-wb-type {
+  background: rgba(255, 255, 255, 0.10);
+  color: #cbd5e1;
+}
+.sched-ai-wb-flag {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+}
+html.dark .sched-ai-wb-flag {
+  background: rgba(251, 191, 36, 0.22);
+  color: #fde68a;
+}
+.sched-ai-wb-meta {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sched-ai-wb-ops {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.sched-ai-wb-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink-secondary);
+  background: rgba(15, 23, 42, 0.05);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sched-ai-wb-btn .ico {
+  width: 14px;
+  height: 14px;
+}
+.sched-ai-wb-btn:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--blue);
+}
+.sched-ai-wb-btn.is-del {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.09);
+}
+.sched-ai-wb-btn.is-del:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #b91c1c;
+}
+html.dark .sched-ai-wb-btn {
+  background: rgba(255, 255, 255, 0.09);
+  color: #cbd5e1;
+}
+html.dark .sched-ai-wb-btn:hover {
+  background: rgba(59, 130, 246, 0.24);
+  color: #93c5fd;
+}
+html.dark .sched-ai-wb-btn.is-del {
+  background: rgba(239, 68, 68, 0.20);
+  color: #fca5a5;
+}
+
+.sched-ai-inline-editor {
+  padding: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(248, 250, 252, 0.72);
+}
+html.dark .sched-ai-inline-editor {
+  border-top-color: rgba(255, 255, 255, 0.09);
+  background: rgba(15, 23, 42, 0.52);
+}
+.sched-ai-ed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.sched-ai-ed-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.sched-ai-ed-field.is-full {
+  grid-column: 1 / -1;
+}
+.sched-ai-ed-field span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+#scheduleAiImportDialog .sched-ai-ed-field input,
+#scheduleAiImportDialog .sched-ai-ed-field select {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 11px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: normal !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  box-sizing: border-box !important;
+}
+#scheduleAiImportDialog .sched-ai-ed-field select {
+  padding-right: 26px !important;
+  background-position: right 8px center !important;
+}
+html.dark #scheduleAiImportDialog .sched-ai-ed-field input,
+html.dark #scheduleAiImportDialog .sched-ai-ed-field select {
+  background: rgba(30, 41, 59, 0.90) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: var(--ink) !important;
+}
+#scheduleAiImportDialog .sched-dlg-actions button {
+  white-space: nowrap;
+  font-size: 13.5px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.sched-ai-ed-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.sched-ai-ed-save,
+.sched-ai-ed-cancel {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sched-ai-ed-save {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 3px 10px -2px rgba(37, 99, 235, 0.36);
+}
+.sched-ai-ed-cancel {
+  background: rgba(15, 23, 42, 0.07);
+  color: var(--ink-secondary);
+}
+html.dark .sched-ai-ed-cancel {
+  background: rgba(255, 255, 255, 0.11);
+  color: #cbd5e1;
+}
+
+.sched-ai-refine-bar {
+  padding-top: 8px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+html.dark .sched-ai-refine-bar {
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+.sched-ai-refine-bar label {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--ink-secondary);
+}
+.sched-ai-refine-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sched-ai-refine-row input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 12.5px;
+  box-sizing: border-box;
+}
+.sched-ai-refine-row input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+html.dark .sched-ai-refine-row input {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+}
+.sched-ai-refine-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 4px 12px -3px rgba(37, 99, 235, 0.40);
+}
+.sched-ai-refine-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .sched-ai-ed-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sched-ai-wb-row {
+    padding: 8px;
+    gap: 7px;
+  }
+  .sched-ai-wb-meta {
+    white-space: normal;
+  }
+  .sched-ai-refine-row {
+    gap: 6px;
+  }
+  .sched-ai-refine-btn {
+    padding: 0 12px;
+  }
+}
+
+/* ================================================================
+   v1.110: 珠光液态玻璃（Pearlescent Liquid Glass）四层光学设计系统
+           + 桌面/移动端页面美学精修 + 移动端 AI 回复极简折叠底栏
+   ================================================================ */
+
+/* ---- 0. 珠光光学色彩与四层变量体系 ---- */
+:root {
+  --pearl-canvas:
+    radial-gradient(64% 48% at 10% -4%, rgba(56, 189, 248, 0.11) 0%, transparent 62%),
+    radial-gradient(52% 44% at 92% 4%, rgba(167, 139, 250, 0.085) 0%, transparent 60%),
+    radial-gradient(58% 46% at 86% 96%, rgba(244, 114, 182, 0.055) 0%, transparent 62%),
+    radial-gradient(50% 42% at 14% 92%, rgba(96, 165, 250, 0.07) 0%, transparent 62%),
+    linear-gradient(168deg, #f3f7fe 0%, #f8faff 48%, #f2f5fc 100%);
+
+  /* Layer 1: 凹陷玻璃槽 */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(219, 228, 242, 0.42) 0%, rgba(241, 245, 252, 0.68) 100%);
+  --pearl-l1-shadow:
+    inset 0 1.5px 3.5px rgba(15, 23, 42, 0.065),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.90),
+    0 0 0 1px rgba(15, 23, 42, 0.055);
+
+  /* Layer 2: 珠光内容主卡（左上高光 + 极微冰蓝/丁香紫双边色散折射） */
+  --pearl-l2-bg:
+    radial-gradient(125% 78% at 10% -6%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0) 56%),
+    radial-gradient(90% 70% at 94% 4%, rgba(224, 231, 255, 0.42) 0%, rgba(243, 232, 255, 0.16) 40%, transparent 72%),
+    linear-gradient(156deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 251, 255, 0.74) 52%, rgba(246, 248, 255, 0.82) 100%);
+  --pearl-l2-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 1px 0 0 rgba(191, 219, 254, 0.48),
+    inset -1px 0 0 rgba(233, 213, 255, 0.40),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.76),
+    0 10px 28px -12px rgba(30, 58, 138, 0.10),
+    0 2px 6px rgba(15, 23, 42, 0.03);
+  --pearl-l2-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(147, 197, 253, 0.65),
+    inset -1px 0 0 rgba(216, 180, 254, 0.56),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.14),
+    0 0 0 1px rgba(191, 219, 254, 0.68),
+    0 16px 36px -12px rgba(37, 99, 235, 0.14),
+    0 4px 10px rgba(15, 23, 42, 0.04);
+
+  /* Layer 3: 悬浮珠光导航与晶透胶囊 */
+  --pearl-l3-bg:
+    radial-gradient(120% 90% at 14% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(244, 248, 255, 0.76) 100%);
+  --pearl-l3-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 1px 0 0 rgba(191, 219, 254, 0.44),
+    inset -1px 0 0 rgba(233, 213, 255, 0.36),
+    0 0 0 1px rgba(255, 255, 255, 0.78),
+    0 12px 32px -10px rgba(30, 58, 138, 0.13),
+    0 3px 10px rgba(15, 23, 42, 0.045);
+
+  /* Layer 4: 顶层晶透弹窗/日历/浮层 */
+  --pearl-l4-bg:
+    radial-gradient(110% 65% at 14% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 52%),
+    radial-gradient(80% 60% at 92% 4%, rgba(224, 231, 255, 0.36) 0%, transparent 66%),
+    linear-gradient(164deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 255, 0.90) 100%);
+  --pearl-l4-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(191, 219, 254, 0.56),
+    inset -1px 0 0 rgba(233, 213, 255, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 28px 64px -14px rgba(15, 23, 42, 0.20),
+    0 6px 18px rgba(30, 58, 138, 0.08);
+}
+
+html.dark,
+html.dark body {
+  --pearl-canvas:
+    radial-gradient(64% 48% at 12% -4%, rgba(59, 130, 246, 0.16) 0%, transparent 62%),
+    radial-gradient(54% 44% at 90% 6%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+    radial-gradient(56% 46% at 84% 96%, rgba(34, 211, 238, 0.085) 0%, transparent 62%),
+    linear-gradient(168deg, #080d1a 0%, #0b1222 50%, #090e1c 100%);
+
+  --pearl-l1-bg: linear-gradient(180deg, rgba(7, 11, 22, 0.62) 0%, rgba(15, 23, 42, 0.50) 100%);
+  --pearl-l1-shadow:
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px rgba(255, 255, 255, 0.07);
+
+  --pearl-l2-bg:
+    radial-gradient(120% 76% at 12% -8%, rgba(147, 197, 253, 0.13) 0%, transparent 54%),
+    radial-gradient(88% 68% at 94% 4%, rgba(167, 139, 250, 0.10) 0%, transparent 68%),
+    linear-gradient(156deg, rgba(24, 34, 54, 0.80) 0%, rgba(15, 23, 42, 0.74) 55%, rgba(19, 27, 46, 0.82) 100%);
+  --pearl-l2-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 1px 0 0 rgba(147, 197, 253, 0.16),
+    inset -1px 0 0 rgba(196, 181, 253, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 14px 34px -10px rgba(0, 0, 0, 0.48);
+  --pearl-l2-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 1px 0 0 rgba(147, 197, 253, 0.28),
+    inset -1px 0 0 rgba(196, 181, 253, 0.24),
+    0 0 0 1px rgba(147, 197, 253, 0.24),
+    0 18px 42px -10px rgba(0, 0, 0, 0.56);
+
+  --pearl-l3-bg:
+    radial-gradient(120% 90% at 14% 0%, rgba(191, 219, 254, 0.14) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(22, 31, 50, 0.86) 0%, rgba(13, 19, 34, 0.78) 100%);
+  --pearl-l3-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 1px 0 0 rgba(147, 197, 253, 0.16),
+    inset -1px 0 0 rgba(196, 181, 253, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 16px 38px -10px rgba(0, 0, 0, 0.54);
+
+  --pearl-l4-bg:
+    radial-gradient(110% 65% at 14% 0%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+    radial-gradient(80% 60% at 92% 4%, rgba(167, 139, 250, 0.11) 0%, transparent 64%),
+    linear-gradient(164deg, rgba(22, 31, 52, 0.95) 0%, rgba(12, 18, 34, 0.93) 100%);
+  --pearl-l4-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 1px 0 0 rgba(147, 197, 253, 0.20),
+    inset -1px 0 0 rgba(196, 181, 253, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.13),
+    0 28px 66px -12px rgba(0, 0, 0, 0.68);
+}
+
+/* ---- 1. Layer 0: 珠光水波漫反射背景 ---- */
+body {
+  background-image: var(--pearl-canvas) !important;
+  background-attachment: fixed;
+}
+
+/* ---- 2. Layer 2: 全站珠光主卡片一致性与微色散高光 ---- */
+.welcome,
+.panel,
+.stats article,
+.notice-card,
+.knowledge-card,
+.sched-d-header,
+.sched-today-card,
+.sched-matrix-card,
+.sched-manage-card,
+.sched-tt-card,
+#messages .bubble.msg-ai {
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(22px) saturate(195%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(195%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+}
+
+.stats article,
+.notice-card,
+.knowledge-card {
+  transition: transform 0.22s var(--lg-spring), box-shadow 0.22s var(--lg-spring) !important;
+}
+@media (hover: hover) {
+  .stats article:hover,
+  .notice-card:hover,
+  .knowledge-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--pearl-l2-shadow-hover) !important;
+  }
+}
+
+/* 首页欢迎卡：顶部母贝虹彩极细高光线 + 精致日期胶囊 */
+.welcome {
+  position: relative;
+  overflow: hidden;
+}
+.welcome::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(125, 211, 252, 0.70) 24%,
+    rgba(255, 255, 255, 0.96) 50%,
+    rgba(196, 181, 253, 0.66) 76%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0.9;
+}
+html.dark .welcome::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(96, 165, 250, 0.55) 26%,
+    rgba(224, 242, 254, 0.72) 50%,
+    rgba(167, 139, 250, 0.52) 74%,
+    transparent 100%
+  );
+}
+.welcome .date {
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+}
+
+/* 首页今日课程条：冷蓝母贝悬浮胶囊 */
+.home-sched-strip {
+  background:
+    radial-gradient(110% 90% at 10% 0%, rgba(255, 255, 255, 0.92) 0%, transparent 55%),
+    radial-gradient(75% 85% at 92% 100%, rgba(191, 219, 254, 0.42) 0%, transparent 65%),
+    linear-gradient(120deg, rgba(239, 246, 255, 0.88) 0%, rgba(245, 243, 255, 0.78) 54%, rgba(238, 246, 255, 0.86) 100%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 1px 0 0 rgba(147, 197, 253, 0.55),
+    inset -1px 0 0 rgba(216, 180, 254, 0.46),
+    0 0 0 1px rgba(147, 197, 253, 0.36),
+    0 10px 26px -10px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark .home-sched-strip {
+  background:
+    radial-gradient(110% 90% at 10% 0%, rgba(96, 165, 250, 0.22) 0%, transparent 56%),
+    radial-gradient(75% 85% at 92% 100%, rgba(167, 139, 250, 0.16) 0%, transparent 65%),
+    linear-gradient(120deg, rgba(23, 37, 74, 0.78) 0%, rgba(30, 27, 66, 0.68) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 0 0 1px rgba(96, 165, 250, 0.28),
+    0 12px 30px -10px rgba(0, 0, 0, 0.48) !important;
+}
+
+/* 统计卡片数字排版与晶透图标底座 */
+.stats article strong,
+.stats article b {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stats article .stat-ico,
+.quick-item .ico,
+.welcome-item > span {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 3px 10px -3px rgba(37, 99, 235, 0.14);
+}
+html.dark .stats article .stat-ico,
+html.dark .welcome-item > span {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 4px 12px -3px rgba(0, 0, 0, 0.38);
+}
+
+/* ---- 3. Layer 1: 嵌套凹陷玻璃槽统一 ---- */
+.sched-d-seg,
+.sched-m-seg,
+.quick-item,
+.welcome-item {
+  border: 0 !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+}
+.sched-d-seg,
+.sched-m-seg {
+  background: var(--pearl-l1-bg) !important;
+}
+.quick-item {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(244, 247, 253, 0.64) 100%) !important;
+  transition: transform 0.18s var(--lg-spring), box-shadow 0.18s var(--lg-spring), background 0.18s ease !important;
+}
+.quick-item:hover {
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l2-shadow-hover) !important;
+  transform: translateY(-1px);
+}
+html.dark .quick-item {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.62) 0%, rgba(15, 23, 42, 0.56) 100%) !important;
+}
+html.dark .quick-item:hover {
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l2-shadow-hover) !important;
+}
+
+/* ---- 4. Layer 3: 悬浮珠光导航栏、顶栏、底栏与宝石级主按钮 ---- */
+#sidebar,
+main > header {
+  background: var(--pearl-l3-bg) !important;
+  backdrop-filter: blur(30px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
+}
+@media (max-width: 960px) {
+  .mobile-tabbar {
+    background:
+      radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 56%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(242, 247, 255, 0.80) 100%) !important;
+    backdrop-filter: blur(32px) saturate(215%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(215%) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      inset 1px 0 0 rgba(191, 219, 254, 0.48),
+      inset -1px 0 0 rgba(233, 213, 255, 0.40),
+      0 0 0 1px rgba(255, 255, 255, 0.82),
+      0 14px 36px -8px rgba(30, 58, 138, 0.16),
+      0 4px 12px rgba(15, 23, 42, 0.06) !important;
+  }
+  html.dark .mobile-tabbar {
+    background:
+      radial-gradient(120% 90% at 18% 0%, rgba(147, 197, 253, 0.16) 0%, transparent 56%),
+      linear-gradient(180deg, rgba(20, 29, 48, 0.88) 0%, rgba(11, 17, 32, 0.84) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 1px 0 0 rgba(147, 197, 253, 0.18),
+      inset -1px 0 0 rgba(196, 181, 253, 0.14),
+      0 0 0 1px rgba(255, 255, 255, 0.11),
+      0 18px 44px -8px rgba(0, 0, 0, 0.62) !important;
+  }
+}
+
+/* 液态滑动胶囊透镜（珠光折射强化） */
+.lg-slide-pill {
+  background:
+    radial-gradient(120% 95% at 22% 0%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.16) 58%, transparent 100%),
+    linear-gradient(148deg, rgba(224, 242, 254, 0.72) 0%, rgba(239, 246, 255, 0.86) 52%, rgba(237, 233, 254, 0.68) 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(147, 197, 253, 0.60),
+    inset -1px 0 0 rgba(216, 180, 254, 0.50),
+    0 0 0 1px rgba(147, 197, 253, 0.34),
+    0 6px 18px -4px rgba(37, 99, 235, 0.20) !important;
+}
+html.dark .lg-slide-pill {
+  background:
+    radial-gradient(120% 95% at 22% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 58%),
+    linear-gradient(148deg, rgba(37, 99, 235, 0.36) 0%, rgba(59, 130, 246, 0.26) 55%, rgba(124, 58, 237, 0.24) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 1px 0 0 rgba(147, 197, 253, 0.28),
+    inset -1px 0 0 rgba(196, 181, 253, 0.24),
+    0 0 0 1px rgba(96, 165, 250, 0.34),
+    0 8px 20px -4px rgba(0, 0, 0, 0.44) !important;
+}
+
+/* 宝石蓝高光主按钮与用户气泡（珠光蓝宝石穹顶） */
+.primary:not(#askSubmitBtn),
+.sched-btn-primary,
+#messages .bubble.msg-user {
+  background:
+    radial-gradient(115% 85% at 18% -10%, rgba(191, 219, 254, 0.52) 0%, transparent 52%),
+    linear-gradient(135deg, #3b82f6 0%, #2563eb 52%, #4338ca 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.16),
+    0 10px 24px -8px rgba(37, 99, 235, 0.44) !important;
+}
+#askSubmitBtn:not(.is-idle) {
+  background:
+    radial-gradient(115% 85% at 22% 0%, rgba(191, 219, 254, 0.54) 0%, transparent 56%),
+    linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #4338ca 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 6px 16px -4px rgba(37, 99, 235, 0.48) !important;
+}
+
+/* AI 底部输入胶囊（Layer 3 晶透浮岛） */
+.ask-input-wrap {
+  background: var(--pearl-l3-bg) !important;
+  backdrop-filter: blur(30px) saturate(215%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(215%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  transition: box-shadow 0.22s var(--lg-spring), transform 0.22s var(--lg-spring) !important;
+}
+.ask-input-wrap:focus-within {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    0 0 0 1.5px rgba(59, 130, 246, 0.36),
+    0 14px 36px -10px rgba(37, 99, 235, 0.22) !important;
+}
+html.dark .ask-input-wrap:focus-within {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 0 0 1.5px rgba(96, 165, 250, 0.46),
+    0 16px 40px -10px rgba(37, 99, 235, 0.34) !important;
+}
+
+/* ---- 5. Layer 4: 顶层晶透弹窗 / 日历 / Toast ---- */
+dialog.task-dialog,
+#docDialog,
+.xz-cal-pop {
+  background: var(--pearl-l4-bg) !important;
+  backdrop-filter: blur(36px) saturate(225%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(225%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l4-shadow) !important;
+}
+
+/* ---- 6. AI 回复底栏深度瘦身：单行紧凑操作栏 + 折叠式依据抽屉 + 轻盈单行横滑追问 ---- */
+#messages .bubble-tools {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  max-width: 100% !important;
+}
+#messages .bubble-tools button {
+  height: 29px !important;
+  min-height: 29px !important;
+  padding: 0 11px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  gap: 4px !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+  background: var(--pearl-l3-bg) !important;
+  color: var(--ink-secondary) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(15, 23, 42, 0.075),
+    0 2px 7px -2px rgba(15, 23, 42, 0.06) !important;
+  transition: transform 0.15s var(--lg-spring), box-shadow 0.15s ease, color 0.15s ease !important;
+}
+#messages .bubble-tools button:hover {
+  color: var(--blue) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 4px 12px -3px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark #messages .bubble-tools button {
+  background: rgba(30, 41, 59, 0.72) !important;
+  color: #cbd5e1 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+html.dark #messages .bubble-tools button:hover {
+  color: #93c5fd !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 1px rgba(96, 165, 250, 0.34) !important;
+}
+
+#messages .bubble-tools .t-short { display: none; }
+#messages .bubble-tools .t-full  { display: inline; }
+
+/* 折叠式“依据/来源”一体化晶透微胶囊 */
+#messages .bubble-tools button.ai-meta-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-weight: 600 !important;
+}
+@media (min-width: 761px) {
+  #messages .bubble-tools button.ai-meta-toggle {
+    margin-left: auto;
+  }
+}
+#messages .bubble-tools button.ai-meta-toggle .ai-meta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #10b981;
+}
+#messages .bubble-tools button.ai-meta-toggle.is-high {
+  color: #067647 !important;
+  background:
+    radial-gradient(110% 90% at 20% 0%, rgba(255, 255, 255, 0.90) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(236, 253, 243, 0.92) 0%, rgba(209, 250, 229, 0.72) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(16, 185, 129, 0.24),
+    0 2px 8px -2px rgba(16, 185, 129, 0.14) !important;
+}
+#messages .bubble-tools button.ai-meta-toggle.is-high .ai-meta-dot { background: #10b981; }
+#messages .bubble-tools button.ai-meta-toggle.is-medium {
+  color: #b45309 !important;
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.94) 0%, rgba(254, 243, 199, 0.76) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(245, 158, 11, 0.28) !important;
+}
+#messages .bubble-tools button.ai-meta-toggle.is-medium .ai-meta-dot { background: #f59e0b; }
+#messages .bubble-tools button.ai-meta-toggle.is-low {
+  color: var(--muted) !important;
+}
+#messages .bubble-tools button.ai-meta-toggle.is-low .ai-meta-dot { background: #94a3b8; }
+#messages .bubble-tools button.ai-meta-toggle.is-ref {
+  color: var(--blue) !important;
+}
+#messages .bubble-tools button.ai-meta-toggle .ai-meta-caret {
+  font-size: 10px;
+  opacity: 0.72;
+  transition: transform 0.2s var(--lg-spring);
+  display: inline-block;
+}
+#messages .bubble-tools button.ai-meta-toggle.is-open .ai-meta-caret {
+  transform: rotate(180deg);
+}
+html.dark #messages .bubble-tools button.ai-meta-toggle.is-high {
+  color: #6ee7b7 !important;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.24) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(52, 211, 153, 0.28) !important;
+}
+html.dark #messages .bubble-tools button.ai-meta-toggle.is-medium {
+  color: #fcd34d !important;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.20) 0%, rgba(120, 53, 15, 0.22) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(251, 191, 36, 0.28) !important;
+}
+
+/* 展开后的珠光依据抽屉（Layer 1 柔和嵌入式面板） */
+.ai-ref-drawer {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--pearl-l1-bg);
+  box-shadow: var(--pearl-l1-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(100%, 720px);
+  animation: lgPageEnter 0.18s var(--lg-spring);
+}
+.ai-ref-drawer.hide {
+  display: none !important;
+}
+.ai-ref-drawer .ai-confidence {
+  margin: 0 !important;
+  padding: 7px 10px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+  flex-wrap: wrap !important;
+  gap: 4px 6px !important;
+}
+.ai-ref-drawer .ai-confidence small {
+  display: inline !important;
+  font-size: 11.5px !important;
+  opacity: 0.85;
+}
+.ai-ref-drawer .followup-box.knowledge-ref-box,
+.ai-ref-drawer .sources-box {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 追问建议胶囊（桌面端优雅轻盈，移动端单行可横滑零臃肿） */
+#messages .followup-box:not(.knowledge-ref-box) {
+  margin-top: 7px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  max-width: min(100%, 760px);
+}
+#messages .followup-box:not(.knowledge-ref-box) > small {
+  font-size: 11px !important;
+  color: var(--muted) !important;
+  opacity: 0.78;
+  margin-bottom: 5px !important;
+  letter-spacing: 0.02em;
+}
+#messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  height: 30px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  color: var(--ink-secondary) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 1px 0 0 rgba(191, 219, 254, 0.42),
+    0 0 0 1px rgba(15, 23, 42, 0.07),
+    0 2px 7px -2px rgba(30, 58, 138, 0.07) !important;
+  transition: transform 0.16s var(--lg-spring), color 0.16s ease, box-shadow 0.16s ease !important;
+}
+#messages .followup-box:not(.knowledge-ref-box) .followup-chips button .fu-arr {
+  font-size: 11px;
+  color: var(--blue);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+#messages .followup-box:not(.knowledge-ref-box) .followup-chips button:hover {
+  color: var(--blue) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 5px 14px -4px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark #messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+  background: rgba(30, 41, 59, 0.70) !important;
+  color: #cbd5e1 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+
+/* 移动端极简排版：操作栏永不臃肿、追问单行横滑、默认收起依据抽屉 */
+@media (max-width: 760px) {
+  #messages .bubble-tools {
+    gap: 5px !important;
+    margin-top: 7px !important;
+  }
+  #messages .bubble-tools .t-full  { display: none !important; }
+  #messages .bubble-tools .t-short { display: inline !important; }
+  #messages .bubble-tools button {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    font-size: 11.5px !important;
+    gap: 3.5px !important;
+  }
+  #messages .bubble-tools button.bt-retry .t-short {
+    display: none !important;
+  }
+  #messages .bubble-tools button.bt-retry {
+    width: 28px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+  #messages .bubble-tools button.ai-meta-toggle {
+    padding: 0 9px !important;
+    font-size: 11px !important;
+  }
+  #messages .followup-box:not(.knowledge-ref-box) {
+    margin-top: 6px !important;
+    width: 100%;
+    overflow: hidden;
+  }
+  #messages .followup-box:not(.knowledge-ref-box) > small {
+    display: none !important;
+  }
+  #messages .followup-box:not(.knowledge-ref-box) .followup-chips {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px !important;
+    padding: 2px 1px 3px !important;
+  }
+  #messages .followup-box:not(.knowledge-ref-box) .followup-chips::-webkit-scrollbar {
+    display: none;
+  }
+  #messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 11px !important;
+    font-size: 11.5px !important;
+    line-height: 28px !important;
+  }
 }

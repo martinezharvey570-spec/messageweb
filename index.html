@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.108" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.110" fetchpriority="high">
 </head>
 <body>
 
@@ -814,7 +814,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.108</span>
+        <span>校务智理校园事务服务平台 · v1.110</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -1121,17 +1121,17 @@
 
 <dialog id="scheduleAiImportDialog" class="task-dialog">
   <div class="dialoghead">
-    <div><h2>AI 智能导课表</h2><small>支持截图、PDF、Excel/CSV、HTML 或直接粘贴教务文字</small></div>
+    <div><h2>AI 智能导课表</h2><small>支持多张截图、PDF、表格、Word 或粘贴文字；识别后可逐条或让 AI 修改</small></div>
     <button type="button" id="closeSchedAiImportDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
   </div>
   <div class="sched-ai-import-body">
     <label class="sched-upload-drop" id="schedAiPickFileBtn" for="schedImgFile">
       <svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg>
       <div>
-        <b>选择课表文件（图片 / PDF / Excel / CSV / TXT）</b>
-        <small id="schedAiFileLabel">支持教务系统截图、导出 PDF、课表表格等任意格式</small>
+        <b>选择课表文件（最多 4 张截图 / PDF / Excel / Word / TXT）</b>
+        <small id="schedAiFileLabel">支持多张教务截图、PDF、Excel/CSV、Word、TXT 等任意格式</small>
       </div>
-      <input type="file" id="schedImgFile" accept="*/*" style="display:none">
+      <input type="file" id="schedImgFile" accept="*/*" multiple style="display:none">
     </label>
     <div class="sched-field" style="margin-top:12px">
       <label for="schedAiPasteText">或者直接粘贴课表文本 / 自然语言描述</label>
@@ -1147,7 +1147,7 @@
     <div id="schedAiStatus" class="sched-ai-status hide" style="margin-top:12px"></div>
     <div id="schedAiPreview" class="sched-ai-preview hide"></div>
     <div class="sched-dlg-actions" style="margin-top:12px">
-      <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="flex:1"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 识别</span></button>
+      <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="flex:1"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 深度识别</span></button>
       <button type="button" id="schedAiConfirmBtn" class="sched-btn-primary hide" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>确认导入课表</span></button>
     </div>
   </div>
@@ -1155,7 +1155,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.108"></script>
+<script src="app.js?v=1.110"></script>
 
 
 </body>

@@ -1906,7 +1906,7 @@ function md_section_kind(title) {
 function format_markdown_safe(text) {
   const raw = String(text ?? "")
     .replace(/\r\n/g, "\n")
-    .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION)-->|$)/g, "");
+    .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)-->|$)/g, "");
   if (!raw.trim()) return "";
 
   const lines = raw.split("\n");
@@ -2258,7 +2258,11 @@ const answer_tail_bad = /[，、,;；:：·（(\[【《〈“"'\-—]$/;
 const answer_tail_cut = /[的该和与或及以于并且是在对为把被从此等而但就都也还很更最不没无]$/;
 
 function looks_done(text) {
-  const t = String(text || "").trimEnd();
+  const t = String(text || "")
+    .replace(/<!--UI_META[\s\S]*?(?:UI_META-->|$)/g, "")
+    .replace(/<!--AGENT_ACTIONS[\s\S]*?(?:AGENT_ACTIONS-->|$)/g, "")
+    .replace(/<!--SCHEDULE_ACTION[\s\S]*?(?:SCHEDULE_ACTION-->|$)/g, "")
+    .trimEnd();
   if (!t) return false;
   const openers = (t.match(/[（(\[【《〈“‘]/g) || []).length;
   const closers = (t.match(/[）)\]】》〉”’]/g) || []).length;
@@ -2415,10 +2419,11 @@ function add_confidence(parent_el, confidence, sources) {
 }
 
 function add_follow_ups(parent_el, items) {
+  const limit = window.innerWidth <= 760 ? 2 : 3;
   const list = (Array.isArray(items) ? items : [])
     .map(s => String(s || "").trim())
     .filter(Boolean)
-    .slice(0, 3);
+    .slice(0, limit);
   if (!list.length) return;
   const box = document.createElement("div");
   box.className = "followup-box";
@@ -2430,7 +2435,7 @@ function add_follow_ups(parent_el, items) {
   list.forEach(text => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.textContent = text;
+    btn.innerHTML = `<span class="fu-arr" aria-hidden="true">↗</span><span>${esc(text)}</span>`;
     btn.onclick = () => {
       const q = $("question");
       if (!q) return;
@@ -2451,7 +2456,7 @@ function has_links(sources) {
 
 function add_doc_chips(parent_el, titles) {
   const list = Array.isArray(titles)
-    ? [...new Set(titles.map(t => String(t || "").trim()).filter(Boolean))].slice(0, 4)
+    ? [...new Set(titles.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
     : [];
   if (!list.length) return;
   const box = document.createElement("div");
@@ -2476,15 +2481,81 @@ function add_doc_chips(parent_el, titles) {
   parent_el.appendChild(box);
 }
 
+function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
+  const { showConf, confidence, showSrc, sources, sources_label, answer_docs } = opts;
+  const validLinks = showSrc ? pick_sources(sources) : [];
+  const docTitles = showSrc && !validLinks.length && Array.isArray(answer_docs)
+    ? [...new Set(answer_docs.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
+    : [];
+  const hasRef = validLinks.length > 0 || docTitles.length > 0;
+
+  const confMap = {
+    high: { text: "依据充分", cls: "high", tip: "已找到与问题对应的校内文件或官网页面" },
+    medium: { text: "依据有限", cls: "medium", tip: "只找到部分相关材料，具体细节以主管部门最新通知为准" },
+    low: { text: "未找到原文", cls: "low", tip: "校内文件库与官网均未检索到直接依据，以下为办理路径建议" }
+  };
+  let confInfo = showConf ? confMap[confidence] : null;
+  if (confInfo && confInfo.cls === "high" && !hasRef && (!sources || !sources.length)) confInfo = null;
+  if (!confInfo && !hasRef) return;
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "ai-meta-toggle" + (confInfo ? (" is-" + confInfo.cls) : " is-ref");
+  toggle.setAttribute("aria-expanded", "false");
+
+  const refCountText = validLinks.length
+    ? `${validLinks.length}条来源`
+    : (docTitles.length ? `${docTitles.length}份文件` : "");
+  const dotHtml = confInfo ? `<i class="ai-meta-dot" aria-hidden="true"></i>` : `${ico("link", "ico-xs")}`;
+  const mainLabel = confInfo && refCountText
+    ? `${confInfo.text} · ${refCountText}`
+    : (confInfo ? confInfo.text : `参考依据 · ${refCountText}`);
+
+  toggle.innerHTML = `${dotHtml}<span>${esc(mainLabel)}</span><span class="ai-meta-caret" aria-hidden="true">▾</span>`;
+  toggle.title = confInfo ? confInfo.tip : "点击展开查看参考依据与原文";
+
+  const drawer = document.createElement("div");
+  drawer.className = "ai-ref-drawer hide";
+  if (confInfo) {
+    const tipEl = document.createElement("div");
+    tipEl.className = "ai-confidence " + confInfo.cls;
+    tipEl.innerHTML = `<i></i><span>${confInfo.text}</span><small>${confInfo.tip}</small>`;
+    drawer.appendChild(tipEl);
+  }
+  if (validLinks.length) {
+    add_sources(drawer, sources, sources_label);
+  } else if (docTitles.length) {
+    add_doc_chips(drawer, docTitles);
+  }
+
+  toggle.onclick = () => {
+    const open = drawer.classList.toggle("hide");
+    const isExpanded = !open;
+    toggle.classList.toggle("is-open", isExpanded);
+    toggle.setAttribute("aria-expanded", String(isExpanded));
+  };
+
+  if (tools_el) {
+    tools_el.appendChild(toggle);
+  } else {
+    wrap_el.appendChild(toggle);
+  }
+  wrap_el.appendChild(drawer);
+}
+
 function add_tools(wrap_el, text_getter, retry_question = "") {
   const tools = document.createElement("div");
   tools.className = "bubble-tools";
 
   const copy_btn = document.createElement("button");
   copy_btn.type = "button";
-  copy_btn.innerHTML = `${ico("copy", "ico-xs")}复制回答`;
+  copy_btn.className = "bt-copy";
+  copy_btn.innerHTML = `${ico("copy", "ico-xs")}<span class="t-full">复制回答</span><span class="t-short">复制</span>`;
   copy_btn.onclick = async () => {
-    const text = typeof text_getter === "function" ? text_getter() : text_getter;
+    const raw = typeof text_getter === "function" ? text_getter() : text_getter;
+    const text = String(raw || "")
+      .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)-->|$)/g, "")
+      .trim();
     const ok = await copy_text_safe(text);
     toast(ok ? "回答已复制到剪贴板" : "复制失败，请长按文字复制");
   };
@@ -2497,12 +2568,12 @@ function add_tools(wrap_el, text_getter, retry_question = "") {
   todo_btn.type = "button";
   todo_btn.className = "todo-action-btn";
   if (steps.length) {
-    todo_btn.innerHTML = `${ico("check-square", "ico-xs")}加入待办（${steps.length} 条）`;
+    todo_btn.innerHTML = `${ico("check-square", "ico-xs")}<span class="t-full">加入待办（${steps.length} 条）</span><span class="t-short">待办(${steps.length})</span>`;
     todo_btn.title = "先检查、编辑并选择要保存的事项，不会直接把整段回答拆成任务";
     todo_btn.onclick = () => review_todos(steps, retry_question);
   } else {
     todo_btn.classList.add("is-manual");
-    todo_btn.innerHTML = `${ico("plus", "ico-xs")}自己加一条待办`;
+    todo_btn.innerHTML = `${ico("plus", "ico-xs")}<span class="t-full">自己加一条待办</span><span class="t-short">记待办</span>`;
     todo_btn.title = "这条回答里没有可直接执行的行动，可以自己写一条";
     todo_btn.onclick = () => review_todos([], retry_question);
   }
@@ -2511,7 +2582,8 @@ function add_tools(wrap_el, text_getter, retry_question = "") {
   if (retry_question) {
     const retry_btn = document.createElement("button");
     retry_btn.type = "button";
-    retry_btn.innerHTML = `${ico("refresh", "ico-xs")}重新生成`;
+    retry_btn.className = "bt-retry";
+    retry_btn.innerHTML = `${ico("refresh", "ico-xs")}<span class="t-full">重新生成</span><span class="t-short">重试</span>`;
     retry_btn.onclick = () => {
       $("question").value = retry_question;
       auto_resize_question();
@@ -2521,6 +2593,7 @@ function add_tools(wrap_el, text_getter, retry_question = "") {
   }
 
   wrap_el.appendChild(tools);
+  return tools;
 }
 
 function create_msg_meta(who) {
@@ -2567,12 +2640,13 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
   }
   wrap.appendChild(d);
 
+  let tools_el = null;
   if (who !== "user") {
-    add_tools(wrap, () => clean_text);
+    tools_el = add_tools(wrap, () => clean_text);
   }
 
   if (sources && sources.length) {
-    add_sources(wrap, sources);
+    add_ai_footer_meta(wrap, tools_el, { showConf: false, showSrc: true, sources });
   }
 
   $("messages").appendChild(wrap);
@@ -2895,6 +2969,7 @@ $("askForm").onsubmit = async e => {
   let sources = [];
   let sources_label = "";
   let confidence = "";
+  let ui_policy = null;
   let follow_ups = [];
   let answer_docs = [];
   let streamed_content = false;
@@ -3027,9 +3102,18 @@ $("askForm").onsubmit = async e => {
           sources = parsed.sources || [];
           sources_label = parsed.sources_label || "";
           confidence = parsed.confidence || "";
+          if (parsed.ui_policy && typeof parsed.ui_policy === "object") ui_policy = parsed.ui_policy;
           if (parsed.cached === true) is_cached_hit = true;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           if (Array.isArray(parsed.knowledge_docs)) answer_docs = parsed.knowledge_docs;
+          return;
+        }
+
+        if (parsed.type === "ui_meta") {
+          if (parsed.ui_policy && typeof parsed.ui_policy === "object") {
+            ui_policy = { ...(ui_policy || {}), ...parsed.ui_policy };
+          }
+          if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           return;
         }
 
@@ -3190,19 +3274,48 @@ $("askForm").onsubmit = async e => {
       wrap.appendChild(box);
       return;
     }
+    const uiMetaMatch = full_answer.match(/<!--UI_META\s*([\s\S]*?)\s*UI_META-->/);
+    if (uiMetaMatch) {
+      try {
+        const parsedUi = JSON.parse(uiMetaMatch[1].trim());
+        if (parsedUi && typeof parsedUi === "object") {
+          ui_policy = {
+            ...(ui_policy || {}),
+            ...(typeof parsedUi.show_confidence === "boolean" ? { show_confidence: parsedUi.show_confidence } : {}),
+            ...(typeof parsedUi.show_sources === "boolean" ? { show_sources: parsedUi.show_sources } : {}),
+            ...(Array.isArray(parsedUi.followups) ? { show_followups: parsedUi.followups.length > 0 } : {})
+          };
+          if (Array.isArray(parsedUi.followups)) {
+            follow_ups = parsedUi.followups.map(s => String(s || "").trim()).filter(Boolean).slice(0, 3);
+          }
+        }
+      } catch {}
+    }
+    const clean_saved_answer = full_answer
+      .replace(/<!--UI_META[\s\S]*?(?:UI_META-->|$)/g, "")
+      .trim();
+    const showConf = ui_policy ? ui_policy.show_confidence === true : Boolean(confidence);
+    const showSrc = ui_policy ? ui_policy.show_sources === true : (has_links(sources) || (answer_docs && answer_docs.length > 0));
+    const showFu = ui_policy ? (ui_policy.show_followups !== false && follow_ups.length > 0) : follow_ups.length > 0;
+
     render_streaming_bubble(false);
     chat_history.push({
       role: "文理智办",
-      content: full_answer,
-      sources: sources || [],
+      content: clean_saved_answer,
+      sources: showSrc ? (sources || []) : [],
       reasoning: full_reasoning.trim()
     });
     save_chat_to_local();
-    add_tools(wrap, () => full_answer, q);
-    add_confidence(wrap, confidence, sources);
-    add_sources(wrap, sources, sources_label);
-    if (!has_links(sources)) add_doc_chips(wrap, answer_docs);
-    add_follow_ups(wrap, follow_ups);
+    const tools_el = add_tools(wrap, () => clean_saved_answer, q);
+    add_ai_footer_meta(wrap, tools_el, {
+      showConf,
+      confidence,
+      showSrc,
+      sources,
+      sources_label,
+      answer_docs
+    });
+    if (showFu) add_follow_ups(wrap, follow_ups);
     if (soft_error) {
       const note = document.createElement("div");
       note.className = "stopped-note";
@@ -3280,11 +3393,19 @@ $("askForm").onsubmit = async e => {
       reasoning: full_reasoning.trim()
     });
     save_chat_to_local();
-    add_tools(wrap, () => full_answer, q);
-    add_confidence(wrap, confidence, sources);
-    add_sources(wrap, sources, sources_label);
-    if (!has_links(sources)) add_doc_chips(wrap, answer_docs);
-    add_follow_ups(wrap, follow_ups);
+    const showConf = ui_policy ? ui_policy.show_confidence === true : false;
+    const showSrc = ui_policy ? ui_policy.show_sources === true : false;
+    const showFu = ui_policy ? (ui_policy.show_followups === true && follow_ups.length > 0) : false;
+    const tools_el = add_tools(wrap, () => full_answer, q);
+    add_ai_footer_meta(wrap, tools_el, {
+      showConf,
+      confidence,
+      showSrc,
+      sources,
+      sources_label,
+      answer_docs
+    });
+    if (showFu) add_follow_ups(wrap, follow_ups);
     toast("已停止生成，保留已输出内容");
   };
 
@@ -5313,8 +5434,326 @@ async function compress_sched_image(file) {
 (function bind_sched_ux_extras() {
   $("homeScheduleStrip")?.addEventListener("click", () => go("schedule"));
 
-  let pendingAiFile = null;
+  let pendingAiFiles = [];
   let pendingParsedCourses = null;
+  let pendingParsedWarnings = [];
+  let pendingParsedNotes = "";
+  let editingParsedIdx = -1;
+  let aiImportRefining = false;
+
+  const SCHED_TYPES_LIST = ["理论", "实验", "上机", "线上", "体育", "其他"];
+
+  function audit_parsed_courses_client(courses) {
+    const list = Array.isArray(courses) ? courses : [];
+    const warnings = [];
+    const weekSets = list.map(c => schedParseWeeks(c.weeks || "1-18"));
+    for (let i = 0; i < list.length; i++) {
+      if (!String(list[i].room || "").trim()) {
+        warnings.push({ type: "missing_room", indices: [i], message: `《${list[i].name}》（${SCHED_DAY_SHORT[list[i].day] || ""} 第${list[i].start}-${list[i].end}节）缺少上课地点` });
+      }
+      for (let j = i + 1; j < list.length; j++) {
+        const a = list[i], b = list[j];
+        if (a.day !== b.day) continue;
+        if (Math.max(a.start, b.start) > Math.min(a.end, b.end)) continue;
+        let overlap = false;
+        for (const w of weekSets[i]) { if (weekSets[j].has(w)) { overlap = true; break; } }
+        if (overlap) {
+          warnings.push({
+            type: "conflict",
+            indices: [i, j],
+            message: `${SCHED_DAY_SHORT[a.day] || ""} 第${Math.max(a.start, b.start)}-${Math.min(a.end, b.end)}节：《${a.name}》与《${b.name}》周次时间重叠`
+          });
+        }
+      }
+    }
+    return warnings.slice(0, 12);
+  }
+
+  function update_ai_confirm_btn() {
+    const btn = $("schedAiConfirmBtn");
+    if (!btn) return;
+    const count = Array.isArray(pendingParsedCourses) ? pendingParsedCourses.length : 0;
+    btn.classList.toggle("hide", count === 0);
+    const span = btn.querySelector("span");
+    if (span) span.textContent = count ? `确认导入 (${count}条)` : "确认导入课表";
+  }
+
+  function format_picked_ai_files_label(files) {
+    if (!files || !files.length) return "支持多张教务截图、PDF、Excel/CSV、Word、TXT 等任意格式";
+    const totalKb = Math.max(1, Math.round(files.reduce((s, f) => s + (f.size || 0), 0) / 1024));
+    if (files.length === 1) return `已选择：${files[0].name}（${totalKb} KB）`;
+    const names = files.map(f => f.name).slice(0, 3).join("、") + (files.length > 3 ? "…" : "");
+    return `已选择 ${files.length} 个文件：${names}（共 ${totalKb} KB）`;
+  }
+
+  function accept_picked_ai_files(fileList) {
+    const arr = Array.from(fileList || []).filter(Boolean);
+    if (!arr.length) return;
+    const isImg = f => {
+      const t = (f.type || "").toLowerCase();
+      const n = (f.name || "").toLowerCase();
+      return t.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/.test(n);
+    };
+    const imgs = arr.filter(isImg);
+    if (imgs.length > 0) {
+      pendingAiFiles = imgs.slice(0, 4);
+      if (imgs.length > 4) toast("单次最多支持 4 张课表截图，已自动取前 4 张");
+    } else {
+      pendingAiFiles = [arr[0]];
+    }
+    set_ai_import_status("");
+    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = format_picked_ai_files_label(pendingAiFiles);
+  }
+
+  function render_ai_parsed_workbench() {
+    const prevEl = $("schedAiPreview");
+    if (!prevEl) return;
+    const list = Array.isArray(pendingParsedCourses) ? pendingParsedCourses : [];
+    if (!list.length) {
+      prevEl.innerHTML = "";
+      prevEl.classList.add("hide");
+      update_ai_confirm_btn();
+      return;
+    }
+
+    const warnIdxSet = new Set();
+    (pendingParsedWarnings || []).forEach(w => {
+      if (Array.isArray(w.indices)) w.indices.forEach(i => warnIdxSet.add(Number(i)));
+    });
+
+    const dayOpts = d => [1, 2, 3, 4, 5, 6, 7].map(n => `<option value="${n}"${Number(d) === n ? " selected" : ""}>${SCHED_DAY_SHORT[n]}</option>`).join("");
+    const periodOpts = v => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}"${Number(v) === n ? " selected" : ""}>第${n}节</option>`).join("");
+    const typeOpts = t => SCHED_TYPES_LIST.map(tp => `<option value="${tp}"${(t || "理论") === tp ? " selected" : ""}>${tp}</option>`).join("");
+
+    const notesHtml = pendingParsedNotes
+      ? `<div class="sched-ai-wb-notes"><span>AI 备注：</span>${schedEsc(pendingParsedNotes)}</div>`
+      : "";
+
+    const warnHtml = pendingParsedWarnings && pendingParsedWarnings.length
+      ? `<div class="sched-ai-warn-box">
+          <div class="sched-ai-warn-title">发现 ${pendingParsedWarnings.length} 处需复核提示（可点击下方条目直接修改）</div>
+          <ul>${pendingParsedWarnings.slice(0, 5).map(w => `<li>${schedEsc(w.message)}</li>`).join("")}${pendingParsedWarnings.length > 5 ? `<li>…其余 ${pendingParsedWarnings.length - 5} 处已在下方高亮标出</li>` : ""}</ul>
+        </div>`
+      : "";
+
+    const itemsHtml = list.map((c, idx) => {
+      const col = SCHED_TYPE_COLOR[c.type] || SCHED_TYPE_COLOR["理论"];
+      const hasWarn = warnIdxSet.has(idx);
+      const isEditing = editingParsedIdx === idx;
+      const metaParts = [
+        `${SCHED_DAY_SHORT[c.day] || "周一"} 第${c.start}-${c.end}节`,
+        `${c.weeks || "1-18"}周`,
+        c.room ? c.room : "未填地点",
+        c.teacher ? c.teacher : ""
+      ].filter(Boolean).join(" · ");
+
+      const editorHtml = isEditing ? `
+        <div class="sched-ai-inline-editor" data-wb-editor="${idx}">
+          <div class="sched-ai-ed-grid">
+            <label class="sched-ai-ed-field is-full">
+              <span>课程名称</span>
+              <input type="text" data-ed-k="name" value="${schedEsc(c.name || "")}" placeholder="课程名称">
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>星期</span>
+              <select data-ed-k="day">${dayOpts(c.day)}</select>
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>开始节</span>
+              <select data-ed-k="start">${periodOpts(c.start)}</select>
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>结束节</span>
+              <select data-ed-k="end">${periodOpts(c.end)}</select>
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>周次</span>
+              <input type="text" data-ed-k="weeks" value="${schedEsc(c.weeks || "1-18")}" placeholder="1-16 或 1-15(单)">
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>教室/地点</span>
+              <input type="text" data-ed-k="room" value="${schedEsc(c.room || "")}" placeholder="如 明德楼B201">
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>教师</span>
+              <input type="text" data-ed-k="teacher" value="${schedEsc(c.teacher || "")}" placeholder="任课教师">
+            </label>
+            <label class="sched-ai-ed-field">
+              <span>类型</span>
+              <select data-ed-k="type">${typeOpts(c.type)}</select>
+            </label>
+          </div>
+          <div class="sched-ai-ed-actions">
+            <button type="button" class="sched-ai-ed-save" data-wb-act="save" data-wb-idx="${idx}">保存修改</button>
+            <button type="button" class="sched-ai-ed-cancel" data-wb-act="cancel" data-wb-idx="${idx}">取消</button>
+          </div>
+        </div>` : "";
+
+      return `<div class="sched-ai-wb-item${hasWarn ? " has-warn" : ""}${isEditing ? " is-editing" : ""}" data-wb-row="${idx}">
+        <div class="sched-ai-wb-row">
+          <span class="sched-ai-wb-bar" style="background:${col}"></span>
+          <div class="sched-ai-wb-main" data-wb-act="edit" data-wb-idx="${idx}" title="点击编辑这条课程">
+            <div class="sched-ai-wb-name">${schedEsc(c.name)}<span class="sched-ai-wb-type">${schedEsc(c.type || "理论")}</span>${hasWarn ? `<span class="sched-ai-wb-flag">待核对</span>` : ""}</div>
+            <div class="sched-ai-wb-meta">${schedEsc(metaParts)}</div>
+          </div>
+          <div class="sched-ai-wb-ops">
+            <button type="button" class="sched-ai-wb-btn" data-wb-act="edit" data-wb-idx="${idx}" aria-label="编辑课程" title="编辑"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+            <button type="button" class="sched-ai-wb-btn is-del" data-wb-act="del" data-wb-idx="${idx}" aria-label="删除课程" title="删除"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg></button>
+          </div>
+        </div>
+        ${editorHtml}
+      </div>`;
+    }).join("");
+
+    prevEl.innerHTML = `
+      <div class="sched-ai-wb-head">
+        <div>
+          <b>识别核对工作台（共 ${list.length} 条）</b>
+          <small>点击课程可逐条修改，或在下方用自然语言让 AI 批量修正</small>
+        </div>
+        <button type="button" class="sched-ai-wb-add" data-wb-act="add">+ 补加一条</button>
+      </div>
+      ${notesHtml}
+      ${warnHtml}
+      <div class="sched-ai-wb-list">${itemsHtml}</div>
+      <div class="sched-ai-refine-bar">
+        <label for="schedAiRefineInput">AI 自然语言二次修正</label>
+        <div class="sched-ai-refine-row">
+          <input type="text" id="schedAiRefineInput" placeholder="如：把大学物理教室全改到明德楼B201；删掉体育；高数改成1-16周" ${aiImportRefining ? "disabled" : ""}>
+          <button type="button" id="schedAiRefineBtn" class="sched-ai-refine-btn" data-wb-act="refine" ${aiImportRefining ? "disabled" : ""}>${aiImportRefining ? "修正中…" : "AI 修正"}</button>
+        </div>
+      </div>`;
+    prevEl.classList.remove("hide");
+    update_ai_confirm_btn();
+  }
+
+  function save_inline_wb_editor(idx) {
+    if (!Array.isArray(pendingParsedCourses) || idx < 0 || idx >= pendingParsedCourses.length) return false;
+    const box = $("schedAiPreview")?.querySelector(`[data-wb-editor="${idx}"]`);
+    if (!box) return false;
+    const getVal = k => String(box.querySelector(`[data-ed-k="${k}"]`)?.value || "").trim();
+    const name = getVal("name");
+    if (!name) {
+      toast("课程名称不能为空");
+      box.querySelector('[data-ed-k="name"]')?.focus();
+      return false;
+    }
+    const day = Math.min(7, Math.max(1, parseInt(getVal("day"), 10) || 1));
+    let start = Math.min(10, Math.max(1, parseInt(getVal("start"), 10) || 1));
+    let end = Math.min(10, Math.max(1, parseInt(getVal("end"), 10) || start));
+    if (end < start) { const tmp = start; start = end; end = tmp; }
+    const weeks = getVal("weeks") || ("1-" + schedState.totalWeeks);
+    const room = getVal("room");
+    const teacher = getVal("teacher");
+    const type = SCHED_TYPES_LIST.includes(getVal("type")) ? getVal("type") : "理论";
+    pendingParsedCourses[idx] = { name, day, start, end, weeks, room, teacher, type };
+    editingParsedIdx = -1;
+    pendingParsedWarnings = audit_parsed_courses_client(pendingParsedCourses);
+    render_ai_parsed_workbench();
+    set_ai_import_status(`已更新课程，当前共 ${pendingParsedCourses.length} 条，核对无误后点击“确认导入课表”。`);
+    toast("课程条目已更新");
+    return true;
+  }
+
+  async function run_ai_schedule_refine() {
+    if (aiImportRefining || !Array.isArray(pendingParsedCourses) || !pendingParsedCourses.length) return;
+    const inp = $("schedAiRefineInput");
+    const instruction = String(inp?.value || "").trim();
+    if (!instruction) {
+      toast("请先输入想让 AI 修改的内容");
+      inp?.focus();
+      return;
+    }
+    if (editingParsedIdx >= 0) save_inline_wb_editor(editingParsedIdx);
+    aiImportRefining = true;
+    render_ai_parsed_workbench();
+    set_ai_import_status("正在用强力 AI 按你的要求批量修正课表…");
+    try {
+      const res = await api("/schedule/refine", {
+        method: "POST",
+        timeoutMs: 105000,
+        body: JSON.stringify({ courses: pendingParsedCourses, instruction })
+      });
+      const updated = Array.isArray(res?.courses) ? res.courses : [];
+      pendingParsedCourses = updated;
+      pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(updated);
+      editingParsedIdx = -1;
+      aiImportRefining = false;
+      render_ai_parsed_workbench();
+      const summary = res?.summary || `AI 已完成课表修正（当前 ${updated.length} 条）`;
+      set_ai_import_status(summary);
+      toast(summary);
+    } catch (err) {
+      aiImportRefining = false;
+      render_ai_parsed_workbench();
+      const msg = err?.message || "AI 修正失败，请重试";
+      set_ai_import_status(msg, true);
+      toast(msg);
+    }
+  }
+
+  $("schedAiPreview")?.addEventListener("click", e => {
+    const actEl = e.target.closest("[data-wb-act]");
+    if (!actEl) return;
+    const act = actEl.dataset.wbAct;
+    const idx = Number(actEl.dataset.wbIdx);
+    if (act === "add") {
+      if (!Array.isArray(pendingParsedCourses)) pendingParsedCourses = [];
+      pendingParsedCourses.push({
+        name: "新课程",
+        day: 1,
+        start: 1,
+        end: 2,
+        weeks: "1-" + schedState.totalWeeks,
+        room: "",
+        teacher: "",
+        type: "理论"
+      });
+      editingParsedIdx = pendingParsedCourses.length - 1;
+      pendingParsedWarnings = audit_parsed_courses_client(pendingParsedCourses);
+      render_ai_parsed_workbench();
+      const row = $("schedAiPreview")?.querySelector(`[data-wb-row="${editingParsedIdx}"]`);
+      row?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      row?.querySelector('[data-ed-k="name"]')?.focus();
+      return;
+    }
+    if (act === "edit") {
+      editingParsedIdx = editingParsedIdx === idx ? -1 : idx;
+      render_ai_parsed_workbench();
+      return;
+    }
+    if (act === "cancel") {
+      editingParsedIdx = -1;
+      render_ai_parsed_workbench();
+      return;
+    }
+    if (act === "save") {
+      save_inline_wb_editor(idx);
+      return;
+    }
+    if (act === "del") {
+      if (!Array.isArray(pendingParsedCourses) || idx < 0 || idx >= pendingParsedCourses.length) return;
+      pendingParsedCourses.splice(idx, 1);
+      if (editingParsedIdx === idx) editingParsedIdx = -1;
+      else if (editingParsedIdx > idx) editingParsedIdx--;
+      pendingParsedWarnings = audit_parsed_courses_client(pendingParsedCourses);
+      render_ai_parsed_workbench();
+      set_ai_import_status(pendingParsedCourses.length
+        ? `已删除 1 条，剩余 ${pendingParsedCourses.length} 条课程待确认导入。`
+        : "已清空全部识别结果，可重新识别或点击“+ 补加一条”手动录入。");
+      return;
+    }
+    if (act === "refine") {
+      run_ai_schedule_refine();
+    }
+  });
+
+  $("schedAiPreview")?.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target && e.target.id === "schedAiRefineInput") {
+      e.preventDefault();
+      run_ai_schedule_refine();
+    }
+  });
 
   window.extract_docx_for_ai = async function extract_docx_for_ai(file) {
     await window.load_ext_script_any([
@@ -5328,11 +5767,16 @@ async function compress_sched_image(file) {
   };
 
   const openAiImportModal = () => {
-    pendingAiFile = null;
+    pendingAiFiles = [];
     pendingParsedCourses = null;
+    pendingParsedWarnings = [];
+    pendingParsedNotes = "";
+    editingParsedIdx = -1;
+    aiImportRefining = false;
     $("schedAiPreview")?.classList.add("hide");
-    $("schedAiConfirmBtn")?.classList.add("hide");
-    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = "支持教务系统截图、导出 PDF、课表表格等任意格式";
+    if ($("schedAiPreview")) $("schedAiPreview").innerHTML = "";
+    update_ai_confirm_btn();
+    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = format_picked_ai_files_label([]);
     if ($("schedAiPasteText")) $("schedAiPasteText").value = "";
     set_ai_import_status("");
     $("scheduleAiImportDialog")?.showModal();
@@ -5427,10 +5871,16 @@ async function compress_sched_image(file) {
 
   $("schedAiConfirmBtn")?.addEventListener("click", () => {
     if (!Array.isArray(pendingParsedCourses) || !pendingParsedCourses.length) return;
+    if (editingParsedIdx >= 0) {
+      if (!save_inline_wb_editor(editingParsedIdx)) return;
+    }
     const mode = document.querySelector('input[name="schedImportMode"]:checked')?.value || "merge";
     schedState.courses = mode === "replace" ? pendingParsedCourses : [...schedState.courses, ...pendingParsedCourses];
     const count = pendingParsedCourses.length;
     pendingParsedCourses = null;
+    pendingParsedWarnings = [];
+    pendingParsedNotes = "";
+    editingParsedIdx = -1;
     schedQueueSync();
     render_schedule_all();
     $("scheduleAiImportDialog")?.close();
@@ -5438,11 +5888,9 @@ async function compress_sched_image(file) {
   });
 
   $("schedImgFile")?.addEventListener("change", e => {
-    const file = e.target.files && e.target.files[0];
+    const files = e.target.files;
+    accept_picked_ai_files(files);
     e.target.value = "";
-    if (!file) return;
-    pendingAiFile = file;
-    if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = `已选择：${file.name}（${Math.max(1, Math.round(file.size / 1024))} KB）`;
   });
 
   window.load_ext_script_any = function load_ext_script_any(urls) {
@@ -5519,7 +5967,7 @@ async function compress_sched_image(file) {
     return { text: txt };
   }
 
-  // 拖拽文件支持
+  // 拖拽文件支持（支持多张课表截图）
   const dropEl = $("schedAiPickFileBtn");
   if (dropEl) {
     dropEl.addEventListener("dragover", e => { e.preventDefault(); dropEl.style.borderColor = "var(--blue)"; });
@@ -5527,18 +5975,13 @@ async function compress_sched_image(file) {
     dropEl.addEventListener("drop", e => {
       e.preventDefault();
       dropEl.style.borderColor = "";
-      const f = e.dataTransfer?.files?.[0];
-      if (f) {
-        pendingAiFile = f;
-        set_ai_import_status("");
-        if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = `已选择：${f.name}（${Math.max(1, Math.round(f.size / 1024))} KB）`;
-      }
+      if (e.dataTransfer?.files?.length) accept_picked_ai_files(e.dataTransfer.files);
     });
   }
 
   $("schedAiRunBtn")?.addEventListener("click", async () => {
     const pasted = ($("schedAiPasteText")?.value || "").trim();
-    if (!pendingAiFile && !pasted) {
+    if (!pendingAiFiles.length && !pasted) {
       set_ai_import_status("请先选择课表文件，或粘贴课表文字", true);
       return;
     }
@@ -5546,54 +5989,124 @@ async function compress_sched_image(file) {
     const btn = $("schedAiRunBtn");
     btn.disabled = true;
     set_ai_import_status("正在准备解析课表…");
-    schedSetSyncLabel("AI 解析中…", true);
+    schedSetSyncLabel("AI 深度解析中…", true);
+
+    let localTick = null;
+    let ctrl = null;
+    let timeoutId = null;
 
     try {
       let payload = {};
-      if (pendingAiFile) {
-        const fname = (pendingAiFile.name || "").toLowerCase();
-        const ftype = (pendingAiFile.type || "").toLowerCase();
-        if (ftype.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/.test(fname)) {
-          set_ai_import_status("正在压缩图片并上传识别…");
-          payload.image = await compress_sched_image(pendingAiFile);
+      if (pendingAiFiles.length) {
+        const first = pendingAiFiles[0];
+        const fname = (first.name || "").toLowerCase();
+        const ftype = (first.type || "").toLowerCase();
+        const isImg = ftype.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/.test(fname);
+        if (isImg) {
+          set_ai_import_status(`正在优化压缩 ${pendingAiFiles.length} 张课表图片…`);
+          const imgs = [];
+          for (const f of pendingAiFiles.slice(0, 4)) {
+            imgs.push(await compress_sched_image(f));
+          }
+          payload.images = imgs;
+          payload.image = imgs[0];
           if (pasted) payload.text = pasted;
         } else if (ftype === "application/pdf" || fname.endsWith(".pdf")) {
-          payload = await extract_pdf_for_schedule(pendingAiFile);
+          payload = await extract_pdf_for_schedule(first);
           if (pasted) payload.text = (payload.text ? payload.text + "\n" : "") + pasted;
         } else if (fname.endsWith(".xlsx") || fname.endsWith(".xls")) {
-          payload = await extract_xlsx_for_schedule(pendingAiFile);
+          payload = await extract_xlsx_for_schedule(first);
           if (pasted) payload.text += "\n" + pasted;
+        } else if (fname.endsWith(".docx")) {
+          set_ai_import_status("正在读取 Word 文档内容…");
+          payload = await window.extract_docx_for_ai(first);
+          if (pasted) payload.text = (payload.text ? payload.text + "\n" : "") + pasted;
         } else if (fname.endsWith(".json")) {
-          const raw = await pendingAiFile.text();
+          const raw = await first.text();
           try {
             const j = JSON.parse(raw);
             const arr = Array.isArray(j) ? j : (Array.isArray(j.courses) ? j.courses : null);
             if (arr && arr.length && arr[0].name && arr[0].day) {
-              schedState.courses = mode === "replace" ? arr : [...schedState.courses, ...arr];
+              pendingParsedCourses = arr;
+              pendingParsedWarnings = audit_parsed_courses_client(arr);
+              pendingParsedNotes = "已直接载入标准 JSON 课表，可在下方核对或修改后确认导入。";
+              editingParsedIdx = -1;
               if (j.startDate) schedState.startDate = j.startDate;
-              schedQueueSync();
-              render_schedule_all();
-              $("scheduleAiImportDialog")?.close();
-              toast(`已导入 ${arr.length} 条 JSON 课程`);
+              render_ai_parsed_workbench();
+              set_ai_import_status(`已解析出 ${arr.length} 条 JSON 课程，核对无误后点击“确认导入课表”。`);
               btn.disabled = false;
               return;
             }
           } catch {}
           payload.text = raw + (pasted ? "\n" + pasted : "");
         } else {
-          payload.text = (await pendingAiFile.text()) + (pasted ? "\n" + pasted : "");
+          payload.text = (await first.text()) + (pasted ? "\n" + pasted : "");
         }
       } else {
         payload.text = pasted;
       }
 
-      set_ai_import_status("正在调用 AI 提取课程信息（约需 5-10 秒）…");
-      set_ai_import_status("正在用强力 AI 深度思考解析课表（约 10-30 秒，请耐心等待）…");
-      const res = await api("/schedule/parse", {
+      const startedAt = Date.now();
+      let lastStage = payload.images?.length
+        ? "正在深度识图并逐列核对星期与节次…"
+        : "正在用强力 AI 深度思考解析课表结构…";
+      set_ai_import_status(`${lastStage}（最长允许深度推理 150 秒）`);
+
+      localTick = setInterval(() => {
+        const sec = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+        set_ai_import_status(`${lastStage}（已用时 ${sec} 秒）`);
+      }, 1000);
+
+      ctrl = new AbortController();
+      timeoutId = setTimeout(() => ctrl.abort(), 185000);
+
+      const resp = await fetch(api_base + "/schedule/parse", {
         method: "POST",
-        timeoutMs: 120000,
-        body: JSON.stringify(payload)
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        body: JSON.stringify({ ...payload, stream: true }),
+        signal: ctrl.signal
       });
+
+      const ct = (resp.headers.get("content-type") || "").toLowerCase();
+      let res = null;
+
+      if (ct.includes("text/event-stream") && resp.body) {
+        const reader = resp.body.getReader();
+        const dec = new TextDecoder();
+        let buf = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split("\n");
+          buf = lines.pop() || "";
+          for (const rawLine of lines) {
+            const line = rawLine.trim();
+            if (!line.startsWith("data:")) continue;
+            const d = line.slice(5).trim();
+            if (!d || d === "[DONE]") continue;
+            let ev = null;
+            try { ev = JSON.parse(d); } catch { continue; }
+            if (ev.type === "progress" && ev.stage) {
+              lastStage = ev.stage;
+              const sec = Number.isFinite(ev.elapsed) ? ev.elapsed : Math.round((Date.now() - startedAt) / 1000);
+              set_ai_import_status(`${lastStage}（已用时 ${sec} 秒）`);
+            } else if (ev.type === "result") {
+              res = ev;
+            } else if (ev.type === "error") {
+              throw new Error(ev.error || "课表解析失败");
+            }
+          }
+        }
+      } else {
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data?.error || data?.message || `课表解析失败（HTTP ${resp.status}）`);
+        res = data;
+      }
+
       const parsed = Array.isArray(res?.courses) ? res.courses : [];
       if (!parsed.length) {
         set_ai_import_status("未识别到有效课程，请确认内容清晰或尝试直接粘贴文字", true);
@@ -5601,19 +6114,24 @@ async function compress_sched_image(file) {
       }
 
       pendingParsedCourses = parsed;
-      const prevEl = $("schedAiPreview");
-      if (prevEl) {
-        prevEl.innerHTML = `<b>已识别出 ${parsed.length} 条课程（请核对后点“确认导入课表”）：</b>` +
-          parsed.slice(0, 12).map(c => `<div class="sched-ai-preview-item">${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节 · ${schedEsc(c.name)}（${schedEsc(c.weeks)}周 ${schedEsc(c.room || "")}）</div>`).join("") +
-          (parsed.length > 12 ? `<div class="sched-ai-preview-item" style="color:var(--muted)">…还有 ${parsed.length - 12} 条课程</div>` : "");
-        prevEl.classList.remove("hide");
-      }
-      $("schedAiConfirmBtn")?.classList.remove("hide");
-      set_ai_import_status(`识别完成！共 ${parsed.length} 门课，请点击“确认导入课表”正式写入。`);
+      pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(parsed);
+      pendingParsedNotes = String(res?.notes || "").trim();
+      editingParsedIdx = -1;
+      render_ai_parsed_workbench();
+      requestAnimationFrame(() => $("schedAiPreview")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      schedSetSyncLabel("识别完成，待确认", false);
+      set_ai_import_status(pendingParsedWarnings.length
+        ? `识别完成！共 ${parsed.length} 条课程（含 ${pendingParsedWarnings.length} 处提醒），修改核对后点“确认导入课表”。`
+        : `识别完成！共 ${parsed.length} 条课程，可在下方微调或直接点击“确认导入课表”。`);
     } catch (err) {
       schedSetSyncLabel("导入失败", false);
-      set_ai_import_status(err?.message || "课表解析失败，请重试", true);
+      const msg = err && err.name === "AbortError"
+        ? "深度解析超时（超过 180 秒），建议分批上传或改用文字/表格导入"
+        : (err?.message || "课表解析失败，请重试");
+      set_ai_import_status(msg, true);
     } finally {
+      if (localTick) clearInterval(localTick);
+      if (timeoutId) clearTimeout(timeoutId);
       btn.disabled = false;
     }
   });
@@ -5749,6 +6267,18 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
         if (typeof load_tasks === "function") load_tasks();
         autoLogs.push(`已将待办「${act.title || act.id}」标记为完成`);
       } catch {}
+    } else if (act.type === "delete_task" && act.id) {
+      try {
+        await api("/tasks/" + Number(act.id), { method: "DELETE" });
+        if (typeof load_tasks === "function") load_tasks();
+        autoLogs.push(`已删除待办「${act.title || act.id}」`);
+      } catch {}
+    } else if (act.type === "open_doc" && act.title) {
+      const docTitle = String(act.title || "").trim();
+      if (docTitle && typeof open_doc_reader === "function") {
+        autoLogs.push(`已为你打开校规原文《${docTitle}》`);
+        setTimeout(() => open_doc_reader(docTitle), 320);
+      }
     } else if (act.type === "navigate" && act.page) {
       const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule"]);
       if (allowedPages.has(act.page)) {

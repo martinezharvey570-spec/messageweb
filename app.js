@@ -1144,7 +1144,7 @@ function render_tasks() {
             <b data-edit-task="${t.id}" title="点击修改待办内容">${esc(t.title)}</b>
             <small>
               ${due_markup(t.due_date, t.status)}
-              <span>· ${t.notice_id ? ico("pin", "ico-xs") + "来自通知" : ico("edit", "ico-xs") + "个人待办"}</span>
+              <span>· ${t.notice_id ? "来自通知" : "个人待办"}</span>
               <span>· 创建于 ${t.created_at ? esc(date(t.created_at)) : "—"}</span>
             </small>
           </div>
@@ -1367,6 +1367,8 @@ function apply_kb_count(total, chunks) {
   });
   const stat = $("statKnowledge");
   if (stat) stat.textContent = String(n);
+  const allKbPill = document.querySelector('#knowledgePills .pill-btn[data-kdept=""]');
+  if (allKbPill) allKbPill.textContent = `全部 (${n})`;
   const chunk_num = Number(chunks);
   if (Number.isFinite(chunk_num) && chunk_num > 0) {
     document.querySelectorAll("[data-kb-chunks]").forEach(el => { el.textContent = String(chunk_num); });
@@ -1490,7 +1492,9 @@ async function load_knowledge() {
   }
   if (grid) grid.setAttribute("aria-busy", "true");
   set_result_meta({ loading: true });
-  if (grid && !knowledge_docs.length) grid.innerHTML = '<div class="panel empty" style="grid-column:1/-1" role="status">正在加载制度目录…</div>';
+  if (grid && !knowledge_docs.length) {
+    grid.innerHTML = Array.from({ length: 4 }, () => `<article class="knowledge-card kb-skeleton" aria-hidden="true"><div class="kb-sk-line w-30"></div><div class="kb-sk-line w-70"></div><div class="kb-sk-line w-90"></div></article>`).join("");
+  }
   try {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
@@ -6412,6 +6416,22 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   if (!actions.length) return;
   toolsEl.dataset.schedRendered = "1";
 
+  const plainAnswerLen = txt.replace(hidden_meta_block_re, "").trim().length;
+  const deferNavAsCard = plainAnswerLen > 45;
+  const PAGE_LABELS = {
+    home: "总览工作台", notices: "通知公告", tasks: "我的待办", ai: "校务指南 AI",
+    knowledge: "校规制度库", schedule: "超级课表", parser: "群通知拆解",
+    academic: "学业与奖助", guide: "校园办事向导", schedtools: "超级课表助手",
+    users: "用户管理", analytics: "数据统计"
+  };
+  const TOOL_LABELS = {
+    notice_parser: "群通知拆解", parser: "群通知拆解",
+    gpa_calc: "GPA 绩点计算", academic_check: "学业与奖助自查", academic: "学业与奖助自查",
+    eligibility: "奖助资格自查", guide_wizard: "校园办事向导", guide: "校园办事向导",
+    sched_tools: "超级课表助手", sched_exams: "考试倒计时", sched_free: "本周空档查询",
+    sched_ics: "导出日历 (.ics)", custom_kb: "新增校规文件", school_picker: "切换目标高校"
+  };
+
   const autoLogs = [];
   const confirmActs = [];
 
@@ -6421,34 +6441,56 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       if (!allowNav && !allowWrite) continue;
       const docTitle = String(act.title || "").trim();
       if (docTitle && typeof open_doc_reader === "function") {
-        autoLogs.push(`已为你打开校规原文《${docTitle}》`);
-        setTimeout(() => open_doc_reader(docTitle), 320);
+        if (deferNavAsCard) {
+          confirmActs.push({ type: "nav_card", icon: "book", label: `查阅校规原文《${docTitle}》`, btnText: "立即查看原文", run: () => open_doc_reader(docTitle) });
+        } else {
+          autoLogs.push(`已为你打开校规原文《${docTitle}》`);
+          setTimeout(() => open_doc_reader(docTitle), 320);
+        }
       }
     } else if (act.type === "navigate" && act.page) {
       if (!allowNav && !allowWrite) continue;
       const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule", "parser", "academic", "guide", "schedtools", "users", "analytics"]);
       if (allowedPages.has(act.page)) {
-        autoLogs.push(`已为你跳转至「${act.page}」`);
-        setTimeout(() => go(act.page), 450);
+        const pLabel = PAGE_LABELS[act.page] || act.page;
+        if (deferNavAsCard) {
+          confirmActs.push({ type: "nav_card", icon: "arrow-right", label: `前往「${pLabel}」`, btnText: "立即跳转", run: () => go(act.page) });
+        } else {
+          autoLogs.push(`已为你跳转至「${pLabel}」`);
+          setTimeout(() => go(act.page), 450);
+        }
       }
     } else if (act.type === "open_tool" && act.tool) {
       if (!allowNav && !allowWrite) continue;
-      autoLogs.push(`已为你调起校务工具`);
-      setTimeout(() => window.invoke_campus_tool?.(act.tool, act), 320);
+      const tLabel = TOOL_LABELS[act.tool] || "校务工具";
+      if (deferNavAsCard) {
+        confirmActs.push({ type: "nav_card", icon: "sparkles", label: `打开「${tLabel}」`, btnText: `打开${tLabel}`, run: () => window.invoke_campus_tool?.(act.tool, act) });
+      } else {
+        autoLogs.push(`已为你打开「${tLabel}」`);
+        setTimeout(() => window.invoke_campus_tool?.(act.tool, act), 320);
+      }
     } else if (act.type === "prefill_guide") {
       if (!allowNav && !allowWrite) continue;
-      autoLogs.push(`已为你打开办事向导并预填申请表`);
-      setTimeout(() => window.invoke_campus_tool?.("guide_wizard", act), 320);
+      if (deferNavAsCard) {
+        confirmActs.push({ type: "nav_card", icon: "clipboard", label: "打开校园办事向导并预填申请表", btnText: "前往办事向导", run: () => window.invoke_campus_tool?.("guide_wizard", act) });
+      } else {
+        autoLogs.push(`已为你打开办事向导并预填申请表`);
+        setTimeout(() => window.invoke_campus_tool?.("guide_wizard", act), 320);
+      }
     } else if (act.type === "check_eligibility") {
       if (!allowNav && !allowWrite) continue;
-      autoLogs.push(`已为你打开奖助与学位红线自检`);
-      setTimeout(() => window.invoke_campus_tool?.("eligibility", act), 320);
+      if (deferNavAsCard) {
+        confirmActs.push({ type: "nav_card", icon: "award", label: "打开奖助资格自查（已同步条件）", btnText: "前往奖助自查", run: () => window.invoke_campus_tool?.("eligibility", act) });
+      } else {
+        autoLogs.push(`已为你打开奖助资格自查`);
+        setTimeout(() => window.invoke_campus_tool?.("eligibility", act), 320);
+      }
     } else if (act.type === "import_gpa" && Array.isArray(act.courses) && act.courses.length) {
       confirmActs.push(act);
     } else if (act.type === "add_exams" && Array.isArray(act.items) && act.items.length) {
       confirmActs.push(act);
     } else if (act.type === "add_custom_kb" && me?.role === "admin") {
-      autoLogs.push(`已为你打开在线增补校规表单`);
+      autoLogs.push(`已为你打开新增校规文件表单`);
       setTimeout(() => window.open_custom_doc_dialog?.(act), 320);
     } else if (!allowWrite) {
       // 第三道物理安全锁：后端未授权写操作时，前端绝不静默执行任何待办/课表/公告写入
@@ -6473,10 +6515,28 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     toast(autoLogs[0]);
   }
 
+  if (confirmActs.some(a => a.type === "add_tasks")) {
+    toolsEl.querySelector(".todo-action-btn")?.classList.add("hide");
+  }
+
+  const cardGrid = confirmActs.length ? document.createElement("div") : null;
+  if (cardGrid) {
+    cardGrid.className = confirmActs.length >= 2 ? "ai-confirm-grid is-multi" : "ai-confirm-grid";
+  }
+
   for (const act of confirmActs) {
     const card = document.createElement("div");
     card.className = "sched-chat-confirm ai-action-confirm-card";
-    if (act.type === "add_tasks") {
+    if (act.type === "nav_card") {
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-${schedEsc(act.icon || "sparkles")}"/></svg><span>${schedEsc(act.label)}</span></div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="go">${schedEsc(act.btnText || "立即前往")}</button>
+        </div>`;
+      card.querySelector('[data-act="go"]').onclick = () => {
+        if (typeof act.run === "function") act.run();
+      };
+    } else if (act.type === "add_tasks") {
       const previewLines = act.items.map(it =>
         `• ${schedEsc(it.title)}${it.due_date ? "（截止 " + schedEsc(it.due_date) + "）" : ""}`
       ).join("<br>");
@@ -6621,7 +6681,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       };
       card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
     }
-    toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
+    cardGrid.appendChild(card);
+  }
+  if (cardGrid && cardGrid.children.length) {
+    toolsEl.parentElement?.insertBefore(cardGrid, toolsEl.nextSibling);
   }
 }
 
@@ -7044,6 +7107,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   const bodyEl = $("globalSearchBody");
   let spItems = [];
   let spActiveIdx = 0;
+  let spReqSeq = 0;
 
   const ensureKbCatalogLoaded = async () => {
     if (Array.isArray(all_knowledge_docs_cache) && all_knowledge_docs_cache.length) return all_knowledge_docs_cache;
@@ -7060,6 +7124,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
   const renderSpotlight = async rawQ => {
     if (!bodyEl) return;
+    const reqSeq = ++spReqSeq;
     const q = String(rawQ || "").trim();
     const ql = q.toLowerCase();
     const items = [];
@@ -7192,6 +7257,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       });
     }
 
+    if (reqSeq !== spReqSeq) return;
     spItems = items;
     spActiveIdx = 0;
 

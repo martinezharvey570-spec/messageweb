@@ -19163,3 +19163,182 @@ html.dark .campus-tool-page .elig-grid .xz-select-trigger {
   }
 }
 
+/* ==================== v1.125 线上深度实测 8 项视觉与交互精修 ==================== */
+
+/* 1. 移动端通知公告页：顶栏双按钮等高 1:1 均分 + 卡片内纯图标按钮锁定 34x34 正圆形（彻底消除扁椭圆拉伸） */
+@media (max-width: 760px) {
+  #noticesPage .pagehead .notice-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #noticesPage .pagehead .notice-actions button:not(.hide) {
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+  #noticesPage .notice-card .notice-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 5px !important;
+    width: 100% !important;
+  }
+  #noticesPage .notice-card .notice-actions button:not(.icon-only) {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 9px !important;
+    gap: 3px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+  #noticesPage .notice-card .notice-actions button.icon-only {
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #noticesPage .notice-card .notice-actions button.icon-only.danger {
+    margin-left: 0 !important;
+  }
+}
+
+/* 2. 桌面端超级课表：优化左右分栏与节次列宽，释放周课表色块横向空间，避免课名截断成2~3字 */
+@media (min-width: 961px) {
+  #schedulePage .sched-d-stage {
+    grid-template-columns: 248px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+  #schedulePage .sched-matrix {
+    grid-template-columns: 50px repeat(7, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+  #schedulePage .sched-m-period {
+    padding: 6px 2px !important;
+  }
+  #schedulePage .sched-m-period b {
+    font-size: 11.5px !important;
+  }
+  #schedulePage .sched-m-period span {
+    font-size: 9.5px !important;
+  }
+  #schedulePage .sched-m-cell {
+    padding: 3px !important;
+    min-height: 84px !important;
+  }
+  #schedulePage .sched-card-item {
+    padding: 6px 5px !important;
+    border-radius: 9px !important;
+  }
+  #schedulePage .sched-card-item .sc-n {
+    font-size: 11.5px !important;
+    line-height: 1.28 !important;
+    -webkit-line-clamp: 3 !important;
+  }
+  #schedulePage .sched-card-item .sc-r {
+    font-size: 10px !important;
+    margin-top: 2px !important;
+  }
+}
+
+/* 3. 桌面端 AI 页面底部输入舱柔化渐变遮罩 + 多张确认卡并排网格 */
+@media (min-width: 961px) {
+  body.on-ai-page .ask {
+    background: linear-gradient(to top, var(--bg) 52%, rgba(244, 247, 251, 0) 100%) !important;
+    padding-top: 26px !important;
+  }
+  html.dark body.on-ai-page .ask {
+    background: linear-gradient(to top, #0b1120 52%, rgba(11, 17, 32, 0) 100%) !important;
+  }
+}
+.ai-confirm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: min(92%, 860px);
+  margin-top: 6px;
+}
+.ai-confirm-grid .sched-chat-confirm {
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+@media (min-width: 961px) {
+  .ai-confirm-grid.is-multi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* 4. 校规制度库首屏加载骨架屏 shimmer */
+@keyframes kbSkShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.knowledge-card.kb-skeleton {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px !important;
+}
+.kb-sk-line {
+  height: 13px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.14) 25%, rgba(148, 163, 184, 0.28) 50%, rgba(148, 163, 184, 0.14) 75%);
+  background-size: 200% 100%;
+  animation: kbSkShimmer 1.3s ease-in-out infinite;
+}
+.kb-sk-line.w-30 { width: 32%; height: 12px; }
+.kb-sk-line.w-70 { width: 68%; height: 16px; }
+.kb-sk-line.w-90 { width: 92%; height: 12px; }
+
+/* 5. 全站 Toast 提示移至顶部安全区下方（使用高优先级 ID 选择器覆盖 android-bridge.js 动态样式），绝不与 AI 输入框或移动端底栏重叠 */
+body #toast.toast,
+body.on-ai-page #toast.toast {
+  top: calc(70px + var(--xz-safe-top, env(safe-area-inset-top, 0px))) !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translate(-50%, -12px) scale(0.96) !important;
+}
+body #toast.toast.show,
+body.on-ai-page #toast.toast.show {
+  transform: translate(-50%, 0) scale(1) !important;
+}
+@media (max-width: 760px) {
+  body #toast.toast,
+  body.on-ai-page #toast.toast {
+    top: calc(64px + var(--xz-safe-top, env(safe-area-inset-top, 0px))) !important;
+    bottom: auto !important;
+  }
+}
+
+/* 6. 数据统计页问题示例优雅截断 */
+#analyticsPage .gov-sample,
+#analyticsPage .gov-spot-main b {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

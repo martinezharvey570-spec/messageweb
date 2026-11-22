@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 
 <head>
@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.119" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.121" fetchpriority="high">
 </head>
 <body>
 
@@ -320,6 +320,11 @@
     <button class="nav" data-page="ai" title="校务指南 AI"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>校务指南 AI</button>
     <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
     <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
+    <small class="navcaption" style="margin-top:14px">智慧工具箱</small>
+    <button type="button" class="nav nav-tool nt-parse" data-open-tool="notice_parser" title="群通知与截图一键拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
+    <button type="button" class="nav nav-tool nt-acad" data-open-tool="academic_check" title="学业 GPA 与奖助评优体检"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
+    <button type="button" class="nav nav-tool nt-guide" data-open-tool="guide_wizard" title="校园办事向导与文书生成"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导</button>
+    <button type="button" class="nav nav-tool nt-sched" data-open-tool="sched_tools" title="考试倒计时、本周空档与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg>超级课表助手</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
@@ -396,27 +401,6 @@
             <button class="quick" data-goto="tasks"><span><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>管理我的待办</span><i>→</i></button>
             <button class="quick" data-goto="ai"><span><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>咨询校务指南 AI</span><i>→</i></button>
             <button class="quick" data-goto="knowledge"><span><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>查阅校规制度库</span><i>→</i></button>
-            <div class="home-tools-section">
-              <small class="muted">校园效率工具</small>
-              <div class="home-tool-grid">
-                <button type="button" class="home-tool-tile ht-parse" id="openNoticeParserBtn">
-                  <span class="ht-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
-                  <div><b>群通知拆解</b><small>文字截图转待办</small></div>
-                </button>
-                <button type="button" class="home-tool-tile ht-acad" id="openGpaCalcBtn">
-                  <span class="ht-ico"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg></span>
-                  <div><b>学业与奖助</b><small>GPA 换算与自检</small></div>
-                </button>
-                <button type="button" class="home-tool-tile ht-guide" id="openGuideWizardBtn">
-                  <span class="ht-ico"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></span>
-                  <div><b>办事向导</b><small>清单与申请表</small></div>
-                </button>
-                <button type="button" class="home-tool-tile ht-sched" id="openSchedToolsHomeBtn">
-                  <span class="ht-ico"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span>
-                  <div><b>课表助手</b><small>考试空档与日历</small></div>
-                </button>
-              </div>
-            </div>
             <div class="quick-tags">
               <small class="muted">常见事务一键提问</small>
               <div class="mini-chips">
@@ -433,7 +417,10 @@
       <section id="noticesPage" class="page hide">
         <div class="pagehead">
           <div><h1>通知公告</h1><p class="muted">集中查看校园通知，支持收藏置顶、加入待办或唤起 AI 解读要点。</p></div>
-          <button id="newNotice" class="primary hide"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>发布通知</button>
+          <div class="notice-actions">
+            <button type="button" class="outline" data-open-tool="notice_parser"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
+            <button id="newNotice" class="primary hide"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>发布通知</button>
+          </div>
         </div>
         <div class="toolbar">
           <div class="search-box">
@@ -1422,7 +1409,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.119"></script>
+<script src="app.js?v=1.121"></script>
 
 
 </body>

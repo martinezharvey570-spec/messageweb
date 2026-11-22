@@ -18578,3 +18578,245 @@ dialog.campus-tool-dialog .dialoghead,
     justify-content: center !important;
   }
 }
+
+
+/* ==================== v1.120 全场景工具直达 + 侧边栏12项独立彩色图标体系 + 圆形图标按钮严苛防椭球 + 数据统计高对比度卡片边缘统一 ==================== */
+
+/* ---- 1. 左侧全局侧边栏全部 12 项功能「一功能一独立图标、一功能一专属色彩、零重复」 ----
+   01 总览工作台 (#i-home)          : 皇家宝蓝 #2563eb
+   02 通知公告 (#i-bell)            : 活力琥珀 #f59e0b
+   03 我的待办 (#i-check-square)    : 翡翠青绿 #10b981
+   04 校务指南 AI (#i-ai-brand)     : 智办星芒渐变
+   05 校规制度库 (#i-book)          : 典雅靛紫 #6366f1
+   06 超级课表 (#i-calendar)        : 晴空蔚蓝 #0ea5e9
+   07 群通知拆解 (#i-sparkles)      : 星云紫罗兰 #8b5cf6
+   08 学业与奖助 (#i-award)         : 桂冠珊瑚橙 #ea580c
+   09 校园办事向导 (#i-clipboard)   : 碧波青碧 #0d9488
+   10 超级课表助手 (#i-bell-alarm)  : 绯红珊瑚 #f43f5e
+   11 用户管理 (#i-users)           : 极光青蓝 #06b6d4
+   12 数据统计 (#i-chart)           : 瑰丽品红 #ec4899
+   底部：账号与密码设置 (#i-settings): 石墨蓝灰 #64748b / 退出账号 (#i-logout): 珊瑚红 #ef4444
+*/
+#sidebar .nav.nav-tool.nt-parse .ico { color: #8b5cf6 !important; }
+#sidebar .nav.nav-tool.nt-acad .ico  { color: #ea580c !important; }
+#sidebar .nav.nav-tool.nt-guide .ico { color: #0d9488 !important; }
+#sidebar .nav.nav-tool.nt-sched .ico { color: #f43f5e !important; }
+#sidebar .nav[data-page="users"] .ico { color: #06b6d4 !important; }
+#sidebar .sidebottom #openProfileSide .ico { color: #64748b !important; }
+#sidebar .sidebottom #logout .ico { color: #ef4444 !important; }
+
+html.dark #sidebar .nav.nav-tool.nt-parse .ico { color: #c4b5fd !important; }
+html.dark #sidebar .nav.nav-tool.nt-acad .ico  { color: #fdba74 !important; }
+html.dark #sidebar .nav.nav-tool.nt-guide .ico { color: #5eead4 !important; }
+html.dark #sidebar .nav.nav-tool.nt-sched .ico { color: #fda4af !important; }
+html.dark #sidebar .nav[data-page="users"] .ico { color: #22d3ee !important; }
+html.dark #sidebar .sidebottom #openProfileSide .ico { color: #94a3b8 !important; }
+html.dark #sidebar .sidebottom #logout .ico { color: #f87171 !important; }
+
+/* 同步首页快捷服务下方 2×2 效率工具磁贴图标色，与侧边栏智慧工具箱 100% 呼应 */
+.home-tool-tile.ht-parse .ht-ico { background: rgba(139, 92, 246, 0.12) !important; color: #8b5cf6 !important; }
+.home-tool-tile.ht-acad .ht-ico  { background: rgba(234, 88, 12, 0.12) !important;  color: #ea580c !important; }
+.home-tool-tile.ht-guide .ht-ico { background: rgba(13, 148, 136, 0.12) !important; color: #0d9488 !important; }
+.home-tool-tile.ht-sched .ht-ico { background: rgba(244, 63, 94, 0.12) !important;  color: #f43f5e !important; }
+html.dark .home-tool-tile.ht-parse .ht-ico { background: rgba(139, 92, 246, 0.22) !important; color: #c4b5fd !important; }
+html.dark .home-tool-tile.ht-acad .ht-ico  { background: rgba(234, 88, 12, 0.22) !important;  color: #fdba74 !important; }
+html.dark .home-tool-tile.ht-guide .ht-ico { background: rgba(13, 148, 136, 0.22) !important; color: #5eead4 !important; }
+html.dark .home-tool-tile.ht-sched .ht-ico { background: rgba(244, 63, 94, 0.22) !important;  color: #fda4af !important; }
+
+/* ---- 2. 彻底根治移动端与全站图标按钮被全局 button { min-height: 40px } 拉成诡异椭圆形的问题 ---- */
+/* 2.1 制度正文阅读器顶栏（关闭 ×、字号 Aa、AI 解读、更多 ⋯）严格 36×36 正圆 */
+#docDialog .doc-m-btn,
+#docDialog .doc-m-btn.doc-m-aa,
+#docDialog .doc-m-btn.is-ai,
+.doc-mobile-nav .doc-m-btn,
+#docDialog .doc-close {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 36px !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
+
+/* 2.2 AI 界面输入框左右「+ 附件」与「↑ 发送」按钮、热门提问左右箭头、全站弹窗右上角关闭钮严格正圆 */
+#aiPage #askAttachBtn,
+#aiPage #askSubmitBtn,
+body.on-ai-page .ask .ask-plus-btn,
+body.on-ai-page .ask #askSubmitBtn {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 36px !important;
+  box-sizing: border-box !important;
+}
+#aiPage .sug-nav-btn,
+body.on-ai-page #aiPage .sug-nav-btn {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  flex: 0 0 28px !important;
+}
+dialog .dialoghead > button,
+dialog.campus-tool-dialog .dialoghead button,
+#gpaCalcDialog .ct-row .task-del-btn,
+.task-del-btn {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  flex: 0 0 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 2.3 移动端（<= 760px）AI 顶栏「参数 / 导出 / 清空」与全局顶栏「菜单 / 搜索 / 主题」严格 36×36 或 38×38 正圆 */
+@media (max-width: 760px) {
+  #aiPage .chat-top-actions button,
+  #aiPage .chat-top-actions .outline,
+  body.on-ai-page #aiPage .chat-top-actions button {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 36px !important;
+    box-sizing: border-box !important;
+  }
+  #aiPage .chat-top-actions button > span,
+  #aiPage .chat-top-actions .outline > span {
+    display: none !important;
+  }
+  #aiPage .chat-top-actions button .ico {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+  }
+  main > header #menu,
+  main > header #globalSearchBtn,
+  main > header #themeToggle {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    flex: 0 0 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ---- 3. 数据统计与治理洞察页（及全站统计子卡）边缘高清晰强化：彻底解决实体屏幕卡片边界过淡问题 ---- */
+#analyticsPage .stats article,
+#homePage .stats article,
+#analyticsPage .panel {
+  border: 1px solid rgba(37, 99, 235, 0.16) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 2px 6px rgba(15, 23, 42, 0.045),
+    0 12px 28px -10px rgba(37, 99, 235, 0.11) !important;
+}
+html.dark #analyticsPage .stats article,
+html.dark #homePage .stats article,
+html.dark #analyticsPage .panel {
+  border: 1px solid rgba(147, 197, 253, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.14),
+    0 12px 28px -10px rgba(0, 0, 0, 0.52) !important;
+}
+
+/* 平台运行概览内部子卡（圆环卡、账号/任务/制度库三指标卡、任务构成进度卡）与治理洞察子卡统一高清晰冰蓝白立体边界 */
+#analyticsPage .stat-ring-box,
+#analyticsPage .stat-metric,
+#analyticsPage .stat-bars,
+#analyticsPage .gov-topic-row,
+#analyticsPage .gov-spot-row,
+#analyticsPage .gov-empty {
+  background: linear-gradient(160deg, rgba(245, 249, 255, 0.95) 0%, rgba(236, 244, 255, 0.86) 100%) !important;
+  border: 1px solid rgba(37, 99, 235, 0.17) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 2px 5px rgba(15, 23, 42, 0.04),
+    0 6px 16px -6px rgba(37, 99, 235, 0.09) !important;
+}
+html.dark #analyticsPage .stat-ring-box,
+html.dark #analyticsPage .stat-metric,
+html.dark #analyticsPage .stat-bars,
+html.dark #analyticsPage .gov-topic-row,
+html.dark #analyticsPage .gov-spot-row,
+html.dark #analyticsPage .gov-empty {
+  background: linear-gradient(160deg, rgba(19, 30, 53, 0.88) 0%, rgba(13, 21, 38, 0.82) 100%) !important;
+  border: 1px solid rgba(147, 197, 253, 0.20) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.12),
+    0 6px 16px -6px rgba(0, 0, 0, 0.45) !important;
+}
+
+#analyticsPage .gov-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+#analyticsPage .gov-topic-row,
+#analyticsPage .gov-spot-row {
+  padding: 12px 13px !important;
+}
+#analyticsPage .gov-rank {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 22px !important;
+  padding: 0 7px !important;
+  border-radius: 999px !important;
+  background: rgba(37, 99, 235, 0.11) !important;
+  color: #1d4ed8 !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+html.dark #analyticsPage .gov-rank {
+  background: rgba(59, 130, 246, 0.24) !important;
+  color: #93c5fd !important;
+}

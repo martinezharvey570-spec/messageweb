@@ -6423,11 +6423,30 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       }
     } else if (act.type === "navigate" && act.page) {
       if (!allowNav && !allowWrite) continue;
-      const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule"]);
+      const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule", "users", "analytics"]);
       if (allowedPages.has(act.page)) {
         autoLogs.push(`已为你跳转至「${act.page}」`);
         setTimeout(() => go(act.page), 450);
       }
+    } else if (act.type === "open_tool" && act.tool) {
+      if (!allowNav && !allowWrite) continue;
+      autoLogs.push(`已为你调起校务工具`);
+      setTimeout(() => window.invoke_campus_tool?.(act.tool, act), 320);
+    } else if (act.type === "prefill_guide") {
+      if (!allowNav && !allowWrite) continue;
+      autoLogs.push(`已为你打开办事向导并预填申请表`);
+      setTimeout(() => window.invoke_campus_tool?.("guide_wizard", act), 320);
+    } else if (act.type === "check_eligibility") {
+      if (!allowNav && !allowWrite) continue;
+      autoLogs.push(`已为你打开奖助与学位红线自检`);
+      setTimeout(() => window.invoke_campus_tool?.("eligibility", act), 320);
+    } else if (act.type === "import_gpa" && Array.isArray(act.courses) && act.courses.length) {
+      confirmActs.push(act);
+    } else if (act.type === "add_exams" && Array.isArray(act.items) && act.items.length) {
+      confirmActs.push(act);
+    } else if (act.type === "add_custom_kb" && me?.role === "admin") {
+      autoLogs.push(`已为你打开在线增补校规表单`);
+      setTimeout(() => window.open_custom_doc_dialog?.(act), 320);
     } else if (!allowWrite) {
       // 第三道物理安全锁：后端未授权写操作时，前端绝不静默执行任何待办/课表/公告写入
       continue;
@@ -6560,6 +6579,36 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         }
       };
       card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消发布"); };
+    } else if (act.type === "import_gpa") {
+      const list = act.courses.slice(0, 12);
+      const preview = list.map(c => `• ${schedEsc(c.name)}（${Number(c.credit) || 3} 学分 · ${Number(c.score) || 0} 分）`).join("<br>");
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>待确认：导入 ${list.length} 门课程并打开 GPA 换算器</span></div>
+        <div class="sched-chat-confirm-list">${preview}</div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认导入并打开 GPA</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = () => {
+        window.invoke_campus_tool?.("import_gpa", { courses: list });
+        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已导入 ${list.length} 门课程并打开 GPA 核算</span></div>`;
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
+    } else if (act.type === "add_exams") {
+      const list = act.items.slice(0, 8);
+      const preview = list.map(it => `• ${schedEsc(it.title)}${it.date ? "（" + schedEsc(it.date) + "）" : ""}${it.place ? " @ " + schedEsc(it.place) : ""}`).join("<br>");
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>待确认：加入 ${list.length} 场考试倒计时</span></div>
+        <div class="sched-chat-confirm-list">${preview}</div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认写入考试倒计时</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = () => {
+        window.invoke_campus_tool?.("add_exams", { items: list });
+        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入考试倒计时</span></div>`;
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
     }
     toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
   }
@@ -6569,15 +6618,16 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   const hasScrolledDescendant = (target, stopAt) => {
     let el = target instanceof Element ? target : target?.parentElement;
     while (el && el !== stopAt) {
-      if (el.scrollHeight > el.clientHeight + 2) {
-        const oy = getComputedStyle(el).overflowY;
-        if (oy === "auto" || oy === "scroll" || oy === "overlay") {
-          if (el.scrollTop > 1) return true;
-        }
-      }
+      if (el.scrollTop > 1) return true;
       el = el.parentElement;
     }
-    return stopAt.scrollTop > 1;
+    if (stopAt.scrollTop > 1) return true;
+    // 还要检查弹窗内部的主滚动容器（如 .ct-body / .spotlight-body / .school-list / .sched-ai-body），即便手指落点在卡片间隙
+    const mainBodies = stopAt.querySelectorAll(".ct-body, .spotlight-body, .school-list, .sched-ai-body, .sched-ai-preview, .sched-dlg-form");
+    for (const b of mainBodies) {
+      if (b.scrollTop > 1) return true;
+    }
+    return false;
   };
 
   const isHorizontalScroller = (target, stopAt) => {
@@ -6620,8 +6670,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
       const inHeaderEl = touchTarget instanceof Element && !!touchTarget.closest(".dialoghead, .spotlight-head, .sched-ai-head");
       inHeaderZone = inHeaderEl || (t.clientY - rect.top) <= 56;
-      // 仅在顶部抓手/标题区，或整个弹窗及手指下全部滚动容器都严格处于最顶端时，才具备候选拖拽资格
-      allowDrag = inHeaderZone || !hasScrolledDescendant(touchTarget, dlg);
+      // 严苛防误滑法则：如果弹窗内滚动区已经向下滑过（scrollTop > 1），无论手指从哪开始，一律禁止在滚回顶部的同一笔手势里触发下拉关闭弹窗！
+      // 用户必须先滑回最顶端松手，再在顶端或顶部抓手向下拉，才能关闭弹窗。
+      const alreadyScrolled = hasScrolledDescendant(touchTarget, dlg);
+      allowDrag = !alreadyScrolled;
     }, { passive: true });
 
     dlg.addEventListener("touchmove", e => {
@@ -8646,4 +8698,91 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if (fu) wrap.insertBefore(bar, fu);
     else wrap.appendChild(bar);
   };
+})();
+
+
+/* ==================== v1.120 全场景工具直达调度器 & AI 全功能调用增强 ==================== */
+(() => {
+  window.invoke_campus_tool = (tool, payload = {}) => {
+    // 若在移动端侧边栏内点击，先收起侧边抽屉
+    document.body.classList.remove("nav-open");
+    $("sidebar")?.classList.remove("open");
+    $("sidebarBackdrop")?.classList.remove("show");
+
+    const t = String(tool || "").trim();
+    if (t === "notice_parser") {
+      window.open_notice_parser?.(payload.prefill || "");
+    } else if (t === "academic_check" || t === "gpa_calc") {
+      window.open_gpa_calc?.("gpa");
+    } else if (t === "eligibility") {
+      window.open_gpa_calc?.("elig");
+      setTimeout(() => {
+        if (payload.gpa !== undefined && $("eligGpa")) $("eligGpa").value = String(payload.gpa);
+        if (payload.rank && $("eligRank")) $("eligRank").value = String(payload.rank);
+        if (payload.fail && $("eligFail")) $("eligFail").value = String(payload.fail);
+        if (payload.punish && $("eligPunish")) $("eligPunish").value = String(payload.punish);
+        if (typeof payload.aid === "boolean" && $("eligAid")) $("eligAid").checked = payload.aid;
+        if (typeof payload.honor === "boolean" && $("eligHonor")) $("eligHonor").checked = payload.honor;
+        $("eligGpa")?.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 60);
+    } else if (t === "import_gpa" && Array.isArray(payload.courses) && payload.courses.length) {
+      try {
+        const key = "xz_gpa_courses_" + (me?.username || "guest");
+        const cur = JSON.parse(localStorage.getItem(key) || "[]");
+        const next = [...(Array.isArray(cur) ? cur : []), ...payload.courses.map(c => ({
+          name: String(c.name || "课程").slice(0, 40),
+          credit: Math.max(0.5, Number(c.credit) || 3),
+          score: Math.min(100, Math.max(0, Number(c.score) || 0))
+        }))];
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {}
+      window.open_gpa_calc?.("gpa");
+      toast(`已导入 ${payload.courses.length} 门课程并核算 GPA`);
+    } else if (t === "guide_wizard") {
+      const tab = payload.tab || "defer";
+      window.open_guide_wizard?.(tab);
+      if (payload.reason) {
+        setTimeout(() => {
+          if ($("gwReason")) $("gwReason").value = String(payload.reason);
+        }, 60);
+      }
+    } else if (t === "sched_tools" || t === "sched_exams") {
+      window.open_sched_tools?.("exams");
+    } else if (t === "sched_free") {
+      window.open_sched_tools?.("free");
+    } else if (t === "sched_ics") {
+      window.open_sched_tools?.("ics");
+    } else if (t === "add_exams" && Array.isArray(payload.items) && payload.items.length) {
+      try {
+        const exKey = "xz_sched_exams_" + (me?.username || "guest");
+        const cur = JSON.parse(localStorage.getItem(exKey) || "[]");
+        const arr = Array.isArray(cur) ? cur : [];
+        payload.items.forEach(ex => {
+          arr.push({
+            id: "ex_ai_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+            title: String(ex.title || "考试").slice(0, 48),
+            date: /^\d{4}-\d{2}-\d{2}$/.test(String(ex.date || "")) ? ex.date : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+            place: String(ex.place || "").slice(0, 40)
+          });
+        });
+        localStorage.setItem(exKey, JSON.stringify(arr));
+      } catch {}
+      window.open_sched_tools?.("exams");
+      toast(`已添加 ${payload.items.length} 场考试倒计时`);
+    } else if (t === "custom_kb") {
+      window.open_custom_doc_dialog?.(payload);
+    } else if (t === "school_picker") {
+      $("aiSchoolBtn")?.click();
+    }
+  };
+
+  // 全局委托：全站任意位置带有 [data-open-tool] 的按钮一键调起对应工具
+  document.addEventListener("click", e => {
+    const btn = e.target.closest("[data-open-tool]");
+    if (!btn) return;
+    e.preventDefault();
+    const tool = btn.dataset.openTool;
+    const tab = btn.dataset.toolTab || "";
+    window.invoke_campus_tool(tool, { tab });
+  });
 })();

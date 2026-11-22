@@ -16924,3 +16924,268 @@ html.dark .ct-ics-card {
   .ct-inline-form button.primary { grid-column: 1 / -1; }
   .ct-doc-form { grid-template-columns: 1fr; }
 }
+
+/* ================================================================
+   v1.117: 全站液态玻璃质感重塑 & 胶囊语言大一统
+           1) 彻底消除横向胶囊轨底光硬裁切
+           2) 全站蓝色及彩色胶囊去除生硬顶部白线，升级柔和漫射液态玻璃
+           3) 移动端侧边栏隐藏桌面收起按钮（消除半黑圆圈）
+           4) 移动端聚合搜索弹窗统一为站内原生全宽底部玻璃抽屉 + 一体化胶囊搜索槽
+           5) 全站单行交互条/用户行/待办行/搜索快捷项/工具行全面胶囊大一统
+   ================================================================ */
+
+/* ---- 1. 消除横向滑动胶囊轨对底部蓝光的硬截断 ---- */
+#knowledgePage .cat-pills,
+#noticesPage #catPills,
+#aiPage .suggestions,
+.sched-week-strip,
+.sched-date-strip {
+  padding-top: 6px !important;
+  padding-bottom: 18px !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  margin-bottom: 2px !important;
+}
+#knowledgePage .knowledge-result-meta {
+  margin-top: 0 !important;
+}
+
+/* ---- 2. 全站彩色液态玻璃胶囊重塑：消除 0px 硬白线，改为柔焦漫射通透玻璃 ---- */
+.primary:not(#askSubmitBtn),
+.pill-btn.active,
+.pill-btn:hover,
+.sched-btn-primary,
+.sched-m-ibtn.is-primary,
+.sched-week-chip.on,
+.sched-d-wstrip .sched-week-chip.on,
+.sched-dseg-btn.on,
+.sched-seg-btn.on,
+.ai-seg-btn.active,
+.lg-slide-pill.is-blue,
+#messages .bubble.msg-user,
+.home-sched-ico,
+#askSubmitBtn:not(.is-idle) {
+  border: 0 !important;
+  background:
+    radial-gradient(125% 95% at 24% 0%, rgba(191, 219, 254, 0.28) 0%, rgba(191, 219, 254, 0.04) 54%, transparent 72%),
+    linear-gradient(150deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.22),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(29, 78, 216, 0.18),
+    0 4px 12px -3px rgba(37, 99, 235, 0.34) !important;
+}
+.primary:not(#askSubmitBtn):hover,
+.sched-btn-primary:hover,
+.pill-btn.active:hover {
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.26),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 6px 16px -4px rgba(37, 99, 235, 0.40) !important;
+}
+/* 绯红停止 / 危险操作胶囊：同源柔焦液态玻璃（零硬白线） */
+.sched-btn-stop,
+button.danger {
+  border-radius: 999px !important;
+  border: 0 !important;
+  background:
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 228, 230, 0.24) 0%, transparent 58%),
+    linear-gradient(150deg, #f43f5e 0%, #e11d48 56%, #be123c 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.20),
+    inset 0 -2px 5px rgba(136, 19, 55, 0.22),
+    0 0 0 1px rgba(190, 18, 60, 0.18),
+    0 4px 12px -3px rgba(225, 29, 72, 0.34) !important;
+}
+/* 琥珀日光 / 午夜星蓝主题钮：柔焦漫射宝石感（去除硬白线与生硬白框） */
+#themeToggle,
+#auth .auth-theme-btn {
+  border: 0 !important;
+  background:
+    radial-gradient(120% 90% at 28% 12%, rgba(254, 243, 199, 0.34) 0%, transparent 58%),
+    linear-gradient(152deg, #fbbf24 0%, #f59e0b 52%, #ea580c 100%) !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.28),
+    inset 0 -2px 5px rgba(154, 52, 18, 0.24),
+    0 0 0 1px rgba(234, 88, 12, 0.20),
+    0 4px 13px -3px rgba(245, 158, 11, 0.42) !important;
+}
+html.dark #themeToggle,
+html.dark #auth .auth-theme-btn {
+  border: 0 !important;
+  background:
+    radial-gradient(120% 90% at 28% 12%, rgba(224, 231, 255, 0.24) 0%, transparent 58%),
+    linear-gradient(152deg, #6366f1 0%, #4338ca 54%, #312e81 100%) !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.20),
+    inset 0 -2px 5px rgba(15, 23, 42, 0.36),
+    0 0 0 1px rgba(165, 180, 252, 0.24),
+    0 4px 14px -3px rgba(99, 102, 241, 0.42) !important;
+}
+
+/* ---- 3. 移动端侧边栏抽屉严格隐藏桌面端专用收起按钮 ---- */
+@media (max-width: 760px) {
+  #desktopSidebarToggle,
+  #desktopSidebarToggle.desktop-rail-toggle {
+    display: none !important;
+  }
+}
+
+/* ---- 4. 聚合搜索弹窗（Spotlight）桌面与移动端 100% 融入原生弹窗体系 + 胶囊大一统 ---- */
+.spotlight-head {
+  padding: 12px 14px !important;
+  gap: 8px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .spotlight-head {
+  border-bottom-color: rgba(148, 197, 255, 0.10) !important;
+}
+/* 消除搜索框内二次套方框的割裂感，做成一体化 999px 液态玻璃胶囊搜索槽 */
+#globalSearchDialog .spotlight-head > .ico {
+  display: none !important;
+}
+#globalSearchDialog #globalSearchInput {
+  flex: 1 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 16px 0 38px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  background-color: var(--pearl-l1-bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 14px center !important;
+  background-size: 16px 16px !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  font-size: 14px !important;
+}
+html.dark #globalSearchDialog #globalSearchInput {
+  background-color: rgba(15, 23, 42, 0.72) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
+}
+#globalSearchDialog #closeGlobalSearchDlg {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+}
+
+/* 搜索快捷项与结果项全面升级为 999px 完整液态玻璃胶囊（与侧边栏选中透镜 100% 同源） */
+#globalSearchDialog .spotlight-body {
+  padding: 8px 12px 14px !important;
+  gap: 6px !important;
+}
+#globalSearchDialog .spotlight-item {
+  border-radius: 999px !important;
+  padding: 8px 12px 8px 9px !important;
+}
+#globalSearchDialog .spotlight-item:hover,
+#globalSearchDialog .spotlight-item.is-active {
+  background:
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 255, 255, 0.72) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.18) 100%) !important;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.78),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 4px 12px -4px rgba(37, 99, 235, 0.18) !important;
+}
+html.dark #globalSearchDialog .spotlight-item:hover,
+html.dark #globalSearchDialog .spotlight-item.is-active {
+  background:
+    radial-gradient(120% 90% at 24% 0%, rgba(191, 219, 254, 0.20) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.26) 0%, rgba(37, 99, 235, 0.18) 100%) !important;
+  box-shadow:
+    inset 0 1px 2px rgba(224, 242, 254, 0.22),
+    0 0 0 1px rgba(147, 197, 253, 0.30) !important;
+}
+
+/* 移动端搜索弹窗：100% 与全站其他原生弹窗统一的“全宽底部液态玻璃抽屉” */
+@media (max-width: 760px) {
+  #globalSearchDialog.spotlight-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: auto 0 0 0 !important;
+    inset-inline: 0 !important;
+    max-height: 82dvh !important;
+    border-radius: 26px 26px 0 0 !important;
+    padding: 0 !important;
+  }
+  #globalSearchDialog.spotlight-dialog .spotlight-head {
+    padding: 22px 14px 12px !important;
+  }
+  #globalSearchDialog.spotlight-dialog .spotlight-body {
+    padding: 8px 12px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* ---- 5. 克制而有呼吸感的胶囊层级（依据视觉同心度与信息密度区分：控件/入口/人员条 = 完整胶囊；多行/勾选数据行 = 柔润同心圆角） ---- */
+/* 5.1 用户管理条：两端皆为胶囊标签与胶囊操作按钮，桌面端 999px 完整胶囊同心贴合，移动端折行平滑退回 24px */
+.user-row {
+  border-radius: 999px !important;
+  padding: 11px 18px !important;
+}
+.user-row .tag,
+.user-row select,
+.user-row .xz-select-trigger,
+.user-row button {
+  border-radius: 999px !important;
+}
+@media (max-width: 760px) {
+  .user-row {
+    border-radius: 24px !important;
+    padding: 12px 15px !important;
+  }
+}
+
+/* 5.2 待办任务条与弹窗数据行（含方框勾选或双行信息）：保留 16px~20px 同心柔润圆角，不强行胶囊化导致发胖，仅内部徽章与按钮保持 999px 胶囊 */
+.taskrow:not(.user-row) {
+  border-radius: 20px !important;
+  padding: 12px 16px !important;
+}
+.taskrow .tag,
+.taskrow button:not(.task-del-btn) {
+  border-radius: 999px !important;
+}
+.ct-row {
+  border-radius: 18px !important;
+  padding: 10px 14px !important;
+}
+dialog .ct-check-item,
+.ct-check-item {
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+}
+.ct-alert-banner {
+  border-radius: 18px !important;
+}
+
+/* 5.3 各主页面顶部搜索框、下拉筛选器与单行录入条统一 999px 完整玻璃胶囊（并消除深色模式 .search-box input 双环套娃） */
+.toolbar .search-box,
+.toolbar select,
+.toolbar .xz-select-trigger,
+#addTaskForm input:not([type="checkbox"]),
+#addTaskForm .xz-date-trigger,
+#newTaskTitle,
+#taskSearch.mini-input,
+.ct-inline-form input {
+  border-radius: 999px !important;
+}
+.search-box input,
+.search-box input:focus,
+html.dark .search-box input,
+html.dark .search-box input:focus {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+/* 5.4 首页快捷服务单行入口严格 999px 完整胶囊 */
+#homePage .quick {
+  border-radius: 999px !important;
+}

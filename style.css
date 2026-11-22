@@ -17189,3 +17189,1109 @@ html.dark .search-box input:focus {
 #homePage .quick {
   border-radius: 999px !important;
 }
+
+
+/* ==================== v1.118 移动端深度精修 + 经典深蓝登录顶 + 国奖级五大引擎原生液态玻璃 ==================== */
+
+/* ---- 1. 恢复移动端登录页顶部为最初经典的深蓝宝石渐变 (#0c2563 -> #155eef -> #2e90fa) ---- */
+@media (max-width: 900px) {
+  html:not(.app-booting):has(#auth:not(.hide)),
+  body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
+    background: #0c2563 !important;
+  }
+  html.dark:not(.app-booting):has(#auth:not(.hide)),
+  html.dark body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
+    background: #091b47 !important;
+  }
+  #auth.auth:not(.hide) {
+    background: linear-gradient(180deg, #0c2563 0%, #155eef 190px, #eef4ff 255px, #f4f7fc 100%) !important;
+  }
+  html.dark #auth.auth:not(.hide) {
+    background: linear-gradient(180deg, #091b47 0%, #0c2563 185px, #0b1120 265px, #0b1120 100%) !important;
+  }
+  #auth.auth:not(.hide) .hero {
+    border-bottom-left-radius: 26px !important;
+    border-bottom-right-radius: 26px !important;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(96, 165, 250, 0.38) 0%, transparent 45%),
+      radial-gradient(circle at 12% 88%, rgba(30, 64, 175, 0.65) 0%, transparent 50%),
+      linear-gradient(145deg, #0c2563 0%, #155eef 62%, #2e90fa 100%) !important;
+    box-shadow: 0 12px 28px -12px rgba(12, 37, 99, 0.42) !important;
+  }
+  html.dark #auth.auth:not(.hide) .hero {
+    background:
+      radial-gradient(circle at 85% 15%, rgba(96, 165, 250, 0.28) 0%, transparent 45%),
+      radial-gradient(circle at 12% 88%, rgba(30, 64, 175, 0.52) 0%, transparent 50%),
+      linear-gradient(145deg, #091b47 0%, #0f3a96 62%, #1d4ed8 100%) !important;
+  }
+}
+
+/* ---- 2. 彻底修复「热门提问」横条视觉错位、桌面端折行、箭头撞胶囊与移动端观感精修 ---- */
+body.on-ai-page #aiPage .suggestions-bar,
+#aiPage .suggestions-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  min-height: 46px !important;
+}
+body.on-ai-page #aiPage .suggestions-label,
+#aiPage .suggestions-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 2px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  color: var(--muted) !important;
+}
+body.on-ai-page #aiPage .suggestions,
+#aiPage .suggestions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 8px !important;
+  padding: 6px 18px 6px 2px !important;
+  margin: 0 !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 92%, transparent 100%) !important;
+  mask-image: linear-gradient(90deg, #000 0%, #000 92%, transparent 100%) !important;
+}
+body.on-ai-page #aiPage .suggestions button,
+#aiPage .suggestions button {
+  margin: 0 !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+body.on-ai-page #aiPage .sug-nav-btn,
+#aiPage .sug-nav-btn {
+  align-self: center !important;
+  flex-shrink: 0 !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+}
+
+/* 移动端隐藏占地撞胶囊的 < > 箭头（直接手指丝滑横滑），并精修欢迎卡提示条与顶栏按钮换行 */
+@media (max-width: 760px) {
+  body.on-ai-page #aiPage .sug-nav-btn,
+  #aiPage .sug-nav-btn {
+    display: none !important;
+  }
+  body.on-ai-page #aiPage .suggestions-bar,
+  #aiPage .suggestions-bar {
+    gap: 8px !important;
+    padding-inline: 14px !important;
+  }
+  body.on-ai-page #aiPage .suggestions,
+  #aiPage .suggestions {
+    padding: 6px 22px 6px 2px !important;
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 84%, transparent 100%) !important;
+    mask-image: linear-gradient(90deg, #000 0%, #000 84%, transparent 100%) !important;
+  }
+  #aiPage .welcome-foot {
+    border-radius: 16px !important;
+    line-height: 1.55 !important;
+    padding: 10px 14px !important;
+  }
+  .kb-head-actions,
+  #tasksPage .notice-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+}
+
+/* ---- 3. 首页新增两个快捷入口语义色对齐侧边栏 ---- */
+#openNoticeParserBtn .ico {
+  color: #6366f1 !important;
+}
+#openEligibilityBtn .ico {
+  color: #f59e0b !important;
+}
+
+/* ---- 4. P0-1 群通知与截图一键拆解器 ---- */
+.np-input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#noticeParserDialog textarea {
+  width: 100%;
+  min-height: 108px;
+  padding: 12px 14px;
+  border-radius: 18px !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg);
+  box-shadow: var(--pearl-l1-shadow);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.6;
+  resize: vertical;
+}
+html.dark #noticeParserDialog textarea {
+  background: rgba(15, 23, 42, 0.72);
+  color: #f1f5f9;
+}
+.np-input-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.np-upload-group,
+.np-run-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.np-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.np-thumb {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+}
+.np-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.np-thumb button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.np-result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+.np-item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.np-item-copy b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.np-doc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- 5. P0-2 动态修订校规徽章与在线增补表单 ---- */
+#knowledgePage .knowledge-card .tag.custom-kb-tag,
+.knowledge-card-top .tag.custom-kb-tag,
+.tag.custom-kb-tag {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #047857 !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.24) !important;
+}
+html.dark #knowledgePage .knowledge-card .tag.custom-kb-tag,
+html.dark .knowledge-card-top .tag.custom-kb-tag,
+html.dark .tag.custom-kb-tag {
+  background: rgba(16, 185, 129, 0.22) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(110, 231, 183, 0.28) !important;
+}
+.outline.danger-soft {
+  color: #e11d48 !important;
+}
+.np-custom-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.np-custom-form .full-span {
+  grid-column: 1 / -1;
+}
+.np-custom-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.np-custom-form input,
+.np-custom-form select,
+.np-custom-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 16px !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg);
+  box-shadow: var(--pearl-l1-shadow);
+  color: var(--ink);
+  font-size: 13.5px;
+}
+html.dark .np-custom-form input,
+html.dark .np-custom-form select,
+html.dark .np-custom-form textarea {
+  background: rgba(15, 23, 42, 0.72);
+  color: #f1f5f9;
+}
+@media (max-width: 640px) {
+  .np-custom-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 6. P0-3 AI 智慧校务治理驾驶舱 ---- */
+.gov-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+@media (max-width: 960px) {
+  .gov-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.gov-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gov-empty {
+  padding: 16px 14px;
+  border-radius: 16px;
+  background: var(--pearl-l1-bg);
+  font-size: 13px;
+  line-height: 1.6;
+}
+html.dark .gov-empty {
+  background: rgba(15, 23, 42, 0.56);
+}
+.gov-topic-row,
+.gov-spot-row {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--pearl-l2-bg);
+  box-shadow: var(--pearl-l2-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gov-spot-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gov-spot-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.gov-spot-main b {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.gov-topic-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gov-topic-title,
+.gov-topic-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.gov-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.gov-bar-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+}
+.gov-bar-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+.gov-draft-btn,
+.gov-add-kb-btn {
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  border-radius: 999px !important;
+  white-space: nowrap;
+}
+.gov-sample {
+  font-size: 12px;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- 7. P1-1 奖助评优与学位红线自检体检仪 ---- */
+.elig-form-card {
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--pearl-l2-bg);
+  box-shadow: var(--pearl-l2-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.elig-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+.elig-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+#eligibilityDialog .elig-grid input,
+#eligibilityDialog .elig-grid select,
+#eligibilityDialog .elig-grid .xz-select-trigger,
+.elig-grid input,
+.elig-grid select {
+  width: 100%;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg);
+  box-shadow: var(--pearl-l1-shadow);
+  color: var(--ink);
+  font-size: 13.5px;
+}
+html.dark .elig-grid input,
+html.dark .elig-grid select {
+  background: rgba(15, 23, 42, 0.74);
+  color: #f1f5f9;
+}
+.elig-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.elig-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+.elig-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.elig-row-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.elig-row-head b {
+  font-size: 14px;
+  color: var(--ink);
+}
+.elig-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.elig-badge.is-ok {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+.elig-badge.is-warn {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+.elig-badge.is-red {
+  background: rgba(244, 63, 94, 0.14);
+  color: #be123c;
+}
+html.dark .elig-badge.is-ok { background: rgba(16, 185, 129, 0.24); color: #6ee7b7; }
+html.dark .elig-badge.is-warn { background: rgba(245, 158, 11, 0.24); color: #fcd34d; }
+html.dark .elig-badge.is-red { background: rgba(244, 63, 94, 0.24); color: #fda4af; }
+.elig-mutex {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.14);
+}
+.elig-row-ops {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.elig-row-ops .pill-btn {
+  min-height: 30px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+}
+@media (max-width: 640px) {
+  .elig-grid,
+  .elig-toggles {
+    grid-template-columns: 1fr;
+  }
+  .elig-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* ---- 8. P1-2 校务指南 AI Agent 站内快捷动作胶囊 ---- */
+.ai-agent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ai-agent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background:
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.11) 0%, rgba(99, 102, 241, 0.14) 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.80),
+    0 0 0 1px rgba(37, 99, 235, 0.20),
+    0 3px 10px -4px rgba(37, 99, 235, 0.18);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.ai-agent-pill:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.90),
+    0 0 0 1px rgba(37, 99, 235, 0.34),
+    0 6px 14px -4px rgba(37, 99, 235, 0.24);
+}
+html.dark .ai-agent-pill {
+  color: #93c5fd;
+  background:
+    radial-gradient(120% 90% at 24% 0%, rgba(191, 219, 254, 0.18) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.24) 0%, rgba(99, 102, 241, 0.20) 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(224, 242, 254, 0.18),
+    0 0 0 1px rgba(147, 197, 253, 0.28);
+}
+
+
+/* ==================== v1.119 计设国奖级全站视觉融洽大一统 + 移动端深度修缮 ==================== */
+
+/* ---- 1. 首页「快捷服务」下方 2×2 校园效率工具磁贴（100% 复用 AI 欢迎卡 .welcome-grid 基因） ---- */
+.home-tools-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html.dark .home-tools-section {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.home-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.home-tool-tile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  padding: 10px 11px !important;
+  border-radius: 16px !important;
+  border: 0 !important;
+  text-align: left !important;
+  background: var(--pearl-l2-bg) !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+  color: var(--ink) !important;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0.25, 1), box-shadow 0.2s ease !important;
+}
+.home-tool-tile:hover {
+  transform: translateY(-1.5px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(37, 99, 235, 0.20),
+    0 8px 18px -8px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark .home-tool-tile:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.16),
+    0 0 0 1px rgba(147, 197, 253, 0.26) !important;
+}
+.home-tool-tile .ht-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(37, 99, 235, 0.10);
+  color: #2563eb;
+}
+.home-tool-tile.ht-parse .ht-ico { background: rgba(99, 102, 241, 0.11); color: #6366f1; }
+.home-tool-tile.ht-acad .ht-ico { background: rgba(245, 158, 11, 0.13); color: #d97706; }
+.home-tool-tile.ht-guide .ht-ico { background: rgba(37, 99, 235, 0.11); color: #2563eb; }
+.home-tool-tile.ht-sched .ht-ico { background: rgba(14, 165, 233, 0.12); color: #0284c7; }
+html.dark .home-tool-tile.ht-parse .ht-ico { background: rgba(99, 102, 241, 0.22); color: #a5b4fc; }
+html.dark .home-tool-tile.ht-acad .ht-ico { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+html.dark .home-tool-tile.ht-guide .ht-ico { background: rgba(59, 130, 246, 0.22); color: #93c5fd; }
+html.dark .home-tool-tile.ht-sched .ht-ico { background: rgba(14, 165, 233, 0.22); color: #38bdf8; }
+.home-tool-tile > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.home-tool-tile b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-tool-tile small {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- 2. 全站新弹窗「去套娃 + 静音关闭钮 + 统一控件材质」 ---- */
+dialog.campus-tool-dialog:focus,
+dialog.campus-tool-dialog:focus-visible {
+  outline: none !important;
+}
+dialog.campus-tool-dialog .dialoghead button,
+dialog.campus-tool-dialog .dialoghead button:focus {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  outline: none !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--muted) !important;
+}
+dialog.campus-tool-dialog .dialoghead button:hover {
+  color: var(--ink) !important;
+}
+
+/* 弹窗内部全面去重框：4层嵌套降至2层，回归原生留白与细分割线 */
+dialog.campus-tool-dialog .elig-form-card,
+dialog.campus-tool-dialog .ct-card {
+  background: rgba(248, 250, 252, 0.72) !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+  box-shadow: none !important;
+  border-radius: 18px !important;
+  padding: 14px 16px !important;
+}
+html.dark dialog.campus-tool-dialog .elig-form-card,
+html.dark dialog.campus-tool-dialog .ct-card {
+  background: rgba(15, 23, 42, 0.44) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+dialog.campus-tool-dialog .ct-kpi {
+  background: rgba(248, 250, 252, 0.76) !important;
+  border: 1px solid rgba(15, 23, 42, 0.055) !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+}
+html.dark dialog.campus-tool-dialog .ct-kpi {
+  background: rgba(15, 23, 42, 0.46) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 列表容器改为统一干净底板 + 细分割线（告别7个硬边框卡片层层叠叠） */
+dialog.campus-tool-dialog .ct-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  border-radius: 18px !important;
+  background: rgba(248, 250, 252, 0.68) !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+  padding: 4px 14px !important;
+  overflow: hidden;
+}
+html.dark dialog.campus-tool-dialog .ct-list {
+  background: rgba(15, 23, 42, 0.44) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+dialog.campus-tool-dialog .ct-list:empty {
+  display: none !important;
+}
+dialog.campus-tool-dialog .ct-list > .ct-row,
+dialog.campus-tool-dialog .ct-list > .elig-row {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 11px 2px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+html.dark dialog.campus-tool-dialog .ct-list > .ct-row,
+html.dark dialog.campus-tool-dialog .ct-list > .elig-row {
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+dialog.campus-tool-dialog .ct-list > :last-child {
+  border-bottom: 0 !important;
+}
+
+/* 统一所有新弹窗内单行输入/下拉/日期触发器为 999px 轻凹玻璃胶囊 */
+dialog.campus-tool-dialog .ct-inline-form input,
+dialog.campus-tool-dialog .ct-inline-form .xz-date-trigger,
+dialog.campus-tool-dialog .elig-grid input,
+dialog.campus-tool-dialog .elig-grid select,
+dialog.campus-tool-dialog .elig-grid .xz-select-trigger {
+  height: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+  padding: 0 14px !important;
+}
+
+/* 奖助体检状态徽章降噪：纯净珍珠白微胶囊 + 6px 语义小圆点 */
+.elig-dot-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.90);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+html.dark .elig-dot-pill {
+  background: rgba(30, 41, 59, 0.78);
+  color: #e2e8f0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.elig-dot-pill i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.elig-dot-pill.is-ok i { background: #10b981; }
+.elig-dot-pill.is-warn i { background: #f59e0b; }
+.elig-dot-pill.is-red i { background: #f43f5e; }
+.elig-mutex-txt {
+  opacity: 0.78;
+}
+.elig-row-ops button {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 11px !important;
+  font-size: 12px !important;
+  border-radius: 999px !important;
+}
+
+/* 通知拆解结果横幅去亮绿噪点，回归原生淡冰蓝玻璃 */
+#noticeParserDialog .ct-alert-banner.is-ok {
+  background: rgba(59, 130, 246, 0.08) !important;
+  color: #1d4ed8 !important;
+  border: 1px solid rgba(59, 130, 246, 0.16) !important;
+  border-radius: 16px !important;
+}
+html.dark #noticeParserDialog .ct-alert-banner.is-ok {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93c5fd !important;
+  border-color: rgba(147, 197, 253, 0.22) !important;
+}
+
+/* ---- 3. 彻底修复移动端 4 大真实 Bug（分段槽折行裁切、考试表单日期压扁重叠、空档页头折行） ---- */
+#schedToolsTabs {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  padding: 4px !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+}
+#academicTabs {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  padding: 4px !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+}
+#schedToolsTabs .sched-dseg-btn,
+#academicTabs .sched-dseg-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 10px !important;
+  gap: 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  font-size: 13px !important;
+}
+#schedToolsTabs .sched-dseg-btn span,
+#academicTabs .sched-dseg-btn span {
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ct-free-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+}
+.ct-free-head #refreshFreeSlotsBtn {
+  flex-shrink: 0 !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+}
+
+@media (max-width: 640px) {
+  #schedToolsTabs .sched-dseg-btn,
+  #academicTabs .sched-dseg-btn {
+    padding: 0 6px !important;
+    font-size: 12.5px !important;
+  }
+  #schedToolsTabs .sched-dseg-btn .ico {
+    display: none !important;
+  }
+  #examAddForm,
+  #gpaAddForm {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  #examAddForm #examTitle,
+  #gpaAddForm #gpaCourseName {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #examAddForm .xz-date-wrap,
+  #examAddForm .xz-date-trigger,
+  #examAddForm #examDate,
+  #examAddForm #examPlace,
+  #gpaAddForm #gpaCourseCredit,
+  #gpaAddForm #gpaCourseScore {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+  }
+  #examAddForm button[type="submit"],
+  #gpaAddForm button[type="submit"] {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+  dialog.campus-tool-dialog {
+    padding-top: 22px !important;
+  }
+}
+
+/* ---- 4. 数据统计与治理洞察（与上方原生「平台运行概览」100% 同源极简排版，永不折行） ---- */
+.gov-list {
+  gap: 0 !important;
+}
+.gov-topic-row,
+.gov-spot-row {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 13px 2px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+html.dark .gov-topic-row,
+html.dark .gov-spot-row {
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+.gov-topic-row:last-child,
+.gov-spot-row:last-child {
+  border-bottom: 0 !important;
+  padding-bottom: 2px !important;
+}
+.gov-topic-top {
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+}
+.gov-topic-title {
+  flex-wrap: nowrap !important;
+  min-width: 0 !important;
+  overflow: hidden;
+  gap: 6px !important;
+}
+.gov-topic-title b {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gov-dept-sep {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gov-rank {
+  width: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+  opacity: 0.72;
+}
+.gov-topic-right {
+  flex-shrink: 0 !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+}
+.gov-stat-num {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gov-bar-track {
+  height: 5px !important;
+  background: rgba(148, 163, 184, 0.18) !important;
+}
+.gov-bar-track i {
+  background: linear-gradient(90deg, #3b82f6, #2563eb) !important;
+}
+.gov-draft-btn,
+.gov-add-kb-btn {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+}
+
+/* ---- 5. AI 对话内 Agent 动作胶囊：与原站追问词条同源的纯净珍珠白微胶囊 ---- */
+.ai-agent-actions {
+  gap: 7px !important;
+  margin-top: 8px !important;
+}
+.ai-agent-pill {
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 12px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+}
+.ai-agent-pill:hover {
+  color: #1d4ed8 !important;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.90),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 4px 12px -4px rgba(37, 99, 235, 0.16) !important;
+}
+html.dark .ai-agent-pill {
+  color: #e2e8f0 !important;
+  background: rgba(30, 41, 59, 0.72) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.10) !important;
+}
+html.dark .ai-agent-pill:hover {
+  color: #93c5fd !important;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.30) !important;
+}
+.ai-agent-pill.is-guide .ico { color: #2563eb; }
+.ai-agent-pill.is-award .ico { color: #d97706; }
+.ai-agent-pill.is-gpa .ico { color: #6366f1; }
+.ai-agent-pill.is-schedule .ico { color: #0ea5e9; }
+.ai-agent-pill.is-todo .ico { color: #10b981; }
+
+
+/* ---- v1.119 Round 2 像素级精修（战胜 :not(#docDialog) 高优先级、修复停止钮 .hide、移动端表单紧凑防遮挡） ---- */
+/* 1. 彻底统一全部新弹窗单行输入/下拉/日期触发器为 999px 轻凹玻璃胶囊（压过 :not(#docDialog) 特异性） */
+dialog:not(#docDialog).campus-tool-dialog .ct-inline-form input:not([type="checkbox"]):not([type="radio"]),
+dialog:not(#docDialog).campus-tool-dialog .ct-inline-form .xz-date-trigger,
+dialog:not(#docDialog).campus-tool-dialog .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+dialog:not(#docDialog).campus-tool-dialog .elig-grid select,
+dialog:not(#docDialog).campus-tool-dialog .elig-grid .xz-select-trigger {
+  border-radius: 999px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+}
+
+/* 2. 修复 .sched-btn-stop.hide 被 display:inline-flex !important 压住导致空闲态仍显示红色停止按钮的 Bug */
+#noticeParserStopBtn.hide,
+#schedAiStopBtn.hide,
+.sched-btn-stop.hide {
+  display: none !important;
+}
+
+/* 3. 通知拆解结果清单同样去套娃：统一为细分割线平坦玻璃清单 */
+#noticeParserDialog .ct-checklist {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+#noticeParserDialog .ct-checklist .ct-check-item {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 10px 2px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+html.dark #noticeParserDialog .ct-checklist .ct-check-item {
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+#noticeParserDialog .ct-checklist .ct-check-item:last-child {
+  border-bottom: 0 !important;
+  padding-bottom: 2px !important;
+}
+
+/* 4. 移动端 360px 极致人因精修：考试表单防截断 + 奖助体检 2×2 紧凑矩阵让首屏直见 KPI 与首条结果 */
+@media (max-width: 640px) {
+  dialog:not(#docDialog).campus-tool-dialog #examAddForm .xz-date-trigger,
+  dialog:not(#docDialog).campus-tool-dialog #examAddForm #examPlace {
+    font-size: 12.5px !important;
+    padding: 0 11px !important;
+  }
+  #gpaCalcDialog .elig-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px 10px !important;
+  }
+  dialog:not(#docDialog).campus-tool-dialog .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+  dialog:not(#docDialog).campus-tool-dialog .elig-grid select,
+  dialog:not(#docDialog).campus-tool-dialog .elig-grid .xz-select-trigger {
+    font-size: 12.5px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 11px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  #gpaCalcDialog .elig-toggles {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  #gpaCalcDialog .elig-toggle {
+    padding: 7px 11px !important;
+    font-size: 12.5px !important;
+  }
+  #gpaCalcDialog .elig-form-card {
+    padding: 11px 12px !important;
+    gap: 9px !important;
+  }
+  #gpaCalcDialog .ct-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  #gpaCalcDialog .ct-kpi {
+    padding: 9px 11px !important;
+  }
+}

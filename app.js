@@ -154,12 +154,12 @@ function welcome_html(is_reset = false) {
   return `<div class="bubble-wrap msg-ai">
     <div class="msg-meta">
       <span class="msg-avatar ai">${ico("ai-brand")}</span>
-      <span class="msg-sender">文理智办 AI</span>
+      <span class="msg-sender">校务指南 AI</span>
     </div>
     <div class="bubble msg-ai welcome-bubble">
       <div class="welcome-bubble-head">
-        <b>${is_reset ? "对话已重置，随时为您服务！" : "你好！我是「文理智办」校园智能办事助手"}</b>
-        <p>基于学校正式规章制度与附件模板，为您梳理清晰的办事指南：</p>
+        <b>${is_reset ? "对话已重置，随时为您服务！" : "你好！我是「校务指南 AI」全国高校智能办事助手"}</b>
+        <p>支持切换全国任意高校，结合校内规章制度与官网实时检索，为您梳理清晰的办事指南：</p>
       </div>
       <div class="welcome-grid">
         <div class="welcome-item">
@@ -660,7 +660,7 @@ function go(p) {
     home: "工作台总览",
     notices: "通知公告",
     tasks: "我的待办",
-    ai: "文理智办",
+    ai: "校务指南 AI",
     knowledge: "校规制度库",
     schedule: "超级课表",
     users: "用户管理",
@@ -1160,7 +1160,7 @@ function render_tasks() {
         </div>`
       )
       .join("") ||
-    '<div class="empty">暂无符合条件的待办事项。可在上方添加个人待办，或在“通知公告 / 文理智办 AI”中一键导入。</div>';
+    '<div class="empty">暂无符合条件的待办事项。可在上方添加个人待办，或使用“AI 拆解通知 / 校务指南 AI”一键导入。</div>';
 
 }
 
@@ -1453,10 +1453,11 @@ function render_knowledge_grid(docs, matched_chunks = [], q = "") {
     grid.innerHTML =
       docs
         .map(
-          d => `<article class="knowledge-card">
+          d => `<article class="knowledge-card${d.is_custom ? " is-custom-doc" : ""}">
             <div>
               <div class="notice-top knowledge-card-top">
                 <span class="tag">${esc(d.dept || "学校部门")}</span>
+                ${d.is_custom ? `<span class="tag custom-kb-tag">动态修订</span>` : ""}
                 <span class="doc-index" title="目录内唯一序号">档案 ${esc(d.catalog_no || String(d.id || 0).padStart(3, "0"))}/${total_txt}</span>
                 <small class="muted">${esc(d.date || "日期未标注")}</small>
               </div>
@@ -1466,6 +1467,7 @@ function render_knowledge_grid(docs, matched_chunks = [], q = "") {
             <div class="knowledge-card-foot">
               <small class="muted">${esc(d.category || "规章制度")} · ${d.chunk_count || 1} 节</small>
               <div class="knowledge-card-actions">
+                ${d.is_custom && me?.role === "admin" ? `<button type="button" class="outline danger-soft" data-del-custom-doc="${esc(String(d.custom_id || ""))}">${ico("trash")}移除</button>` : ""}
                 <button type="button" class="outline" data-read-doc="${esc(d.title)}">${ico("book")}查看原文</button>
                 <button type="button" class="ai-btn" data-ask-doc="${esc(d.title)}">${ico("sparkles")}解读</button>
               </div>
@@ -2653,7 +2655,7 @@ function create_msg_meta(who) {
     const user_char = me && me.display_name ? me.display_name.slice(0, 1) : "我";
     meta.innerHTML = `<span class="msg-avatar user">${esc(user_char)}</span><span class="msg-sender">我</span>`;
   } else {
-    meta.innerHTML = `<span class="msg-avatar ai">${ico("ai-brand")}</span><span class="msg-sender">文理智办 AI</span>`;
+    meta.innerHTML = `<span class="msg-avatar ai">${ico("ai-brand")}</span><span class="msg-sender">校务指南 AI</span>`;
   }
   return meta;
 }
@@ -2664,7 +2666,7 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
   if (!clean_text) return;
 
   chat_history.push({
-    role: who === "user" ? "学生" : "文理智办",
+    role: who === "user" ? "学生" : "校务指南 AI",
     content: clean_text,
     sources: sources || [],
     reasoning: reasoning || ""
@@ -2737,7 +2739,7 @@ $("exportChat")?.addEventListener("click", () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `文理智办咨询记录_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.download = `校务指南AI咨询记录_${new Date().toISOString().slice(0, 10)}.txt`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   toast("咨询记录已导出");
@@ -3028,6 +3030,7 @@ $("askForm").onsubmit = async e => {
   let follow_ups = [];
   let answer_docs = [];
   let doc_citations = {};
+  let suggested_actions = [];
   let streamed_content = false;
   let delta_chunks = 0;
   let is_cached_hit = false;
@@ -3178,6 +3181,7 @@ $("askForm").onsubmit = async e => {
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           if (Array.isArray(parsed.knowledge_docs)) answer_docs = parsed.knowledge_docs;
           if (parsed.doc_citations && typeof parsed.doc_citations === "object") doc_citations = parsed.doc_citations;
+          if (Array.isArray(parsed.suggested_actions)) suggested_actions = parsed.suggested_actions;
           return;
         }
 
@@ -3373,7 +3377,7 @@ $("askForm").onsubmit = async e => {
 
     render_streaming_bubble(false);
     chat_history.push({
-      role: "文理智办",
+      role: "校务指南 AI",
       content: clean_saved_answer,
       sources: showSrc ? (sources || []) : [],
       reasoning: full_reasoning.trim()
@@ -3389,6 +3393,7 @@ $("askForm").onsubmit = async e => {
       answer_docs,
       doc_citations
     });
+    window.render_ai_agent_actions?.(wrap, suggested_actions, q, clean_saved_answer);
     if (showFu) add_follow_ups(wrap, follow_ups);
     if (soft_error) {
       const note = document.createElement("div");
@@ -3461,7 +3466,7 @@ $("askForm").onsubmit = async e => {
     stop_note.innerHTML = `${ico("stop", "ico-xs")}已停止生成，以上为已输出的部分内容`;
     bubble.appendChild(stop_note);
     chat_history.push({
-      role: "文理智办",
+      role: "校务指南 AI",
       content: full_answer + "\n\n（此回答由用户中途停止生成）",
       sources: sources || [],
       reasoning: full_reasoning.trim()
@@ -3722,6 +3727,7 @@ async function load_stats() {
           <span><i class="dot open"></i>待处理 ${pending_count}</span>
         </div>
       </div>`;
+    window.load_gov_insights?.();
   } catch (e) {
     toast(e.message);
   }
@@ -6936,13 +6942,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
     if (!q) {
       items.push(
-        { group: "快捷入口", mod: "ai", icon: "ai-brand", title: "咨询文理智办 AI", sub: "校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
+        { group: "快捷入口", mod: "ai", icon: "ai-brand", title: "咨询校务指南 AI", sub: "服务全国高校 · 校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
         { group: "快捷入口", mod: "schedule", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
-        { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份本校规章与校园服务指南`, run: () => go("knowledge") },
+        { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份规章制度与校园服务指南`, run: () => go("knowledge") },
         { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
         { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") },
+        { group: "效率工具", mod: "ai", icon: "sparkles", title: "群通知与截图一键拆解", sub: "粘贴班级群消息或上传聊天截图，自动生成待办与考试日程", run: () => window.open_notice_parser?.() },
+        { group: "效率工具", mod: "notices", icon: "award", title: "奖助评优与学位红线自检", sub: "对照量化细则实时核算国奖/励志/助学金兼得与红线", run: () => window.open_eligibility_dialog?.() },
         { group: "效率工具", mod: "home", icon: "clipboard", title: "校园办事向导与文书生成", sub: "材料清单核对、流程指引与一键导出 Word 申请表", run: () => window.open_guide_wizard?.() },
-        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业 GPA 换算与学位预警", sub: "实时核算平均学分绩点并对照本校学位标准预警", run: () => window.open_gpa_calc?.() },
+        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业 GPA 换算与学位预警", sub: "实时核算平均学分绩点并对照学位标准预警", run: () => window.open_gpa_calc?.() },
         { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
       );
     } else {
@@ -7012,7 +7020,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
       // 5) 直问 AI
       items.push({
-        group: "文理智办 AI",
+        group: "校务指南 AI",
         mod: "ai",
         icon: "ai-brand",
         title: `直接问 AI：「${q}」`,
@@ -7437,19 +7445,23 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     });
 
     $("guideExportDocBtn")?.addEventListener("click", () => {
-      const html = buildWordHtml(guide, readForm());
+      const curSchool = typeof get_selected_school === "function" ? (get_selected_school()?.n || "西安文理学院") : "西安文理学院";
+      const dynGuide = { ...guide, docFormTitle: guide.docFormTitle.replace("西安文理学院", curSchool) };
+      const html = buildWordHtml(dynGuide, readForm());
       const blob = new Blob(["\ufeff" + html], { type: "application/msword;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${guide.docFormTitle}.doc`;
+      a.download = `${dynGuide.docFormTitle}.doc`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1200);
-      toast("已生成标准 Word 申请表，可直接打印签字提交");
+      toast(`已生成「${curSchool}」标准 Word 申请表，可直接打印签字提交`);
     });
 
     $("guidePrintPdfBtn")?.addEventListener("click", () => {
-      const html = buildWordHtml(guide, readForm());
+      const curSchool = typeof get_selected_school === "function" ? (get_selected_school()?.n || "西安文理学院") : "西安文理学院";
+      const dynGuide = { ...guide, docFormTitle: guide.docFormTitle.replace("西安文理学院", curSchool) };
+      const html = buildWordHtml(dynGuide, readForm());
       const win = window.open("", "_blank", "width=860,height=920");
       if (!win) return toast("浏览器拦截了打印窗口，可改用“导出 Word 申请表”");
       win.document.open();
@@ -7470,7 +7482,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if (guideId && CAMPUS_GUIDES.some(g => g.id === guideId)) activeGuideId = guideId;
     renderGuideWizard();
     const dlg = $("guideWizardDialog");
-    if (dlg && !dlg.open) dlg.showModal();
+    if (dlg && !dlg.open) {
+      dlg.showModal();
+      try { dlg.focus({ preventScroll: true }); } catch {}
+    }
   };
   $("openGuideWizardBtn")?.addEventListener("click", () => window.open_guide_wizard());
   $("openGuideFromKbBtn")?.addEventListener("click", () => window.open_guide_wizard());
@@ -7605,13 +7620,17 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   });
 
-  window.open_gpa_calc = () => {
+  window.open_gpa_calc = (tab = "gpa") => {
     gpaCourses = loadGpaCourses();
     renderGpaCalc();
+    window.switch_academic_tab?.(tab);
     const dlg = $("gpaCalcDialog");
-    if (dlg && !dlg.open) dlg.showModal();
+    if (dlg && !dlg.open) {
+      dlg.showModal();
+      try { dlg.focus({ preventScroll: true }); } catch {}
+    }
   };
-  $("openGpaCalcBtn")?.addEventListener("click", () => window.open_gpa_calc());
+  $("openGpaCalcBtn")?.addEventListener("click", () => window.open_gpa_calc("gpa"));
   $("closeGpaCalcDlg")?.addEventListener("click", () => $("gpaCalcDialog")?.close());
   $("gpaCalcDialog")?.addEventListener("click", e => { if (e.target === $("gpaCalcDialog")) $("gpaCalcDialog").close(); });
 
@@ -7689,11 +7708,19 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   ];
   const DAY_CN = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
-  const renderFreeSlots = () => {
+  const renderFreeSlots = async () => {
     const grid = $("freeSlotsGrid");
     const sum = $("freeSlotsSummary");
     if (!grid) return;
-    const curWeek = Math.max(1, Number(schedState?.currentWeek || schedState?.viewWeek || 1));
+    if ((!Array.isArray(schedState?.courses) || !schedState.courses.length) && typeof load_schedule === "function") {
+      try { await load_schedule(); } catch {}
+    }
+    const todayWeek = typeof schedGetWeekNumber === "function"
+      ? Math.max(1, Math.min(Number(schedState?.totalWeeks || 18), schedGetWeekNumber(new Date(), schedState?.startDate || "2026-08-31") || 1))
+      : 1;
+    const curWeek = schedState?.bound && Number(schedState?.selectedWeek) >= 1
+      ? Number(schedState.selectedWeek)
+      : todayWeek;
     const courses = Array.isArray(schedState?.courses) ? schedState.courses : [];
     const activeCourses = courses.filter(c => {
       if (typeof schedParseWeeks === "function") {
@@ -7702,7 +7729,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       }
       return true;
     });
-    if (sum) sum.textContent = `当前扫描：第 ${curWeek} 周（共 ${activeCourses.length} 节有效排课）`;
+    if (sum) sum.textContent = `第 ${curWeek} 周 · 共 ${activeCourses.length} 节排课`;
 
     const rows = [];
     for (let d = 1; d <= 7; d++) {
@@ -7827,10 +7854,720 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     examsList = loadExams();
     switchSchedToolsTab(tab);
     const dlg = $("schedToolsDialog");
-    if (dlg && !dlg.open) dlg.showModal();
+    if (dlg && !dlg.open) {
+      dlg.showModal();
+      try { dlg.focus({ preventScroll: true }); } catch {}
+    }
   };
   $("schedOpenToolsBtn")?.addEventListener("click", () => window.open_sched_tools("exams"));
+  $("openSchedToolsHomeBtn")?.addEventListener("click", () => window.open_sched_tools("exams"));
   $("schedMobTools")?.addEventListener("click", () => window.open_sched_tools("exams"));
   $("closeSchedToolsDlg")?.addEventListener("click", () => $("schedToolsDialog")?.close());
   $("schedToolsDialog")?.addEventListener("click", e => { if (e.target === $("schedToolsDialog")) $("schedToolsDialog").close(); });
+})();
+
+
+/* ==================== v1.118 国奖级五大引擎（群通知拆解 / 知识库热更新 / 治理驾驶舱 / 奖助红线自检 / AI Agent 站内联动） ==================== */
+(() => {
+  /* ---------- 工具：通用图片高清压缩（用于群聊截图识图） ---------- */
+  const compressNoticeImage = (file, maxSide = 2048, quality = 0.92) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("读取图片失败"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("图片格式不支持"));
+      img.onload = () => {
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const cv = document.createElement("canvas");
+        cv.width = w;
+        cv.height = h;
+        const ctx = cv.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL("image/jpeg", quality));
+      };
+      img.src = String(reader.result || "");
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ---------- P0-1：多模态「群通知 / 截图」一键智能拆解器 ---------- */
+  let npImages = [];
+  let npLastData = null;
+  let npAbortCtrl = null;
+
+  const renderNpThumbs = () => {
+    const box = $("noticeParserThumbs");
+    const status = $("noticeParserImgStatus");
+    if (!box) return;
+    if (!npImages.length) {
+      box.classList.add("hide");
+      box.innerHTML = "";
+      if (status) status.textContent = "";
+      return;
+    }
+    box.classList.remove("hide");
+    if (status) status.textContent = `已选 ${npImages.length} 张截图`;
+    box.innerHTML = npImages.map((src, i) => `
+      <div class="np-thumb">
+        <img src="${src}" alt="群聊截图 ${i + 1}">
+        <button type="button" data-np-rm-img="${i}" title="移除图片">&times;</button>
+      </div>
+    `).join("");
+  };
+
+  const renderNpResult = (data) => {
+    npLastData = data;
+    const box = $("noticeParserResult");
+    if (!box) return;
+    box.classList.remove("hide");
+    const tasksList = Array.isArray(data.tasks) ? data.tasks : [];
+    const examsList = Array.isArray(data.exams) ? data.exams : [];
+    const docsList = Array.isArray(data.related_docs) ? data.related_docs : [];
+
+    box.innerHTML = `
+      <div class="ct-alert-banner is-ok">
+        ${ico("sparkles", "ico-xs")}
+        <span><b>拆解完成：</b>${esc(data.summary || `共识别 ${tasksList.length} 项待办与 ${examsList.length} 项日程`)}</span>
+      </div>
+
+      ${tasksList.length ? `
+        <div class="ct-card">
+          <div class="ct-card-head">
+            <b>${ico("check-square", "ico-xs")}提取出的待办事项 (${tasksList.length})</b>
+            <small class="muted">勾选后一键写入「我的待办」</small>
+          </div>
+          <div class="ct-checklist">
+            ${tasksList.map((t, i) => `
+              <label class="ct-check-item">
+                <input type="checkbox" data-np-task="${i}" checked>
+                <div class="np-item-copy">
+                  <b>${esc(t.title)}</b>
+                  <small class="muted">${t.due_date ? `截止 ${esc(t.due_date)}` : "未注明截止日期"}${t.detail && t.detail !== t.title ? ` · ${esc(t.detail.slice(0, 72))}` : ""}</small>
+                </div>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      ${examsList.length ? `
+        <div class="ct-card">
+          <div class="ct-card-head">
+            <b>${ico("bell-alarm", "ico-xs")}提取出的考试与重要日程 (${examsList.length})</b>
+            <small class="muted">勾选后一键加入「考试倒计时」</small>
+          </div>
+          <div class="ct-checklist">
+            ${examsList.map((ex, i) => `
+              <label class="ct-check-item">
+                <input type="checkbox" data-np-exam="${i}" checked>
+                <div class="np-item-copy">
+                  <b>${esc(ex.title)}</b>
+                  <small class="muted">${esc(ex.date || "待定")}${ex.place ? ` · ${esc(ex.place)}` : ""}</small>
+                </div>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      ${docsList.length ? `
+        <div class="ct-card">
+          <div class="ct-card-head">
+            <b>${ico("book", "ico-xs")}自动关联的校规依据</b>
+            <small class="muted">点击直达原文条款</small>
+          </div>
+          <div class="np-doc-chips">
+            ${docsList.map(d => `
+              <button type="button" class="pill-btn" data-np-open-doc="${esc(d.title)}">
+                ${ico("book", "ico-xs")}<span>${esc(d.title)}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      <div class="ct-foot-actions">
+        <button type="button" id="npResetBtn" class="outline">清空重来</button>
+        <button type="button" id="npCommitBtn" class="primary">${ico("check")}一键写入待办与倒计时</button>
+      </div>
+    `;
+
+    box.querySelectorAll("[data-np-open-doc]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        $("noticeParserDialog")?.close();
+        open_doc_reader(btn.dataset.npOpenDoc);
+      });
+    });
+
+    $("npResetBtn")?.addEventListener("click", () => {
+      npImages = [];
+      npLastData = null;
+      if ($("noticeParserText")) $("noticeParserText").value = "";
+      renderNpThumbs();
+      box.classList.add("hide");
+      box.innerHTML = "";
+    });
+
+    $("npCommitBtn")?.addEventListener("click", async () => {
+      const btn = $("npCommitBtn");
+      const checkedTasks = [...box.querySelectorAll("[data-np-task]:checked")].map(el => tasksList[Number(el.dataset.npTask)]).filter(Boolean);
+      const checkedExams = [...box.querySelectorAll("[data-np-exam]:checked")].map(el => examsList[Number(el.dataset.npExam)]).filter(Boolean);
+      if (!checkedTasks.length && !checkedExams.length) return toast("请至少勾选一项要写入的待办或日程");
+      if (btn) { btn.disabled = true; btn.textContent = "正在写入…"; }
+
+      let addedTasks = 0;
+      for (const t of checkedTasks) {
+        try {
+          await api("/tasks", {
+            method: "POST",
+            body: JSON.stringify({ title: String(t.title || "").slice(0, 180), due_date: String(t.due_date || "") })
+          });
+          addedTasks++;
+        } catch {}
+      }
+
+      let addedExams = 0;
+      if (checkedExams.length) {
+        try {
+          const exKey = "xz_sched_exams_" + (me?.username || "guest");
+          const curExams = JSON.parse(localStorage.getItem(exKey) || "[]");
+          const arr = Array.isArray(curExams) ? curExams : [];
+          for (const ex of checkedExams) {
+            arr.push({
+              id: "ex_np_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+              title: String(ex.title || "").slice(0, 48),
+              date: /^\d{4}-\d{2}-\d{2}$/.test(String(ex.date || "")) ? ex.date : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+              place: String(ex.place || "").slice(0, 40)
+            });
+            addedExams++;
+          }
+          localStorage.setItem(exKey, JSON.stringify(arr));
+        } catch {}
+      }
+
+      if (addedTasks > 0 && typeof load_tasks === "function") load_tasks();
+      if (btn) { btn.disabled = false; btn.innerHTML = `${ico("check")}一键写入待办与倒计时`; }
+      toast(`写入成功：新增 ${addedTasks} 项待办${addedExams ? `、${addedExams} 场考试倒计时` : ""}`);
+      $("noticeParserDialog")?.close();
+    });
+  };
+
+  window.open_notice_parser = (prefillText = "") => {
+    const dlg = $("noticeParserDialog");
+    if (!dlg) return;
+    if (prefillText && $("noticeParserText")) {
+      $("noticeParserText").value = String(prefillText).slice(0, 6000);
+    }
+    renderNpThumbs();
+    if (!dlg.open) {
+      dlg.showModal();
+      try { dlg.focus({ preventScroll: true }); } catch {}
+    }
+  };
+
+  $("openNoticeParserBtn")?.addEventListener("click", () => window.open_notice_parser());
+  $("openNoticeParserFromTasksBtn")?.addEventListener("click", () => window.open_notice_parser());
+  $("closeNoticeParserDlg")?.addEventListener("click", () => {
+    if (npAbortCtrl) { try { npAbortCtrl.abort(); } catch {} }
+    $("noticeParserDialog")?.close();
+  });
+  $("noticeParserPickImgBtn")?.addEventListener("click", () => $("noticeParserFiles")?.click());
+  $("noticeParserFiles")?.addEventListener("change", async e => {
+    const files = [...(e.target.files || [])].slice(0, 4 - npImages.length);
+    for (const f of files) {
+      try {
+        const dataUrl = await compressNoticeImage(f, 2048, 0.92);
+        npImages.push(dataUrl);
+      } catch (err) { toast(err.message || "图片处理失败"); }
+    }
+    e.target.value = "";
+    renderNpThumbs();
+  });
+  $("noticeParserThumbs")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-np-rm-img]");
+    if (!btn) return;
+    npImages.splice(Number(btn.dataset.npRmImg), 1);
+    renderNpThumbs();
+  });
+  $("noticeParserDemoBtn")?.addEventListener("click", () => {
+    if ($("noticeParserText")) {
+      $("noticeParserText").value = "【辅导员通知】@全体同学：1. 请本周五 17:00 前把《四六级报名信息核对表》与本学年《家庭经济困难认定申请表》纸质版交至明德楼 304 学工办；2. 12月18日 09:00《数据结构与算法》期末考试，地点博学楼 B204，请务必携带学生证与身份证；3. 如因病无法参加期末考试，务必在开考前提交缓考申请与二甲医院诊断证明。";
+    }
+  });
+  $("noticeParserStopBtn")?.addEventListener("click", () => {
+    if (npAbortCtrl) {
+      try { npAbortCtrl.abort(); } catch {}
+      npAbortCtrl = null;
+      toast("已停止群通知拆解");
+    }
+  });
+  $("noticeParserRunBtn")?.addEventListener("click", async () => {
+    const text = ($("noticeParserText")?.value || "").trim();
+    if (!text && !npImages.length) return toast("请先粘贴群通知文字或上传群聊截图");
+    const runBtn = $("noticeParserRunBtn");
+    const stopBtn = $("noticeParserStopBtn");
+    if (npAbortCtrl) { try { npAbortCtrl.abort(); } catch {} }
+    npAbortCtrl = new AbortController();
+    if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = `${ico("sparkles")}正在智能拆解…`; }
+    stopBtn?.classList.remove("hide");
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const res = await fetch(`${api_base}/ai/parse-notice`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ text, images: npImages, today }),
+        signal: npAbortCtrl.signal
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j.error || "拆解失败，请稍后重试");
+      renderNpResult(j);
+    } catch (e) {
+      if (e.name !== "AbortError") toast(e.message || "拆解失败");
+    } finally {
+      npAbortCtrl = null;
+      if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = `${ico("ai-brand", "ico-star")}开始智能拆解`; }
+      stopBtn?.classList.add("hide");
+    }
+  });
+
+  /* ---------- P0-2：校务知识库在线热更新（管理员增补/移除动态校规） ---------- */
+  window.open_custom_doc_dialog = (prefill = {}) => {
+    if (!me || me.role !== "admin") return toast("仅系统管理员可在线增补或修订校规");
+    const dlg = $("customDocDialog");
+    if (!dlg) return;
+    $("customDocId").value = prefill.custom_id ? String(prefill.custom_id) : "";
+    $("customDocDlgTitle").textContent = prefill.custom_id ? "编辑动态修订校规" : "在线增补校规与补充通知";
+    $("customDocTitle").value = prefill.title || "";
+    if (prefill.dept && $("customDocDept")) $("customDocDept").value = prefill.dept;
+    $("customDocNo").value = prefill.doc_no || "";
+    $("customDocContent").value = prefill.content || "";
+    if (!dlg.open) {
+      dlg.showModal();
+      try { dlg.focus({ preventScroll: true }); } catch {}
+    }
+  };
+
+  $("openCustomDocBtn")?.addEventListener("click", () => window.open_custom_doc_dialog());
+  $("openCustomDocFromStatsBtn")?.addEventListener("click", () => window.open_custom_doc_dialog());
+  $("closeCustomDocDlg")?.addEventListener("click", () => $("customDocDialog")?.close());
+  $("cancelCustomDocBtn")?.addEventListener("click", () => $("customDocDialog")?.close());
+
+  $("customDocForm")?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = $("saveCustomDocBtn");
+    const payload = {
+      custom_id: Number($("customDocId")?.value || 0) || undefined,
+      title: ($("customDocTitle")?.value || "").trim(),
+      dept: ($("customDocDept")?.value || "教务处").trim(),
+      doc_no: ($("customDocNo")?.value || "").trim(),
+      content: ($("customDocContent")?.value || "").trim()
+    };
+    if (btn) { btn.disabled = true; btn.textContent = "保存中…"; }
+    try {
+      const r = await api("/knowledge/custom", { method: "POST", body: JSON.stringify(payload) });
+      toast(r.message || "动态校规已入库并即时生效");
+      $("customDocDialog")?.close();
+      all_knowledge_docs_cache = null;
+      if (typeof load_knowledge === "function") load_knowledge();
+      if (typeof load_stats === "function" && !$("analyticsPage")?.classList.contains("hide")) load_stats();
+    } catch (err) {
+      toast(err.message || "保存失败");
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = `${ico("check")}保存并立即生效`; }
+    }
+  });
+
+  document.addEventListener("click", async e => {
+    const delBtn = e.target.closest("[data-del-custom-doc]");
+    if (!delBtn) return;
+    const cid = delBtn.dataset.delCustomDoc;
+    if (!cid) return;
+    if (!confirm("确定移除这条在线增补的动态校规吗？")) return;
+    try {
+      await api(`/knowledge/custom/${encodeURIComponent(cid)}`, { method: "DELETE" });
+      toast("已移除该动态校规");
+      all_knowledge_docs_cache = null;
+      if (typeof load_knowledge === "function") load_knowledge();
+    } catch (err) {
+      toast(err.message || "移除失败");
+    }
+  });
+
+  /* ---------- P0-3：AI 智慧校务治理驾驶舱（高频咨询热力 + 制度盲区 + 一键生成答疑通知） ---------- */
+  window.load_gov_insights = async () => {
+    const hotEl = $("govHotTopics");
+    const blindEl = $("govBlindSpots");
+    const metaEl = $("govQueryMeta");
+    if (!hotEl || !blindEl) return;
+    try {
+      const data = await api("/analytics/insights");
+      const total = Number(data?.total_queries || 0);
+      const rate = Number(data?.high_conf_rate ?? 100);
+      const customCnt = Number(data?.custom_docs_count || 0);
+      if (metaEl) {
+        metaEl.textContent = total
+          ? `累计分析 ${total} 次脱敏 AI 咨询 · 校规命中率 ${rate}% · 在线动态增补 ${customCnt} 份`
+          : `系统已就绪（在线动态校规 ${customCnt} 份），师生向校务指南 AI 提问后将实时聚类`;
+      }
+
+      const topics = Array.isArray(data?.hot_topics) ? data.hot_topics : [];
+      if (!topics.length) {
+        hotEl.innerHTML = `<div class="gov-empty muted">暂无 AI 咨询记录。体验几次「校务指南 AI」问答后刷新，这里将实时呈现全校高频咨询热力并支持一键起草官方答疑通知。</div>`;
+      } else {
+        hotEl.innerHTML = topics.map((t, idx) => `
+          <div class="gov-topic-row">
+            <div class="gov-topic-top">
+              <div class="gov-topic-title">
+                <span class="gov-rank">${String(idx + 1).padStart(2, "0")}</span>
+                <b>${esc(t.label)}</b>
+                <small class="gov-dept-sep">· ${esc(t.dept)}</small>
+              </div>
+              <div class="gov-topic-right">
+                <span class="gov-stat-num">${t.count} 次 · ${t.pct}%</span>
+                <button type="button" class="outline gov-draft-btn" data-gov-draft="${idx}">${ico("sparkles", "ico-xs")}生成通知</button>
+              </div>
+            </div>
+            <div class="gov-bar-track"><i style="width:${Math.max(8, t.pct)}%"></i></div>
+            ${Array.isArray(t.samples) && t.samples.length ? `<small class="muted gov-sample">${esc(t.samples.slice(0, 2).join(" ｜ "))}</small>` : ""}
+          </div>
+        `).join("");
+
+        hotEl.querySelectorAll("[data-gov-draft]").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const topicObj = topics[Number(btn.dataset.govDraft)];
+            if (!topicObj) return;
+            const oldHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.textContent = "起草中…";
+            try {
+              const r = await api("/analytics/draft-notice", {
+                method: "POST",
+                body: JSON.stringify({ topic: topicObj.label, dept: topicObj.dept, samples: topicObj.samples || [] })
+              });
+              const draft = r?.draft;
+              if (draft) {
+                go("notices");
+                setTimeout(() => {
+                  const nDlg = $("noticeDialog");
+                  if ($("noticeId")) $("noticeId").value = "";
+                  if ($("nTitle")) $("nTitle").value = draft.title || "";
+                  if ($("nCategory") && draft.category) $("nCategory").value = draft.category;
+                  if ($("nAudience") && draft.audience) $("nAudience").value = draft.audience;
+                  if ($("nDeadline")) $("nDeadline").value = draft.deadline || "";
+                  if ($("nBody")) $("nBody").value = draft.body || "";
+                  if (nDlg && !nDlg.open) nDlg.showModal();
+                  toast("AI 已依据本校校规起草官方答疑通知，请审阅后发布");
+                }, 120);
+              }
+            } catch (err) {
+              toast(err.message || "生成通知草稿失败");
+            } finally {
+              btn.disabled = false;
+              btn.innerHTML = oldHtml;
+            }
+          });
+        });
+      }
+
+      const spots = Array.isArray(data?.blind_spots) ? data.blind_spots : [];
+      if (!spots.length) {
+        blindEl.innerHTML = `<div class="gov-empty muted">${ico("check-square", "ico-xs")} 当前暂未发现低置信度制度盲区，现有 ${Number(data?.total_docs_count || kb_total || 126)} 份校规覆盖表现良好。</div>`;
+      } else {
+        blindEl.innerHTML = spots.map((s, idx) => `
+          <div class="gov-spot-row">
+            <div class="gov-spot-main">
+              <b>${esc(s.question)}</b>
+              <small class="muted">归类：${esc(s.topic)} · 建议归口：${esc(s.dept)}</small>
+            </div>
+            <button type="button" class="outline gov-add-kb-btn" data-gov-spot="${idx}">${ico("plus", "ico-xs")}增补</button>
+          </div>
+        `).join("");
+        blindEl.querySelectorAll("[data-gov-spot]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const sp = spots[Number(btn.dataset.govSpot)];
+            if (!sp) return;
+            window.open_custom_doc_dialog({
+              title: `关于「${sp.question.slice(0, 28)}」的校务补充说明`,
+              dept: sp.dept,
+              content: `针对近期学生高频咨询问题“${sp.question}”，现补充明确办理依据与流程如下：\n1. 受理部门：${sp.dept}\n2. 办理条件与材料：\n3. 办理时间与咨询电话：`
+            });
+          });
+        });
+      }
+    } catch {
+      hotEl.innerHTML = `<div class="gov-empty muted">治理洞察数据暂不可用，请点击右上角刷新重试。</div>`;
+    }
+  };
+
+  /* ---------- P1-1：奖助学金 · 评优 · 毕业资格「红线自检体检仪」 ---------- */
+  const renderEligibility = () => {
+    const gpa = Math.max(0, Math.min(5, parseFloat($("eligGpa")?.value || "0") || 0));
+    const rank = Number($("eligRank")?.value || 10);
+    const fail = $("eligFail")?.value || "none";
+    const punish = $("eligPunish")?.value || "none";
+    const hasAid = !!$("eligAid")?.checked;
+    const hasHonor = !!$("eligHonor")?.checked;
+
+    const noFail = fail === "none";
+    const noActivePunish = punish !== "active";
+    const cleanRecord = punish === "none";
+
+    const items = [
+      {
+        name: "国家奖学金（8000 元/年）",
+        mutex: "与国家励志奖学金不可兼得",
+        doc: "西安文理学院学生奖学金评定办法",
+        guide: "aid",
+        amount: 8000,
+        eval: () => {
+          if (!noFail || !cleanRecord) return { state: "red", tag: "触碰红线", reason: !noFail ? "要求学年内全部课程一次通过（存在挂科/补考记录即一票否决）。" : "要求在校期间无任何违纪处分记录。" };
+          if (rank <= 10 || (rank <= 30 && hasHonor)) return { state: "ok", tag: "已达标可申", reason: rank <= 10 ? `专业排名进入前 ${rank}% 且无挂科处分，符合国家级拔尖评选门槛。` : "排名在前 30% 内且具备省级以上突出获奖，满足破格推荐条件。" };
+          return { state: "warn", tag: "差一步达标", reason: `需智育/综测进入前 10%（或前 30% 且获省级以上竞赛奖项），当前排名为前 ${rank}%。` };
+        }
+      },
+      {
+        name: "国家励志奖学金（5000 元/年）",
+        mutex: "与国家奖学金不可兼得 · 可兼得助学金",
+        doc: "西安文理学院国家励志奖学金评定办法",
+        guide: "aid",
+        amount: 5000,
+        eval: () => {
+          if (!hasAid) return { state: "warn", tag: "需先做困难认定", reason: "申请前提为本学年已通过家庭经济困难学生认定，请先在“办事向导”完成认定。" };
+          if (!noFail || !noActivePunish) return { state: "red", tag: "触碰红线", reason: !noFail ? "要求学年无不及格课程记录。" : "处分期内不可申报国家励志奖学金。" };
+          if (rank <= 25 || (rank <= 30 && gpa >= 3.0)) return { state: "ok", tag: "已达标可申", reason: "已通过困难认定且成绩优良无挂科，符合国家励志奖学金申报条件。" };
+          return { state: "warn", tag: "差一步达标", reason: `需成绩排名进入前 20%~30% 且绩点稳步提升（当前 GPA ${gpa.toFixed(2)}）。` };
+        }
+      },
+      {
+        name: "国家助学金（2800~4400 元/年）",
+        mutex: "可与各类奖学金兼得",
+        doc: "西安文理学院家庭经济困难学生认定工作实施办法（修订）",
+        guide: "aid",
+        amount: 3500,
+        eval: () => {
+          if (!noActivePunish) return { state: "red", tag: "触碰红线", reason: "尚在违纪处分期内，暂不符合国家助学金受助条件。" };
+          if (!hasAid) return { state: "warn", tag: "需完成困难认定", reason: "须先提交家庭经济困难认定材料并入库，审核通过后即可按档次受助。" };
+          return { state: "ok", tag: "已达标可申", reason: "已完成家庭经济困难认定且遵纪守法，可按特困/困难/一般困难分档享受资助。" };
+        }
+      },
+      {
+        name: "校级优秀学生奖学金（一/二/三等）",
+        mutex: "按综测分档评定",
+        doc: "西安文理学院学生奖学金评定办法",
+        guide: "aid",
+        amount: 2000,
+        eval: () => {
+          if (!noFail || !noActivePunish) return { state: "red", tag: "触碰红线", reason: !noFail ? "学年存在不及格课程时，通常取消当学年校级奖学金评定资格。" : "违纪处分期内取消评优评奖资格。" };
+          if (rank <= 10 && gpa >= 3.3) return { state: "ok", tag: "可冲刺一等奖", reason: `GPA ${gpa.toFixed(2)} 且排名前 ${rank}%，具备竞争一等奖学金与校级三好学生实力。` };
+          if (rank <= 30 && gpa >= 2.6) return { state: "ok", tag: "可申二/三等奖", reason: `GPA ${gpa.toFixed(2)} 且排名前 ${rank}%，符合校级二/三等奖学金参评条件。` };
+          return { state: "warn", tag: "差一步达标", reason: "建议将专业排名提升至前 30% 且 GPA 达到 2.6 以上。" };
+        }
+      },
+      {
+        name: "普通本科生转专业申请资格",
+        mutex: "需通过转入学院考核",
+        doc: "西安文理学院普通本科生转专业及大类专业分流管理办法",
+        guide: "major",
+        amount: 0,
+        eval: () => {
+          if (!noActivePunish) return { state: "red", tag: "触碰红线", reason: "受违纪处分尚未解除期间，不得申请转专业。" };
+          if (fail === "active") return { state: "warn", tag: "风险提示", reason: "存在未通过课程可能影响接收学院综合排名与降级评估，建议先清考重修。" };
+          if (rank <= 20 || gpa >= 3.0) return { state: "ok", tag: "竞争优势强", reason: "无处分且学业成绩优良，申请热门转入专业具有较强面试/笔试优势。" };
+          return { state: "ok", tag: "可报名参评", reason: "符合基本申请资格，需重点准备转入学院的笔试与面试考核。" };
+        }
+      },
+      {
+        name: "学士学位授予红线体检",
+        mutex: "毕业核心底线标准",
+        doc: "西安文理学院学士学位授予工作实施细则",
+        guide: "diploma",
+        amount: 0,
+        eval: () => {
+          if (!noActivePunish) return { state: "red", tag: "学位红线预警", reason: "违纪处分未解除前无法正常授予学士学位，请务必对照《处分解除指南》按期申请解除。" };
+          if (gpa < 2.0 || fail === "active") return { state: "red", tag: "学分/绩点预警", reason: gpa < 2.0 ? `当前平均学分绩点 ${gpa.toFixed(2)} 低于 2.0 授予标准（差 ${(2.0 - gpa).toFixed(2)}），请尽快重修低分课程。` : "尚有未通过课程，请务必在毕业前完成重修并修满培养方案学分。" };
+          return { state: "ok", tag: "学位状态健康", reason: `GPA ${gpa.toFixed(2)}（≥ 2.0）、无未解除处分，正常修满学分并通过毕业论文答辩即可授予学位。` };
+        }
+      },
+      {
+        name: "入党积极分子团组织推优",
+        mutex: "德智体美劳综合考察",
+        doc: "西安文理学院发展党员工作全流程指南",
+        guide: "appeal",
+        amount: 0,
+        eval: () => {
+          if (!noActivePunish || fail === "active") return { state: "red", tag: "暂不符合推优", reason: !noActivePunish ? "处分期内暂不具备团组织推优资格。" : "一般要求近一学年无挂科或已全部重修通过。" };
+          if (rank <= 30 && gpa >= 2.5) return { state: "ok", tag: "符合推优标准", reason: "学业表现优良、无违纪记录，可向所在团支部提交入党申请与推优材料。" };
+          return { state: "warn", tag: "建议提升成绩", reason: "建议保持专业前 50% 且无挂科，并积极参加志愿服务与第二课堂活动。" };
+        }
+      }
+    ];
+
+    const evaluated = items.map(it => ({ ...it, res: it.eval() }));
+    const okCount = evaluated.filter(x => x.res.state === "ok").length;
+    const warnCount = evaluated.filter(x => x.res.state === "warn").length;
+    const redCount = evaluated.filter(x => x.res.state === "red").length;
+
+    // 精确按互斥规则估算最高可申请资助金额：max(国奖, 励志, 校奖) + 助学金
+    const okSet = new Set(evaluated.filter(x => x.res.state === "ok").map(x => x.name));
+    const scholarshipMax = Math.max(
+      okSet.has("国家奖学金（8000 元/年）") ? 8000 : 0,
+      okSet.has("国家励志奖学金（5000 元/年）") ? 5000 : 0,
+      okSet.has("校级优秀学生奖学金（一/二/三等）") ? 2000 : 0
+    );
+    const aidAmt = okSet.has("国家助学金（2800~4400 元/年）") ? 3500 : 0;
+    const maxMoney = scholarshipMax + aidAmt;
+
+    const sumEl = $("eligSummary");
+    if (sumEl) {
+      sumEl.innerHTML = `
+        <div class="ct-kpi"><small>已达标项目</small><b style="color:#059669">${okCount} 项</b></div>
+        <div class="ct-kpi"><small>差一步达标</small><b style="color:#d97706">${warnCount} 项</b></div>
+        <div class="ct-kpi"><small>红线预警</small><b style="color:${redCount ? "#e11d48" : "#059669"}">${redCount} 项</b></div>
+        <div class="ct-kpi"><small>合规兼得预估</small><b style="color:#2563eb">${maxMoney ? `¥${maxMoney}` : "—"}</b></div>
+      `;
+    }
+
+    const listEl = $("eligResults");
+    if (listEl) {
+      listEl.innerHTML = evaluated.map(x => `
+        <div class="elig-row is-${x.res.state}">
+          <div class="elig-row-main">
+            <div class="elig-row-head">
+              <b>${esc(x.name)}</b>
+              <span class="elig-dot-pill is-${x.res.state}"><i></i>${esc(x.res.tag)}</span>
+            </div>
+            <small class="muted">${esc(x.res.reason)} <span class="elig-mutex-txt">（${esc(x.mutex)}）</span></small>
+          </div>
+          <div class="elig-row-ops">
+            <button type="button" class="outline" data-elig-doc="${esc(x.doc)}">依据</button>
+            <button type="button" class="outline" data-elig-guide="${esc(x.guide)}">办理</button>
+          </div>
+        </div>
+      `).join("");
+
+      listEl.querySelectorAll("[data-elig-doc]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          $("gpaCalcDialog")?.close();
+          open_doc_reader(btn.dataset.eligDoc);
+        });
+      });
+      listEl.querySelectorAll("[data-elig-guide]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          $("gpaCalcDialog")?.close();
+          window.open_guide_wizard?.(btn.dataset.eligGuide);
+        });
+      });
+    }
+  };
+
+  const syncGpaToEligibility = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("xz_gpa_courses_" + (me?.username || "guest")) || localStorage.getItem("xz_gpa_courses_v1") || "null");
+      if (Array.isArray(saved) && saved.length) {
+        let tc = 0, tw = 0, fails = 0;
+        saved.forEach(c => {
+          const cr = Math.max(0.5, Number(c.credit) || 0);
+          const sc = Math.max(0, Math.min(100, Number(c.score) || 0));
+          const gp = sc < 60 ? 0 : Math.min(5, Math.max(1, (sc - 50) / 10));
+          tc += cr; tw += cr * gp;
+          if (sc < 60) fails++;
+        });
+        if (tc > 0 && $("eligGpa")) $("eligGpa").value = (tw / tc).toFixed(2);
+        if (fails > 0 && $("eligFail")) $("eligFail").value = "active";
+        else if ($("eligFail") && $("eligFail").value === "active" && fails === 0) $("eligFail").value = "none";
+      }
+    } catch {}
+  };
+
+  window.switch_academic_tab = (tab = "gpa") => {
+    const t = tab === "elig" ? "elig" : "gpa";
+    $("academicTabs")?.querySelectorAll("[data-actab]").forEach(b => b.classList.toggle("on", b.dataset.actab === t));
+    $("acPaneGpa")?.classList.toggle("hide", t !== "gpa");
+    $("acPaneElig")?.classList.toggle("hide", t !== "elig");
+    if (t === "elig") {
+      syncGpaToEligibility();
+      renderEligibility();
+    }
+  };
+
+  $("academicTabs")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-actab]");
+    if (!btn) return;
+    window.switch_academic_tab(btn.dataset.actab);
+  });
+
+  window.open_eligibility_dialog = () => {
+    window.open_gpa_calc?.("elig");
+  };
+
+  $("gpaToEligibilityBtn")?.addEventListener("click", () => {
+    window.switch_academic_tab("elig");
+  });
+  ["eligGpa", "eligRank", "eligFail", "eligPunish", "eligAid", "eligHonor"].forEach(id => {
+    $(id)?.addEventListener("input", renderEligibility);
+    $(id)?.addEventListener("change", renderEligibility);
+  });
+
+  /* ---------- P1-2：校务指南 AI Agent 对话内原生站内动作胶囊（与原站追问胶囊同源） ---------- */
+  const inferClientAgentActions = (question, answerText) => {
+    const hay = `${question || ""} ${(answerText || "").slice(0, 420)}`;
+    const out = [];
+    const add = (id, label, icon, payload) => {
+      if (out.length >= 3 || out.some(a => a.id === id)) return;
+      out.push({ id, label, icon, payload });
+    };
+    if (/缓考/.test(hay)) add("guide_defer", "缓考办事向导", "guide", { action: "guide", tab: "defer" });
+    else if (/转专业/.test(hay)) add("guide_major", "转专业向导", "guide", { action: "guide", tab: "major" });
+    else if (/休学|复学/.test(hay)) add("guide_leave", "休学复学向导", "guide", { action: "guide", tab: "leave" });
+    else if (/困难认定|助学金|资助|贷款/.test(hay)) add("guide_aid", "困难资助向导", "guide", { action: "guide", tab: "aid" });
+    else if (/学生证|火车票|优惠卡/.test(hay)) add("guide_id", "学生证补办向导", "guide", { action: "guide", tab: "student_id" });
+    else if (/参军|入伍|征兵|退役/.test(hay)) add("guide_mil", "参军入伍向导", "guide", { action: "guide", tab: "military" });
+    else if (/毕业证|学位证.*补办/.test(hay)) add("guide_dip", "证书补办向导", "guide", { action: "guide", tab: "diploma" });
+    else if (/处分|申诉|解除/.test(hay)) add("guide_app", "申诉解除向导", "guide", { action: "guide", tab: "appeal" });
+
+    if (/奖学金|励志|助学金|评优|三好|推优|学位授予/.test(hay)) add("elig", "奖助红线自检", "award", { action: "eligibility" });
+    if (/绩点|gpa|挂科|重修|学士学位/i.test(hay)) add("gpa", "GPA 核算预警", "gpa", { action: "gpa" });
+    if (/课表|空闲|考试时间|倒计时/.test(hay)) add("sched", "课表与倒计时", "schedule", { action: "schedule" });
+    if (/提交|材料|截止|步骤|流程/.test(hay) && (answerText || "").length >= 60) add("parse", "拆解为待办", "todo", { action: "parse_answer" });
+    return out.slice(0, 3);
+  };
+
+  window.render_ai_agent_actions = (wrap, serverActions, question, answerText) => {
+    if (!wrap) return;
+    const list = (Array.isArray(serverActions) && serverActions.length)
+      ? serverActions.slice(0, 3)
+      : inferClientAgentActions(question, answerText);
+    if (!list.length) return;
+    if (wrap.querySelector(".ai-agent-actions")) return;
+
+    const iconMap = { guide: "clipboard", award: "award", gpa: "gauge", schedule: "calendar", todo: "sparkles" };
+    const bar = document.createElement("div");
+    bar.className = "ai-agent-actions";
+    bar.innerHTML = list.map((act, i) => `
+      <button type="button" class="ai-agent-pill is-${esc(act.icon || "todo")}" data-ag-idx="${i}">
+        ${ico(iconMap[act.icon] || "sparkles", "ico-xs")}
+        <span>${esc(act.label)}</span>
+      </button>
+    `).join("");
+
+    bar.querySelectorAll("[data-ag-idx]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const act = list[Number(btn.dataset.agIdx)];
+        const p = act?.payload || {};
+        if (p.action === "guide") window.open_guide_wizard?.(p.tab || "defer");
+        else if (p.action === "eligibility") window.open_eligibility_dialog?.();
+        else if (p.action === "gpa") window.open_gpa_calc?.();
+        else if (p.action === "schedule") { go("schedule"); setTimeout(() => window.open_sched_tools?.("exams"), 160); }
+        else if (p.action === "parse_answer") window.open_notice_parser?.(answerText || question || "");
+      });
+    });
+
+    const fu = wrap.querySelector(".followups");
+    if (fu) wrap.insertBefore(bar, fu);
+    else wrap.appendChild(bar);
+  };
 })();

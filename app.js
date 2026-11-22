@@ -646,7 +646,7 @@ function scroll_messages_to_bottom(force = false) {
 
 function go(p) {
   cur_page = p;
-  ["home", "notices", "tasks", "ai", "knowledge", "schedule", "users", "analytics"].forEach(x =>
+  ["home", "notices", "tasks", "ai", "knowledge", "schedule", "parser", "academic", "guide", "schedtools", "users", "analytics"].forEach(x =>
     $(`${x}Page`)?.classList.toggle("hide", x !== p)
   );
   document.body.classList.toggle("on-ai-page", p === "ai");
@@ -663,6 +663,10 @@ function go(p) {
     ai: "校务指南 AI",
     knowledge: "校规制度库",
     schedule: "超级课表",
+    parser: "群通知拆解",
+    academic: "学业与奖助",
+    guide: "校园办事向导",
+    schedtools: "超级课表助手",
     users: "用户管理",
     analytics: "数据统计"
   }[p] || "工作台总览";
@@ -686,6 +690,10 @@ function go(p) {
     if (typeof bind_schedule_events === "function") bind_schedule_events();
     if (typeof render_schedule_all === "function") render_schedule_all();
   }
+  if (p === "parser" && typeof window.init_parser_page === "function") window.init_parser_page();
+  if (p === "academic" && typeof window.init_academic_page === "function") window.init_academic_page();
+  if (p === "guide" && typeof window.init_guide_page === "function") window.init_guide_page();
+  if (p === "schedtools" && typeof window.init_schedtools_page === "function") window.init_schedtools_page();
   if (p === "users") load_users();
   if (p === "analytics") load_stats();
 }
@@ -6423,7 +6431,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       }
     } else if (act.type === "navigate" && act.page) {
       if (!allowNav && !allowWrite) continue;
-      const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule", "users", "analytics"]);
+      const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule", "parser", "academic", "guide", "schedtools", "users", "analytics"]);
       if (allowedPages.has(act.page)) {
         autoLogs.push(`已为你跳转至「${act.page}」`);
         setTimeout(() => go(act.page), 450);
@@ -6924,7 +6932,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     bindSlider(document.getElementById("sidebar"), ".nav", ".nav.active", "is-nav-glass");
     document.querySelectorAll(".ai-seg").forEach(el => bindSlider(el, ".ai-seg-btn", ".ai-seg-btn.active", "is-blue"));
     bindSlider(document.querySelector(".sched-m-seg"), ".sched-seg-btn", ".sched-seg-btn.on", "is-blue");
-    bindSlider(document.querySelector(".sched-d-seg"), ".sched-dseg-btn", ".sched-dseg-btn.on", "is-blue");
+    document.querySelectorAll(".sched-d-seg").forEach(el => bindSlider(el, ".sched-dseg-btn", ".sched-dseg-btn.on", "is-blue"));
     bindSlider(document.querySelector(".authbox .tabs"), "button", "button.selected", "is-blue");
     document.querySelectorAll("#docDialog .doc-font-group, .doc-m-font-seg").forEach(el =>
       bindSlider(el, "button", "button.active", "is-blue")
@@ -7591,19 +7599,16 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     renderGuideWizard();
   });
 
+  window.init_guide_page = () => {
+    renderGuideWizard();
+  };
   window.open_guide_wizard = guideId => {
     if (guideId && CAMPUS_GUIDES.some(g => g.id === guideId)) activeGuideId = guideId;
+    go("guide");
     renderGuideWizard();
-    const dlg = $("guideWizardDialog");
-    if (dlg && !dlg.open) {
-      dlg.showModal();
-      try { dlg.focus({ preventScroll: true }); } catch {}
-    }
   };
   $("openGuideWizardBtn")?.addEventListener("click", () => window.open_guide_wizard());
   $("openGuideFromKbBtn")?.addEventListener("click", () => window.open_guide_wizard());
-  $("closeGuideWizardDlg")?.addEventListener("click", () => $("guideWizardDialog")?.close());
-  $("guideWizardDialog")?.addEventListener("click", e => { if (e.target === $("guideWizardDialog")) $("guideWizardDialog").close(); });
 
   /* ---------- 2. 学业 GPA 换算与学位预警（默认空状态，绝不预填假成绩） ---------- */
   const gpaStorageKey = () => "xz_gpa_courses_" + (me?.username || "guest");
@@ -7733,19 +7738,18 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   });
 
-  window.open_gpa_calc = (tab = "gpa") => {
+  window.init_academic_page = () => {
     gpaCourses = loadGpaCourses();
     renderGpaCalc();
+    renderEligibility();
+  };
+  window.open_gpa_calc = (tab = "gpa") => {
+    gpaCourses = loadGpaCourses();
+    go("academic");
+    renderGpaCalc();
     window.switch_academic_tab?.(tab);
-    const dlg = $("gpaCalcDialog");
-    if (dlg && !dlg.open) {
-      dlg.showModal();
-      try { dlg.focus({ preventScroll: true }); } catch {}
-    }
   };
   $("openGpaCalcBtn")?.addEventListener("click", () => window.open_gpa_calc("gpa"));
-  $("closeGpaCalcDlg")?.addEventListener("click", () => $("gpaCalcDialog")?.close());
-  $("gpaCalcDialog")?.addEventListener("click", e => { if (e.target === $("gpaCalcDialog")) $("gpaCalcDialog").close(); });
 
   /* ---------- 3. 超级课表助手（考试倒计时 · 本周空档 · .ics 日历导出） ---------- */
   const examStorageKey = () => "xz_sched_exams_" + (me?.username || "guest");
@@ -7963,20 +7967,19 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     switchSchedToolsTab(btn.dataset.sttab);
   });
 
+  window.init_schedtools_page = () => {
+    examsList = loadExams();
+    const curOn = $("schedToolsTabs")?.querySelector(".sched-dseg-btn.on")?.dataset.sttab || "exams";
+    switchSchedToolsTab(curOn);
+  };
   window.open_sched_tools = (tab = "exams") => {
     examsList = loadExams();
+    go("schedtools");
     switchSchedToolsTab(tab);
-    const dlg = $("schedToolsDialog");
-    if (dlg && !dlg.open) {
-      dlg.showModal();
-      try { dlg.focus({ preventScroll: true }); } catch {}
-    }
   };
   $("schedOpenToolsBtn")?.addEventListener("click", () => window.open_sched_tools("exams"));
   $("openSchedToolsHomeBtn")?.addEventListener("click", () => window.open_sched_tools("exams"));
   $("schedMobTools")?.addEventListener("click", () => window.open_sched_tools("exams"));
-  $("closeSchedToolsDlg")?.addEventListener("click", () => $("schedToolsDialog")?.close());
-  $("schedToolsDialog")?.addEventListener("click", e => { if (e.target === $("schedToolsDialog")) $("schedToolsDialog").close(); });
 })();
 
 
@@ -8169,25 +8172,19 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     });
   };
 
+  window.init_parser_page = () => {
+    renderNpThumbs();
+  };
   window.open_notice_parser = (prefillText = "") => {
-    const dlg = $("noticeParserDialog");
-    if (!dlg) return;
+    go("parser");
     if (prefillText && $("noticeParserText")) {
       $("noticeParserText").value = String(prefillText).slice(0, 6000);
     }
     renderNpThumbs();
-    if (!dlg.open) {
-      dlg.showModal();
-      try { dlg.focus({ preventScroll: true }); } catch {}
-    }
   };
 
   $("openNoticeParserBtn")?.addEventListener("click", () => window.open_notice_parser());
   $("openNoticeParserFromTasksBtn")?.addEventListener("click", () => window.open_notice_parser());
-  $("closeNoticeParserDlg")?.addEventListener("click", () => {
-    if (npAbortCtrl) { try { npAbortCtrl.abort(); } catch {} }
-    $("noticeParserDialog")?.close();
-  });
   $("noticeParserPickImgBtn")?.addEventListener("click", () => $("noticeParserFiles")?.click());
   $("noticeParserFiles")?.addEventListener("change", async e => {
     const files = [...(e.target.files || [])].slice(0, 4 - npImages.length);
@@ -8710,9 +8707,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     $("sidebarBackdrop")?.classList.remove("show");
 
     const t = String(tool || "").trim();
-    if (t === "notice_parser") {
+    if (t === "notice_parser" || t === "parser") {
       window.open_notice_parser?.(payload.prefill || "");
-    } else if (t === "academic_check" || t === "gpa_calc") {
+    } else if (t === "academic_check" || t === "gpa_calc" || t === "academic") {
       window.open_gpa_calc?.("gpa");
     } else if (t === "eligibility") {
       window.open_gpa_calc?.("elig");
@@ -8738,7 +8735,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       } catch {}
       window.open_gpa_calc?.("gpa");
       toast(`已导入 ${payload.courses.length} 门课程并核算 GPA`);
-    } else if (t === "guide_wizard") {
+    } else if (t === "guide_wizard" || t === "guide") {
       const tab = payload.tab || "defer";
       window.open_guide_wizard?.(tab);
       if (payload.reason) {
@@ -8746,7 +8743,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           if ($("gwReason")) $("gwReason").value = String(payload.reason);
         }, 60);
       }
-    } else if (t === "sched_tools" || t === "sched_exams") {
+    } else if (t === "sched_tools" || t === "sched_exams" || t === "schedtools") {
       window.open_sched_tools?.("exams");
     } else if (t === "sched_free") {
       window.open_sched_tools?.("free");

@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.121" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.122" fetchpriority="high">
 </head>
 <body>
 
@@ -321,10 +321,10 @@
     <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
     <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
     <small class="navcaption" style="margin-top:14px">智慧工具箱</small>
-    <button type="button" class="nav nav-tool nt-parse" data-open-tool="notice_parser" title="群通知与截图一键拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
-    <button type="button" class="nav nav-tool nt-acad" data-open-tool="academic_check" title="学业 GPA 与奖助评优体检"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
-    <button type="button" class="nav nav-tool nt-guide" data-open-tool="guide_wizard" title="校园办事向导与文书生成"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导</button>
-    <button type="button" class="nav nav-tool nt-sched" data-open-tool="sched_tools" title="考试倒计时、本周空档与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg>超级课表助手</button>
+    <button type="button" class="nav nav-tool nt-parse" data-page="parser" title="群通知与截图一键拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
+    <button type="button" class="nav nav-tool nt-acad" data-page="academic" title="学业 GPA 与奖助评优体检"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
+    <button type="button" class="nav nav-tool nt-guide" data-page="guide" title="校园办事向导与文书生成"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导</button>
+    <button type="button" class="nav nav-tool nt-sched" data-page="schedtools" title="考试倒计时、本周空档与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg>超级课表助手</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
@@ -870,6 +870,184 @@
         </div>
       </section>
 
+      <section id="parserPage" class="page campus-tool-page hide">
+        <div class="pagehead">
+          <div>
+            <h1>群通知与截图一键拆解</h1>
+            <p class="muted">粘贴班级群/学院群消息或上传聊天截图，AI 自动提取待办、考试日程与关联校规。</p>
+          </div>
+          <div class="kb-head-actions">
+            <button type="button" class="outline" data-goto="tasks"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>我的待办</button>
+            <button type="button" class="outline" data-goto="notices"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>通知公告</button>
+          </div>
+        </div>
+        <article class="panel ct-page-panel">
+          <div class="ct-body">
+            <div class="np-input-panel">
+              <textarea id="noticeParserText" rows="4" placeholder="粘贴辅导员或教务群通知文字（例：请各位同学本周五17:00前提交四六级核对表和家庭经济困难认定申请表至明德楼304，12月18日数据结构期末考试在博学楼204…）"></textarea>
+              <div class="np-input-bar">
+                <div class="np-upload-group">
+                  <input type="file" id="noticeParserFiles" accept="image/*" multiple class="hide">
+                  <button type="button" id="noticeParserPickImgBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg>上传群聊截图</button>
+                  <button type="button" id="noticeParserDemoBtn" class="outline">填入示例通知</button>
+                  <span id="noticeParserImgStatus" class="muted"></span>
+                </div>
+                <div class="np-run-group">
+                  <button type="button" id="noticeParserStopBtn" class="sched-btn-stop hide"><svg class="ico" aria-hidden="true"><use href="#i-stop"/></svg>停止</button>
+                  <button type="button" id="noticeParserRunBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>开始智能拆解</button>
+                </div>
+              </div>
+              <div id="noticeParserThumbs" class="np-thumbs hide"></div>
+            </div>
+            <div id="noticeParserResult" class="np-result hide"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="academicPage" class="page campus-tool-page hide">
+        <div class="pagehead">
+          <div>
+            <h1>学业与奖助体检</h1>
+            <p class="muted">核算平均学分绩点、学位红线及奖助学金评优资格，两项数据实时联动。</p>
+          </div>
+          <div class="kb-head-actions">
+            <button type="button" class="outline" data-goto="guide"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>办事向导</button>
+            <button type="button" class="outline" data-goto="ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>咨询 AI</button>
+          </div>
+        </div>
+        <article class="panel ct-page-panel">
+          <div class="ct-body">
+            <div class="sched-d-seg ct-seg" id="academicTabs" role="tablist">
+              <button type="button" class="sched-dseg-btn on" data-actab="gpa"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>GPA 换算与预警</span></button>
+              <button type="button" class="sched-dseg-btn" data-actab="elig"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>奖助评优自检</span></button>
+            </div>
+
+            <div id="acPaneGpa" class="ct-pane">
+              <div id="gpaSummary" class="ct-kpi-grid"></div>
+              <div id="gpaAlertBox" class="ct-alert-banner"></div>
+              <form id="gpaAddForm" class="ct-inline-form">
+                <input id="gpaCourseName" placeholder="课程名称（如：高等数学）" maxlength="40" required>
+                <input id="gpaCourseCredit" type="number" step="0.5" min="0.5" max="15" placeholder="学分" value="3" required>
+                <input id="gpaCourseScore" type="number" step="0.5" min="0" max="100" placeholder="成绩(0-100)" required>
+                <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
+              </form>
+              <div id="gpaCourseList" class="ct-list"></div>
+              <div class="ct-foot-actions">
+                <button type="button" id="gpaResetDemoBtn" class="outline">清空课程</button>
+                <button type="button" id="gpaToEligibilityBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>去测奖助资格</button>
+                <button type="button" id="gpaAskAiBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>让 AI 诊断学业</button>
+              </div>
+            </div>
+
+            <div id="acPaneElig" class="ct-pane hide">
+              <div class="elig-form-card">
+                <div class="elig-grid">
+                  <label><span>平均学分绩点 (GPA)</span><input id="eligGpa" type="number" step="0.01" min="0" max="5" value="" placeholder="如 3.20"></label>
+                  <label><span>智育/综测排名</span>
+                    <select id="eligRank">
+                      <option value="5">专业前 5%</option>
+                      <option value="10" selected>专业前 10%</option>
+                      <option value="20">专业前 20%</option>
+                      <option value="30">专业前 30%</option>
+                      <option value="50">30% 以后</option>
+                    </select>
+                  </label>
+                  <label><span>挂科与重修</span>
+                    <select id="eligFail">
+                      <option value="none" selected>全学年无挂科</option>
+                      <option value="passed">曾挂科已补过</option>
+                      <option value="active">尚有未过课程</option>
+                    </select>
+                  </label>
+                  <label><span>违纪处分</span>
+                    <select id="eligPunish">
+                      <option value="none" selected>无违纪处分</option>
+                      <option value="lifted">处分已解除</option>
+                      <option value="active">尚在处分期</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="elig-toggles">
+                  <label class="ct-check-item elig-toggle"><input type="checkbox" id="eligAid"><span>已通过本学年家庭经济困难认定</span></label>
+                  <label class="ct-check-item elig-toggle"><input type="checkbox" id="eligHonor"><span>有省级以上学科竞赛获奖 / 突出表现</span></label>
+                </div>
+              </div>
+              <div id="eligSummary" class="ct-kpi-grid"></div>
+              <div id="eligResults" class="ct-list"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="guidePage" class="page campus-tool-page hide">
+        <div class="pagehead">
+          <div>
+            <h1>校园办事向导与文书生成</h1>
+            <p class="muted">对照本校正式制度自查资格、核对材料清单，一键生成标准申请表。</p>
+          </div>
+          <div class="kb-head-actions">
+            <button type="button" class="outline" data-goto="knowledge"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
+            <button type="button" class="outline" data-goto="ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>咨询 AI</button>
+          </div>
+        </div>
+        <article class="panel ct-page-panel">
+          <div class="ct-body">
+            <div id="guideTabs" class="cat-pills ct-pills" role="tablist" aria-label="办事场景选择"></div>
+            <div id="guideDetail" class="ct-detail"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="schedtoolsPage" class="page campus-tool-page hide">
+        <div class="pagehead">
+          <div>
+            <h1>超级课表助手</h1>
+            <p class="muted">管理考试倒计时、查找本周空闲时段，或导出标准日历到手机提醒。</p>
+          </div>
+          <div class="kb-head-actions">
+            <button type="button" class="outline" data-goto="schedule"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>返回超级课表</button>
+          </div>
+        </div>
+        <article class="panel ct-page-panel">
+          <div class="ct-body">
+            <div class="sched-d-seg ct-seg" id="schedToolsTabs" role="tablist">
+              <button type="button" class="sched-dseg-btn on" data-sttab="exams"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>考试倒计时</span></button>
+              <button type="button" class="sched-dseg-btn" data-sttab="free"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>本周空档</span></button>
+              <button type="button" class="sched-dseg-btn" data-sttab="ics"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出日历</span></button>
+            </div>
+
+            <div id="stPaneExams" class="ct-pane">
+              <form id="examAddForm" class="ct-inline-form">
+                <input id="examTitle" placeholder="考试或截止事项（如：高数期末）" maxlength="40" required>
+                <input id="examDate" type="date" required>
+                <input id="examPlace" placeholder="考场/座位" maxlength="32">
+                <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
+              </form>
+              <div id="examList" class="ct-list"></div>
+            </div>
+
+            <div id="stPaneFree" class="ct-pane hide">
+              <div class="ct-free-head">
+                <span id="freeSlotsSummary" class="muted">自动扫描当前周次 1-10 节无课时段</span>
+                <button type="button" id="refreshFreeSlotsBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新空档</button>
+              </div>
+              <div id="freeSlotsGrid" class="ct-list"></div>
+            </div>
+
+            <div id="stPaneIcs" class="ct-pane hide">
+              <div class="ct-ics-card">
+                <div class="ct-ics-info">
+                  <b>导出标准日历文件（.ics）</b>
+                  <p class="muted">将当前全部课程及上下课作息生成通用日历文件，可直接导入苹果日历、华为/小米日历或 Outlook，支持上课前 15 分钟系统弹窗提醒。</p>
+                </div>
+                <div class="ct-ics-meta" id="icsExportStats"></div>
+                <button type="button" id="exportSchedIcsBtn" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>一键导出课表日历（.ics）</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
       <footer id="appFooter">
         <span>校务智理 · 校园事务服务平台</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
@@ -1225,153 +1403,6 @@
   </div>
 </dialog>
 
-<dialog id="guideWizardDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="校园办事向导与文书生成">
-  <div class="dialoghead">
-    <div><h2>校园办事向导与文书生成</h2><small>对照本校正式制度自查资格、核对材料清单，一键生成标准申请表</small></div>
-    <button type="button" id="closeGuideWizardDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
-  </div>
-  <div class="ct-body">
-    <div id="guideTabs" class="cat-pills ct-pills" role="tablist" aria-label="办事场景选择"></div>
-    <div id="guideDetail" class="ct-detail"></div>
-  </div>
-</dialog>
-
-<dialog id="gpaCalcDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="学业与奖助体检">
-  <div class="dialoghead">
-    <div><h2>学业与奖助体检</h2><small>核算平均学分绩点、学位红线及奖助学金评优资格，两项数据实时联动</small></div>
-    <button type="button" id="closeGpaCalcDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
-  </div>
-  <div class="ct-body">
-    <div class="sched-d-seg ct-seg" id="academicTabs" role="tablist">
-      <button type="button" class="sched-dseg-btn on" data-actab="gpa"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>GPA 换算与预警</span></button>
-      <button type="button" class="sched-dseg-btn" data-actab="elig"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>奖助评优自检</span></button>
-    </div>
-
-    <div id="acPaneGpa" class="ct-pane">
-      <div id="gpaSummary" class="ct-kpi-grid"></div>
-      <div id="gpaAlertBox" class="ct-alert-banner"></div>
-      <form id="gpaAddForm" class="ct-inline-form">
-        <input id="gpaCourseName" placeholder="课程名称（如：高等数学）" maxlength="40" required>
-        <input id="gpaCourseCredit" type="number" step="0.5" min="0.5" max="15" placeholder="学分" value="3" required>
-        <input id="gpaCourseScore" type="number" step="0.5" min="0" max="100" placeholder="成绩(0-100)" required>
-        <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
-      </form>
-      <div id="gpaCourseList" class="ct-list"></div>
-      <div class="ct-foot-actions">
-        <button type="button" id="gpaResetDemoBtn" class="outline">清空课程</button>
-        <button type="button" id="gpaToEligibilityBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>去测奖助资格</button>
-        <button type="button" id="gpaAskAiBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>让 AI 诊断学业</button>
-      </div>
-    </div>
-
-    <div id="acPaneElig" class="ct-pane hide">
-      <div class="elig-form-card">
-        <div class="elig-grid">
-          <label><span>平均学分绩点 (GPA)</span><input id="eligGpa" type="number" step="0.01" min="0" max="5" value="" placeholder="如 3.20"></label>
-          <label><span>智育/综测排名</span>
-            <select id="eligRank">
-              <option value="5">专业前 5%</option>
-              <option value="10" selected>专业前 10%</option>
-              <option value="20">专业前 20%</option>
-              <option value="30">专业前 30%</option>
-              <option value="50">30% 以后</option>
-            </select>
-          </label>
-          <label><span>挂科与重修</span>
-            <select id="eligFail">
-              <option value="none" selected>全学年无挂科</option>
-              <option value="passed">曾挂科已补过</option>
-              <option value="active">尚有未过课程</option>
-            </select>
-          </label>
-          <label><span>违纪处分</span>
-            <select id="eligPunish">
-              <option value="none" selected>无违纪处分</option>
-              <option value="lifted">处分已解除</option>
-              <option value="active">尚在处分期</option>
-            </select>
-          </label>
-        </div>
-        <div class="elig-toggles">
-          <label class="ct-check-item elig-toggle"><input type="checkbox" id="eligAid"><span>已通过本学年家庭经济困难认定</span></label>
-          <label class="ct-check-item elig-toggle"><input type="checkbox" id="eligHonor"><span>有省级以上学科竞赛获奖 / 突出表现</span></label>
-        </div>
-      </div>
-      <div id="eligSummary" class="ct-kpi-grid"></div>
-      <div id="eligResults" class="ct-list"></div>
-    </div>
-  </div>
-</dialog>
-
-<dialog id="schedToolsDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="超级课表助手">
-  <div class="dialoghead">
-    <div><h2>超级课表助手</h2><small>管理考试倒计时、查找本周空闲时段，或导出标准日历到手机提醒</small></div>
-    <button type="button" id="closeSchedToolsDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
-  </div>
-  <div class="ct-body">
-    <div class="sched-d-seg ct-seg" id="schedToolsTabs" role="tablist">
-      <button type="button" class="sched-dseg-btn on" data-sttab="exams"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>考试倒计时</span></button>
-      <button type="button" class="sched-dseg-btn" data-sttab="free"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>本周空档</span></button>
-      <button type="button" class="sched-dseg-btn" data-sttab="ics"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出日历</span></button>
-    </div>
-
-    <div id="stPaneExams" class="ct-pane">
-      <form id="examAddForm" class="ct-inline-form">
-        <input id="examTitle" placeholder="考试或截止事项（如：高数期末）" maxlength="40" required>
-        <input id="examDate" type="date" required>
-        <input id="examPlace" placeholder="考场/座位" maxlength="32">
-        <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
-      </form>
-      <div id="examList" class="ct-list"></div>
-    </div>
-
-    <div id="stPaneFree" class="ct-pane hide">
-      <div class="ct-free-head">
-        <span id="freeSlotsSummary" class="muted">自动扫描当前周次 1-10 节无课时段</span>
-        <button type="button" id="refreshFreeSlotsBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新空档</button>
-      </div>
-      <div id="freeSlotsGrid" class="ct-list"></div>
-    </div>
-
-    <div id="stPaneIcs" class="ct-pane hide">
-      <div class="ct-ics-card">
-        <div class="ct-ics-info">
-          <b>导出标准日历文件（.ics）</b>
-          <p class="muted">将当前全部课程及上下课作息生成通用日历文件，可直接导入苹果日历、华为/小米日历或 Outlook，支持上课前 15 分钟系统弹窗提醒。</p>
-        </div>
-        <div class="ct-ics-meta" id="icsExportStats"></div>
-        <button type="button" id="exportSchedIcsBtn" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>一键导出课表日历（.ics）</button>
-      </div>
-    </div>
-  </div>
-</dialog>
-
-<dialog id="noticeParserDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="群通知与截图一键拆解">
-  <div class="dialoghead">
-    <div><h2>群通知与截图一键拆解</h2><small>粘贴班级群/学院群消息或上传聊天截图，AI 自动提取待办、考试日程与关联校规</small></div>
-    <button type="button" id="closeNoticeParserDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
-  </div>
-  <div class="ct-body">
-    <div class="np-input-panel">
-      <textarea id="noticeParserText" rows="4" placeholder="粘贴辅导员或教务群通知文字（例：请各位同学本周五17:00前提交四六级核对表和家庭经济困难认定申请表至明德楼304，12月18日数据结构期末考试在博学楼204…）"></textarea>
-      <div class="np-input-bar">
-        <div class="np-upload-group">
-          <input type="file" id="noticeParserFiles" accept="image/*" multiple class="hide">
-          <button type="button" id="noticeParserPickImgBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg>上传群聊截图</button>
-          <button type="button" id="noticeParserDemoBtn" class="outline">填入示例通知</button>
-          <span id="noticeParserImgStatus" class="muted"></span>
-        </div>
-        <div class="np-run-group">
-          <button type="button" id="noticeParserStopBtn" class="sched-btn-stop hide"><svg class="ico" aria-hidden="true"><use href="#i-stop"/></svg>停止</button>
-          <button type="button" id="noticeParserRunBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>开始智能拆解</button>
-        </div>
-      </div>
-      <div id="noticeParserThumbs" class="np-thumbs hide"></div>
-    </div>
-    <div id="noticeParserResult" class="np-result hide"></div>
-  </div>
-</dialog>
-
 <dialog id="customDocDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="校务知识库在线增补与修订">
   <div class="dialoghead">
     <div><h2 id="customDocDlgTitle">在线增补校规与补充通知</h2><small>无需改代码重新部署，提交后毫秒级写入知识库并同步进入校务指南 AI 检索</small></div>
@@ -1409,7 +1440,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.121"></script>
+<script src="app.js?v=1.122"></script>
 
 
 </body>

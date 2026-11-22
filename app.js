@@ -207,32 +207,45 @@ function save_chat_to_local() {
 }
 
 function restore_chat_from_local() {
+  const box = $("messages");
   try {
     const raw = localStorage.getItem(chat_cache_key_for());
-    if (!raw) return;
-    const list = JSON.parse(raw);
-    if (!Array.isArray(list) || !list.length) return;
+    const list = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(list) || !list.length) {
+      if (box && !box.querySelector(".bubble-wrap")) box.innerHTML = welcome_html(false);
+      return;
+    }
 
     chat_history = [];
-    $("messages").innerHTML = welcome_html(false);
+    if (box) box.innerHTML = welcome_html(false);
     list.forEach(item => {
       if (!item || !item.content) return;
       const is_user = item.role === "学生" || item.role === "user";
       create_message(item.content, is_user ? "user" : "ai", item.sources || [], true, item.reasoning || "");
     });
-  } catch {}
+  } catch {
+    if (box && !box.querySelector(".bubble-wrap")) box.innerHTML = welcome_html(false);
+  }
 }
 
 function ensure_chat_restored() {
-  if (chat_restored) return;
-  chat_restored = true;
-  restore_chat_from_local();
+  if (!chat_restored) {
+    chat_restored = true;
+    restore_chat_from_local();
+  }
+  const box = $("messages");
+  if (box && !box.querySelector(".bubble-wrap")) {
+    box.innerHTML = welcome_html(false);
+  }
 }
 
 /* ---- 深浅色 ---- */
 function sync_theme_icon(is_dark) {
+  const html = ico(is_dark ? "moon" : "sun");
   const btn = $("themeToggle");
-  if (btn) btn.innerHTML = ico(is_dark ? "moon" : "sun");
+  if (btn) btn.innerHTML = html;
+  const authBtn = $("authThemeToggle");
+  if (authBtn) authBtn.innerHTML = html;
 }
 
 function sync_theme_root(is_dark) {
@@ -242,7 +255,10 @@ function sync_theme_root(is_dark) {
   if (document.body) document.body.classList.toggle("dark", dark);
   const booting = root.classList.contains("app-booting");
   const on_auth = !booting && $("auth") && !$("auth").classList.contains("hide");
-  const topBg = booting ? (dark ? "#0b1120" : "#f8fafc") : (on_auth ? "#164bc9" : (dark ? "#0b1120" : "#eef4ff"));
+  const isMobileAuth = on_auth && window.innerWidth <= 900;
+  const topBg = booting
+    ? (dark ? "#0b1120" : "#f8fafc")
+    : (isMobileAuth ? (dark ? "#123c9e" : "#164bc9") : (dark ? "#0b1120" : "#eef4ff"));
   root.style.background = topBg;
   root.style.colorScheme = dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -388,7 +404,7 @@ $("logout").onclick = () => {
     localStorage.removeItem(home_snap_last_key);
   } catch {}
   const msg_box = $("messages");
-  if (msg_box) msg_box.innerHTML = "";
+  if (msg_box) msg_box.innerHTML = welcome_html(false);
   document.body.classList.remove("on-ai-page");
   $("app").classList.add("hide");
   $("auth").classList.remove("hide");
@@ -2770,7 +2786,7 @@ function compress_image_file(file) {
       const img = new Image();
       img.onerror = () => reject(new Error("图片格式不支持"));
       img.onload = () => {
-        const maxSide = 1280;
+        const maxSide = 2048;
         let w = img.width, h = img.height;
         if (w > maxSide || h > maxSide) {
           if (w >= h) { h = Math.round(h * maxSide / w); w = maxSide; }
@@ -2779,8 +2795,10 @@ function compress_image_file(file) {
         const cv = document.createElement("canvas");
         cv.width = w; cv.height = h;
         const ctx = cv.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(cv.toDataURL("image/jpeg", 0.82));
+        resolve(cv.toDataURL("image/jpeg", 0.92));
       };
       img.src = reader.result;
     };
@@ -3036,10 +3054,16 @@ $("askForm").onsubmit = async e => {
           : `${ico("bulb", "ico-xs")}已深度思考（点击查看推理过程）`;
       html += `<details class="ai-reasoning"><summary>${summary_label}</summary><div class="ai-reasoning-body">${esc(full_reasoning.trim())}</div></details>`;
     }
-    if (text_to_show.trim()) {
-      html += format_markdown_safe(strip_meta_talk(text_to_show));
+    const display_text = strip_meta_talk(text_to_show).trim();
+    if (display_text) {
+      html += format_markdown_safe(display_text);
     } else if (is_streaming) {
       html += `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在生成办事指引</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+    } else if (text_to_show.trim()) {
+      html += format_markdown_safe(text_to_show.trim());
+    }
+    if (!html) {
+      html = `<span class="muted">正在整理回答内容…</span>`;
     }
     bubble.innerHTML = html;
   };
@@ -3224,7 +3248,7 @@ $("askForm").onsubmit = async e => {
           }
           if (full_answer.trim()) {
             streamed_content = true;
-            if (!is_cached_hit && delta_content.length <= 80) {
+            if (!is_cached_hit) {
               render_streaming_bubble(true);
             }
           }
@@ -5460,6 +5484,11 @@ function render_home_schedule_strip() {
 }
 
 async function compress_sched_image(file) {
+  const slices = await compress_sched_image_slices(file);
+  return slices[0];
+}
+
+async function compress_sched_image_slices(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("读取图片失败"));
@@ -5467,14 +5496,32 @@ async function compress_sched_image(file) {
       const img = new Image();
       img.onerror = () => reject(new Error("图片格式不支持"));
       img.onload = () => {
-        const maxW = 1600;
-        let w = img.width, h = img.height;
-        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", 0.86));
+        const renderCrop = (sx, sy, sw, sh, maxDim) => {
+          let tw = sw, th = sh;
+          if (tw > maxDim || th > maxDim) {
+            const ratio = Math.min(maxDim / tw, maxDim / th);
+            tw = Math.max(1, Math.round(tw * ratio));
+            th = Math.max(1, Math.round(th * ratio));
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = tw;
+          canvas.height = th;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, tw, th);
+          return canvas.toDataURL("image/jpeg", 0.92);
+        };
+        const iw = img.width || 1, ih = img.height || 1;
+        // 超长竖屏课表截图（高宽比 >= 2.05）：自动拆分为上下重叠高清两切片，避免底部晚课与小字被压缩模糊
+        if (ih / iw >= 2.05 && ih >= 1600) {
+          const sliceH = Math.round(ih * 0.58);
+          const topSlice = renderCrop(0, 0, iw, sliceH, 2200);
+          const bottomSlice = renderCrop(0, ih - sliceH, iw, sliceH, 2200);
+          resolve([topSlice, bottomSlice]);
+        } else {
+          resolve([renderCrop(0, 0, iw, ih, 2400)]);
+        }
       };
       img.src = ev.target.result;
     };
@@ -5488,6 +5535,33 @@ async function compress_sched_image(file) {
   let pendingAiFiles = [];
   let pendingParsedCourses = null;
   let pendingParsedWarnings = [];
+  let activeSchedAiCtrl = null;
+  let schedAiUserAborted = false;
+
+  const set_sched_ai_running = running => {
+    const runBtn = $("schedAiRunBtn");
+    const stopBtn = $("schedAiStopBtn");
+    if (runBtn) runBtn.disabled = !!running;
+    if (stopBtn) stopBtn.classList.toggle("hide", !running);
+  };
+
+  const stop_sched_ai_task = (showTip = true) => {
+    if (!activeSchedAiCtrl) return;
+    schedAiUserAborted = true;
+    try { activeSchedAiCtrl.abort(); } catch {}
+    activeSchedAiCtrl = null;
+    set_sched_ai_running(false);
+    if (showTip) {
+      schedSetSyncLabel("已停止解析", false);
+      set_ai_import_status("已停止本次 AI 导入，可重新选择文件或再次识别");
+      toast("已停止本次 AI 导入");
+    }
+  };
+
+  $("schedAiStopBtn")?.addEventListener("click", () => stop_sched_ai_task(true));
+  $("scheduleAiImportDialog")?.addEventListener("close", () => {
+    if (activeSchedAiCtrl) stop_sched_ai_task(false);
+  });
   let pendingParsedNotes = "";
   let editingParsedIdx = -1;
   let aiImportRefining = false;
@@ -5717,14 +5791,25 @@ async function compress_sched_image(file) {
     }
     if (editingParsedIdx >= 0) save_inline_wb_editor(editingParsedIdx);
     aiImportRefining = true;
+    schedAiUserAborted = false;
+    const ctrl = new AbortController();
+    activeSchedAiCtrl = ctrl;
+    set_sched_ai_running(true);
     render_ai_parsed_workbench();
-    set_ai_import_status("正在用强力 AI 按你的要求批量修正课表…");
+    set_ai_import_status("正在按你的要求批量修正课表（可随时点击“停止导入”）…");
+    let timer = setTimeout(() => ctrl.abort(), 105000);
     try {
-      const res = await api("/schedule/refine", {
+      const resp = await fetch(api_base + "/schedule/refine", {
         method: "POST",
-        timeoutMs: 105000,
-        body: JSON.stringify({ courses: pendingParsedCourses, instruction })
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        body: JSON.stringify({ courses: pendingParsedCourses, instruction }),
+        signal: ctrl.signal
       });
+      const res = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(res?.detail || res?.error || "课表修正失败，请重试");
       const updated = Array.isArray(res?.courses) ? res.courses : [];
       pendingParsedCourses = updated;
       pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(updated);
@@ -5737,9 +5822,17 @@ async function compress_sched_image(file) {
     } catch (err) {
       aiImportRefining = false;
       render_ai_parsed_workbench();
-      const msg = err?.message || "AI 修正失败，请重试";
-      set_ai_import_status(msg, true);
-      toast(msg);
+      if (schedAiUserAborted) {
+        set_ai_import_status("已停止本次 AI 课表修正");
+      } else {
+        const msg = err?.name === "AbortError" ? "AI 修正超时，请重试" : (err?.message || "AI 修正失败，请重试");
+        set_ai_import_status(msg, true);
+        toast(msg);
+      }
+    } finally {
+      clearTimeout(timer);
+      if (activeSchedAiCtrl === ctrl) activeSchedAiCtrl = null;
+      set_sched_ai_running(false);
     }
   }
 
@@ -5995,11 +6088,11 @@ async function compress_sched_image(file) {
     }
     set_ai_import_status("检测到扫描版 PDF，正在转成高清图片识别…");
     const page1 = await pdf.getPage(1);
-    const vp = page1.getViewport({ scale: 1.8 });
+    const vp = page1.getViewport({ scale: 2.4 });
     const canvas = document.createElement("canvas");
     canvas.width = vp.width; canvas.height = vp.height;
     await page1.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
-    return { image: canvas.toDataURL("image/jpeg", 0.88) };
+    return { image: canvas.toDataURL("image/jpeg", 0.92) };
   }
 
   window.extract_xlsx_for_schedule = async function extract_xlsx_for_schedule(file) {
@@ -6038,12 +6131,14 @@ async function compress_sched_image(file) {
     }
     const mode = document.querySelector('input[name="schedImportMode"]:checked')?.value || "merge";
     const btn = $("schedAiRunBtn");
-    btn.disabled = true;
-    set_ai_import_status("正在准备解析课表…");
+    schedAiUserAborted = false;
+    set_sched_ai_running(true);
+    set_ai_import_status("正在准备高清识图与课表解析…");
     schedSetSyncLabel("AI 深度解析中…", true);
 
     let localTick = null;
-    let ctrl = null;
+    let ctrl = new AbortController();
+    activeSchedAiCtrl = ctrl;
     let timeoutId = null;
 
     try {
@@ -6054,10 +6149,14 @@ async function compress_sched_image(file) {
         const ftype = (first.type || "").toLowerCase();
         const isImg = ftype.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/.test(fname);
         if (isImg) {
-          set_ai_import_status(`正在优化压缩 ${pendingAiFiles.length} 张课表图片…`);
+          set_ai_import_status(`正在高清预处理 ${pendingAiFiles.length} 张课表图片…`);
           const imgs = [];
           for (const f of pendingAiFiles.slice(0, 4)) {
-            imgs.push(await compress_sched_image(f));
+            if (schedAiUserAborted || ctrl.signal.aborted) throw Object.assign(new Error("aborted"), { name: "AbortError" });
+            const slices = await compress_sched_image_slices(f);
+            for (const s of slices) {
+              if (imgs.length < 6) imgs.push(s);
+            }
           }
           payload.images = imgs;
           payload.image = imgs[0];
@@ -6080,12 +6179,11 @@ async function compress_sched_image(file) {
             if (arr && arr.length && arr[0].name && arr[0].day) {
               pendingParsedCourses = arr;
               pendingParsedWarnings = audit_parsed_courses_client(arr);
-              pendingParsedNotes = "已直接载入标准 JSON 课表，可在下方核对或修改后确认导入。";
+              pendingParsedNotes = "已直接载入标准课表文件，可在下方核对或修改后确认导入。";
               editingParsedIdx = -1;
               if (j.startDate) schedState.startDate = j.startDate;
               render_ai_parsed_workbench();
-              set_ai_import_status(`已解析出 ${arr.length} 条 JSON 课程，核对无误后点击“确认导入课表”。`);
-              btn.disabled = false;
+              set_ai_import_status(`已解析出 ${arr.length} 条课程，核对无误后点击“确认导入课表”。`);
               return;
             }
           } catch {}
@@ -6097,18 +6195,23 @@ async function compress_sched_image(file) {
         payload.text = pasted;
       }
 
+      if (schedAiUserAborted || ctrl.signal.aborted) {
+        throw Object.assign(new Error("aborted"), { name: "AbortError" });
+      }
+
       const startedAt = Date.now();
       let lastStage = payload.images?.length
-        ? "正在深度识图并逐列核对星期与节次…"
+        ? (payload.images.length > pendingAiFiles.length
+            ? "已自动切分长图，正在高清逐格识图…"
+            : "正在高清识图并逐列核对星期与节次…")
         : "正在用强力 AI 深度思考解析课表结构…";
-      set_ai_import_status(`${lastStage}（最长允许深度推理 150 秒）`);
+      set_ai_import_status(`${lastStage}（可随时点击“停止导入”）`);
 
       localTick = setInterval(() => {
         const sec = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
         set_ai_import_status(`${lastStage}（已用时 ${sec} 秒）`);
       }, 1000);
 
-      ctrl = new AbortController();
       timeoutId = setTimeout(() => ctrl.abort(), 185000);
 
       const resp = await fetch(api_base + "/schedule/parse", {
@@ -6175,15 +6278,21 @@ async function compress_sched_image(file) {
         ? `识别完成！共 ${parsed.length} 条课程（含 ${pendingParsedWarnings.length} 处提醒），修改核对后点“确认导入课表”。`
         : `识别完成！共 ${parsed.length} 条课程，可在下方微调或直接点击“确认导入课表”。`);
     } catch (err) {
-      schedSetSyncLabel("导入失败", false);
-      const msg = err && err.name === "AbortError"
-        ? "深度解析超时（超过 180 秒），建议分批上传或改用文字/表格导入"
-        : (err?.message || "课表解析失败，请重试");
-      set_ai_import_status(msg, true);
+      if (schedAiUserAborted) {
+        schedSetSyncLabel("已停止解析", false);
+        set_ai_import_status("已停止本次 AI 导入，可重新选择文件或再次识别");
+      } else {
+        schedSetSyncLabel("导入失败", false);
+        const msg = err && err.name === "AbortError"
+          ? "深度解析超时，建议分批上传或改用文字/表格导入"
+          : (err?.message || "课表解析失败，请重试");
+        set_ai_import_status(msg, true);
+      }
     } finally {
       if (localTick) clearInterval(localTick);
       if (timeoutId) clearTimeout(timeoutId);
-      btn.disabled = false;
+      if (activeSchedAiCtrl === ctrl) activeSchedAiCtrl = null;
+      set_sched_ai_running(false);
     }
   });
 
@@ -6792,20 +6901,12 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     setKbOpen(false);
   }, { passive: true });
 
-  // 2. 登录页主题切换按钮同步
-  const syncAuthThemeIcon = () => {
-    const btn = $("authThemeToggle");
-    if (!btn) return;
-    const isDark = document.documentElement.classList.contains("dark");
-    btn.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-${isDark ? "moon" : "sun"}"/></svg>`;
-  };
+  // 2. 登录页主题切换按钮与站内 #themeToggle 100% 同步
   $("authThemeToggle")?.addEventListener("click", () => {
-    $("themeToggle")?.click();
-    setTimeout(syncAuthThemeIcon, 30);
+    if (typeof handle_toggle_theme === "function") handle_toggle_theme();
+    else $("themeToggle")?.click();
   });
-  const themeMo = new MutationObserver(syncAuthThemeIcon);
-  themeMo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  syncAuthThemeIcon();
+  sync_theme_icon(document.documentElement.classList.contains("dark"));
 
   // 3. 全局 Ctrl+K 玻璃聚合搜索（Spotlight）
   const dlg = $("globalSearchDialog");
@@ -6835,11 +6936,11 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
     if (!q) {
       items.push(
-        { group: "快捷入口", icon: "ai-brand", title: "咨询文理智办 AI", sub: "校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
-        { group: "快捷入口", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
-        { group: "快捷入口", icon: "book", title: "浏览校规制度库", sub: "查阅 122 份本校正式规章全文", run: () => go("knowledge") },
-        { group: "快捷入口", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
-        { group: "快捷入口", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") }
+        { group: "快捷入口", mod: "ai", icon: "ai-brand", title: "咨询文理智办 AI", sub: "校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
+        { group: "快捷入口", mod: "schedule", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
+        { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份本校规章与校园服务指南`, run: () => go("knowledge") },
+        { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
+        { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") }
       );
     } else {
       // 1) 校规制度库
@@ -6850,6 +6951,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       }).slice(0, 5).forEach(d => {
         items.push({
           group: "校规制度原文",
+          mod: "knowledge",
           icon: "book",
           title: d.title,
           sub: `${d.dept || "学校部门"} · ${d.category || "规章制度"}`,
@@ -6863,6 +6965,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       ).slice(0, 4).forEach(n => {
         items.push({
           group: "校园通知公告",
+          mod: "notices",
           icon: "bell",
           title: n.title,
           sub: `${n.category || "通知"}${n.deadline ? " · 截止 " + n.deadline : ""}`,
@@ -6882,6 +6985,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       ).slice(0, 4).forEach(c => {
         items.push({
           group: "超级课表",
+          mod: "schedule",
           icon: "calendar",
           title: c.name,
           sub: `${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节 · ${c.weeks || ""}周${c.room ? " · " + c.room : ""}`,
@@ -6895,6 +6999,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       ).slice(0, 4).forEach(t => {
         items.push({
           group: "我的待办",
+          mod: "tasks",
           icon: "check-square",
           title: t.title,
           sub: `${t.status === "completed" ? "已完成" : "待处理"}${t.due_date ? " · 截止 " + t.due_date : ""}`,
@@ -6905,6 +7010,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       // 5) 直问 AI
       items.push({
         group: "文理智办 AI",
+        mod: "ai",
         icon: "ai-brand",
         title: `直接问 AI：「${q}」`,
         sub: "由后端智脑自主检索校规并极简直答",
@@ -6927,8 +7033,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     bodyEl.innerHTML = items.map((it, idx) => {
       const grp = it.group !== lastGroup ? `<div class="spotlight-group">${esc(it.group)}</div>` : "";
       lastGroup = it.group;
+      const modCls = it.mod ? ` mod-${it.mod}` : "";
       return `${grp}<button type="button" class="spotlight-item${idx === 0 ? " is-active" : ""}" data-sp-idx="${idx}">
-        <span class="spotlight-ico">${ico(it.icon)}</span>
+        <span class="spotlight-ico${modCls}">${ico(it.icon)}</span>
         <span class="spotlight-text"><b>${esc(it.title)}</b><small>${esc(it.sub || "")}</small></span>
         <span class="spotlight-go">↵</span>
       </button>`;

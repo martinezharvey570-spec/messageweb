@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.114" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.115" fetchpriority="high">
 </head>
 <body>
 
@@ -270,20 +270,15 @@
   <div class="hero">
     <div class="hero-top">
       <div class="logo">校</div>
-      <span class="hero-badge">智慧校务 · V1.114</span>
     </div>
     <div class="hero-copy">
       <h1>校务智理</h1>
       <p>让校园通知更清晰，让制度查询与办事流程更简单。</p>
     </div>
     <div class="hero-list">
-      <p><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span><b>文理智办 AI</b><small>自主查阅 122 份本校规章，条款溯源极简直答</small></span></p>
-      <p><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span><b>超级课表协同</b><small>AI 多图深思导课表，冲突巡检与云端同步</small></span></p>
-      <p><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span><b>通知与待办闭环</b><small>公告实时触达，重要节点一键沉淀为个人待办</small></span></p>
-    </div>
-    <div class="hero-foot">
-      <small>CAMPUS SERVICE PLATFORM</small>
-      <span>Web / Android 云端实时同步</span>
+      <p class="hl-ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span><b>文理智办 AI</b><small>自主查阅本校规章制度，精准条款溯源与办事指引</small></span></p>
+      <p class="hl-schedule"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span><b>超级课表</b><small>AI 高清多图导课表、冲突巡检与跨端同步</small></span></p>
+      <p class="hl-tasks"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span><b>通知与待办</b><small>校园公告及时触达，重要节点一键整理为个人待办</small></span></p>
     </div>
   </div>
   <form id="authForm" class="authbox">
@@ -304,7 +299,7 @@
     </label>
     <button class="primary wide" id="authSubmit">登录</button>
     <button type="button" id="quickDemoStudent" class="demo-login-link">登入演示账号</button>
-    <p class="hint">账号数据将加密保存在云端数据库</p>
+    <p class="hint">登录后自动同步个人通知、课表与待办</p>
   </form>
 </section>
 
@@ -313,7 +308,7 @@
   <aside id="sidebar">
     <div class="sidebrand">
       <div class="logo">校</div>
-      <div class="sidebrand-text"><b>校务智理</b><small>CAMPUS SERVICES</small></div>
+      <div class="sidebrand-text"><b>校务智理</b><small>校园事务工作台</small></div>
       <button type="button" id="desktopSidebarToggle" class="desktop-rail-toggle" title="收起/展开侧边栏" aria-label="收起或展开侧边栏">
         <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg>
       </button>
@@ -361,7 +356,7 @@
       <section id="homePage" class="page">
         <div class="welcome">
           <div class="welcome-main">
-            <small class="blue">CAMPUS WORKSPACE</small>
+            <small class="blue">校务工作台</small>
             <h1>你好，<span id="welcomeName">同学</span></h1>
             <p class="muted">欢迎进入校务智理，及时掌握校园事务动态与个人办理进度。</p>
           </div>
@@ -689,7 +684,7 @@
         </div>
         <article class="panel">
           <div class="panelhead">
-            <div><h3>用户列表</h3><small>密码经 PBKDF2 加密安全存储</small></div>
+            <div><h3>用户列表</h3><small>用户密码已安全加密保护</small></div>
             <button id="reloadUsers" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新</button>
           </div>
           <div id="userList"></div>
@@ -708,7 +703,7 @@
         </div>
         <article class="panel">
           <div class="panelhead">
-            <div><h3>平台运行概览</h3><small>数据由接口实时汇总，缺失时显示 —</small></div>
+            <div><h3>平台运行概览</h3><small>汇总当前校园通知、待办与知识库服务数据</small></div>
           </div>
           <div id="statsDetails"></div>
         </article>
@@ -828,7 +823,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.114</span>
+        <span>校务智理 · 校园事务服务平台</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -1162,6 +1157,7 @@
     <div id="schedAiPreview" class="sched-ai-preview hide"></div>
     <div class="sched-dlg-actions" style="margin-top:12px">
       <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="flex:1"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 深度识别</span></button>
+      <button type="button" id="schedAiStopBtn" class="sched-btn-stop hide"><svg class="ico" aria-hidden="true"><use href="#i-stop"/></svg><span>停止导入</span></button>
       <button type="button" id="schedAiConfirmBtn" class="sched-btn-primary hide" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>确认导入课表</span></button>
     </div>
   </div>
@@ -1170,20 +1166,20 @@
 <dialog id="globalSearchDialog" class="task-dialog spotlight-dialog" aria-label="全局聚合搜索">
   <div class="spotlight-head">
     <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
-    <input type="search" id="globalSearchInput" autocomplete="off" placeholder="搜索 122 份校规、通知公告、个人课表、待办，或直接问 AI…">
+    <input type="search" id="globalSearchInput" autocomplete="off" placeholder="搜索校规制度、通知公告、个人课表、待办，或直接问 AI…">
     <button type="button" id="closeGlobalSearchDlg" aria-label="关闭搜索"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
   </div>
   <div id="globalSearchBody" class="spotlight-body"></div>
   <div class="spotlight-foot">
-    <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
-    <span><kbd>Enter</kbd> 打开</span>
-    <span><kbd>Esc</kbd> 关闭</span>
+    <span class="sp-hint-pill"><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+    <span class="sp-hint-pill"><kbd>Enter</kbd> 打开</span>
+    <span class="sp-hint-pill"><kbd>Esc</kbd> 关闭</span>
   </div>
 </dialog>
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.114"></script>
+<script src="app.js?v=1.115"></script>
 
 
 </body>

@@ -18295,3 +18295,286 @@ html.dark #noticeParserDialog .ct-checklist .ct-check-item {
     padding: 9px 11px !important;
   }
 }
+
+.ct-alert-banner.is-info {
+  background: rgba(59, 130, 246, 0.08) !important;
+  color: #1d4ed8 !important;
+  border: 1px solid rgba(59, 130, 246, 0.16) !important;
+}
+html.dark .ct-alert-banner.is-info {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93c5fd !important;
+  border-color: rgba(147, 197, 253, 0.22) !important;
+}
+
+
+/* ==================== v1.119 移动端弹窗滚动防误滑 + 全站移动端按钮同行等高对齐大一统 ==================== */
+
+/* 1. 桌面端 .user-row-ops 与 .ct-card-head-ops 保持自然同行 */
+.user-row-ops {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.ct-card-head-ops {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.ct-card-head-ops button {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 12px !important;
+  font-size: 12.5px !important;
+  white-space: nowrap !important;
+}
+
+/* 2. 全站移动端弹窗内滚动区加固（防止触摸滚动失灵或穿透到弹窗整体下拉） */
+dialog.campus-tool-dialog .ct-body,
+#globalSearchDialog .spotlight-body,
+#schoolDialog .school-list,
+#scheduleAiImportDialog .sched-ai-body,
+#scheduleAiImportDialog .sched-ai-preview {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+}
+dialog.campus-tool-dialog .dialoghead,
+#globalSearchDialog .spotlight-head {
+  touch-action: none;
+}
+
+/* 3. 移动端按钮严格等高、同行等分、逻辑统一的几何体系（<= 760px） */
+@media (max-width: 760px) {
+  /* A. 页面顶栏操作组（校规库、我的待办、数据统计）：flex 等分铺满一整行，统一 36px 高度 */
+  #knowledgePage .kb-head-actions,
+  #tasksPage .pagehead .notice-actions,
+  #analyticsPage .kb-head-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #knowledgePage .kb-head-actions button,
+  #tasksPage .pagehead .notice-actions button,
+  #analyticsPage .kb-head-actions button {
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 8px !important;
+    font-size: 12.5px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #knowledgePage .kb-head-actions button.hide {
+    display: none !important;
+  }
+
+  /* B. 校规卡片底部按钮（移除 / 查看原文 / 解读）：上下分层 + 按钮 flex 等分同行、统一 34px 高度 */
+  #knowledgePage .knowledge-card .knowledge-card-foot,
+  #knowledgePage .knowledge-card-foot {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+  #knowledgePage .knowledge-card .knowledge-card-foot > small,
+  #knowledgePage .knowledge-card-foot > small {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+  }
+  #knowledgePage .knowledge-card .knowledge-card-actions,
+  #knowledgePage .knowledge-card-foot > .knowledge-card-actions,
+  #knowledgePage .knowledge-card-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #knowledgePage .knowledge-card .knowledge-card-actions button,
+  #knowledgePage .knowledge-card-actions button {
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* C. 用户管理条操作组（角色下拉 / 重置密码 / 删除用户）：严格排在一行、统一 34px 高度，清零 .xz-select min-width 彻底防重叠 */
+  #usersPage .user-row .user-row-ops,
+  #usersPage .user-row-ops {
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.05fr) minmax(0, 1.05fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    align-items: center !important;
+    margin-top: 2px;
+  }
+  #usersPage .user-row .user-row-ops .xz-select,
+  #usersPage .user-row .user-row-ops .xz-select-trigger,
+  #usersPage .user-row .user-row-ops button,
+  #usersPage .user-row-ops .xz-select,
+  #usersPage .user-row-ops .xz-select-trigger,
+  #usersPage .user-row-ops button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+  #usersPage .user-row-ops .xz-select-trigger {
+    justify-content: space-between !important;
+    padding: 0 10px !important;
+  }
+  #usersPage .user-row-ops .user-self-tag {
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* D. 通知卡片底部操作组：统一 34px 等高，整齐排列 */
+  #noticesPage .notice-card .notice-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+  #noticesPage .notice-card .notice-actions button {
+    flex: 1 1 0% !important;
+    min-width: 72px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* E. 弹窗底部按钮栏（2钮同行 50/50 等宽等高 38px；3钮时前两钮同行 50/50 38px + 主按钮满宽 40px） */
+  dialog.campus-tool-dialog .ct-foot-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding-top: 4px !important;
+  }
+  dialog.campus-tool-dialog .ct-foot-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+  dialog.campus-tool-dialog .ct-foot-actions button:nth-child(3):last-child {
+    grid-column: 1 / -1 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+
+  /* F. 办事向导卡片内「查阅制度原文 / 未勾项加待办」：同行 50/50 等宽等高 34px，徽章保持自然宽度不拉满 */
+  #guideWizardDialog .ct-card-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  #guideWizardDialog .ct-card-head .ct-badge {
+    align-self: flex-start !important;
+    width: auto !important;
+  }
+  #guideWizardDialog .ct-card-head-ops {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    align-self: stretch !important;
+  }
+  #guideWizardDialog .ct-card-head-ops button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 12.5px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* G. 群通知拆解操作栏：上传截图 & 示例通知 50/50 同行 36px，主操作按钮满宽 40px */
+  #noticeParserDialog .np-input-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  #noticeParserDialog .np-upload-group {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #noticeParserDialog .np-upload-group button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 8px !important;
+    font-size: 12.5px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+  #noticeParserDialog .np-upload-group #noticeParserImgStatus {
+    grid-column: 1 / -1;
+    font-size: 12px;
+  }
+  #noticeParserDialog .np-upload-group #noticeParserImgStatus:empty {
+    display: none;
+  }
+  #noticeParserDialog .np-run-group {
+    display: flex !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  #noticeParserDialog .np-run-group button {
+    flex: 1 1 0% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 13.5px !important;
+    justify-content: center !important;
+  }
+
+  /* H. 奖助体检单行「依据 / 办理」按钮：同行 50/50 等宽等高 32px */
+  #gpaCalcDialog .elig-row-ops {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-top: 4px;
+  }
+  #gpaCalcDialog .elig-row-ops button {
+    width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+  }
+}

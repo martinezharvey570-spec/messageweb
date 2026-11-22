@@ -3400,6 +3400,9 @@ $("askForm").onsubmit = async e => {
       note.className = "stopped-note";
       note.innerHTML = `${ico("alert", "ico-xs")}生成过程被中断，以上为已收到的内容`;
       bubble.appendChild(note);
+    } else if ($("aiStatus") && $("aiStatus").textContent !== "在线") {
+      $("aiStatus").textContent = "在线";
+      $("aiStatus").classList.add("ready");
     }
     sync_scroll_btn(true);
   };
@@ -3580,16 +3583,18 @@ async function load_users() {
               <b>${esc(u.display_name)}</b>
               <small>用户名：${esc(u.username)} · 注册：${date(u.created_at)}</small>
             </div>
-            <select data-role="${u.id}" ${u.id === me.id ? "disabled" : ""}>
-              <option value="student" ${u.role === "student" ? "selected" : ""}>学生</option>
-              <option value="admin" ${u.role === "admin" ? "selected" : ""}>管理员</option>
-            </select>
-            <button type="button" class="outline" data-reset-pwd="${u.id}" data-uname="${esc(u.display_name)}">${ico("key", "ico-xs")}重置密码</button>
-            ${
-              u.id === me?.id
-                ? '<span class="muted">当前账号</span>'
-                : `<button class="danger" data-delete-user="${u.id}">删除用户</button>`
-            }
+            <div class="user-row-ops">
+              <select data-role="${u.id}" ${u.id === me.id ? "disabled" : ""}>
+                <option value="student" ${u.role === "student" ? "selected" : ""}>学生</option>
+                <option value="admin" ${u.role === "admin" ? "selected" : ""}>管理员</option>
+              </select>
+              <button type="button" class="outline" data-reset-pwd="${u.id}" data-uname="${esc(u.display_name)}">${ico("key", "ico-xs")}重置密码</button>
+              ${
+                u.id === me?.id
+                  ? '<span class="muted user-self-tag">当前账号</span>'
+                  : `<button class="danger" data-delete-user="${u.id}">删除用户</button>`
+              }
+            </div>
           </div>`
         )
         .join("") || '<p class="muted">暂无用户。</p>';
@@ -6561,31 +6566,89 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 }
 
 (function init_all_dialog_swipe_to_close() {
+  const hasScrolledDescendant = (target, stopAt) => {
+    let el = target instanceof Element ? target : target?.parentElement;
+    while (el && el !== stopAt) {
+      if (el.scrollHeight > el.clientHeight + 2) {
+        const oy = getComputedStyle(el).overflowY;
+        if (oy === "auto" || oy === "scroll" || oy === "overlay") {
+          if (el.scrollTop > 1) return true;
+        }
+      }
+      el = el.parentElement;
+    }
+    return stopAt.scrollTop > 1;
+  };
+
+  const isHorizontalScroller = (target, stopAt) => {
+    let el = target instanceof Element ? target : target?.parentElement;
+    while (el && el !== stopAt) {
+      if (el.scrollWidth > el.clientWidth + 4) {
+        const ox = getComputedStyle(el).overflowX;
+        if (ox === "auto" || ox === "scroll" || ox === "overlay") return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  };
+
   document.querySelectorAll("dialog:not(#docDialog)").forEach(dlg => {
     // 点击弹窗外部遮罩关闭
     dlg.addEventListener("click", e => {
       if (e.target === dlg) dlg.close();
     });
 
-    let startY = 0, startTime = 0, curY = 0, dragging = false, allowDrag = false;
+    let startX = 0, startY = 0, startTime = 0, curY = 0;
+    let dragging = false, allowDrag = false, inHeaderZone = false, touchTarget = null;
 
     dlg.addEventListener("touchstart", e => {
       if (e.touches.length !== 1) return;
       const t = e.touches[0];
       const rect = dlg.getBoundingClientRect();
-      const inHeader = (t.clientY - rect.top) <= 72;
-      const atTop = dlg.scrollTop <= 1;
-      // 只有触碰顶部手柄/标题区，或者内容已在最顶部时，才允许触发下拉关闭
-      allowDrag = inHeader || atTop;
+      touchTarget = e.target;
+      startX = t.clientX;
       startY = t.clientY;
       startTime = Date.now();
       curY = 0;
       dragging = false;
+
+      // 在输入框/文本域/下拉框内绝不劫持下拉关闭
+      if (touchTarget instanceof Element && touchTarget.closest("input, textarea, select, [contenteditable]")) {
+        allowDrag = false;
+        return;
+      }
+
+      const inHeaderEl = touchTarget instanceof Element && !!touchTarget.closest(".dialoghead, .spotlight-head, .sched-ai-head");
+      inHeaderZone = inHeaderEl || (t.clientY - rect.top) <= 56;
+      // 仅在顶部抓手/标题区，或整个弹窗及手指下全部滚动容器都严格处于最顶端时，才具备候选拖拽资格
+      allowDrag = inHeaderZone || !hasScrolledDescendant(touchTarget, dlg);
     }, { passive: true });
 
     dlg.addEventListener("touchmove", e => {
       if (!allowDrag || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
+
+      // 一旦判定为向上滚动内容或横向滑动标签条，本次手势永久放弃下拉关闭，绝不中途抢手势
+      if (!dragging) {
+        if (dy < -6) {
+          allowDrag = false;
+          return;
+        }
+        if (Math.abs(dx) > 8 && Math.abs(dx) >= Math.abs(dy) * 0.85) {
+          allowDrag = false;
+          return;
+        }
+        if (!inHeaderZone && isHorizontalScroller(touchTarget, dlg) && Math.abs(dx) > 4) {
+          allowDrag = false;
+          return;
+        }
+        if (!inHeaderZone && hasScrolledDescendant(touchTarget, dlg)) {
+          allowDrag = false;
+          return;
+        }
+      }
+
       if (dy <= 0) {
         if (dragging) {
           curY = 0;
@@ -6593,11 +6656,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         }
         return;
       }
-      // 若内部有正在滚动的子列表且未到顶，则不拦截
-      const scrollable = e.target.closest(".sched-ai-preview, .sched-clist, .school-list, .xz-select-menu, textarea, select");
-      if (scrollable && scrollable.scrollTop > 0) return;
 
-      if (dy > 8) {
+      const threshold = inHeaderZone ? 10 : 18;
+      if (dy > threshold && (dragging || dy > Math.abs(dx) * 1.4)) {
         dragging = true;
         curY = dy;
         dlg.style.transition = "none";
@@ -6611,7 +6672,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       dragging = false;
       const dt = Math.max(1, Date.now() - startTime);
       const velocity = curY / dt;
-      if (curY > 75 || (curY > 30 && velocity > 0.45)) {
+      if (curY > 92 || (curY > 44 && velocity > 0.55)) {
         dlg.style.transition = "transform 0.18s cubic-bezier(0.32, 0.72, 0.3, 1)";
         dlg.style.transform = "translateY(100%)";
         setTimeout(() => {
@@ -7356,9 +7417,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       <div class="ct-card">
         <div class="ct-card-head">
           <b>${ico("clipboard")}材料准备清单（${doneSet.size}/${guide.materials.length}）</b>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button type="button" class="outline" id="guideReadDocBtn">${ico("book", "ico-xs")}查阅本校制度原文</button>
-            <button type="button" class="primary" id="guideToTodoBtn">${ico("check-square", "ico-xs")}未勾项加入待办</button>
+          <div class="ct-card-head-ops">
+            <button type="button" class="outline" id="guideReadDocBtn">${ico("book", "ico-xs")}查阅制度原文</button>
+            <button type="button" class="primary" id="guideToTodoBtn">${ico("check-square", "ico-xs")}未勾项加待办</button>
           </div>
         </div>
         <div class="ct-check-list">
@@ -7392,8 +7453,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           <textarea id="gwReason" placeholder="${esc(guide.reasonPlaceholder)}"></textarea>
         </div>
         <div class="ct-foot-actions">
-          <button type="button" class="outline" id="guidePrintPdfBtn">${ico("file-text", "ico-xs")}打印 / 另存 PDF</button>
-          <button type="button" class="primary" id="guideExportDocBtn">${ico("download", "ico-xs")}导出 Word 申请表 (.doc)</button>
+          <button type="button" class="outline" id="guidePrintPdfBtn">${ico("file-text", "ico-xs")}打印 / 存 PDF</button>
+          <button type="button" class="primary" id="guideExportDocBtn">${ico("download", "ico-xs")}导出 Word 申请表</button>
         </div>
       </div>
     `;
@@ -7492,20 +7553,14 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   $("closeGuideWizardDlg")?.addEventListener("click", () => $("guideWizardDialog")?.close());
   $("guideWizardDialog")?.addEventListener("click", e => { if (e.target === $("guideWizardDialog")) $("guideWizardDialog").close(); });
 
-  /* ---------- 2. 学业 GPA 换算与学位预警 ---------- */
-  const GPA_DEFAULT = [
-    { name: "高等数学 A（上）", credit: 5, score: 84 },
-    { name: "大学英语（一）", credit: 3, score: 88 },
-    { name: "程序设计基础", credit: 4, score: 91 },
-    { name: "思想道德与法治", credit: 3, score: 82 }
-  ];
+  /* ---------- 2. 学业 GPA 换算与学位预警（默认空状态，绝不预填假成绩） ---------- */
   const gpaStorageKey = () => "xz_gpa_courses_" + (me?.username || "guest");
   const loadGpaCourses = () => {
     try {
       const arr = JSON.parse(localStorage.getItem(gpaStorageKey()) || "null");
-      if (Array.isArray(arr) && arr.length) return arr;
+      if (Array.isArray(arr)) return arr;
     } catch {}
-    return GPA_DEFAULT.map(x => ({ ...x }));
+    return [];
   };
   const saveGpaCourses = arr => {
     try { localStorage.setItem(gpaStorageKey(), JSON.stringify(arr)); } catch {}
@@ -7539,30 +7594,34 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const listEl = $("gpaCourseList");
     if (!sumEl || !alertEl || !listEl) return;
 
+    const hasCourses = gpaCourses.length > 0;
     const m = computeGpaMetrics(gpaCourses);
-    const gpaCls = m.gpa < 2.0 ? "is-red" : (m.gpa < 2.4 ? "is-amber" : "is-blue");
-    const failCls = m.failCount > 0 ? "is-red" : "is-green";
+    const gpaCls = !hasCourses ? "" : (m.gpa < 2.0 ? "is-red" : (m.gpa < 2.4 ? "is-amber" : "is-blue"));
+    const failCls = !hasCourses ? "" : (m.failCount > 0 ? "is-red" : "is-green");
 
     sumEl.innerHTML = `
-      <div class="ct-kpi ${gpaCls}"><small>平均学分绩点 (GPA)</small><b>${m.gpa.toFixed(2)}</b></div>
-      <div class="ct-kpi is-indigo"><small>加权平均分</small><b>${m.avg.toFixed(1)}</b></div>
+      <div class="ct-kpi ${gpaCls}"><small>平均学分绩点 (GPA)</small><b>${hasCourses ? m.gpa.toFixed(2) : "—"}</b></div>
+      <div class="ct-kpi ${hasCourses ? "is-indigo" : ""}"><small>加权平均分</small><b>${hasCourses ? m.avg.toFixed(1) : "—"}</b></div>
       <div class="ct-kpi"><small>已录总学分</small><b>${m.totalCred.toFixed(1)}</b></div>
       <div class="ct-kpi ${failCls}"><small>不及格门数</small><b>${m.failCount}</b></div>
     `;
 
-    if (m.failCount > 0 || m.gpa < 2.0) {
+    if (!hasCourses) {
+      alertEl.className = "ct-alert-banner is-info";
+      alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>尚未录入课程成绩：</b>在下方输入课程名称、学分与成绩，系统将实时核算 GPA 与学士学位达标状态。</span>`;
+    } else if (m.failCount > 0 || m.gpa < 2.0) {
       alertEl.className = "ct-alert-banner is-danger";
-      alertEl.innerHTML = `${ico("alert", "ico-xs")}<span><b>学业与学位红线提醒：</b>当前 GPA 为 ${m.gpa.toFixed(2)}（不及格 ${m.failCount} 门）。按《西安文理学院学士学位授予实施细则》，申请学士学位须达平均学分绩点 2.0 及以上，建议及时在每学期开学前两周完成重修报名。</span>`;
+      alertEl.innerHTML = `${ico("alert", "ico-xs")}<span><b>学业与学位红线提醒：</b>当前 GPA 为 ${m.gpa.toFixed(2)}（不及格 ${m.failCount} 门）。按学士学位授予标准，申请学士学位一般须达平均学分绩点 2.0 及以上，建议及时完成重修报名。</span>`;
     } else if (m.gpa < 2.4) {
       alertEl.className = "ct-alert-banner is-warn";
       alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>学业预警提示：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，虽已超过学位底线（2.0），但余量偏紧，建议优先冲刺高学分专业课提分。</span>`;
     } else {
       alertEl.className = "ct-alert-banner is-ok";
-      const extra = m.gpa >= 3.5 ? "，具备冲刺国家奖学金、校内一等奖学金及优秀毕业生竞争力！" : "，保持当前节奏可顺利满足学士学位授予绩点要求。";
+      const extra = m.gpa >= 3.5 ? "，具备冲刺国家奖学金、校级一等奖学金及优秀毕业生竞争力！" : "，保持当前节奏可顺利满足学士学位授予绩点要求。";
       alertEl.innerHTML = `${ico("check", "ico-xs")}<span><b>学位达标状态良好：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，零挂科${extra}</span>`;
     }
 
-    listEl.innerHTML = gpaCourses.length
+    listEl.innerHTML = hasCourses
       ? gpaCourses.map((c, idx) => {
           const gp = scoreToGp(c.score);
           const badgeCls = c.score < 60 ? "is-urgent" : (c.score >= 85 ? "is-safe" : "");
@@ -7577,7 +7636,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
             </div>
           </div>`;
         }).join("")
-      : `<div class="ct-row"><small class="muted">暂无课程记录，请在上方添加课程成绩</small></div>`;
+      : `<div class="ct-row"><small class="muted">暂无已录入课程，添加成绩后自动保存在本地</small></div>`;
   };
 
   $("gpaAddForm")?.addEventListener("submit", e => {
@@ -7602,13 +7661,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   });
 
   $("gpaResetDemoBtn")?.addEventListener("click", () => {
-    gpaCourses = GPA_DEFAULT.map(x => ({ ...x }));
+    if (!gpaCourses.length) return toast("当前暂无课程记录");
+    gpaCourses = [];
     saveGpaCourses(gpaCourses);
     renderGpaCalc();
-    toast("已恢复示例课程");
+    toast("已清空全部课程记录");
   });
 
   $("gpaAskAiBtn")?.addEventListener("click", () => {
+    if (!gpaCourses.length) return toast("请先录入至少一门课程成绩后再让 AI 诊断");
     const m = computeGpaMetrics(gpaCourses);
     $("gpaCalcDialog")?.close();
     go("ai");
@@ -8303,9 +8364,26 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   };
 
-  /* ---------- P1-1：奖助学金 · 评优 · 毕业资格「红线自检体检仪」 ---------- */
+  /* ---------- P1-1：奖助学金 · 评优 · 毕业资格「红线自检体检仪」（默认空状态，不虚构假绩点） ---------- */
   const renderEligibility = () => {
-    const gpa = Math.max(0, Math.min(5, parseFloat($("eligGpa")?.value || "0") || 0));
+    const rawGpa = ($("eligGpa")?.value || "").trim();
+    const sumEl = $("eligSummary");
+    const listEl = $("eligResults");
+    if (!rawGpa || !Number.isFinite(parseFloat(rawGpa))) {
+      if (sumEl) {
+        sumEl.innerHTML = `
+          <div class="ct-kpi"><small>已达标项目</small><b>—</b></div>
+          <div class="ct-kpi"><small>差一步达标</small><b>—</b></div>
+          <div class="ct-kpi"><small>红线预警</small><b>—</b></div>
+          <div class="ct-kpi"><small>合规兼得预估</small><b>—</b></div>
+        `;
+      }
+      if (listEl) {
+        listEl.innerHTML = `<div class="ct-row"><small class="muted">请输入您的平均学分绩点 GPA（或在左侧「GPA 换算与预警」录入课程成绩自动同步），即可实时测算 7 项奖助评优与学位红线资格。</small></div>`;
+      }
+      return;
+    }
+    const gpa = Math.max(0, Math.min(5, parseFloat(rawGpa) || 0));
     const rank = Number($("eligRank")?.value || 10);
     const fail = $("eligFail")?.value || "none";
     const punish = $("eligPunish")?.value || "none";
@@ -8421,7 +8499,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const aidAmt = okSet.has("国家助学金（2800~4400 元/年）") ? 3500 : 0;
     const maxMoney = scholarshipMax + aidAmt;
 
-    const sumEl = $("eligSummary");
     if (sumEl) {
       sumEl.innerHTML = `
         <div class="ct-kpi"><small>已达标项目</small><b style="color:#059669">${okCount} 项</b></div>
@@ -8431,7 +8508,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       `;
     }
 
-    const listEl = $("eligResults");
     if (listEl) {
       listEl.innerHTML = evaluated.map(x => `
         <div class="elig-row is-${x.res.state}">

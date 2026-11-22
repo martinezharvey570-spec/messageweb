@@ -471,22 +471,7 @@ document.addEventListener("click", e => {
   }
 });
 
-document.addEventListener("keydown", e => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-    if ($("auth") && !$("auth").classList.contains("hide")) return;
-    e.preventDefault();
-    if (!$("noticesPage")?.classList.contains("hide")) {
-      $("search")?.focus();
-    } else if (!$("tasksPage")?.classList.contains("hide")) {
-      $("taskSearch")?.focus();
-    } else if (!$("aiPage")?.classList.contains("hide")) {
-      $("question")?.focus();
-    } else {
-      go("knowledge");
-      setTimeout(() => $("knowledgeSearch")?.focus(), 40);
-    }
-  }
-});
+// 全局快捷键 Ctrl+K / Cmd+K 由下方 Spotlight 聚合搜索弹窗统一接管
 
 $("toggleAiConfig")?.addEventListener("click", () => {
   if (window.innerWidth >= 761) return;
@@ -945,7 +930,7 @@ function render_home() {
           <span class="bullet"></span>
           <div style="flex:1;min-width:0">
             <h4>${esc(n.title)}</h4>
-            <p>${esc(n.body)}</p>
+            <p>${esc(String(n.body || "").replace(/\s*\n+\s*/g, " · ").trim())}</p>
             <div class="meta">
               <span class="tag">${esc(n.category)}</span>
               <span>${date(n.created_at)}</span>
@@ -2702,7 +2687,7 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
 
   let tools_el = null;
   if (who !== "user") {
-    tools_el = add_tools(wrap, () => clean_text);
+    tools_el = add_tools(wrap, () => clean_text, "", { allowWrite: true, allowNav: true });
   }
 
   if (sources && sources.length) {
@@ -3052,12 +3037,6 @@ $("askForm").onsubmit = async e => {
   const paint_bubble = (is_streaming, custom_text) => {
     let html = "";
     const text_to_show = custom_text !== undefined ? custom_text : full_answer;
-    if (agent_trace && Array.isArray(agent_trace.steps) && agent_trace.steps.length >= 2) {
-      const stepsHtml = agent_trace.steps.map((st, idx) =>
-        `<div class="ai-trace-step"><span class="ai-trace-num">${idx + 1}</span><div><b>${esc(st.label || "")}</b><small>${esc(st.detail || "")}</small></div></div>`
-      ).join("");
-      html += `<details class="ai-agent-trace"><summary><span class="ai-trace-spark" aria-hidden="true">✦</span><span>${esc(agent_trace.summary || "智办规划轨迹")}</span></summary><div class="ai-trace-list">${stepsHtml}</div></details>`;
-    }
     if (full_reasoning.trim()) {
       const summary_label =
         !text_to_show.trim() && is_streaming
@@ -3230,6 +3209,9 @@ $("askForm").onsubmit = async e => {
         }
 
         if (delta_content) {
+          if (continue_from && /智能生成服务暂时繁忙/.test(delta_content)) {
+            return;
+          }
           delta_chunks++;
           full_answer += delta_content;
           if (/<think>/i.test(full_answer)) {
@@ -3423,8 +3405,7 @@ $("askForm").onsubmit = async e => {
       const need_continue =
         !cut_by_timeout && (
           finish_reason === "length" ||
-          truncated_flag ||
-          (!finish_reason && full_answer.trim().length > 0 && !looks_done(full_answer))
+          truncated_flag
         );
       if (!need_continue) break;
       if (!full_answer.trim()) break;
@@ -6503,7 +6484,11 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
             added++;
           } catch {}
         }
-        if (typeof load_tasks === "function") load_tasks();
+        try {
+          tasks = await api("/tasks");
+          render_tasks();
+          render_home();
+        } catch {}
         toast(added ? `已添加 ${added} 条待办` : "添加待办失败");
         card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已确认添加 ${added} 条待办</span></div>`;
       };
@@ -6518,7 +6503,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       card.querySelector('[data-act="confirm"]').onclick = async () => {
         try {
           await api("/tasks/" + Number(act.id), { method: "PATCH", body: JSON.stringify({ status: "completed" }) });
-          if (typeof load_tasks === "function") load_tasks();
+          tasks = await api("/tasks");
+          render_tasks();
+          render_home();
           toast("已标记为完成");
           card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已标记完成「${schedEsc(act.title || act.id)}」</span></div>`;
         } catch { toast("操作失败"); }
@@ -6534,7 +6521,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       card.querySelector('[data-act="confirm"]').onclick = async () => {
         try {
           await api("/tasks/" + Number(act.id), { method: "DELETE" });
-          if (typeof load_tasks === "function") load_tasks();
+          tasks = await api("/tasks");
+          render_tasks();
+          render_home();
           toast("已删除待办");
           card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已删除待办「${schedEsc(act.title || act.id)}」</span></div>`;
         } catch { toast("删除失败"); }
@@ -6579,7 +6568,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
               deadline: act.deadline || ""
             })
           });
-          if (typeof load_notices === "function") load_notices();
+          await refresh();
           toast("公告已正式发布");
           card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已正式发布通知公告</span></div>`;
         } catch (err) {
@@ -7075,12 +7064,28 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
       );
     } else {
-      // 1) 校规制度库
-      const kbList = await ensureKbCatalogLoaded();
-      kbList.filter(d => {
-        const hay = `${d.title || ""} ${d.dept || ""} ${d.category || ""}`.toLowerCase();
+      // 0) 校园办事向导（高频事务 + 关联制度原文）
+      const guideHits = (Array.isArray(window.CAMPUS_GUIDES) ? window.CAMPUS_GUIDES : []).filter(g => {
+        const hay = `${g.name || ""} ${g.dept || ""} ${g.docTitle || ""} ${g.docFormTitle || ""} ${(g.materials || []).join(" ")}`.toLowerCase();
         return hay.includes(ql);
-      }).slice(0, 5).forEach(d => {
+      });
+      guideHits.slice(0, 3).forEach(g => {
+        items.push({
+          group: "办事向导与文书生成",
+          mod: "guide",
+          icon: "clipboard",
+          title: `办事向导：${g.name}`,
+          sub: `${g.dept} · 勾选材料清单并导出《${g.docFormTitle}》`,
+          run: () => window.open_guide_wizard?.(g.id)
+        });
+      });
+
+      // 1) 校规制度库（标题/摘要匹配 + 关联向导制度 + 后端全文检索兜底）
+      const kbList = await ensureKbCatalogLoaded();
+      const seenDocTitles = new Set();
+      const pushKbDoc = d => {
+        if (!d || !d.title || seenDocTitles.has(d.title)) return;
+        seenDocTitles.add(d.title);
         items.push({
           group: "校规制度原文",
           mod: "knowledge",
@@ -7089,7 +7094,22 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           sub: `${d.dept || "学校部门"} · ${d.category || "规章制度"}`,
           run: () => open_doc_reader(d.title)
         });
+      };
+      kbList.filter(d => {
+        const hay = `${d.title || ""} ${d.dept || ""} ${d.category || ""} ${d.preview || ""}`.toLowerCase();
+        return hay.includes(ql);
+      }).slice(0, 5).forEach(pushKbDoc);
+      guideHits.forEach(g => {
+        if (seenDocTitles.size >= 5 || !g.docTitle) return;
+        const found = kbList.find(d => d.title === g.docTitle) || { title: g.docTitle, dept: g.dept, category: "核心校规依据" };
+        pushKbDoc(found);
       });
+      if (seenDocTitles.size < 3 && ql.length >= 2) {
+        try {
+          const remoteKb = await api("/knowledge?q=" + encodeURIComponent(q));
+          (Array.isArray(remoteKb?.docs) ? remoteKb.docs : []).slice(0, 5).forEach(pushKbDoc);
+        } catch {}
+      }
 
       // 2) 通知公告
       (Array.isArray(notices) ? notices : []).filter(n =>
@@ -7599,6 +7619,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     renderGuideWizard();
   });
 
+  window.CAMPUS_GUIDES = CAMPUS_GUIDES;
   window.init_guide_page = () => {
     renderGuideWizard();
   };
@@ -7741,7 +7762,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   window.init_academic_page = () => {
     gpaCourses = loadGpaCourses();
     renderGpaCalc();
-    renderEligibility();
+    window.render_eligibility?.();
   };
   window.open_gpa_calc = (tab = "gpa") => {
     gpaCourses = loadGpaCourses();
@@ -8356,19 +8377,26 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
             try {
               const r = await api("/analytics/draft-notice", {
                 method: "POST",
+                timeoutMs: 25000,
                 body: JSON.stringify({ topic: topicObj.label, dept: topicObj.dept, samples: topicObj.samples || [] })
               });
               const draft = r?.draft;
               if (draft) {
                 go("notices");
                 setTimeout(() => {
-                  const nDlg = $("noticeDialog");
-                  if ($("noticeId")) $("noticeId").value = "";
+                  const nDlg = $("dialog");
+                  if ($("nEditId")) $("nEditId").value = "";
+                  if ($("dialogTitle")) $("dialogTitle").textContent = "发布校园通知（AI 治理起草）";
+                  if ($("submitNoticeBtn")) $("submitNoticeBtn").textContent = "确认发布";
                   if ($("nTitle")) $("nTitle").value = draft.title || "";
-                  if ($("nCategory") && draft.category) $("nCategory").value = draft.category;
+                  if ($("nCategory") && draft.category) {
+                    $("nCategory").value = draft.category;
+                    if (typeof sync_xz_select === "function") sync_xz_select($("nCategory"));
+                  }
                   if ($("nAudience") && draft.audience) $("nAudience").value = draft.audience;
                   if ($("nDeadline")) $("nDeadline").value = draft.deadline || "";
                   if ($("nBody")) $("nBody").value = draft.body || "";
+                  $("nTasksWrap")?.classList.remove("hide");
                   if (nDlg && !nDlg.open) nDlg.showModal();
                   toast("AI 已依据本校校规起草官方答疑通知，请审阅后发布");
                 }, 120);
@@ -8457,11 +8485,11 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         }
       },
       {
-        name: "国家励志奖学金（5000 元/年）",
+        name: "国家励志奖学金（6000 元/年）",
         mutex: "与国家奖学金不可兼得 · 可兼得助学金",
         doc: "西安文理学院国家励志奖学金评定办法",
         guide: "aid",
-        amount: 5000,
+        amount: 6000,
         eval: () => {
           if (!hasAid) return { state: "warn", tag: "需先做困难认定", reason: "申请前提为本学年已通过家庭经济困难学生认定，请先在“办事向导”完成认定。" };
           if (!noFail || !noActivePunish) return { state: "red", tag: "触碰红线", reason: !noFail ? "要求学年无不及格课程记录。" : "处分期内不可申报国家励志奖学金。" };
@@ -8542,7 +8570,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const okSet = new Set(evaluated.filter(x => x.res.state === "ok").map(x => x.name));
     const scholarshipMax = Math.max(
       okSet.has("国家奖学金（8000 元/年）") ? 8000 : 0,
-      okSet.has("国家励志奖学金（5000 元/年）") ? 5000 : 0,
+      okSet.has("国家励志奖学金（6000 元/年）") ? 6000 : 0,
       okSet.has("校级优秀学生奖学金（一/二/三等）") ? 2000 : 0
     );
     const aidAmt = okSet.has("国家助学金（2800~4400 元/年）") ? 3500 : 0;
@@ -8588,6 +8616,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       });
     }
   };
+
+  window.render_eligibility = renderEligibility;
 
   const syncGpaToEligibility = () => {
     try {

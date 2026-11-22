@@ -6940,7 +6940,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         { group: "快捷入口", mod: "schedule", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
         { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份本校规章与校园服务指南`, run: () => go("knowledge") },
         { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
-        { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") }
+        { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") },
+        { group: "效率工具", mod: "home", icon: "clipboard", title: "校园办事向导与文书生成", sub: "材料清单核对、流程指引与一键导出 Word 申请表", run: () => window.open_guide_wizard?.() },
+        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业 GPA 换算与学位预警", sub: "实时核算平均学分绩点并对照本校学位标准预警", run: () => window.open_gpa_calc?.() },
+        { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
       );
     } else {
       // 1) 校规制度库
@@ -7105,4 +7108,729 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       else openSpotlight();
     }
   });
+})();
+
+/* ================================================================
+   v1.116: 全站高价值校园实用工具套件
+           1) 校园办事向导与标准 Word/PDF 申请表一键生成
+           2) 学业 GPA 换算与本校学位红线预警
+           3) 超级课表助手（考试倒计时 · 本周空档查询 · .ics 手机日历导出）
+   ================================================================ */
+(function init_v116_campus_tools() {
+  /* ---------- 1. 校园办事向导与文书生成 ---------- */
+  const CAMPUS_GUIDES = [
+    {
+      id: "defer",
+      name: "缓考申请",
+      dept: "教务处",
+      office: "所在二级学院教务办 → 教务处考试科",
+      docTitle: "西安文理学院考试管理规定",
+      docFormTitle: "西安文理学院本科生课程缓考申请表",
+      reasonPlaceholder: "例如：因突发急性肠胃炎/发热住院，无法按时参加《高等数学》期末考试，已附二级甲等以上医院诊断证明，特申请缓考。",
+      materials: [
+        "《西安文理学院学生缓考申请表》（一式两份）",
+        "二级甲等及以上医院出具的诊断证明、病历及缴费票据（因病缓考必备）",
+        "学生证与身份证复印件",
+        "因直系亲属变故或校级竞赛冲突申请的，附相关单位证明材料"
+      ],
+      steps: [
+        "务必在考试开始前提出申请（急诊突发情况须第一时间向辅导员与任课教师报备，并在考后规定工作日内补交证明）。",
+        "填写并打印《缓考申请表》，附医院证明材料交由辅导员与所在二级学院教学院长审核签字盖章。",
+        "经学院汇总报教务处审批备案后生效；缓考通常安排在下一学期初随补考一并进行，成绩按正常考试记载。"
+      ]
+    },
+    {
+      id: "major",
+      name: "转专业申请",
+      dept: "教务处",
+      office: "转出学院教务办 → 转入学院考核组 → 教务处学籍科",
+      docTitle: "西安文理学院普通本科生转专业及大类专业分流管理办法",
+      docFormTitle: "西安文理学院普通本科生转专业申请表",
+      reasonPlaceholder: "例如：本人在大一期间已修课程平均学分绩点良好、无不及格科目，对计算机/软件工程方向具有浓厚学术兴趣并已自学相关课程，特申请转入目标专业。",
+      materials: [
+        "《西安文理学院本科生转专业申请表》",
+        "教务系统导出并加盖学院公章的历学期全科成绩单及绩点证明",
+        "个人学业规划与转专业理由说明（附竞赛获奖或特长证明更佳）",
+        "身份证与学生证复印件"
+      ],
+      steps: [
+        "关注每学年教务处发布的转专业及大类分流通知，对照转入学院公布的接收人数与成绩/GPA 门槛。",
+        "在规定时间内通过教务系统或纸质渠道提交《转专业申请表》及成绩单，经转出学院审核同意。",
+        "按时参加转入学院组织的笔试、上机或综合面试考核，经学校公示无异议后办理学籍异动与课程学分置换。"
+      ]
+    },
+    {
+      id: "suspend",
+      name: "休学 / 复学",
+      dept: "教务处",
+      office: "所在二级学院 → 学生工作部 / 校医院 → 教务处学籍科",
+      docTitle: "学生申请休学、复学办理流程",
+      docFormTitle: "西安文理学院本科生休学（复学）申请表",
+      reasonPlaceholder: "例如：因健康治疗/创新创业/家庭特殊原因，拟申请自 2026 年 9 月至 2027 年 8 月休学一学年，期满后按期返校复学。",
+      materials: [
+        "《西安文理学院学生休学 / 复学申请表》",
+        "因病休学：二级甲等以上医院诊断证明及校医院复核意见；因病复学须附医院康复诊断证明",
+        "家长知情同意书及家长身份证复印件",
+        "学生证、离校/退宿交接手续单"
+      ],
+      steps: [
+        "向辅导员与所在学院提交休学或复学书面申请及相关佐证材料，家长须书面知情确认。",
+        "因病办理者先经校医院审核诊断证明；创业休学须附工商营业执照或孵化项目材料。",
+        "学院审核签章后报教务处审批发文，休学期满前须提前一个月提交复学申请并办理注册选课。"
+      ]
+    },
+    {
+      id: "aid",
+      name: "困难认定与资助",
+      dept: "学生资助管理中心",
+      office: "所在二级学院资助工作小组 → 学生资助管理中心",
+      docTitle: "西安文理学院家庭经济困难学生认定工作实施办法（修订）",
+      docFormTitle: "西安文理学院家庭经济困难情况个人说明",
+      reasonPlaceholder: "例如：家庭主要劳动力务农/收入较低，且家中有两位在校就读子女及长辈需长期医疗支出，家庭经济负担较重，特申请本学年家庭经济困难认定。",
+      materials: [
+        "《陕西省家庭经济困难学生认定申请表》（手写签名承诺）",
+        "建档立卡、低保、特困供养、残疾、孤儿或突发重病/受灾等相关证明复印件（如有）",
+        "个人身份证与家庭户口簿复印件",
+        "本人已绑定学校的银行卡信息（用于助学金发放）"
+      ],
+      steps: [
+        "每年秋季学期开学初按学院通知填写《家庭经济困难学生认定申请表》并如实说明家庭情况。",
+        "经班级民主评议小组评议、学院认定工作组审核并在适当范围内公示（严格保护个人隐私）。",
+        "认定通过后建立困难生档案，可依次申请国家助学金、国家励志奖学金、勤工助学岗位及临时困难补助。"
+      ]
+    },
+    {
+      id: "studentid",
+      name: "学生证与优惠卡",
+      dept: "学生工作部",
+      office: "所在二级学院学工办 → 学生工作部（029-88215725）",
+      docTitle: "西安文理学院学生证补办与火车票学生优惠卡办理指南",
+      docFormTitle: "西安文理学院学生证补办 / 优惠卡变更申请表",
+      reasonPlaceholder: "例如：本人不慎遗失学生证（或火车票优惠卡消磁/家庭住址变更为 XX 省 XX 市），现申请补办学生证并办理学生火车票优惠资质核验。",
+      materials: [
+        "《西安文理学院学生证补办申请表》（经辅导员及学院签章）",
+        "近期一寸免冠蓝/白底证件照 1 张",
+        "身份证复印件；如需变更火车票乘车区间，须附家庭新住址户籍或居住证明"
+      ],
+      steps: [
+        "确认证件遗失后，填写《学生证补办申请表》并贴好证件照，交所在学院学工办审核盖章。",
+        "由学院汇总或本人按通知时段交至学生工作部（处）统一印制补发新证并加盖钢印。",
+        "每年记得在铁路 12306 App 完成学生资质在线核验或按学院通知完成优惠卡充磁，确保寒暑假正常购票。"
+      ]
+    },
+    {
+      id: "army",
+      name: "参军入伍与补偿",
+      dept: "学生工作部",
+      office: "学校武装部 / 学生资助管理中心 / 教务处",
+      docTitle: "学生参军入伍保留学籍流程",
+      docFormTitle: "西安文理学院应征入伍保留学籍及资助申请说明",
+      reasonPlaceholder: "例如：本人已通过 2026 年秋季应征入伍体检政审并取得《入伍通知书》，现申请保留学籍至退役后两年，并申请应征入伍服兵役国家学费补偿。",
+      materials: [
+        "《应征入伍普通高等学校录取新生/在校生保留学籍申请表》",
+        "《入伍通知书》原件及复印件",
+        "全国征兵网打印并经入伍地征兵办盖章的《高校学生国家教育资助申请表》",
+        "本人身份证、学生证及绑定银行卡复印件"
+      ],
+      steps: [
+        "在全国征兵网完成报名并体检政审通过取得《入伍通知书》后，第一时间联系学校武装部与辅导员。",
+        "提交保留学籍材料至教务处办理学籍保留（保留至退役后两年内），同时向资助中心提交学费补偿/代偿申请。",
+        "退役返校复学时持《退役证》办理复学，并自动享受全日制退役士兵学费减免与国家助学金政策。"
+      ]
+    },
+    {
+      id: "cert",
+      name: "毕业/学位证补办",
+      dept: "教务处",
+      office: "学校档案馆（029-88215404）→ 教务处学籍科",
+      docTitle: "毕业证书、学位证书补办",
+      docFormTitle: "西安文理学院毕业证明书 / 学位证明书补办申请表",
+      reasonPlaceholder: "例如：本人系 XXXX 届 XX 专业毕业生，因保管不慎遗失毕业证书/学位证书原件，现申请查档并补办与原件同等法律效力的证明书。",
+      materials: [
+        "《补办毕业证明书 / 学位证明书申请表》",
+        "本人有效身份证原件及复印件（委托他人代办需附亲笔授权委托书及双方身份证）",
+        "学校档案馆查档出具的录取花名册与毕业/学位授予审批表复印件（加盖档案馆公章）",
+        "近期二寸蓝底免冠证件照（纸质版及同底电子版）"
+      ],
+      steps: [
+        "先携带身份证到学校档案馆（029-88215404）调取本人当年录取与毕业/学位审批底档并盖章。",
+        "向教务处学籍科提交申请表、档案复印件、身份证复印件及蓝底照片审核核验。",
+        "审核通过后由学校按教育部规定制作《毕业证明书》或《学位证明书》（与原证书具有同等法律效力，并同步更新学信网）。"
+      ]
+    },
+    {
+      id: "appeal",
+      name: "处分解除与申诉",
+      dept: "学生工作部",
+      office: "所在二级学院 → 学生工作部 / 学生申诉处理委员会",
+      docTitle: "西安文理学院学生申诉处理与违纪处分解除指南",
+      docFormTitle: "西安文理学院学生违纪处分解除（申诉）申请书",
+      reasonPlaceholder: "例如：本人在处分期内深刻反思错误、严格遵守校纪校规、积极参与学习与志愿活动且无任何再违纪行为，现处分期已满，特申请解除处分。",
+      materials: [
+        "《解除处分申请书》或《学生申诉申请书》（申诉须在收到决定书 10 个工作日内提交）",
+        "处分期内个人思想汇报及表现总结（解除处分必备）",
+        "班级评议意见、辅导员鉴定意见及获奖/志愿服务证明（如有）"
+      ],
+      steps: [
+        "【解除处分】处分期满后，向所在班级和辅导员递交书面解除申请与思想汇报，经班级评议与学院审核后报学工部审批。",
+        "【学生申诉】如对处分或退学处理决定不服，务必在收到决定书 10 个工作日内向学生申诉处理委员会提交书面申诉及事实证据。"
+      ]
+    }
+  ];
+
+  let activeGuideId = CAMPUS_GUIDES[0].id;
+  const guideCheckKey = () => "xz_guide_chk_" + (me?.username || "guest");
+  const loadGuideChecks = () => {
+    try { return JSON.parse(localStorage.getItem(guideCheckKey()) || "{}"); } catch { return {}; }
+  };
+  const saveGuideChecks = map => {
+    try { localStorage.setItem(guideCheckKey(), JSON.stringify(map)); } catch {}
+  };
+
+  const buildWordHtml = (guide, form) => {
+    const today = new Date().toISOString().slice(0, 10);
+    return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(guide.docFormTitle)}</title>
+<style>
+  body { font-family: "SimSun", "Songti SC", serif; color: #111; margin: 28px 34px; line-height: 1.75; }
+  h1 { text-align: center; font-size: 20pt; margin: 0 0 18px; letter-spacing: 1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5pt; }
+  td { border: 1px solid #222; padding: 9px 11px; vertical-align: top; }
+  .lbl { width: 16%; font-weight: bold; text-align: center; background: #f8fafc; }
+  .tall { height: 110px; }
+  .sign { text-align: right; margin-top: 26px; }
+  .foot { margin-top: 12px; font-size: 9.5pt; color: #555; }
+</style></head><body>
+<h1>${esc(guide.docFormTitle)}</h1>
+<table>
+  <tr>
+    <td class="lbl">姓 名</td><td>${esc(form.name || (me?.display_name || ""))}</td>
+    <td class="lbl">学 号</td><td>${esc(form.sno || "")}</td>
+  </tr>
+  <tr>
+    <td class="lbl">学院 / 专业</td><td>${esc(form.college || "")}</td>
+    <td class="lbl">联系电话</td><td>${esc(form.phone || "")}</td>
+  </tr>
+  <tr>
+    <td class="lbl">办理类别</td><td>${esc(guide.name)}</td>
+    <td class="lbl">申请日期</td><td>${esc(today)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">申请事由<br>与情况说明</td>
+    <td colspan="3" class="tall">${esc(form.reason || "").replace(/\n/g, "<br>")}<div class="sign">申请人签字：______________ &nbsp;&nbsp; ${esc(today)}</div></td>
+  </tr>
+  <tr>
+    <td class="lbl">辅导员 /<br>学院意见</td>
+    <td colspan="3" class="tall"><div class="sign">负责人签字（盖章）：______________ &nbsp;&nbsp; 年 &nbsp;&nbsp; 月 &nbsp;&nbsp; 日</div></td>
+  </tr>
+  <tr>
+    <td class="lbl">${esc(guide.dept)}<br>审批意见</td>
+    <td colspan="3" class="tall"><div class="sign">审批人签字（盖章）：______________ &nbsp;&nbsp; 年 &nbsp;&nbsp; 月 &nbsp;&nbsp; 日</div></td>
+  </tr>
+</table>
+<p class="foot">依据制度：《${esc(guide.docTitle)}》｜受理路径：${esc(guide.office)}（请双面或单面 A4 打印并附相关证明材料提交）</p>
+</body></html>`;
+  };
+
+  const renderGuideWizard = () => {
+    const tabsEl = $("guideTabs");
+    const detailEl = $("guideDetail");
+    if (!tabsEl || !detailEl) return;
+
+    tabsEl.innerHTML = CAMPUS_GUIDES.map(g =>
+      `<button type="button" class="pill-btn${g.id === activeGuideId ? " active" : ""}" data-gid="${g.id}">${esc(g.name)}</button>`
+    ).join("");
+
+    const guide = CAMPUS_GUIDES.find(g => g.id === activeGuideId) || CAMPUS_GUIDES[0];
+    const checks = loadGuideChecks();
+    const doneSet = new Set(Array.isArray(checks[guide.id]) ? checks[guide.id] : []);
+
+    detailEl.innerHTML = `
+      <div class="ct-card">
+        <div class="ct-card-head">
+          <b>${ico("clipboard")}材料准备清单（${doneSet.size}/${guide.materials.length}）</b>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="outline" id="guideReadDocBtn">${ico("book", "ico-xs")}查阅本校制度原文</button>
+            <button type="button" class="primary" id="guideToTodoBtn">${ico("check-square", "ico-xs")}未勾项加入待办</button>
+          </div>
+        </div>
+        <div class="ct-check-list">
+          ${guide.materials.map((m, idx) => {
+            const on = doneSet.has(idx);
+            return `<label class="ct-check-item${on ? " is-done" : ""}"><input type="checkbox" data-gm-idx="${idx}" ${on ? "checked" : ""}><span>${esc(m)}</span></label>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="ct-card">
+        <div class="ct-card-head">
+          <b>${ico("route")}办理流程与受理路径</b>
+          <span class="ct-badge">${esc(guide.dept)}</span>
+        </div>
+        <small class="muted">受理部门：${esc(guide.office)}</small>
+        <ol class="ct-step-list">
+          ${guide.steps.map((s, idx) => `<li><span class="ct-step-num">${idx + 1}</span><span>${esc(s)}</span></li>`).join("")}
+        </ol>
+      </div>
+
+      <div class="ct-card">
+        <div class="ct-card-head">
+          <b>${ico("file-text")}一键生成标准申请表（Word / 打印 PDF）</b>
+        </div>
+        <div class="ct-doc-form">
+          <input id="gwName" placeholder="学生姓名" value="${esc(me?.display_name || "")}">
+          <input id="gwSno" placeholder="学号（选填）">
+          <input id="gwCollege" placeholder="学院 / 专业班级（如：信息工程学院 软工2301）">
+          <input id="gwPhone" placeholder="联系电话（选填）">
+          <textarea id="gwReason" placeholder="${esc(guide.reasonPlaceholder)}"></textarea>
+        </div>
+        <div class="ct-foot-actions">
+          <button type="button" class="outline" id="guidePrintPdfBtn">${ico("file-text", "ico-xs")}打印 / 另存 PDF</button>
+          <button type="button" class="primary" id="guideExportDocBtn">${ico("download", "ico-xs")}导出 Word 申请表 (.doc)</button>
+        </div>
+      </div>
+    `;
+
+    detailEl.querySelectorAll("[data-gm-idx]").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const idx = Number(cb.dataset.gmIdx);
+        const cur = loadGuideChecks();
+        const set = new Set(Array.isArray(cur[guide.id]) ? cur[guide.id] : []);
+        if (cb.checked) set.add(idx); else set.delete(idx);
+        cur[guide.id] = [...set];
+        saveGuideChecks(cur);
+        renderGuideWizard();
+      });
+    });
+
+    $("guideReadDocBtn")?.addEventListener("click", () => {
+      $("guideWizardDialog")?.close();
+      open_doc_reader(guide.docTitle);
+    });
+
+    $("guideToTodoBtn")?.addEventListener("click", async () => {
+      const pending = guide.materials.filter((_, i) => !doneSet.has(i));
+      if (!pending.length) return toast("所有材料都已勾选完成！");
+      let okCount = 0;
+      for (const item of pending.slice(0, 6)) {
+        try {
+          await api("/tasks", {
+            method: "POST",
+            body: JSON.stringify({ title: `[${guide.name}] 准备：${item.slice(0, 60)}`, due_date: "" })
+          });
+          okCount++;
+        } catch {}
+      }
+      if (okCount > 0) {
+        if (typeof load_tasks === "function") load_tasks();
+        toast(`已将 ${okCount} 项待准备材料加入“我的待办”`);
+      } else {
+        toast("加入待办失败，请检查登录状态后重试");
+      }
+    });
+
+    const readForm = () => ({
+      name: $("gwName")?.value.trim() || "",
+      sno: $("gwSno")?.value.trim() || "",
+      college: $("gwCollege")?.value.trim() || "",
+      phone: $("gwPhone")?.value.trim() || "",
+      reason: $("gwReason")?.value.trim() || guide.reasonPlaceholder
+    });
+
+    $("guideExportDocBtn")?.addEventListener("click", () => {
+      const html = buildWordHtml(guide, readForm());
+      const blob = new Blob(["\ufeff" + html], { type: "application/msword;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${guide.docFormTitle}.doc`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+      toast("已生成标准 Word 申请表，可直接打印签字提交");
+    });
+
+    $("guidePrintPdfBtn")?.addEventListener("click", () => {
+      const html = buildWordHtml(guide, readForm());
+      const win = window.open("", "_blank", "width=860,height=920");
+      if (!win) return toast("浏览器拦截了打印窗口，可改用“导出 Word 申请表”");
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+      setTimeout(() => { try { win.print(); } catch {} }, 250);
+    });
+  };
+
+  $("guideTabs")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-gid]");
+    if (!btn) return;
+    activeGuideId = btn.dataset.gid;
+    renderGuideWizard();
+  });
+
+  window.open_guide_wizard = guideId => {
+    if (guideId && CAMPUS_GUIDES.some(g => g.id === guideId)) activeGuideId = guideId;
+    renderGuideWizard();
+    const dlg = $("guideWizardDialog");
+    if (dlg && !dlg.open) dlg.showModal();
+  };
+  $("openGuideWizardBtn")?.addEventListener("click", () => window.open_guide_wizard());
+  $("openGuideFromKbBtn")?.addEventListener("click", () => window.open_guide_wizard());
+  $("closeGuideWizardDlg")?.addEventListener("click", () => $("guideWizardDialog")?.close());
+  $("guideWizardDialog")?.addEventListener("click", e => { if (e.target === $("guideWizardDialog")) $("guideWizardDialog").close(); });
+
+  /* ---------- 2. 学业 GPA 换算与学位预警 ---------- */
+  const GPA_DEFAULT = [
+    { name: "高等数学 A（上）", credit: 5, score: 84 },
+    { name: "大学英语（一）", credit: 3, score: 88 },
+    { name: "程序设计基础", credit: 4, score: 91 },
+    { name: "思想道德与法治", credit: 3, score: 82 }
+  ];
+  const gpaStorageKey = () => "xz_gpa_courses_" + (me?.username || "guest");
+  const loadGpaCourses = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(gpaStorageKey()) || "null");
+      if (Array.isArray(arr) && arr.length) return arr;
+    } catch {}
+    return GPA_DEFAULT.map(x => ({ ...x }));
+  };
+  const saveGpaCourses = arr => {
+    try { localStorage.setItem(gpaStorageKey(), JSON.stringify(arr)); } catch {}
+  };
+  const scoreToGp = s => {
+    const n = Number(s);
+    if (!Number.isFinite(n) || n < 60) return 0;
+    return Math.min(5, Math.max(1, Number(((n - 50) / 10).toFixed(2))));
+  };
+
+  let gpaCourses = loadGpaCourses();
+  const computeGpaMetrics = list => {
+    let totalCred = 0, weightedGp = 0, weightedScore = 0, failCount = 0;
+    list.forEach(c => {
+      const cr = Math.max(0.5, Number(c.credit) || 0);
+      const sc = Math.min(100, Math.max(0, Number(c.score) || 0));
+      const gp = scoreToGp(sc);
+      totalCred += cr;
+      weightedGp += cr * gp;
+      weightedScore += cr * sc;
+      if (sc < 60) failCount++;
+    });
+    const gpa = totalCred > 0 ? weightedGp / totalCred : 0;
+    const avg = totalCred > 0 ? weightedScore / totalCred : 0;
+    return { totalCred, gpa, avg, failCount };
+  };
+
+  const renderGpaCalc = () => {
+    const sumEl = $("gpaSummary");
+    const alertEl = $("gpaAlertBox");
+    const listEl = $("gpaCourseList");
+    if (!sumEl || !alertEl || !listEl) return;
+
+    const m = computeGpaMetrics(gpaCourses);
+    const gpaCls = m.gpa < 2.0 ? "is-red" : (m.gpa < 2.4 ? "is-amber" : "is-blue");
+    const failCls = m.failCount > 0 ? "is-red" : "is-green";
+
+    sumEl.innerHTML = `
+      <div class="ct-kpi ${gpaCls}"><small>平均学分绩点 (GPA)</small><b>${m.gpa.toFixed(2)}</b></div>
+      <div class="ct-kpi is-indigo"><small>加权平均分</small><b>${m.avg.toFixed(1)}</b></div>
+      <div class="ct-kpi"><small>已录总学分</small><b>${m.totalCred.toFixed(1)}</b></div>
+      <div class="ct-kpi ${failCls}"><small>不及格门数</small><b>${m.failCount}</b></div>
+    `;
+
+    if (m.failCount > 0 || m.gpa < 2.0) {
+      alertEl.className = "ct-alert-banner is-danger";
+      alertEl.innerHTML = `${ico("alert", "ico-xs")}<span><b>学业与学位红线提醒：</b>当前 GPA 为 ${m.gpa.toFixed(2)}（不及格 ${m.failCount} 门）。按《西安文理学院学士学位授予实施细则》，申请学士学位须达平均学分绩点 2.0 及以上，建议及时在每学期开学前两周完成重修报名。</span>`;
+    } else if (m.gpa < 2.4) {
+      alertEl.className = "ct-alert-banner is-warn";
+      alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>学业预警提示：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，虽已超过学位底线（2.0），但余量偏紧，建议优先冲刺高学分专业课提分。</span>`;
+    } else {
+      alertEl.className = "ct-alert-banner is-ok";
+      const extra = m.gpa >= 3.5 ? "，具备冲刺国家奖学金、校内一等奖学金及优秀毕业生竞争力！" : "，保持当前节奏可顺利满足学士学位授予绩点要求。";
+      alertEl.innerHTML = `${ico("check", "ico-xs")}<span><b>学位达标状态良好：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，零挂科${extra}</span>`;
+    }
+
+    listEl.innerHTML = gpaCourses.length
+      ? gpaCourses.map((c, idx) => {
+          const gp = scoreToGp(c.score);
+          const badgeCls = c.score < 60 ? "is-urgent" : (c.score >= 85 ? "is-safe" : "");
+          return `<div class="ct-row">
+            <div class="ct-row-main">
+              <b>${esc(c.name)}</b>
+              <small>${Number(c.credit)} 学分 · 成绩 ${Number(c.score)} 分</small>
+            </div>
+            <div class="ct-row-right">
+              <span class="ct-badge ${badgeCls}">绩点 ${gp.toFixed(2)}</span>
+              <button type="button" class="ct-del-btn" data-gpa-del="${idx}" aria-label="删除课程">${ico("trash")}</button>
+            </div>
+          </div>`;
+        }).join("")
+      : `<div class="ct-row"><small class="muted">暂无课程记录，请在上方添加课程成绩</small></div>`;
+  };
+
+  $("gpaAddForm")?.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = $("gpaCourseName")?.value.trim();
+    const credit = Number($("gpaCourseCredit")?.value);
+    const score = Number($("gpaCourseScore")?.value);
+    if (!name || !Number.isFinite(credit) || !Number.isFinite(score)) return;
+    gpaCourses.push({ name, credit: Math.max(0.5, credit), score: Math.min(100, Math.max(0, score)) });
+    saveGpaCourses(gpaCourses);
+    $("gpaCourseName").value = "";
+    $("gpaCourseScore").value = "";
+    renderGpaCalc();
+  });
+
+  $("gpaCourseList")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-gpa-del]");
+    if (!btn) return;
+    gpaCourses.splice(Number(btn.dataset.gpaDel), 1);
+    saveGpaCourses(gpaCourses);
+    renderGpaCalc();
+  });
+
+  $("gpaResetDemoBtn")?.addEventListener("click", () => {
+    gpaCourses = GPA_DEFAULT.map(x => ({ ...x }));
+    saveGpaCourses(gpaCourses);
+    renderGpaCalc();
+    toast("已恢复示例课程");
+  });
+
+  $("gpaAskAiBtn")?.addEventListener("click", () => {
+    const m = computeGpaMetrics(gpaCourses);
+    $("gpaCalcDialog")?.close();
+    go("ai");
+    const qEl = $("question");
+    if (qEl) {
+      qEl.value = `我目前平均学分绩点 GPA 为 ${m.gpa.toFixed(2)}，已修 ${m.totalCred.toFixed(1)} 学分，不及格 ${m.failCount} 门。请对照本校学士学位授予和评优奖学金规定，给我一份简明的学业与提分建议。`;
+      if (typeof auto_resize_question === "function") auto_resize_question();
+      $("askForm")?.requestSubmit();
+    }
+  });
+
+  window.open_gpa_calc = () => {
+    gpaCourses = loadGpaCourses();
+    renderGpaCalc();
+    const dlg = $("gpaCalcDialog");
+    if (dlg && !dlg.open) dlg.showModal();
+  };
+  $("openGpaCalcBtn")?.addEventListener("click", () => window.open_gpa_calc());
+  $("closeGpaCalcDlg")?.addEventListener("click", () => $("gpaCalcDialog")?.close());
+  $("gpaCalcDialog")?.addEventListener("click", e => { if (e.target === $("gpaCalcDialog")) $("gpaCalcDialog").close(); });
+
+  /* ---------- 3. 超级课表助手（考试倒计时 · 本周空档 · .ics 日历导出） ---------- */
+  const examStorageKey = () => "xz_sched_exams_" + (me?.username || "guest");
+  const loadExams = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(examStorageKey()) || "[]");
+      if (Array.isArray(arr)) return arr;
+    } catch {}
+    return [];
+  };
+  const saveExams = arr => {
+    try { localStorage.setItem(examStorageKey(), JSON.stringify(arr)); } catch {}
+  };
+
+  let examsList = loadExams();
+  const renderExamsList = () => {
+    const el = $("examList");
+    if (!el) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const sorted = examsList.map((ex, idx) => {
+      const dt = new Date(ex.date + "T00:00:00");
+      const diff = Number.isNaN(dt.getTime()) ? 999 : Math.round((dt - today) / 86400000);
+      return { ...ex, idx, diff };
+    }).sort((a, b) => a.diff - b.diff);
+
+    el.innerHTML = sorted.length
+      ? sorted.map(ex => {
+          const badgeText = ex.diff < 0 ? `已过 ${Math.abs(ex.diff)} 天` : (ex.diff === 0 ? "就在今天" : `剩 ${ex.diff} 天`);
+          const cls = ex.diff <= 7 && ex.diff >= 0 ? "is-urgent" : (ex.diff <= 21 && ex.diff > 7 ? "is-soon" : "is-safe");
+          return `<div class="ct-row">
+            <div class="ct-row-main">
+              <b>${esc(ex.title)}</b>
+              <small>${esc(ex.date)}${ex.place ? " · " + esc(ex.place) : ""}</small>
+            </div>
+            <div class="ct-row-right">
+              <span class="ct-badge ${cls}">${badgeText}</span>
+              <button type="button" class="ct-del-btn" data-ex-del="${ex.idx}" aria-label="删除考试">${ico("trash")}</button>
+            </div>
+          </div>`;
+        }).join("")
+      : `<div class="ct-row"><small class="muted">还没有考试倒计时，可在上方添加期末考试、四六级或论文截止日期</small></div>`;
+  };
+
+  $("examAddForm")?.addEventListener("submit", e => {
+    e.preventDefault();
+    const title = $("examTitle")?.value.trim();
+    const date = $("examDate")?.value;
+    const place = $("examPlace")?.value.trim() || "";
+    if (!title || !date) return;
+    examsList.push({ title, date, place });
+    saveExams(examsList);
+    $("examTitle").value = "";
+    $("examPlace").value = "";
+    renderExamsList();
+    toast("已添加考试倒计时");
+  });
+
+  $("examList")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-ex-del]");
+    if (!btn) return;
+    examsList.splice(Number(btn.dataset.exDel), 1);
+    saveExams(examsList);
+    renderExamsList();
+  });
+
+  const BLOCKS_5 = [
+    { label: "1-2 节 (08:00-09:50)", s: 1, e: 2 },
+    { label: "3-4 节 (10:10-12:00)", s: 3, e: 4 },
+    { label: "5-6 节 (14:00-15:50)", s: 5, e: 6 },
+    { label: "7-8 节 (16:10-18:00)", s: 7, e: 8 },
+    { label: "9-10 节 (19:00-20:50)", s: 9, e: 10 }
+  ];
+  const DAY_CN = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+
+  const renderFreeSlots = () => {
+    const grid = $("freeSlotsGrid");
+    const sum = $("freeSlotsSummary");
+    if (!grid) return;
+    const curWeek = Math.max(1, Number(schedState?.currentWeek || schedState?.viewWeek || 1));
+    const courses = Array.isArray(schedState?.courses) ? schedState.courses : [];
+    const activeCourses = courses.filter(c => {
+      if (typeof schedParseWeeks === "function") {
+        const set = schedParseWeeks(c.weeks || "1-18");
+        return !set.size || set.has(curWeek);
+      }
+      return true;
+    });
+    if (sum) sum.textContent = `当前扫描：第 ${curWeek} 周（共 ${activeCourses.length} 节有效排课）`;
+
+    const rows = [];
+    for (let d = 1; d <= 7; d++) {
+      const dayCourses = activeCourses.filter(c => Number(c.day) === d);
+      const frees = BLOCKS_5.filter(b => !dayCourses.some(c => Number(c.start) <= b.e && Number(c.end) >= b.s));
+      rows.push(`<div class="ct-row">
+        <div class="ct-row-main">
+          <b>${DAY_CN[d]}（空闲 ${frees.length} 大节）</b>
+          <small>${frees.length ? frees.map(f => f.label.split(" ")[0]).join(" · ") : "当天全天满课"}</small>
+        </div>
+        <div class="ct-row-right">
+          ${frees.length ? `<button type="button" class="outline" style="height:30px;min-height:30px;padding:0 11px;font-size:12px" data-free-todo="${DAY_CN[d]} ${frees[0].label}">+ 加入待办</button>` : `<span class="ct-badge is-soon">满课</span>`}
+        </div>
+      </div>`);
+    }
+    grid.innerHTML = rows.join("");
+  };
+
+  $("freeSlotsGrid")?.addEventListener("click", async e => {
+    const btn = e.target.closest("[data-free-todo]");
+    if (!btn) return;
+    const label = btn.dataset.freeTodo;
+    try {
+      await api("/tasks", {
+        method: "POST",
+        body: JSON.stringify({ title: `利用空档安排自习/事务（${label}）`, due_date: "" })
+      });
+      if (typeof load_tasks === "function") load_tasks();
+      toast(`已将「${label}」加入我的待办`);
+    } catch {
+      toast("加入待办失败，请重试");
+    }
+  });
+  $("refreshFreeSlotsBtn")?.addEventListener("click", renderFreeSlots);
+
+  const renderIcsMeta = () => {
+    const el = $("icsExportStats");
+    if (!el) return;
+    const list = Array.isArray(schedState?.courses) ? schedState.courses : [];
+    const sd = schedState?.startDate || "2026-08-31";
+    el.innerHTML = `
+      <span class="ct-badge">当前课程 ${list.length} 门</span>
+      <span class="ct-badge is-safe">开学周一 ${esc(sd)}</span>
+      <span class="ct-badge">含课前 15 分钟提醒</span>
+    `;
+  };
+
+  const PERIOD_START_HM = { 1: [8, 0], 2: [8, 55], 3: [10, 10], 4: [11, 5], 5: [14, 0], 6: [14, 55], 7: [16, 10], 8: [17, 5], 9: [19, 0], 10: [19, 55] };
+  const PERIOD_END_HM = { 1: [8, 50], 2: [9, 50], 3: [11, 0], 4: [12, 0], 5: [14, 50], 6: [15, 50], 7: [17, 0], 8: [18, 0], 9: [19, 50], 10: [20, 50] };
+
+  $("exportSchedIcsBtn")?.addEventListener("click", () => {
+    const list = Array.isArray(schedState?.courses) ? schedState.courses : [];
+    if (!list.length) return toast("当前课表暂无课程，请先添加或导入课表");
+    const baseDate = new Date((schedState?.startDate || "2026-08-31") + "T00:00:00");
+    if (Number.isNaN(baseDate.getTime())) return toast("开学日期格式无效，请先在课表设置中核对");
+    const pad2 = n => String(n).padStart(2, "0");
+    const fmtIcsDt = (d, hm) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(hm[0])}${pad2(hm[1])}00`;
+    const escIcs = s => String(s || "").replace(/[\\,;]/g, m => "\\" + m).replace(/\n/g, "\\n");
+
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//XiaoWuZhiLi//Campus Schedule//CN",
+      "CALSCALE:GREGORIAN",
+      "X-WR-CALNAME:校务智理超级课表"
+    ];
+    let evtCount = 0;
+    list.forEach((c, idx) => {
+      const day = Math.min(7, Math.max(1, Number(c.day) || 1));
+      const sP = Math.min(10, Math.max(1, Number(c.start) || 1));
+      const eP = Math.min(10, Math.max(sP, Number(c.end) || sP));
+      const wks = typeof schedParseWeeks === "function" ? [...schedParseWeeks(c.weeks || "1-18")] : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+      const hmS = PERIOD_START_HM[sP] || [8, 0];
+      const hmE = PERIOD_END_HM[eP] || [9, 50];
+      wks.forEach(w => {
+        const dt = new Date(baseDate.getTime() + ((w - 1) * 7 + (day - 1)) * 86400000);
+        evtCount++;
+        lines.push(
+          "BEGIN:VEVENT",
+          `UID:xawl-sched-${idx}-w${w}@messageweb.xyz`,
+          `DTSTART;TZID=Asia/Shanghai:${fmtIcsDt(dt, hmS)}`,
+          `DTEND;TZID=Asia/Shanghai:${fmtIcsDt(dt, hmE)}`,
+          `SUMMARY:${escIcs(c.name || "课程")}`,
+          `LOCATION:${escIcs(c.room || "校内教室")}`,
+          `DESCRIPTION:${escIcs(`教师：${c.teacher || "未填"}｜第${w}周 第${sP}-${eP}节`)}`,
+          "BEGIN:VALARM",
+          "TRIGGER:-PT15M",
+          "ACTION:DISPLAY",
+          `DESCRIPTION:${escIcs((c.name || "课程") + " 即将开始")}`,
+          "END:VALARM",
+          "END:VEVENT"
+        );
+      });
+    });
+    lines.push("END:VCALENDAR");
+    const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "校务智理_超级课表.ics";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1200);
+    toast(`已导出 ${evtCount} 条课程日程（.ics），可直接导入手机日历`);
+  });
+
+  const switchSchedToolsTab = tab => {
+    $("schedToolsTabs")?.querySelectorAll("[data-sttab]").forEach(b => b.classList.toggle("on", b.dataset.sttab === tab));
+    $("stPaneExams")?.classList.toggle("hide", tab !== "exams");
+    $("stPaneFree")?.classList.toggle("hide", tab !== "free");
+    $("stPaneIcs")?.classList.toggle("hide", tab !== "ics");
+    if (tab === "exams") renderExamsList();
+    if (tab === "free") renderFreeSlots();
+    if (tab === "ics") renderIcsMeta();
+  };
+  $("schedToolsTabs")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-sttab]");
+    if (!btn) return;
+    switchSchedToolsTab(btn.dataset.sttab);
+  });
+
+  window.open_sched_tools = (tab = "exams") => {
+    examsList = loadExams();
+    switchSchedToolsTab(tab);
+    const dlg = $("schedToolsDialog");
+    if (dlg && !dlg.open) dlg.showModal();
+  };
+  $("schedOpenToolsBtn")?.addEventListener("click", () => window.open_sched_tools("exams"));
+  $("schedMobTools")?.addEventListener("click", () => window.open_sched_tools("exams"));
+  $("closeSchedToolsDlg")?.addEventListener("click", () => $("schedToolsDialog")?.close());
+  $("schedToolsDialog")?.addEventListener("click", e => { if (e.target === $("schedToolsDialog")) $("schedToolsDialog").close(); });
 })();

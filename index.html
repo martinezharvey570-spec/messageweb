@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.115" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.116" fetchpriority="high">
 </head>
 <body>
 
@@ -396,6 +396,8 @@
             <button class="quick" data-goto="tasks"><span><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>管理我的待办</span><i>→</i></button>
             <button class="quick" data-goto="ai"><span><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>咨询文理智办 AI</span><i>→</i></button>
             <button class="quick" data-goto="knowledge"><span><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>查阅校规制度库</span><i>→</i></button>
+            <button type="button" class="quick" id="openGuideWizardBtn"><span><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导与文书生成</span><i>→</i></button>
+            <button type="button" class="quick" id="openGpaCalcBtn"><span><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg>学业 GPA 换算与学位预警</span><i>→</i></button>
             <div class="quick-tags">
               <small class="muted">常见事务一键提问</small>
               <div class="mini-chips">
@@ -634,20 +636,36 @@
         <div class="pagehead">
           <div>
             <h1>校规制度库</h1>
-            <p class="muted">收录教务处、学生工作部 <span data-kb-count>…</span> 份唯一标题制度文件、办事指南与附件全文，支持实时检索查阅与 AI 解读。</p>
+            <p class="muted">收录教务处、学生工作部、图书馆、后勤保卫、计财与就业等全校 <span data-kb-count>…</span> 份规章制度与校园服务指南，支持实时检索查阅与 AI 解读。</p>
           </div>
-          <button type="button" class="outline" data-goto="ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>前往 AI 问答</button>
+          <div class="kb-head-actions">
+            <button type="button" id="openGuideFromKbBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>办事向导</button>
+            <button type="button" class="outline" data-goto="ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>前往 AI 问答</button>
+          </div>
         </div>
 
         <div class="toolbar">
           <div class="search-box">
-            <input id="knowledgeSearch" placeholder="搜索制度名称或条款关键词（如：缓考、转专业、学分置换、查重、奖学金）…">
+            <input id="knowledgeSearch" placeholder="搜索制度名称、办事流程或电话（如：缓考、转专业、图书馆、校园网、医保、三方协议）…">
             <button type="button" id="clearKnowledgeSearch" class="clear-btn hide" title="清空搜索"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
           </div>
           <select id="knowledgeDept">
             <option value="">全部部门</option>
             <option value="教务处">教务处</option>
             <option value="学生工作部">学生工作部</option>
+            <option value="信息与现代教育技术中心">信息与现代教育技术中心</option>
+            <option value="图书馆">图书馆</option>
+            <option value="后勤保障处">后勤保障处</option>
+            <option value="保卫处">保卫处</option>
+            <option value="计划财务处">计划财务处</option>
+            <option value="招生就业处">招生就业处</option>
+            <option value="学生资助管理中心">学生资助管理中心</option>
+            <option value="校团委">校团委</option>
+            <option value="党委组织部">党委组织部</option>
+            <option value="党政办公室">党政办公室</option>
+            <option value="体育学院">体育学院</option>
+            <option value="国际交流处">国际交流处</option>
+            <option value="国有资产与实验室管理处">国有资产与实验室管理处</option>
           </select>
         </div>
 
@@ -656,9 +674,12 @@
           <button type="button" class="pill-btn" data-kdept="教务处" data-base-label="教务处">教务处</button>
           <button type="button" class="pill-btn" data-kdept="学生工作部" data-base-label="学生工作部">学生工作部</button>
           <button type="button" class="pill-btn" data-kq="考试">考试与缓补考</button>
-          <button type="button" class="pill-btn" data-kq="毕业论文">毕业论文规范</button>
-          <button type="button" class="pill-btn" data-kq="奖学金">奖助学金</button>
-          <button type="button" class="pill-btn" data-kq="公寓">学生公寓</button>
+          <button type="button" class="pill-btn" data-kq="毕业论文">毕业论文</button>
+          <button type="button" class="pill-btn" data-kq="奖学金">奖助资助</button>
+          <button type="button" class="pill-btn" data-kq="公寓">宿舍公寓</button>
+          <button type="button" class="pill-btn" data-kq="指南">校园生活与服务</button>
+          <button type="button" class="pill-btn" data-kq="就业">就业档案</button>
+          <button type="button" class="pill-btn" data-kq="电话">常用电话</button>
         </div>
 
         <div id="knowledgeMatchedBox" class="panel hide" style="margin-bottom: 16px;">
@@ -721,6 +742,7 @@
               </div>
               <div class="sched-d-actions">
                 <button type="button" id="schedDesktopToday" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-calendar-today"/></svg><span>回到今天</span></button>
+                <button type="button" id="schedOpenToolsBtn" class="sched-btn-ghost" title="考试倒计时、本周空档查询与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>课表助手</span></button>
                 <button type="button" id="schedImportImgBtn" class="sched-btn-ghost" title="支持图片、PDF、表格或文本一键导课表"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>AI 导课表</span></button>
                 <button type="button" id="schedOpenSettings" class="sched-btn-ghost"><svg class="ico" aria-hidden="true"><use href="#i-calendar-cog"/></svg><span>设置与备份</span></button>
                 <button type="button" id="schedDesktopAdd" class="sched-btn-primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>添加课程</span></button>
@@ -774,6 +796,7 @@
               </div>
               <div class="sched-m-actions">
                 <button type="button" id="schedMobToday" class="sched-m-ibtn" title="回到今天" aria-label="回到今天"><svg class="ico" aria-hidden="true"><use href="#i-calendar-today"/></svg></button>
+                <button type="button" id="schedMobTools" class="sched-m-ibtn" title="考试倒计时、空档与日历导出" aria-label="课表助手"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></button>
                 <button type="button" id="schedMobSettings" class="sched-m-ibtn" title="课表菜单与设置" aria-label="课表菜单与设置"><svg class="ico" aria-hidden="true"><use href="#i-calendar-cog"/></svg></button>
                 <button type="button" id="schedMobAdd" class="sched-m-ibtn is-primary" title="添加课程" aria-label="添加课程"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></button>
               </div>
@@ -1177,9 +1200,85 @@
   </div>
 </dialog>
 
+<dialog id="guideWizardDialog" class="task-dialog campus-tool-dialog" aria-label="校园办事向导与文书生成">
+  <div class="dialoghead">
+    <div><h2>校园办事向导与文书生成</h2><small>对照本校正式制度自查资格、核对材料清单，一键生成标准申请表</small></div>
+    <button type="button" id="closeGuideWizardDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="ct-body">
+    <div id="guideTabs" class="cat-pills ct-pills" role="tablist" aria-label="办事场景选择"></div>
+    <div id="guideDetail" class="ct-detail"></div>
+  </div>
+</dialog>
+
+<dialog id="gpaCalcDialog" class="task-dialog campus-tool-dialog" aria-label="学业 GPA 换算与学位预警">
+  <div class="dialoghead">
+    <div><h2>学业 GPA 换算与学位预警</h2><small>按本校学士学位授予标准自动核算平均学分绩点与学业风险提示</small></div>
+    <button type="button" id="closeGpaCalcDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="ct-body">
+    <div id="gpaSummary" class="ct-kpi-grid"></div>
+    <div id="gpaAlertBox" class="ct-alert-banner"></div>
+    <form id="gpaAddForm" class="ct-inline-form">
+      <input id="gpaCourseName" placeholder="课程名称（如：高等数学）" maxlength="40" required>
+      <input id="gpaCourseCredit" type="number" step="0.5" min="0.5" max="15" placeholder="学分" value="3" required>
+      <input id="gpaCourseScore" type="number" step="0.5" min="0" max="100" placeholder="成绩(0-100)" required>
+      <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
+    </form>
+    <div id="gpaCourseList" class="ct-list"></div>
+    <div class="ct-foot-actions">
+      <button type="button" id="gpaResetDemoBtn" class="outline">恢复示例课程</button>
+      <button type="button" id="gpaAskAiBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>让 AI 诊断学业规划</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="schedToolsDialog" class="task-dialog campus-tool-dialog" aria-label="超级课表助手">
+  <div class="dialoghead">
+    <div><h2>超级课表助手</h2><small>管理考试倒计时、查找本周空闲时段，或导出标准日历到手机提醒</small></div>
+    <button type="button" id="closeSchedToolsDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="ct-body">
+    <div class="sched-d-seg ct-seg" id="schedToolsTabs" role="tablist">
+      <button type="button" class="sched-dseg-btn on" data-sttab="exams"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>考试倒计时</span></button>
+      <button type="button" class="sched-dseg-btn" data-sttab="free"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>本周空档</span></button>
+      <button type="button" class="sched-dseg-btn" data-sttab="ics"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出手机日历</span></button>
+    </div>
+
+    <div id="stPaneExams" class="ct-pane">
+      <form id="examAddForm" class="ct-inline-form">
+        <input id="examTitle" placeholder="考试或ddl名称（如：高数期末）" maxlength="40" required>
+        <input id="examDate" type="date" required>
+        <input id="examPlace" placeholder="考场/座位（选填）" maxlength="32">
+        <button type="submit" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>添加</button>
+      </form>
+      <div id="examList" class="ct-list"></div>
+    </div>
+
+    <div id="stPaneFree" class="ct-pane hide">
+      <div class="ct-free-head">
+        <span id="freeSlotsSummary" class="muted">自动扫描当前周次 1-10 节无课时段</span>
+        <button type="button" id="refreshFreeSlotsBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新空档</button>
+      </div>
+      <div id="freeSlotsGrid" class="ct-list"></div>
+    </div>
+
+    <div id="stPaneIcs" class="ct-pane hide">
+      <div class="ct-ics-card">
+        <div class="ct-ics-info">
+          <b>导出标准日历文件（.ics）</b>
+          <p class="muted">将当前全部课程及上下课作息生成通用日历文件，可直接导入苹果日历、华为/小米日历或 Outlook，支持上课前 15 分钟系统弹窗提醒。</p>
+        </div>
+        <div class="ct-ics-meta" id="icsExportStats"></div>
+        <button type="button" id="exportSchedIcsBtn" class="primary"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>一键导出课表日历（.ics）</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.115"></script>
+<script src="app.js?v=1.116"></script>
 
 
 </body>

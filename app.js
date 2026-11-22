@@ -2543,7 +2543,7 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   wrap_el.appendChild(drawer);
 }
 
-function add_tools(wrap_el, text_getter, retry_question = "") {
+function add_tools(wrap_el, text_getter, retry_question = "", action_opts = {}) {
   const tools = document.createElement("div");
   tools.className = "bubble-tools";
 
@@ -2562,7 +2562,7 @@ function add_tools(wrap_el, text_getter, retry_question = "") {
   tools.appendChild(copy_btn);
 
   const answer_text = typeof text_getter === "function" ? text_getter() : text_getter;
-  setTimeout(() => { if (typeof apply_ai_schedule_action === "function") apply_ai_schedule_action(answer_text, tools); }, 0);
+  setTimeout(() => { if (typeof apply_ai_schedule_action === "function") apply_ai_schedule_action(answer_text, tools, action_opts); }, 0);
   const steps = pick_steps(answer_text);
   const todo_btn = document.createElement("button");
   todo_btn.type = "button";
@@ -2970,6 +2970,9 @@ $("askForm").onsubmit = async e => {
   let sources_label = "";
   let confidence = "";
   let ui_policy = null;
+  let agent_trace = null;
+  let allow_write_actions = false;
+  let allow_nav_actions = false;
   let follow_ups = [];
   let answer_docs = [];
   let streamed_content = false;
@@ -2985,6 +2988,12 @@ $("askForm").onsubmit = async e => {
   const paint_bubble = (is_streaming, custom_text) => {
     let html = "";
     const text_to_show = custom_text !== undefined ? custom_text : full_answer;
+    if (agent_trace && Array.isArray(agent_trace.steps) && agent_trace.steps.length >= 2) {
+      const stepsHtml = agent_trace.steps.map((st, idx) =>
+        `<div class="ai-trace-step"><span class="ai-trace-num">${idx + 1}</span><div><b>${esc(st.label || "")}</b><small>${esc(st.detail || "")}</small></div></div>`
+      ).join("");
+      html += `<details class="ai-agent-trace"><summary><span class="ai-trace-spark" aria-hidden="true">✦</span><span>${esc(agent_trace.summary || "智办规划轨迹")}</span></summary><div class="ai-trace-list">${stepsHtml}</div></details>`;
+    }
     if (full_reasoning.trim()) {
       const summary_label =
         !text_to_show.trim() && is_streaming
@@ -3103,6 +3112,9 @@ $("askForm").onsubmit = async e => {
           sources_label = parsed.sources_label || "";
           confidence = parsed.confidence || "";
           if (parsed.ui_policy && typeof parsed.ui_policy === "object") ui_policy = parsed.ui_policy;
+          if (parsed.agent_trace && typeof parsed.agent_trace === "object") agent_trace = parsed.agent_trace;
+          if (typeof parsed.allow_write_actions === "boolean") allow_write_actions = parsed.allow_write_actions;
+          if (typeof parsed.allow_nav_actions === "boolean") allow_nav_actions = parsed.allow_nav_actions;
           if (parsed.cached === true) is_cached_hit = true;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           if (Array.isArray(parsed.knowledge_docs)) answer_docs = parsed.knowledge_docs;
@@ -3113,6 +3125,7 @@ $("askForm").onsubmit = async e => {
           if (parsed.ui_policy && typeof parsed.ui_policy === "object") {
             ui_policy = { ...(ui_policy || {}), ...parsed.ui_policy };
           }
+          if (typeof parsed.allow_write_actions === "boolean") allow_write_actions = parsed.allow_write_actions;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           return;
         }
@@ -3306,7 +3319,7 @@ $("askForm").onsubmit = async e => {
       reasoning: full_reasoning.trim()
     });
     save_chat_to_local();
-    const tools_el = add_tools(wrap, () => clean_saved_answer, q);
+    const tools_el = add_tools(wrap, () => clean_saved_answer, q, { allowWrite: allow_write_actions, allowNav: allow_nav_actions });
     add_ai_footer_meta(wrap, tools_el, {
       showConf,
       confidence,
@@ -6213,8 +6226,10 @@ async function execute_single_schedule_act(act) {
   render_schedule_all();
 }
 
-async function apply_ai_schedule_action(rawText, toolsEl) {
+async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   if (!toolsEl || toolsEl.dataset.schedRendered) return;
+  const allowWrite = opts && opts.allowWrite === true;
+  const allowNav = opts && opts.allowNav === true;
   const txt = String(rawText || "");
   const actions = [];
 
@@ -6241,79 +6256,30 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
 
   for (const act of actions) {
     if (!act || !act.type) continue;
-    if (act.type === "add_tasks" && Array.isArray(act.items) && act.items.length) {
-      let added = 0;
-      for (const it of act.items.slice(0, 6)) {
-        const title = String(it?.title || "").trim();
-        if (!title) continue;
-        try {
-          await api("/tasks", {
-            method: "POST",
-            body: JSON.stringify({ title, due_date: String(it?.due_date || "").trim() })
-          });
-          added++;
-        } catch {}
-      }
-      if (added > 0) {
-        if (typeof load_tasks === "function") load_tasks();
-        autoLogs.push(`已自动添加 ${added} 条待办`);
-      }
-    } else if (act.type === "complete_task" && act.id) {
-      try {
-        await api("/tasks/" + Number(act.id), {
-          method: "PATCH",
-          body: JSON.stringify({ status: "completed" })
-        });
-        if (typeof load_tasks === "function") load_tasks();
-        autoLogs.push(`已将待办「${act.title || act.id}」标记为完成`);
-      } catch {}
-    } else if (act.type === "delete_task" && act.id) {
-      try {
-        await api("/tasks/" + Number(act.id), { method: "DELETE" });
-        if (typeof load_tasks === "function") load_tasks();
-        autoLogs.push(`已删除待办「${act.title || act.id}」`);
-      } catch {}
-    } else if (act.type === "open_doc" && act.title) {
+    if (act.type === "open_doc" && act.title) {
+      if (!allowNav && !allowWrite) continue;
       const docTitle = String(act.title || "").trim();
       if (docTitle && typeof open_doc_reader === "function") {
         autoLogs.push(`已为你打开校规原文《${docTitle}》`);
         setTimeout(() => open_doc_reader(docTitle), 320);
       }
     } else if (act.type === "navigate" && act.page) {
+      if (!allowNav && !allowWrite) continue;
       const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule"]);
       if (allowedPages.has(act.page)) {
-        autoLogs.push(`已为你准备跳转至「${act.page}」`);
+        autoLogs.push(`已为你跳转至「${act.page}」`);
         setTimeout(() => go(act.page), 450);
       }
+    } else if (!allowWrite) {
+      // 第三道物理安全锁：后端未授权写操作时，前端绝不静默执行任何待办/课表/公告写入
+      continue;
+    } else if (act.type === "add_tasks" && Array.isArray(act.items) && act.items.length) {
+      const validItems = act.items.slice(0, 6).filter(it => String(it?.title || "").trim());
+      if (validItems.length) confirmActs.push({ ...act, items: validItems });
+    } else if ((act.type === "complete_task" || act.type === "delete_task") && act.id) {
+      confirmActs.push(act);
     } else if (act.type === "schedule") {
-      // 小规模增删改配置可直接自动执行（带撤销）；整表替换 replace 需确认
-      if (act.mode === "replace") {
-        confirmActs.push(act);
-      } else {
-        const snapshot = JSON.parse(JSON.stringify(schedState.courses));
-        const prevStart = schedState.startDate;
-        const prevWeeks = schedState.totalWeeks;
-        await execute_single_schedule_act(act);
-        const card = document.createElement("div");
-        card.className = "sched-chat-confirm";
-        card.innerHTML = `
-          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>AI 已自动执行课表更新并同步云端</span></div>
-          <div class="sched-chat-confirm-actions">
-            <button type="button" class="sched-btn-ghost" data-act="view">查看超级课表</button>
-            <button type="button" class="sched-btn-ghost" data-act="undo">撤销本次修改</button>
-          </div>`;
-        card.querySelector('[data-act="view"]').onclick = () => go("schedule");
-        card.querySelector('[data-act="undo"]').onclick = () => {
-          schedState.courses = snapshot;
-          schedState.startDate = prevStart;
-          schedState.totalWeeks = prevWeeks;
-          schedQueueSync();
-          render_schedule_all();
-          card.remove();
-          toast("已撤销本次 AI 课表修改");
-        };
-        toolsEl.parentElement?.insertBefore(card, toolsEl.nextSibling);
-      }
+      confirmActs.push(act);
     } else if (act.type === "publish_notice" && me?.role === "admin") {
       confirmActs.push(act);
     }
@@ -6322,32 +6288,92 @@ async function apply_ai_schedule_action(rawText, toolsEl) {
   if (autoLogs.length) {
     const noteEl = document.createElement("div");
     noteEl.className = "sched-chat-confirm";
-    noteEl.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>AI 已自主执行：${schedEsc(autoLogs.join("；"))}</span></div>`;
+    noteEl.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>${schedEsc(autoLogs.join("；"))}</span></div>`;
     toolsEl.parentElement?.insertBefore(noteEl, toolsEl.nextSibling);
     toast(autoLogs[0]);
   }
 
   for (const act of confirmActs) {
     const card = document.createElement("div");
-    card.className = "sched-chat-confirm";
-    if (act.type === "schedule") {
+    card.className = "sched-chat-confirm ai-action-confirm-card";
+    if (act.type === "add_tasks") {
+      const previewLines = act.items.map(it =>
+        `• ${schedEsc(it.title)}${it.due_date ? "（截止 " + schedEsc(it.due_date) + "）" : ""}`
+      ).join("<br>");
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认添加 ${act.items.length} 条待办</span></div>
+        <div class="sched-chat-confirm-list">${previewLines}</div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认加入待办</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">暂不添加</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = async () => {
+        let added = 0;
+        for (const it of act.items) {
+          try {
+            await api("/tasks", {
+              method: "POST",
+              body: JSON.stringify({ title: String(it.title).trim(), due_date: String(it.due_date || "").trim() })
+            });
+            added++;
+          } catch {}
+        }
+        if (typeof load_tasks === "function") load_tasks();
+        toast(added ? `已添加 ${added} 条待办` : "添加待办失败");
+        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已确认添加 ${added} 条待办</span></div>`;
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已忽略该待办建议"); };
+    } else if (act.type === "complete_task") {
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认完成待办：「${schedEsc(act.title || act.id)}」</span></div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认标记完成</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = async () => {
+        try {
+          await api("/tasks/" + Number(act.id), { method: "PATCH", body: JSON.stringify({ status: "completed" }) });
+          if (typeof load_tasks === "function") load_tasks();
+          toast("已标记为完成");
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已标记完成「${schedEsc(act.title || act.id)}」</span></div>`;
+        } catch { toast("操作失败"); }
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
+    } else if (act.type === "delete_task") {
+      card.innerHTML = `
+        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>待确认删除待办：「${schedEsc(act.title || act.id)}」</span></div>
+        <div class="sched-chat-confirm-actions">
+          <button type="button" class="sched-btn-primary" data-act="confirm">确认删除</button>
+          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+        </div>`;
+      card.querySelector('[data-act="confirm"]').onclick = async () => {
+        try {
+          await api("/tasks/" + Number(act.id), { method: "DELETE" });
+          if (typeof load_tasks === "function") load_tasks();
+          toast("已删除待办");
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已删除待办「${schedEsc(act.title || act.id)}」</span></div>`;
+        } catch { toast("删除失败"); }
+      };
+      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
+    } else if (act.type === "schedule") {
       const courses = Array.isArray(act.courses) ? act.courses : [];
+      const isReplace = act.mode === "replace";
       const previewLines = courses.slice(0, 4).map(c =>
         `• ${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节《${schedEsc(c.name)}》${c.room ? " @ " + schedEsc(c.room) : ""}`
       ).join("<br>");
       card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>高权限操作待确认：将整套替换为 ${courses.length} 条新课程</span></div>
+        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>${isReplace ? `待确认：整套替换为 ${courses.length} 条新课程` : `待确认：更新超级课表（${courses.length ? courses.length + " 条课程" : "课表调整"}）`}</span></div>
         ${previewLines ? `<div class="sched-chat-confirm-list">${previewLines}${courses.length > 4 ? `<br>…等共 ${courses.length} 条` : ""}</div>` : ""}
         <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认覆盖并同步</button>
+          <button type="button" class="sched-btn-primary" data-act="confirm">${isReplace ? "确认覆盖并同步" : "确认写入课表"}</button>
           <button type="button" class="sched-btn-ghost" data-act="cancel">暂不应用</button>
         </div>`;
       card.querySelector('[data-act="confirm"]').onclick = async () => {
         await execute_single_schedule_act(act);
-        toast("已确认替换课表并同步云端");
-        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已覆盖写入超级课表</span></div>`;
+        toast("已确认更新课表并同步云端");
+        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入超级课表并同步云端</span></div>`;
       };
-      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消替换"); };
+      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消课表修改"); };
     } else if (act.type === "publish_notice") {
       card.innerHTML = `
         <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-bell"/></svg><span>管理员公告待确认：《${schedEsc(act.title || "校园通知")}》</span></div>

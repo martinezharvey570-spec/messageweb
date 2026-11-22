@@ -15742,3 +15742,285 @@ html.dark #messages .followup-box:not(.knowledge-ref-box) .followup-chips button
     line-height: 28px !important;
   }
 }
+
+/* ================================================================
+   v1.113: 全站 4 级几何宪法（消灭扁椭圆/杂散圆角）
+           + 白盒 Agent 推理轨迹 + 写操作确认卡样式
+   ================================================================ */
+:root {
+  --r-circle: 50%;
+  --r-pill: 999px;
+  --r-ctrl: 12px;
+  --r-card: 20px;
+  --r-modal: 24px;
+}
+
+/* 1. 严格纯正圆规范：全站所有纯图标按钮必须 1:1 等宽高正圆，杜绝任何扁椭圆 */
+#desktopSidebarToggle.desktop-rail-toggle {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: var(--r-circle) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+@media (min-width: 761px) {
+  body.sidebar-collapsed #desktopSidebarToggle.desktop-rail-toggle {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: var(--r-circle) !important;
+    margin: 0 auto !important;
+  }
+}
+
+dialog .dialoghead > button,
+.doc-close,
+.task-del-btn,
+.sched-clist-item .del,
+.sched-ai-wb-btn,
+.sched-icon-btn,
+.sched-m-act,
+.doc-m-btn,
+.sug-nav-btn,
+#themeBtn,
+#mobileMenuBtn,
+#askAttachBtn,
+#askSubmitBtn,
+#schedMobAddCourse,
+.notice-actions .icon-only {
+  border-radius: var(--r-circle) !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+dialog .dialoghead > button,
+.doc-close {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 2px 6px -2px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark dialog .dialoghead > button,
+html.dark .doc-close {
+  background: rgba(30, 41, 59, 0.80) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.18),
+    0 0 0 1px rgba(148, 197, 255, 0.16) !important;
+}
+
+.notice-actions .icon-only {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+@media (max-width: 480px) {
+  .notice-actions .icon-only {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+  }
+}
+
+.task-del-btn,
+.sched-clist-item .del {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+/* 2. 严格标准胶囊规范：全站带文字操作按钮、筛选标签统一 999px 与顺滑按压微反馈 */
+.primary,
+.outline:not(.icon-only),
+.sched-btn-primary,
+.sched-btn-ghost,
+.ai-btn,
+.added,
+.pill,
+.sched-link-btn,
+.sched-weeks-quick button,
+.suggestions button {
+  border-radius: var(--r-pill) !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, background 0.18s ease, color 0.16s ease !important;
+}
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* 3. 严格圆润矩形规范：弹窗与表单内全部 input/select/textarea 统一 12px，消除胶囊 select 与方框 textarea 混搭 */
+dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
+dialog:not(#docDialog) select,
+dialog:not(#docDialog) textarea,
+.sched-field input,
+.sched-field select,
+.sched-field textarea,
+.sched-field .xz-date-trigger,
+#addTaskForm input:not([type="checkbox"]),
+#addTaskForm select,
+#addTaskForm .xz-date-trigger {
+  border-radius: var(--r-ctrl) !important;
+}
+
+.taskrow,
+.user-row,
+.sched-clist-item,
+.sched-ai-wb-item,
+.ai-ref-drawer,
+.sched-chat-confirm {
+  border-radius: 14px !important;
+}
+
+/* 4. 严格主卡与弹窗同心圆角规范 */
+.welcome,
+.panel,
+.stats article,
+.notice-card,
+.knowledge-card,
+.sched-d-header,
+.sched-today-card,
+.sched-matrix-card,
+.sched-manage-card,
+.sched-tt-card {
+  border-radius: var(--r-card) !important;
+}
+dialog.task-dialog,
+#docDialog,
+.xz-cal-pop {
+  border-radius: var(--r-modal) !important;
+}
+
+/* 5. 白盒 Agent 推理轨迹微胶囊（默认折叠极简一行，点击展开步骤时间线） */
+.ai-agent-trace {
+  margin: 0 0 9px;
+  border-radius: var(--r-ctrl);
+  background: rgba(239, 246, 255, 0.72);
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  overflow: hidden;
+  font-size: 12px;
+}
+.ai-agent-trace > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  color: #1d4ed8;
+  font-weight: 600;
+  line-height: 1.3;
+  user-select: none;
+}
+.ai-agent-trace > summary::-webkit-details-marker {
+  display: none;
+}
+.ai-agent-trace > summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 10px;
+  opacity: 0.7;
+  transition: transform 0.2s var(--lg-spring);
+}
+.ai-agent-trace[open] > summary::after {
+  transform: rotate(180deg);
+}
+.ai-trace-spark {
+  font-size: 12px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+.ai-trace-list {
+  padding: 6px 10px 9px;
+  border-top: 1px solid rgba(37, 99, 235, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ai-trace-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.ai-trace-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+  font-size: 10.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ai-trace-step b {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.ai-trace-step small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+html.dark .ai-agent-trace {
+  background: rgba(30, 58, 138, 0.20);
+  border-color: rgba(96, 165, 250, 0.24);
+}
+html.dark .ai-agent-trace > summary {
+  color: #93c5fd;
+}
+html.dark .ai-trace-spark {
+  color: #60a5fa;
+}
+html.dark .ai-trace-list {
+  border-top-color: rgba(147, 197, 253, 0.14);
+}
+html.dark .ai-trace-num {
+  background: rgba(59, 130, 246, 0.28);
+  color: #bfdbfe;
+}
+
+/* 6. 写操作确认卡（统一冰蓝白实边玻璃风格） */
+.ai-action-confirm-card {
+  margin-top: 8px !important;
+  padding: 10px 12px !important;
+  background: var(--pearl-l2-bg) !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+  border: 0 !important;
+}
+.ai-action-confirm-card .sched-chat-confirm-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ai-action-confirm-card .sched-chat-confirm-actions button {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 13px !important;
+  font-size: 12px !important;
+}

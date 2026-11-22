@@ -536,7 +536,7 @@ function sync_scroll_btn(respectLock = false) {
   const btn = $("scrollBottomBtn");
   const m = get_ai_scroll_metrics();
   if (!btn || !m) return;
-  const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 72 || m.maxTop <= 48;
+  const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 140 || m.maxTop <= 64;
   btn.classList.toggle("hide", shouldHide);
 }
 let scroll_btn_lock_until = 0;
@@ -1450,7 +1450,7 @@ function render_knowledge_grid(docs, matched_chunks = [], q = "") {
             <div>
               <div class="notice-top knowledge-card-top">
                 <span class="tag">${esc(d.dept || "学校部门")}</span>
-                ${d.is_custom ? `<span class="tag custom-kb-tag">动态修订</span>` : ""}
+                ${d.is_custom ? `<span class="tag custom-kb-tag">补充规定</span>` : ""}
                 <span class="doc-index" title="目录内唯一序号">档案 ${esc(d.catalog_no || String(d.id || 0).padStart(3, "0"))}/${total_txt}</span>
                 <small class="muted">${esc(d.date || "日期未标注")}</small>
               </div>
@@ -1949,7 +1949,7 @@ function md_section_kind(title) {
 function format_markdown_safe(text) {
   const raw = String(text ?? "")
     .replace(/\r\n/g, "\n")
-    .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)-->|$)/g, "");
+    .replace(/<!--\s*(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)?-->|$)/g, "");
   if (!raw.trim()) return "";
 
   const lines = raw.split("\n");
@@ -2258,22 +2258,30 @@ const meta_talk_sentence_res = [
   /(检索|搜索|查找|匹配)[^。！？\n]{0,12}(过程|日志|记录)[^。！？\n]{0,10}(不|无|省略|此处|如下)/,
 ];
 
+const hidden_meta_block_re = /<!--\s*(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)?-->|$)/g;
+
 function strip_meta_talk(text) {
   let out = String(text || "");
   if (!out) return out;
+  const savedBlocks = [];
+  out = out.replace(hidden_meta_block_re, m => {
+    savedBlocks.push(m);
+    return "";
+  });
   out = out.replace(/[（(]\s*(注|说明|备注|提示)\s*[:：][^）)]{0,160}[）)]/g, m =>
     /链接|网址|来源|检索|搜索|伪造|编造|真实|有效|URL/i.test(m) ? "" : m
   );
   out = (out.match(/[^。！？；\n]+[。！？；\n]*/g) || [])
     .filter(seg => !meta_talk_sentence_res.some(re => re.test(seg)))
     .join("");
-  return out
+  const cleaned = out
     .replace(/[ \t]+([，。；：、！？])/g, "$1")
     .replace(/[（(]\s*[)）]/g, "")
     .replace(/^[ \t]*[-*·][ \t]*$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+$/gm, "")
     .trim();
+  return savedBlocks.length ? `${cleaned}\n${savedBlocks.join("\n")}`.trim() : cleaned;
 }
 
 function clean_links(text, sources) {
@@ -2282,6 +2290,11 @@ function clean_links(text, sources) {
   };
   const allowed = new Set(pick_sources(sources).map(s => norm(s.url)).filter(Boolean));
   let out = strip_meta_talk(text);
+  const savedBlocks = [];
+  out = out.replace(hidden_meta_block_re, m => {
+    savedBlocks.push(m);
+    return "";
+  });
   out = out.replace(/\[([^\]]{1,240})\]\((https?:\/\/[^\s)]+)(?:\s+[^)]*)?\)/gi,
     (all, label, url) => (allowed.has(norm(url)) ? all : label)
   );
@@ -2289,7 +2302,8 @@ function clean_links(text, sources) {
     const bare = url.replace(/[，。；;！？!?]+$/, "");
     return allowed.has(norm(bare)) ? url : "";
   });
-  return out.replace(/[ \t]+([，。；：、！？])/g, "$1").replace(/[（(]\s*[)）]/g, "");
+  const cleaned = out.replace(/[ \t]+([，。；：、！？])/g, "$1").replace(/[（(]\s*[)）]/g, "").trim();
+  return savedBlocks.length ? `${cleaned}\n${savedBlocks.join("\n")}`.trim() : cleaned;
 }
 
 function tidy_title(value) {
@@ -2302,9 +2316,7 @@ const answer_tail_cut = /[的该和与或及以于并且是在对为把被从此
 
 function looks_done(text) {
   const t = String(text || "")
-    .replace(/<!--UI_META[\s\S]*?(?:UI_META-->|$)/g, "")
-    .replace(/<!--AGENT_ACTIONS[\s\S]*?(?:AGENT_ACTIONS-->|$)/g, "")
-    .replace(/<!--SCHEDULE_ACTION[\s\S]*?(?:SCHEDULE_ACTION-->|$)/g, "")
+    .replace(hidden_meta_block_re, "")
     .trimEnd();
   if (!t) return false;
   const openers = (t.match(/[（(\[【《〈“‘]/g) || []).length;
@@ -2694,6 +2706,7 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
     add_ai_footer_meta(wrap, tools_el, { showConf: false, showSrc: true, sources });
   }
 
+  $("messages")?.querySelector(".welcome-bubble")?.closest(".bubble-wrap")?.remove();
   $("messages").appendChild(wrap);
   sync_scroll_btn(true);
   return wrap;
@@ -3341,7 +3354,7 @@ $("askForm").onsubmit = async e => {
       wrap.appendChild(box);
       return;
     }
-    const uiMetaMatch = full_answer.match(/<!--UI_META\s*([\s\S]*?)\s*UI_META-->/);
+    const uiMetaMatch = full_answer.match(/<!--\s*UI_META\s*([\s\S]*?)\s*(?:UI_META)?-->/);
     if (uiMetaMatch) {
       try {
         const parsedUi = JSON.parse(uiMetaMatch[1].trim());
@@ -3359,7 +3372,7 @@ $("askForm").onsubmit = async e => {
       } catch {}
     }
     const clean_saved_answer = full_answer
-      .replace(/<!--UI_META[\s\S]*?(?:UI_META-->|$)/g, "")
+      .replace(/<!--\s*UI_META[\s\S]*?(?:(?:UI_META)?-->|$)/g, "")
       .trim();
     const showConf = ui_policy ? ui_policy.show_confidence === true : Boolean(confidence);
     const showSrc = ui_policy ? ui_policy.show_sources === true : (has_links(sources) || (answer_docs && answer_docs.length > 0));
@@ -3705,7 +3718,7 @@ async function load_stats() {
           <div class="stat-metric">
             <span>内置校规制度库</span>
             <b>${knowledge_files || "—"}</b>
-            <small>${knowledge_chunks ? knowledge_chunks + " 个检索知识切片" : "官方文件与附件"}</small>
+            <small>${knowledge_chunks ? `含 ${knowledge_chunks} 节制度章节条款` : "学校规章制度与办事指南"}</small>
           </div>
         </div>
       </div>
@@ -6380,17 +6393,18 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   const txt = String(rawText || "");
   const actions = [];
 
-  const agentMatch = txt.match(/<!--AGENT_ACTIONS\s*([\s\S]*?)\s*AGENT_ACTIONS-->/);
-  if (agentMatch) {
+  const agentMatches = [...txt.matchAll(/<!--\s*AGENT_ACTIONS\s*([\s\S]*?)\s*(?:AGENT_ACTIONS)?-->/g)];
+  for (const m of agentMatches) {
     try {
-      const arr = JSON.parse(agentMatch[1]);
-      if (Array.isArray(arr)) actions.push(...arr);
+      const parsed = JSON.parse(m[1].trim());
+      if (Array.isArray(parsed)) actions.push(...parsed);
+      else if (parsed && typeof parsed === "object") actions.push(parsed);
     } catch {}
   }
-  const schedMatch = txt.match(/<!--SCHEDULE_ACTION\s*([\s\S]*?)\s*SCHEDULE_ACTION-->/);
-  if (schedMatch) {
+  const schedMatches = [...txt.matchAll(/<!--\s*SCHEDULE_ACTION\s*([\s\S]*?)\s*(?:SCHEDULE_ACTION)?-->/g)];
+  for (const m of schedMatches) {
     try {
-      const obj = JSON.parse(schedMatch[1]);
+      const obj = JSON.parse(m[1].trim());
       if (obj && obj.mode) actions.push({ type: "schedule", ...obj });
     } catch {}
   }
@@ -7058,9 +7072,9 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
         { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") },
         { group: "效率工具", mod: "ai", icon: "sparkles", title: "群通知与截图一键拆解", sub: "粘贴班级群消息或上传聊天截图，自动生成待办与考试日程", run: () => window.open_notice_parser?.() },
-        { group: "效率工具", mod: "notices", icon: "award", title: "奖助评优与学位红线自检", sub: "对照量化细则实时核算国奖/励志/助学金兼得与红线", run: () => window.open_eligibility_dialog?.() },
+        { group: "效率工具", mod: "notices", icon: "award", title: "奖助学金与评优资格自查", sub: "核对国家奖学金、励志奖学金、助学金与学位授予条件", run: () => window.open_eligibility_dialog?.() },
         { group: "效率工具", mod: "home", icon: "clipboard", title: "校园办事向导与文书生成", sub: "材料清单核对、流程指引与一键导出 Word 申请表", run: () => window.open_guide_wizard?.() },
-        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业 GPA 换算与学位预警", sub: "实时核算平均学分绩点并对照学位标准预警", run: () => window.open_gpa_calc?.() },
+        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业绩点 (GPA) 计算", sub: "计算平均学分绩点与加权平均分，核对学士学位要求", run: () => window.open_gpa_calc?.() },
         { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
       );
     } else {
@@ -7165,7 +7179,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         mod: "ai",
         icon: "ai-brand",
         title: `直接问 AI：「${q}」`,
-        sub: "由后端智脑自主检索校规并极简直答",
+        sub: "结合学校规章制度提供解答与办事指引",
         run: () => {
           go("ai");
           const qEl = $("question");
@@ -7623,8 +7637,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   window.init_guide_page = () => {
     renderGuideWizard();
   };
+  const GUIDE_ID_ALIASES = { leave: "suspend", student_id: "studentid", military: "army", diploma: "cert" };
   window.open_guide_wizard = guideId => {
-    if (guideId && CAMPUS_GUIDES.some(g => g.id === guideId)) activeGuideId = guideId;
+    const resolved = GUIDE_ID_ALIASES[guideId] || guideId;
+    if (resolved && CAMPUS_GUIDES.some(g => g.id === resolved)) activeGuideId = resolved;
     go("guide");
     renderGuideWizard();
   };
@@ -7689,10 +7705,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>尚未录入课程成绩：</b>在下方输入课程名称、学分与成绩，系统将实时核算 GPA 与学士学位达标状态。</span>`;
     } else if (m.failCount > 0 || m.gpa < 2.0) {
       alertEl.className = "ct-alert-banner is-danger";
-      alertEl.innerHTML = `${ico("alert", "ico-xs")}<span><b>学业与学位红线提醒：</b>当前 GPA 为 ${m.gpa.toFixed(2)}（不及格 ${m.failCount} 门）。按学士学位授予标准，申请学士学位一般须达平均学分绩点 2.0 及以上，建议及时完成重修报名。</span>`;
+      alertEl.innerHTML = `${ico("alert", "ico-xs")}<span><b>学位绩点提醒：</b>当前 GPA 为 ${m.gpa.toFixed(2)}（不及格 ${m.failCount} 门）。按学士学位授予标准，申请学士学位一般须达平均学分绩点 2.0 及以上，建议及时完成重修报名。</span>`;
     } else if (m.gpa < 2.4) {
       alertEl.className = "ct-alert-banner is-warn";
-      alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>学业预警提示：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，虽已超过学位底线（2.0），但余量偏紧，建议优先冲刺高学分专业课提分。</span>`;
+      alertEl.innerHTML = `${ico("bulb", "ico-xs")}<span><b>学业提升提示：</b>当前 GPA 为 ${m.gpa.toFixed(2)}，已达到学位要求（2.0），建议优先巩固高学分专业课成绩。</span>`;
     } else {
       alertEl.className = "ct-alert-banner is-ok";
       const extra = m.gpa >= 3.5 ? "，具备冲刺国家奖学金、校级一等奖学金及优秀毕业生竞争力！" : "，保持当前节奏可顺利满足学士学位授予绩点要求。";
@@ -8265,13 +8281,13 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   });
 
-  /* ---------- P0-2：校务知识库在线热更新（管理员增补/移除动态校规） ---------- */
+  /* ---------- P0-2：校务知识库在线更新（管理员新增/删除补充校规） ---------- */
   window.open_custom_doc_dialog = (prefill = {}) => {
-    if (!me || me.role !== "admin") return toast("仅系统管理员可在线增补或修订校规");
+    if (!me || me.role !== "admin") return toast("仅系统管理员可新增或修改校规文件");
     const dlg = $("customDocDialog");
     if (!dlg) return;
     $("customDocId").value = prefill.custom_id ? String(prefill.custom_id) : "";
-    $("customDocDlgTitle").textContent = prefill.custom_id ? "编辑动态修订校规" : "在线增补校规与补充通知";
+    $("customDocDlgTitle").textContent = prefill.custom_id ? "编辑校规文件" : "新增校规与补充通知";
     $("customDocTitle").value = prefill.title || "";
     if (prefill.dept && $("customDocDept")) $("customDocDept").value = prefill.dept;
     $("customDocNo").value = prefill.doc_no || "";
@@ -8300,7 +8316,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if (btn) { btn.disabled = true; btn.textContent = "保存中…"; }
     try {
       const r = await api("/knowledge/custom", { method: "POST", body: JSON.stringify(payload) });
-      toast(r.message || "动态校规已入库并即时生效");
+      toast(r.message || "校规文件已保存");
       $("customDocDialog")?.close();
       all_knowledge_docs_cache = null;
       if (typeof load_knowledge === "function") load_knowledge();
@@ -8317,10 +8333,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if (!delBtn) return;
     const cid = delBtn.dataset.delCustomDoc;
     if (!cid) return;
-    if (!confirm("确定移除这条在线增补的动态校规吗？")) return;
+    if (!confirm("确定删除这份补充校规文件吗？")) return;
     try {
       await api(`/knowledge/custom/${encodeURIComponent(cid)}`, { method: "DELETE" });
-      toast("已移除该动态校规");
+      toast("已删除该校规文件");
       all_knowledge_docs_cache = null;
       if (typeof load_knowledge === "function") load_knowledge();
     } catch (err) {
@@ -8328,7 +8344,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   });
 
-  /* ---------- P0-3：AI 智慧校务治理驾驶舱（高频咨询热力 + 制度盲区 + 一键生成答疑通知） ---------- */
+  /* ---------- P0-3：数据统计与常见咨询分析 ---------- */
   window.load_gov_insights = async () => {
     const hotEl = $("govHotTopics");
     const blindEl = $("govBlindSpots");
@@ -8341,13 +8357,13 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       const customCnt = Number(data?.custom_docs_count || 0);
       if (metaEl) {
         metaEl.textContent = total
-          ? `累计分析 ${total} 次脱敏 AI 咨询 · 校规命中率 ${rate}% · 在线动态增补 ${customCnt} 份`
-          : `系统已就绪（在线动态校规 ${customCnt} 份），师生向校务指南 AI 提问后将实时聚类`;
+          ? `累计问答 ${total} 次 · 制度匹配率 ${rate}%${customCnt ? ` · 新增补充规定 ${customCnt} 份` : ""}`
+          : `师生使用「校务指南 AI」提问后，这里会自动统计常见咨询问题`;
       }
 
       const topics = Array.isArray(data?.hot_topics) ? data.hot_topics : [];
       if (!topics.length) {
-        hotEl.innerHTML = `<div class="gov-empty muted">暂无 AI 咨询记录。体验几次「校务指南 AI」问答后刷新，这里将实时呈现全校高频咨询热力并支持一键起草官方答疑通知。</div>`;
+        hotEl.innerHTML = `<div class="gov-empty muted">暂无咨询统计记录。师生在「校务指南 AI」提问后，这里会自动汇总常见问题并支持一键起草答疑通知。</div>`;
       } else {
         hotEl.innerHTML = topics.map((t, idx) => `
           <div class="gov-topic-row">
@@ -8386,7 +8402,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
                 setTimeout(() => {
                   const nDlg = $("dialog");
                   if ($("nEditId")) $("nEditId").value = "";
-                  if ($("dialogTitle")) $("dialogTitle").textContent = "发布校园通知（AI 治理起草）";
+                  if ($("dialogTitle")) $("dialogTitle").textContent = "发布校园通知";
                   if ($("submitNoticeBtn")) $("submitNoticeBtn").textContent = "确认发布";
                   if ($("nTitle")) $("nTitle").value = draft.title || "";
                   if ($("nCategory") && draft.category) {
@@ -8398,7 +8414,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
                   if ($("nBody")) $("nBody").value = draft.body || "";
                   $("nTasksWrap")?.classList.remove("hide");
                   if (nDlg && !nDlg.open) nDlg.showModal();
-                  toast("AI 已依据本校校规起草官方答疑通知，请审阅后发布");
+                  toast("已根据校规生成通知草稿，请核对后发布");
                 }, 120);
               }
             } catch (err) {
@@ -8413,7 +8429,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
       const spots = Array.isArray(data?.blind_spots) ? data.blind_spots : [];
       if (!spots.length) {
-        blindEl.innerHTML = `<div class="gov-empty muted">${ico("check-square", "ico-xs")} 当前暂未发现低置信度制度盲区，现有 ${Number(data?.total_docs_count || kb_total || 126)} 份校规覆盖表现良好。</div>`;
+        blindEl.innerHTML = `<div class="gov-empty muted">${ico("check-square", "ico-xs")} 当前暂无待补充规定的问题，现有 ${Number(data?.total_docs_count || kb_total || 126)} 份校规制度已覆盖近期咨询。</div>`;
       } else {
         blindEl.innerHTML = spots.map((s, idx) => `
           <div class="gov-spot-row">
@@ -8421,7 +8437,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
               <b>${esc(s.question)}</b>
               <small class="muted">归类：${esc(s.topic)} · 建议归口：${esc(s.dept)}</small>
             </div>
-            <button type="button" class="outline gov-add-kb-btn" data-gov-spot="${idx}">${ico("plus", "ico-xs")}增补</button>
+            <button type="button" class="outline gov-add-kb-btn" data-gov-spot="${idx}">${ico("plus", "ico-xs")}补充规定</button>
           </div>
         `).join("");
         blindEl.querySelectorAll("[data-gov-spot]").forEach(btn => {
@@ -8431,17 +8447,17 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
             window.open_custom_doc_dialog({
               title: `关于「${sp.question.slice(0, 28)}」的校务补充说明`,
               dept: sp.dept,
-              content: `针对近期学生高频咨询问题“${sp.question}”，现补充明确办理依据与流程如下：\n1. 受理部门：${sp.dept}\n2. 办理条件与材料：\n3. 办理时间与咨询电话：`
+              content: `针对近期学生常问问题“${sp.question}”，现补充明确办理依据与流程如下：\n1. 受理部门：${sp.dept}\n2. 办理条件与材料：\n3. 办理时间与咨询电话：`
             });
           });
         });
       }
     } catch {
-      hotEl.innerHTML = `<div class="gov-empty muted">治理洞察数据暂不可用，请点击右上角刷新重试。</div>`;
+      hotEl.innerHTML = `<div class="gov-empty muted">统计数据加载失败，请点击右上角刷新重试。</div>`;
     }
   };
 
-  /* ---------- P1-1：奖助学金 · 评优 · 毕业资格「红线自检体检仪」（默认空状态，不虚构假绩点） ---------- */
+  /* ---------- P1-1：奖助学金 · 评优 · 毕业资格自查（默认空状态，不虚构假绩点） ---------- */
   const renderEligibility = () => {
     const rawGpa = ($("eligGpa")?.value || "").trim();
     const sumEl = $("eligSummary");
@@ -8451,12 +8467,12 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         sumEl.innerHTML = `
           <div class="ct-kpi"><small>已达标项目</small><b>—</b></div>
           <div class="ct-kpi"><small>差一步达标</small><b>—</b></div>
-          <div class="ct-kpi"><small>红线预警</small><b>—</b></div>
-          <div class="ct-kpi"><small>合规兼得预估</small><b>—</b></div>
+          <div class="ct-kpi"><small>未达条件</small><b>—</b></div>
+          <div class="ct-kpi"><small>可申奖助预估</small><b>—</b></div>
         `;
       }
       if (listEl) {
-        listEl.innerHTML = `<div class="ct-row"><small class="muted">请输入您的平均学分绩点 GPA（或在左侧「GPA 换算与预警」录入课程成绩自动同步），即可实时测算 7 项奖助评优与学位红线资格。</small></div>`;
+        listEl.innerHTML = `<div class="ct-row"><small class="muted">请输入平均学分绩点 GPA（或在「GPA 绩点计算」中录入课程成绩自动带入），即可核对 7 项奖助学金、评优与学位申请条件。</small></div>`;
       }
       return;
     }
@@ -8479,8 +8495,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         guide: "aid",
         amount: 8000,
         eval: () => {
-          if (!noFail || !cleanRecord) return { state: "red", tag: "触碰红线", reason: !noFail ? "要求学年内全部课程一次通过（存在挂科/补考记录即一票否决）。" : "要求在校期间无任何违纪处分记录。" };
-          if (rank <= 10 || (rank <= 30 && hasHonor)) return { state: "ok", tag: "已达标可申", reason: rank <= 10 ? `专业排名进入前 ${rank}% 且无挂科处分，符合国家级拔尖评选门槛。` : "排名在前 30% 内且具备省级以上突出获奖，满足破格推荐条件。" };
+          if (!noFail || !cleanRecord) return { state: "red", tag: "暂不符合", reason: !noFail ? "要求学年内全部课程一次通过（存在挂科/补考记录即不符合申请条件）。" : "要求在校期间无任何违纪处分记录。" };
+          if (rank <= 10 || (rank <= 30 && hasHonor)) return { state: "ok", tag: "已达标可申", reason: rank <= 10 ? `专业排名进入前 ${rank}% 且无挂科处分，符合国家奖学金评选条件。` : "排名在前 30% 内且具备省级以上突出获奖，满足申请条件。" };
           return { state: "warn", tag: "差一步达标", reason: `需智育/综测进入前 10%（或前 30% 且获省级以上竞赛奖项），当前排名为前 ${rank}%。` };
         }
       },
@@ -8491,8 +8507,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         guide: "aid",
         amount: 6000,
         eval: () => {
-          if (!hasAid) return { state: "warn", tag: "需先做困难认定", reason: "申请前提为本学年已通过家庭经济困难学生认定，请先在“办事向导”完成认定。" };
-          if (!noFail || !noActivePunish) return { state: "red", tag: "触碰红线", reason: !noFail ? "要求学年无不及格课程记录。" : "处分期内不可申报国家励志奖学金。" };
+          if (!hasAid) return { state: "warn", tag: "需先做困难认定", reason: "申请前提为本学年已通过家庭经济困难学生认定，请先在“办事向导”查看认定材料。" };
+          if (!noFail || !noActivePunish) return { state: "red", tag: "暂不符合", reason: !noFail ? "要求学年无不及格课程记录。" : "处分期内不可申报国家励志奖学金。" };
           if (rank <= 25 || (rank <= 30 && gpa >= 3.0)) return { state: "ok", tag: "已达标可申", reason: "已通过困难认定且成绩优良无挂科，符合国家励志奖学金申报条件。" };
           return { state: "warn", tag: "差一步达标", reason: `需成绩排名进入前 20%~30% 且绩点稳步提升（当前 GPA ${gpa.toFixed(2)}）。` };
         }
@@ -8504,8 +8520,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         guide: "aid",
         amount: 3500,
         eval: () => {
-          if (!noActivePunish) return { state: "red", tag: "触碰红线", reason: "尚在违纪处分期内，暂不符合国家助学金受助条件。" };
-          if (!hasAid) return { state: "warn", tag: "需完成困难认定", reason: "须先提交家庭经济困难认定材料并入库，审核通过后即可按档次受助。" };
+          if (!noActivePunish) return { state: "red", tag: "暂不符合", reason: "尚在违纪处分期内，暂不符合国家助学金受助条件。" };
+          if (!hasAid) return { state: "warn", tag: "需完成困难认定", reason: "须先提交家庭经济困难认定材料并审核通过，即可按档次受助。" };
           return { state: "ok", tag: "已达标可申", reason: "已完成家庭经济困难认定且遵纪守法，可按特困/困难/一般困难分档享受资助。" };
         }
       },
@@ -8516,8 +8532,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         guide: "aid",
         amount: 2000,
         eval: () => {
-          if (!noFail || !noActivePunish) return { state: "red", tag: "触碰红线", reason: !noFail ? "学年存在不及格课程时，通常取消当学年校级奖学金评定资格。" : "违纪处分期内取消评优评奖资格。" };
-          if (rank <= 10 && gpa >= 3.3) return { state: "ok", tag: "可冲刺一等奖", reason: `GPA ${gpa.toFixed(2)} 且排名前 ${rank}%，具备竞争一等奖学金与校级三好学生实力。` };
+          if (!noFail || !noActivePunish) return { state: "red", tag: "暂不符合", reason: !noFail ? "学年存在不及格课程时，通常不具备当学年校级奖学金评定资格。" : "违纪处分期内暂不具备评优评奖资格。" };
+          if (rank <= 10 && gpa >= 3.3) return { state: "ok", tag: "可冲刺一等奖", reason: `GPA ${gpa.toFixed(2)} 且排名前 ${rank}%，具备申请一等奖学金与校级三好学生条件。` };
           if (rank <= 30 && gpa >= 2.6) return { state: "ok", tag: "可申二/三等奖", reason: `GPA ${gpa.toFixed(2)} 且排名前 ${rank}%，符合校级二/三等奖学金参评条件。` };
           return { state: "warn", tag: "差一步达标", reason: "建议将专业排名提升至前 30% 且 GPA 达到 2.6 以上。" };
         }
@@ -8529,22 +8545,22 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         guide: "major",
         amount: 0,
         eval: () => {
-          if (!noActivePunish) return { state: "red", tag: "触碰红线", reason: "受违纪处分尚未解除期间，不得申请转专业。" };
-          if (fail === "active") return { state: "warn", tag: "风险提示", reason: "存在未通过课程可能影响接收学院综合排名与降级评估，建议先清考重修。" };
-          if (rank <= 20 || gpa >= 3.0) return { state: "ok", tag: "竞争优势强", reason: "无处分且学业成绩优良，申请热门转入专业具有较强面试/笔试优势。" };
+          if (!noActivePunish) return { state: "red", tag: "暂不符合", reason: "受违纪处分尚未解除期间，不得申请转专业。" };
+          if (fail === "active") return { state: "warn", tag: "需注意重修", reason: "存在未通过课程可能影响接收学院综合排名与学分核算，建议及时重修。" };
+          if (rank <= 20 || gpa >= 3.0) return { state: "ok", tag: "竞争优势强", reason: "无处分且学业成绩优良，申请热门转入专业具有较强竞争优势。" };
           return { state: "ok", tag: "可报名参评", reason: "符合基本申请资格，需重点准备转入学院的笔试与面试考核。" };
         }
       },
       {
-        name: "学士学位授予红线体检",
-        mutex: "毕业核心底线标准",
+        name: "学士学位授予条件核对",
+        mutex: "毕业学位授予标准",
         doc: "西安文理学院学士学位授予工作实施细则",
-        guide: "diploma",
+        guide: "cert",
         amount: 0,
         eval: () => {
-          if (!noActivePunish) return { state: "red", tag: "学位红线预警", reason: "违纪处分未解除前无法正常授予学士学位，请务必对照《处分解除指南》按期申请解除。" };
-          if (gpa < 2.0 || fail === "active") return { state: "red", tag: "学分/绩点预警", reason: gpa < 2.0 ? `当前平均学分绩点 ${gpa.toFixed(2)} 低于 2.0 授予标准（差 ${(2.0 - gpa).toFixed(2)}），请尽快重修低分课程。` : "尚有未通过课程，请务必在毕业前完成重修并修满培养方案学分。" };
-          return { state: "ok", tag: "学位状态健康", reason: `GPA ${gpa.toFixed(2)}（≥ 2.0）、无未解除处分，正常修满学分并通过毕业论文答辩即可授予学位。` };
+          if (!noActivePunish) return { state: "red", tag: "需解除处分", reason: "违纪处分未解除前无法正常授予学士学位，请务必对照《处分解除指南》按期申请解除。" };
+          if (gpa < 2.0 || fail === "active") return { state: "red", tag: "学分/绩点提醒", reason: gpa < 2.0 ? `当前平均学分绩点 ${gpa.toFixed(2)} 低于 2.0 授予标准（差 ${(2.0 - gpa).toFixed(2)}），请尽快重修低分课程。` : "尚有未通过课程，请务必在毕业前完成重修并修满培养方案学分。" };
+          return { state: "ok", tag: "符合授予条件", reason: `GPA ${gpa.toFixed(2)}（≥ 2.0）、无未解除处分，正常修满学分并通过毕业论文答辩即可授予学位。` };
         }
       },
       {
@@ -8580,8 +8596,8 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       sumEl.innerHTML = `
         <div class="ct-kpi"><small>已达标项目</small><b style="color:#059669">${okCount} 项</b></div>
         <div class="ct-kpi"><small>差一步达标</small><b style="color:#d97706">${warnCount} 项</b></div>
-        <div class="ct-kpi"><small>红线预警</small><b style="color:${redCount ? "#e11d48" : "#059669"}">${redCount} 项</b></div>
-        <div class="ct-kpi"><small>合规兼得预估</small><b style="color:#2563eb">${maxMoney ? `¥${maxMoney}` : "—"}</b></div>
+        <div class="ct-kpi"><small>未达条件</small><b style="color:${redCount ? "#e11d48" : "#059669"}">${redCount} 项</b></div>
+        <div class="ct-kpi"><small>可申奖助预估</small><b style="color:#2563eb">${maxMoney ? `¥${maxMoney}` : "—"}</b></div>
       `;
     }
 
@@ -8691,40 +8707,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     return out.slice(0, 3);
   };
 
-  window.render_ai_agent_actions = (wrap, serverActions, question, answerText) => {
-    if (!wrap) return;
-    const list = (Array.isArray(serverActions) && serverActions.length)
-      ? serverActions.slice(0, 3)
-      : inferClientAgentActions(question, answerText);
-    if (!list.length) return;
-    if (wrap.querySelector(".ai-agent-actions")) return;
-
-    const iconMap = { guide: "clipboard", award: "award", gpa: "gauge", schedule: "calendar", todo: "sparkles" };
-    const bar = document.createElement("div");
-    bar.className = "ai-agent-actions";
-    bar.innerHTML = list.map((act, i) => `
-      <button type="button" class="ai-agent-pill is-${esc(act.icon || "todo")}" data-ag-idx="${i}">
-        ${ico(iconMap[act.icon] || "sparkles", "ico-xs")}
-        <span>${esc(act.label)}</span>
-      </button>
-    `).join("");
-
-    bar.querySelectorAll("[data-ag-idx]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const act = list[Number(btn.dataset.agIdx)];
-        const p = act?.payload || {};
-        if (p.action === "guide") window.open_guide_wizard?.(p.tab || "defer");
-        else if (p.action === "eligibility") window.open_eligibility_dialog?.();
-        else if (p.action === "gpa") window.open_gpa_calc?.();
-        else if (p.action === "schedule") { go("schedule"); setTimeout(() => window.open_sched_tools?.("exams"), 160); }
-        else if (p.action === "parse_answer") window.open_notice_parser?.(answerText || question || "");
-      });
-    });
-
-    const fu = wrap.querySelector(".followups");
-    if (fu) wrap.insertBefore(bar, fu);
-    else wrap.appendChild(bar);
-  };
+  window.render_ai_agent_actions = () => {};
 })();
 
 

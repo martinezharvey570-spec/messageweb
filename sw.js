@@ -1,9 +1,9 @@
-﻿const CACHE_NAME = "xiaowu-zhili-v1123";
+﻿const CACHE_NAME = "xiaowu-zhili-v1124";
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css?v=1.123",
-  "/app.js?v=1.123",
+  "/style.css?v=1.124",
+  "/app.js?v=1.124",
   "/config.js?v=1.104",
   "/android-bridge.js?v=1.104",
   "/manifest.json",

@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.123" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.124" fetchpriority="high">
 </head>
 <body>
 
@@ -322,7 +322,7 @@
     <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
     <small class="navcaption" style="margin-top:14px">智慧工具箱</small>
     <button type="button" class="nav nav-tool nt-parse" data-page="parser" title="群通知与截图一键拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
-    <button type="button" class="nav nav-tool nt-acad" data-page="academic" title="学业 GPA 与奖助评优体检"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
+    <button type="button" class="nav nav-tool nt-acad" data-page="academic" title="学业 GPA 与奖助资格自查"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
     <button type="button" class="nav nav-tool nt-guide" data-page="guide" title="校园办事向导与文书生成"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导</button>
     <button type="button" class="nav nav-tool nt-sched" data-page="schedtools" title="考试倒计时、本周空档与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg>超级课表助手</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
@@ -646,7 +646,7 @@
             <p class="muted">收录教务处、学生工作部、图书馆、后勤保卫、计财与就业等全校 <span data-kb-count>…</span> 份规章制度与校园服务指南，支持实时检索查阅与 AI 解读。</p>
           </div>
           <div class="kb-head-actions">
-            <button type="button" id="openCustomDocBtn" class="primary admin-only hide"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>在线增补校规</button>
+            <button type="button" id="openCustomDocBtn" class="primary admin-only hide"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>新增校规文件</button>
             <button type="button" id="openGuideFromKbBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>办事向导</button>
             <button type="button" class="outline" data-goto="ai"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>前往 AI 问答</button>
           </div>
@@ -722,9 +722,9 @@
 
       <section id="analyticsPage" class="page hide">
         <div class="pagehead">
-          <div><h1>数据统计与治理洞察</h1><p class="muted">汇总平台运行指标、AI 高频校务咨询热点与制度盲区预警，助力精准高效治理。</p></div>
+          <div><h1>数据统计</h1><p class="muted">汇总平台运行数据、常见咨询问题与待补充规定，便于及时跟进校园事务。</p></div>
           <div class="kb-head-actions">
-            <button type="button" id="openCustomDocFromStatsBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>增补动态校规</button>
+            <button type="button" id="openCustomDocFromStatsBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>新增校规文件</button>
             <button id="reloadStats" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>刷新</button>
           </div>
         </div>
@@ -742,13 +742,13 @@
         <div class="gov-grid" id="govInsightsWrap">
           <article class="panel">
             <div class="panelhead">
-              <div><h3>AI 高频校务咨询热力</h3><small id="govQueryMeta">基于脱敏 AI 问答日志自动聚类</small></div>
+              <div><h3>常见校务咨询统计</h3><small id="govQueryMeta">统计同学们近期常问的校务问题</small></div>
             </div>
             <div id="govHotTopics" class="gov-list"></div>
           </article>
           <article class="panel">
             <div class="panelhead">
-              <div><h3>制度盲区与低置信度预警</h3><small>自动捕获暂缺明确条款的高频问题，支持一键热增补入库</small></div>
+              <div><h3>待补充规定提醒</h3><small>汇总暂时缺少明确依据的咨询问题，可随时补充相关说明</small></div>
             </div>
             <div id="govBlindSpots" class="gov-list"></div>
           </article>
@@ -793,7 +793,7 @@
             <div class="sched-d-rightcol sched-d-right-panel">
               <div class="sched-d-stage-head">
                 <div class="sched-d-seg" role="tablist" aria-label="桌面端课表视图">
-                  <button type="button" class="sched-dseg-btn on" data-dtab="matrix"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg><span>周课表矩阵</span></button>
+                  <button type="button" class="sched-dseg-btn on" data-dtab="matrix"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg><span>本周课表</span></button>
                   <button type="button" class="sched-dseg-btn" data-dtab="timetable"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>作息对照</span></button>
                 </div>
                 <span id="schedDesktopRange" class="sched-range-text"></span>
@@ -907,8 +907,8 @@
       <section id="academicPage" class="page campus-tool-page hide">
         <div class="pagehead">
           <div>
-            <h1>学业与奖助体检</h1>
-            <p class="muted">核算平均学分绩点、学位红线及奖助学金评优资格，两项数据实时联动。</p>
+            <h1>学业与奖助自查</h1>
+            <p class="muted">计算平均学分绩点、核对学位授予要求与奖助学金申请条件，数据实时同步。</p>
           </div>
           <div class="kb-head-actions">
             <button type="button" class="outline" data-goto="guide"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>办事向导</button>
@@ -918,8 +918,8 @@
         <article class="panel ct-page-panel">
           <div class="ct-body">
             <div class="sched-d-seg ct-seg" id="academicTabs" role="tablist">
-              <button type="button" class="sched-dseg-btn on" data-actab="gpa"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>GPA 换算与预警</span></button>
-              <button type="button" class="sched-dseg-btn" data-actab="elig"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>奖助评优自检</span></button>
+              <button type="button" class="sched-dseg-btn on" data-actab="gpa"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>GPA 绩点计算</span></button>
+              <button type="button" class="sched-dseg-btn" data-actab="elig"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>奖助资格自查</span></button>
             </div>
 
             <div id="acPaneGpa" class="ct-pane">
@@ -935,7 +935,7 @@
               <div class="ct-foot-actions">
                 <button type="button" id="gpaResetDemoBtn" class="outline">清空课程</button>
                 <button type="button" id="gpaToEligibilityBtn" class="outline"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>去测奖助资格</button>
-                <button type="button" id="gpaAskAiBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>让 AI 诊断学业</button>
+                <button type="button" id="gpaAskAiBtn" class="primary"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>让 AI 分析成绩</button>
               </div>
             </div>
 
@@ -1403,9 +1403,9 @@
   </div>
 </dialog>
 
-<dialog id="customDocDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="校务知识库在线增补与修订">
+<dialog id="customDocDialog" class="task-dialog campus-tool-dialog" tabindex="-1" aria-label="新增校规与补充通知">
   <div class="dialoghead">
-    <div><h2 id="customDocDlgTitle">在线增补校规与补充通知</h2><small>无需改代码重新部署，提交后毫秒级写入知识库并同步进入校务指南 AI 检索</small></div>
+    <div><h2 id="customDocDlgTitle">新增校规与补充通知</h2><small>保存后立即加入校规制度库，方便师生查阅与 AI 问答参考</small></div>
     <button type="button" id="closeCustomDocDlg" aria-label="关闭"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
   </div>
   <div class="ct-body">
@@ -1440,7 +1440,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.123"></script>
+<script src="app.js?v=1.124"></script>
 
 
 </body>

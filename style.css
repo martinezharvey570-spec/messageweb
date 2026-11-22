@@ -19146,3 +19146,20 @@ html.dark .campus-tool-page .elig-grid .xz-select-trigger {
   }
 }
 
+/* 5. 移动端 AI 页面“回到底部”按钮靠右下对齐（消除 left:50% 居中遮挡气泡正文）+ 移动端数据统计页 3 卡片对称满行 */
+@media (max-width: 960px) {
+  body.on-ai-page #scrollBottomBtn,
+  body.on-ai-page .scroll-bottom-btn {
+    left: auto !important;
+    right: 16px !important;
+    bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+    transform: none !important;
+    z-index: 26 !important;
+  }
+}
+@media (max-width: 760px) {
+  #analyticsPage .stats > article:nth-child(3):last-child {
+    grid-column: 1 / -1 !important;
+  }
+}
+

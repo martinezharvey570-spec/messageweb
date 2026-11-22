@@ -1662,9 +1662,12 @@ function sync_doc_progress() {
   if (current?.id) set_outline_active(current.id);
 }
 
-async function open_doc_reader(doc_title) {
+async function open_doc_reader(doc_title, highlight_articles = []) {
   if (!doc_title) return;
   const clean_title = String(doc_title).split(" · ")[0].trim();
+  const hlList = Array.isArray(highlight_articles)
+    ? highlight_articles.map(s => String(s || "").trim()).filter(Boolean)
+    : [];
   try {
     const data = await api("/knowledge?doc=" + encodeURIComponent(clean_title));
     const doc = data.doc || { title: clean_title, dept: "学校部门", category: "规章制度", url: "https://jwc.xawl.edu.cn/" };
@@ -1685,6 +1688,28 @@ async function open_doc_reader(doc_title) {
     apply_font_scale();
     build_outline(paper);
 
+    let firstHlEl = null;
+    const hitLabels = [];
+    if (hlList.length) {
+      const blocks = [...paper.querySelectorAll("p, h2, h3, li")];
+      for (const art of hlList) {
+        const matched = blocks.find(el => (el.textContent || "").includes(art));
+        if (matched) {
+          matched.classList.add("doc-clause-hl");
+          if (!firstHlEl) firstHlEl = matched;
+          if (!hitLabels.includes(art)) hitLabels.push(art);
+        }
+      }
+      if (hitLabels.length) {
+        const banner = document.createElement("div");
+        banner.className = "doc-hl-banner";
+        banner.innerHTML = `<span class="doc-hl-spark">✦</span><span>已为你自动定位 AI 引用条款：<b>${esc(hitLabels.join("、"))}</b></span>`;
+        const h1 = paper.querySelector(".doc-paper-title");
+        if (h1 && h1.nextSibling) paper.insertBefore(banner, h1.nextSibling);
+        else paper.prepend(banner);
+      }
+    }
+
     const chars = full_text.replace(/\s/g, "").length;
     const meta = $("docReaderMeta");
     if (meta) meta.textContent = `${chars.toLocaleString("zh-CN")} 字 · ${chunks.length} 节`;
@@ -1698,8 +1723,15 @@ async function open_doc_reader(doc_title) {
 
     $("docDialog")?.showModal();
     const sc = $("docReaderScroll");
-    if (sc) sc.scrollTop = 0;
-    requestAnimationFrame(sync_doc_progress);
+    if (firstHlEl) {
+      requestAnimationFrame(() => {
+        firstHlEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        sync_doc_progress();
+      });
+    } else {
+      if (sc) sc.scrollTop = 0;
+      requestAnimationFrame(sync_doc_progress);
+    }
   } catch (e) {
     toast(e.message || "未能加载该制度原文");
   }
@@ -2454,26 +2486,28 @@ function has_links(sources) {
   return pick_sources(sources).length > 0;
 }
 
-function add_doc_chips(parent_el, titles) {
+function add_doc_chips(parent_el, titles, citations_map = {}) {
   const list = Array.isArray(titles)
     ? [...new Set(titles.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
     : [];
   if (!list.length) return;
+  const cmap = citations_map && typeof citations_map === "object" ? citations_map : {};
   const box = document.createElement("div");
   box.className = "followup-box knowledge-ref-box";
   const label = document.createElement("small");
-  label.innerHTML = `${ico("link", "ico-xs")}本次回答参考的校内文件（${list.length}）· 点击查看原文`;
+  label.innerHTML = `${ico("link", "ico-xs")}本次回答参考的校内文件（${list.length}）· 点击定位条款原文`;
   box.appendChild(label);
   const chips = document.createElement("div");
   chips.className = "followup-chips";
   list.forEach(title => {
+    const arts = Array.isArray(cmap[title]) ? cmap[title] : [];
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "doc-ref-chip";
-    btn.textContent = title;
-    btn.title = "查看制度原文";
+    btn.textContent = arts.length ? `${title} · ${arts[0]}` : title;
+    btn.title = arts.length ? `查看制度原文并定位 ${arts.join("、")}` : "查看制度原文";
     btn.onclick = () => {
-      if (typeof open_doc_reader === "function") open_doc_reader(title);
+      if (typeof open_doc_reader === "function") open_doc_reader(title, arts);
     };
     chips.appendChild(btn);
   });
@@ -2482,7 +2516,7 @@ function add_doc_chips(parent_el, titles) {
 }
 
 function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
-  const { showConf, confidence, showSrc, sources, sources_label, answer_docs } = opts;
+  const { showConf, confidence, showSrc, sources, sources_label, answer_docs, doc_citations } = opts;
   const validLinks = showSrc ? pick_sources(sources) : [];
   const docTitles = showSrc && !validLinks.length && Array.isArray(answer_docs)
     ? [...new Set(answer_docs.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
@@ -2525,7 +2559,7 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   if (validLinks.length) {
     add_sources(drawer, sources, sources_label);
   } else if (docTitles.length) {
-    add_doc_chips(drawer, docTitles);
+    add_doc_chips(drawer, docTitles, doc_citations);
   }
 
   toggle.onclick = () => {
@@ -2975,6 +3009,7 @@ $("askForm").onsubmit = async e => {
   let allow_nav_actions = false;
   let follow_ups = [];
   let answer_docs = [];
+  let doc_citations = {};
   let streamed_content = false;
   let delta_chunks = 0;
   let is_cached_hit = false;
@@ -3118,6 +3153,7 @@ $("askForm").onsubmit = async e => {
           if (parsed.cached === true) is_cached_hit = true;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           if (Array.isArray(parsed.knowledge_docs)) answer_docs = parsed.knowledge_docs;
+          if (parsed.doc_citations && typeof parsed.doc_citations === "object") doc_citations = parsed.doc_citations;
           return;
         }
 
@@ -3326,7 +3362,8 @@ $("askForm").onsubmit = async e => {
       showSrc,
       sources,
       sources_label,
-      answer_docs
+      answer_docs,
+      doc_citations
     });
     if (showFu) add_follow_ups(wrap, follow_ups);
     if (soft_error) {
@@ -3416,7 +3453,8 @@ $("askForm").onsubmit = async e => {
       showSrc,
       sources,
       sources_label,
-      answer_docs
+      answer_docs,
+      doc_citations
     });
     if (showFu) add_follow_ups(wrap, follow_ups);
     toast("已停止生成，保留已输出内容");
@@ -6676,4 +6714,288 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   } else {
     setupAll();
   }
+})();
+
+/* ================================================================
+   v1.114: 1) 移动端软键盘防顶起底栏（.kb-open 双路感知）
+           2) 登录页深浅色切换同步（#authThemeToggle）
+           3) 全局 Ctrl+K 玻璃聚合搜索（Spotlight）
+   ================================================================ */
+(function init_v114_ux_suite() {
+  // 1. 移动端软键盘防顶起 6-Tab 底栏
+  const isTextEditable = el => {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.isContentEditable) return true;
+    const tag = el.tagName;
+    if (tag === "TEXTAREA") return !el.readOnly && !el.disabled;
+    if (tag === "INPUT") {
+      const t = (el.type || "text").toLowerCase();
+      return !["checkbox", "radio", "button", "submit", "reset", "file", "range", "color", "hidden"].includes(t) && !el.readOnly && !el.disabled;
+    }
+    return false;
+  };
+
+  let baseWinH = window.innerHeight || 0;
+  let kbBlurTimer = 0;
+  let hadViewportShrink = false;
+
+  const setKbOpen = open => {
+    const active = Boolean(open) && window.innerWidth <= 960;
+    document.body.classList.toggle("kb-open", active);
+  };
+
+  const evaluateKeyboard = () => {
+    if (window.innerWidth > 960) {
+      hadViewportShrink = false;
+      setKbOpen(false);
+      return;
+    }
+    const ae = document.activeElement;
+    const focused = isTextEditable(ae);
+    const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (vvH > baseWinH) baseWinH = vvH;
+    const shrink = baseWinH - vvH;
+    if (shrink >= 120) {
+      hadViewportShrink = true;
+      if (focused) {
+        clearTimeout(kbBlurTimer);
+        setKbOpen(true);
+      }
+    } else if (hadViewportShrink && shrink < 80) {
+      // 用户按返回键收起软键盘但输入框仍保有焦点时，也立刻恢复底部导航栏
+      hadViewportShrink = false;
+      setKbOpen(false);
+    } else if (!focused && shrink < 90) {
+      setKbOpen(false);
+    }
+  };
+
+  document.addEventListener("focusin", e => {
+    if (window.innerWidth <= 960 && isTextEditable(e.target)) {
+      clearTimeout(kbBlurTimer);
+      setKbOpen(true);
+    }
+  }, true);
+
+  document.addEventListener("focusout", () => {
+    clearTimeout(kbBlurTimer);
+    kbBlurTimer = setTimeout(() => {
+      if (!isTextEditable(document.activeElement)) setKbOpen(false);
+    }, 120);
+  }, true);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", evaluateKeyboard, { passive: true });
+  }
+  window.addEventListener("orientationchange", () => {
+    baseWinH = window.innerHeight || 0;
+    setKbOpen(false);
+  }, { passive: true });
+
+  // 2. 登录页主题切换按钮同步
+  const syncAuthThemeIcon = () => {
+    const btn = $("authThemeToggle");
+    if (!btn) return;
+    const isDark = document.documentElement.classList.contains("dark");
+    btn.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-${isDark ? "moon" : "sun"}"/></svg>`;
+  };
+  $("authThemeToggle")?.addEventListener("click", () => {
+    $("themeToggle")?.click();
+    setTimeout(syncAuthThemeIcon, 30);
+  });
+  const themeMo = new MutationObserver(syncAuthThemeIcon);
+  themeMo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  syncAuthThemeIcon();
+
+  // 3. 全局 Ctrl+K 玻璃聚合搜索（Spotlight）
+  const dlg = $("globalSearchDialog");
+  const inp = $("globalSearchInput");
+  const bodyEl = $("globalSearchBody");
+  let spItems = [];
+  let spActiveIdx = 0;
+
+  const ensureKbCatalogLoaded = async () => {
+    if (Array.isArray(all_knowledge_docs_cache) && all_knowledge_docs_cache.length) return all_knowledge_docs_cache;
+    if (Array.isArray(knowledge_docs) && knowledge_docs.length) return knowledge_docs;
+    try {
+      const res = await api("/knowledge");
+      const docs = Array.isArray(res?.docs) ? res.docs : [];
+      if (docs.length) all_knowledge_docs_cache = docs;
+      return docs;
+    } catch {
+      return [];
+    }
+  };
+
+  const renderSpotlight = async rawQ => {
+    if (!bodyEl) return;
+    const q = String(rawQ || "").trim();
+    const ql = q.toLowerCase();
+    const items = [];
+
+    if (!q) {
+      items.push(
+        { group: "快捷入口", icon: "ai-brand", title: "咨询文理智办 AI", sub: "校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
+        { group: "快捷入口", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
+        { group: "快捷入口", icon: "book", title: "浏览校规制度库", sub: "查阅 122 份本校正式规章全文", run: () => go("knowledge") },
+        { group: "快捷入口", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
+        { group: "快捷入口", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") }
+      );
+    } else {
+      // 1) 校规制度库
+      const kbList = await ensureKbCatalogLoaded();
+      kbList.filter(d => {
+        const hay = `${d.title || ""} ${d.dept || ""} ${d.category || ""}`.toLowerCase();
+        return hay.includes(ql);
+      }).slice(0, 5).forEach(d => {
+        items.push({
+          group: "校规制度原文",
+          icon: "book",
+          title: d.title,
+          sub: `${d.dept || "学校部门"} · ${d.category || "规章制度"}`,
+          run: () => open_doc_reader(d.title)
+        });
+      });
+
+      // 2) 通知公告
+      (Array.isArray(notices) ? notices : []).filter(n =>
+        `${n.title || ""} ${n.body || ""} ${n.category || ""}`.toLowerCase().includes(ql)
+      ).slice(0, 4).forEach(n => {
+        items.push({
+          group: "校园通知公告",
+          icon: "bell",
+          title: n.title,
+          sub: `${n.category || "通知"}${n.deadline ? " · 截止 " + n.deadline : ""}`,
+          run: () => {
+            go("notices");
+            if ($("noticeSearch")) {
+              $("noticeSearch").value = q;
+              $("noticeSearch").dispatchEvent(new Event("input"));
+            }
+          }
+        });
+      });
+
+      // 3) 个人课表
+      (Array.isArray(schedState?.courses) ? schedState.courses : []).filter(c =>
+        `${c.name || ""} ${c.room || ""} ${c.teacher || ""}`.toLowerCase().includes(ql)
+      ).slice(0, 4).forEach(c => {
+        items.push({
+          group: "超级课表",
+          icon: "calendar",
+          title: c.name,
+          sub: `${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节 · ${c.weeks || ""}周${c.room ? " · " + c.room : ""}`,
+          run: () => go("schedule")
+        });
+      });
+
+      // 4) 我的待办
+      (Array.isArray(tasks) ? tasks : []).filter(t =>
+        String(t.title || "").toLowerCase().includes(ql)
+      ).slice(0, 4).forEach(t => {
+        items.push({
+          group: "我的待办",
+          icon: "check-square",
+          title: t.title,
+          sub: `${t.status === "completed" ? "已完成" : "待处理"}${t.due_date ? " · 截止 " + t.due_date : ""}`,
+          run: () => go("tasks")
+        });
+      });
+
+      // 5) 直问 AI
+      items.push({
+        group: "文理智办 AI",
+        icon: "ai-brand",
+        title: `直接问 AI：「${q}」`,
+        sub: "由后端智脑自主检索校规并极简直答",
+        run: () => {
+          go("ai");
+          const qEl = $("question");
+          if (qEl) {
+            qEl.value = q;
+            if (typeof auto_resize_question === "function") auto_resize_question();
+            $("askForm")?.requestSubmit();
+          }
+        }
+      });
+    }
+
+    spItems = items;
+    spActiveIdx = 0;
+
+    let lastGroup = "";
+    bodyEl.innerHTML = items.map((it, idx) => {
+      const grp = it.group !== lastGroup ? `<div class="spotlight-group">${esc(it.group)}</div>` : "";
+      lastGroup = it.group;
+      return `${grp}<button type="button" class="spotlight-item${idx === 0 ? " is-active" : ""}" data-sp-idx="${idx}">
+        <span class="spotlight-ico">${ico(it.icon)}</span>
+        <span class="spotlight-text"><b>${esc(it.title)}</b><small>${esc(it.sub || "")}</small></span>
+        <span class="spotlight-go">↵</span>
+      </button>`;
+    }).join("");
+  };
+
+  const syncActiveRow = () => {
+    if (!bodyEl) return;
+    bodyEl.querySelectorAll(".spotlight-item").forEach((el, i) => {
+      const on = i === spActiveIdx;
+      el.classList.toggle("is-active", on);
+      if (on) el.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const openSpotlight = () => {
+    if (!dlg || !$("app") || $("app").classList.contains("hide")) return;
+    if (inp) inp.value = "";
+    renderSpotlight("");
+    if (!dlg.open) dlg.showModal();
+    setTimeout(() => inp?.focus(), 40);
+  };
+
+  const runSpotlightItem = idx => {
+    const it = spItems[idx];
+    if (!it) return;
+    dlg?.close();
+    if (typeof it.run === "function") it.run();
+  };
+
+  $("globalSearchBtn")?.addEventListener("click", openSpotlight);
+  $("closeGlobalSearchDlg")?.addEventListener("click", () => dlg?.close());
+  dlg?.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+  let spTimer = 0;
+  inp?.addEventListener("input", () => {
+    clearTimeout(spTimer);
+    spTimer = setTimeout(() => renderSpotlight(inp.value), 90);
+  });
+
+  inp?.addEventListener("keydown", e => {
+    if (!spItems.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      spActiveIdx = (spActiveIdx + 1) % spItems.length;
+      syncActiveRow();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      spActiveIdx = (spActiveIdx - 1 + spItems.length) % spItems.length;
+      syncActiveRow();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      runSpotlightItem(spActiveIdx);
+    }
+  });
+
+  bodyEl?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-sp-idx]");
+    if (!btn) return;
+    runSpotlightItem(Number(btn.dataset.spIdx));
+  });
+
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && String(e.key || "").toLowerCase() === "k") {
+      e.preventDefault();
+      if (dlg?.open) dlg.close();
+      else openSpotlight();
+    }
+  });
 })();

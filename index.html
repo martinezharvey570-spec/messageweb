@@ -159,7 +159,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.113" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.114" fetchpriority="high">
 </head>
 <body>
 
@@ -266,16 +266,25 @@
 <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <section id="auth" class="auth">
+  <button type="button" id="authThemeToggle" class="auth-theme-btn" title="切换深色/浅色模式" aria-label="切换深色或浅色模式"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg></button>
   <div class="hero">
-    <div class="logo">校</div>
-    <h1>校务智理</h1>
-    <p>让校园通知更清晰，让办事流程更简单。</p>
-    <div class="hero-list">
-      <p><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg> 通知公告集中管理</p>
-      <p><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg> 个人待办进度跟踪</p>
-      <p><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg> 文理智办 AI 问答</p>
+    <div class="hero-top">
+      <div class="logo">校</div>
+      <span class="hero-badge">智慧校务 · V1.114</span>
     </div>
-    <small>CAMPUS SERVICE PLATFORM</small>
+    <div class="hero-copy">
+      <h1>校务智理</h1>
+      <p>让校园通知更清晰，让制度查询与办事流程更简单。</p>
+    </div>
+    <div class="hero-list">
+      <p><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span><b>文理智办 AI</b><small>自主查阅 122 份本校规章，条款溯源极简直答</small></span></p>
+      <p><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span><b>超级课表协同</b><small>AI 多图深思导课表，冲突巡检与云端同步</small></span></p>
+      <p><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span><b>通知与待办闭环</b><small>公告实时触达，重要节点一键沉淀为个人待办</small></span></p>
+    </div>
+    <div class="hero-foot">
+      <small>CAMPUS SERVICE PLATFORM</small>
+      <span>Web / Android 云端实时同步</span>
+    </div>
   </div>
   <form id="authForm" class="authbox">
     <div class="logo mobile">校</div>
@@ -335,6 +344,11 @@
         </div>
       </div>
       <div class="header-right">
+        <button type="button" id="globalSearchBtn" class="global-search-trigger" title="全局聚合搜索（Ctrl + K）" aria-label="全局搜索">
+          <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+          <span class="gs-label">搜索校务…</span>
+          <kbd class="gs-kbd">Ctrl K</kbd>
+        </button>
         <button type="button" id="themeToggle" class="icon-btn" title="切换深色/浅色模式"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg></button>
         <button type="button" id="userProfileBtn" class="user" title="个人资料与密码设置">
           <span id="avatar">同</span>
@@ -814,7 +828,7 @@
       </section>
 
       <footer id="appFooter">
-        <span>校务智理校园事务服务平台 · v1.113</span>
+        <span>校务智理校园事务服务平台 · v1.114</span>
         <span>正式规定请以学校相关部门最新公布文件为准</span>
       </footer>
     </div>
@@ -1153,9 +1167,23 @@
   </div>
 </dialog>
 
+<dialog id="globalSearchDialog" class="task-dialog spotlight-dialog" aria-label="全局聚合搜索">
+  <div class="spotlight-head">
+    <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+    <input type="search" id="globalSearchInput" autocomplete="off" placeholder="搜索 122 份校规、通知公告、个人课表、待办，或直接问 AI…">
+    <button type="button" id="closeGlobalSearchDlg" aria-label="关闭搜索"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div id="globalSearchBody" class="spotlight-body"></div>
+  <div class="spotlight-foot">
+    <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+    <span><kbd>Enter</kbd> 打开</span>
+    <span><kbd>Esc</kbd> 关闭</span>
+  </div>
+</dialog>
+
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.113"></script>
+<script src="app.js?v=1.114"></script>
 
 
 </body>

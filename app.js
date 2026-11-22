@@ -687,8 +687,11 @@ let boot_gate_done = false;
 function set_boot_progress(pct, text, isError = false) {
   const splash = $("appBootSplash");
   const bar = $("appBootBarFill");
+  const pctEl = $("appBootPct");
   const status = $("appBootStatus");
-  if (bar && Number.isFinite(pct)) bar.style.width = Math.max(8, Math.min(100, pct)) + "%";
+  const clamped = Number.isFinite(pct) ? Math.round(Math.max(8, Math.min(100, pct))) : null;
+  if (bar && clamped !== null) bar.style.width = clamped + "%";
+  if (pctEl && clamped !== null) pctEl.textContent = clamped + "%";
   if (status && text) status.textContent = text;
   if (splash) splash.classList.toggle("is-error", !!isError);
 }
@@ -728,24 +731,37 @@ function wait_assets_ready() {
 async function finish_boot_gate(showAuth) {
   const authEl = $("auth");
   const appEl = $("app");
+  const splash = $("appBootSplash");
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const startTs = Number(window.__XZ_BOOT_TS__) || 0;
+  if (!reduced && startTs > 0 && splash && !splash.classList.contains("is-done")) {
+    const elapsed = Date.now() - startTs;
+    const remain = 720 - elapsed;
+    if (remain > 40) {
+      await new Promise(r => setTimeout(r, Math.min(remain, 720)));
+    }
+  }
   if (authEl) authEl.classList.toggle("hide", !showAuth);
   if (appEl) appEl.classList.toggle("hide", !!showAuth);
   document.documentElement.classList.remove("app-booting", "has-saved-auth");
   sync_theme_root(document.documentElement.classList.contains("dark"));
   await next_paint();
-  const splash = $("appBootSplash");
   if (splash && !splash.classList.contains("is-done")) {
+    if (!reduced) {
+      splash.classList.add("is-ready");
+      await new Promise(r => setTimeout(r, 220));
+    }
     splash.classList.add("is-done");
     setTimeout(() => {
       if (splash.classList.contains("is-done")) splash.style.display = "none";
-    }, 260);
+    }, 380);
   }
   boot_gate_done = true;
   try { window.AndroidBridge?.onAppDataReady?.(); } catch {}
 }
 
 $("appBootRetryBtn")?.addEventListener("click", async () => {
-  set_boot_progress(25, "正在重新连接服务…", false);
+  set_boot_progress(28, "正在重新连接校园服务…", false);
   if (!token) {
     try { token = localStorage.getItem("xz_token") || ""; } catch {}
   }
@@ -756,7 +772,7 @@ $("appBootRetryBtn")?.addEventListener("click", async () => {
       Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]),
       wait_assets_ready()
     ]);
-    set_boot_progress(100, "准备就绪", false);
+    set_boot_progress(100, "校园服务已就绪 ✨", false);
     await finish_boot_gate(true);
   }
 });
@@ -766,7 +782,7 @@ async function enter(isBoot = false) {
     try { token = localStorage.getItem("xz_token") || ""; } catch {}
   }
   if (isBoot && !boot_gate_done) {
-    set_boot_progress(45, "正在验证身份与同步校园数据…", false);
+    set_boot_progress(45, "正在翻阅 126 份校园规章并验证身份…", false);
   }
   const me_req = api("/me");
   const data_req = Promise.all([api("/notices"), api("/tasks")]);
@@ -806,7 +822,7 @@ async function enter(isBoot = false) {
 
   try {
     if (isBoot && !boot_gate_done) {
-      set_boot_progress(72, "正在加载通知、待办与课表…", false);
+      set_boot_progress(75, "正在核对本周课表、通知与待办…", false);
     }
     const sched_req = (typeof load_schedule === "function")
       ? Promise.race([Promise.resolve(load_schedule()), new Promise(r => setTimeout(r, 4500))]).catch(() => {})
@@ -851,7 +867,7 @@ async function enter(isBoot = false) {
   if (cur_page === "home") go("home");
 
   if (!boot_gate_done) {
-    set_boot_progress(100, "加载完成", false);
+    set_boot_progress(100, "一切就绪，欢迎回来 ✨", false);
     await finish_boot_gate(false);
   } else {
     document.documentElement.classList.remove("has-saved-auth");
@@ -3560,12 +3576,12 @@ $("aiThinking")?.addEventListener("change", () => {
     await enter(true);
     return;
   }
-  set_boot_progress(45, "正在检查服务状态并加载界面…", false);
+  set_boot_progress(52, "校务指南 AI 正在热身 ✨", false);
   await Promise.allSettled([
     Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]),
     wait_assets_ready()
   ]);
-  set_boot_progress(100, "准备就绪", false);
+  set_boot_progress(100, "校园服务已就绪，请登录 ✨", false);
   await finish_boot_gate(true);
 })();
 

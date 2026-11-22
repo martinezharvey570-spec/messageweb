@@ -40,89 +40,618 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      background: #f8fafc;
+      padding: calc(24px + var(--xz-safe-top, env(safe-area-inset-top, 0px))) 20px calc(24px + env(safe-area-inset-bottom, 0px));
+      background:
+        radial-gradient(ellipse 84% 62% at 50% 34%, #edf4ff 0%, #f7faff 54%, #eef3fb 100%);
       color: #0f172a;
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-      transition: opacity 0.22s ease, visibility 0.22s ease;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  filter 0.34s ease,
+                  visibility 0.34s ease;
     }
     html.dark #appBootSplash {
-      background: #0b1120;
+      background:
+        radial-gradient(ellipse 84% 62% at 50% 34%, #112142 0%, #0b1120 62%, #070b15 100%);
       color: #f8fafc;
     }
     #appBootSplash.is-done {
       opacity: 0;
+      transform: scale(1.035);
+      filter: blur(8px);
       visibility: hidden;
       pointer-events: none;
     }
-    .boot-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #3b82f6, #155eef);
+
+    /* 背景漂浮柔光极光球 */
+    .boot-aurora {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .boot-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(64px);
+      opacity: 0.44;
+      will-change: transform;
+    }
+    .boot-orb-a {
+      width: 340px;
+      height: 340px;
+      left: calc(50% - 290px);
+      top: calc(50% - 250px);
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.55) 0%, rgba(59, 130, 246, 0) 70%);
+      animation: bootOrbDriftA 7.5s ease-in-out infinite alternate;
+    }
+    .boot-orb-b {
+      width: 320px;
+      height: 320px;
+      right: calc(50% - 280px);
+      bottom: calc(50% - 240px);
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.48) 0%, rgba(6, 182, 212, 0.16) 46%, rgba(99, 102, 241, 0) 72%);
+      animation: bootOrbDriftB 8.5s ease-in-out infinite alternate;
+    }
+    html.dark .boot-orb { opacity: 0.38; }
+
+    /* 居中液态玻璃展示容器 */
+    .boot-card {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: min(360px, 100%);
+      padding: 26px 24px 22px;
+      border-radius: 30px;
+      background: linear-gradient(158deg, rgba(255, 255, 255, 0.78) 0%, rgba(242, 247, 255, 0.56) 100%);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+        0 0 0 1px rgba(37, 99, 235, 0.08),
+        0 24px 56px -16px rgba(15, 23, 42, 0.14);
+    }
+    html.dark .boot-card {
+      background: linear-gradient(158deg, rgba(22, 34, 58, 0.78) 0%, rgba(15, 23, 42, 0.62) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        0 0 0 1px rgba(96, 165, 250, 0.16),
+        0 26px 60px -14px rgba(0, 0, 0, 0.56);
+    }
+
+    /* 主动画舞台（支持点击互动彩蛋） */
+    .boot-stage {
+      position: relative;
+      width: 176px;
+      height: 158px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 24px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+    .boot-stage:hover .boot-book-wrap {
+      transform: translateY(-4px) scale(1.03);
+    }
+
+    /* 底部悬浮柔光投影 */
+    .boot-shadow {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 98px;
+      height: 15px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.28) 0%, rgba(37, 99, 235, 0) 74%);
+      transform: translateX(-50%);
+      animation: bootShadowPulse 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    html.dark .boot-shadow {
+      background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.34) 0%, rgba(37, 99, 235, 0) 74%);
+    }
+
+    /* 完成瞬间的星光涟漪 */
+    .boot-ripple {
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      border: 2px solid rgba(59, 130, 246, 0.62);
+      box-shadow: 0 0 26px rgba(56, 189, 248, 0.42);
+      transform: translate(-50%, -50%) scale(0.45);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #appBootSplash.is-ready .boot-ripple {
+      animation: bootReadyRipple 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* 书本飘出的 5 枚校园灵感气泡 */
+    .boot-bubbles {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .boot-chip {
+      position: absolute;
+      left: 50%;
+      bottom: 66px;
+      width: 30px;
+      height: 30px;
+      margin-left: -15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        0 6px 16px -4px rgba(15, 23, 42, 0.16),
+        0 0 0 1px rgba(37, 99, 235, 0.10);
+      opacity: 0;
+      will-change: transform, opacity;
+      animation: bootPopBubble 3.25s cubic-bezier(0.25, 0.8, 0.35, 1) infinite;
+      animation-delay: var(--d, 0s);
+    }
+    html.dark .boot-chip {
+      background: rgba(30, 41, 59, 0.92);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 6px 18px -4px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(148, 163, 184, 0.22);
+    }
+    .boot-chip svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2.1;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .boot-chip.c-sched { color: #0284c7; --bx: -46px; --by: -74px; --rot: -11deg; --d: 0s; }
+    .boot-chip.c-notice { color: #d97706; --bx: 44px; --by: -68px; --rot: 10deg; --d: -0.65s; }
+    .boot-chip.c-todo { color: #059669; --bx: -22px; --by: -86px; --rot: -6deg; --d: -1.3s; }
+    .boot-chip.c-rule { color: #4f46e5; --bx: 24px; --by: -84px; --rot: 7deg; --d: -1.95s; }
+    .boot-chip.c-ai {
       color: #fff;
-      font-size: 32px;
+      background: linear-gradient(135deg, #06b6d4 0%, #2563eb 58%, #4f46e5 100%);
+      box-shadow: 0 8px 18px -4px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+      --bx: 0px; --by: -94px; --rot: 0deg; --d: -2.6s;
+    }
+    html.dark .boot-chip.c-sched { color: #38bdf8; }
+    html.dark .boot-chip.c-notice { color: #fbbf24; }
+    html.dark .boot-chip.c-todo { color: #34d399; }
+    html.dark .boot-chip.c-rule { color: #818cf8; }
+    html.dark .boot-chip.c-ai {
+      color: #fff;
+      background: linear-gradient(135deg, #06b6d4 0%, #2563eb 58%, #4f46e5 100%);
+      box-shadow: 0 8px 20px -4px rgba(56, 189, 248, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    /* 3D 液态玻璃翻书本体 */
+    .boot-book-wrap {
+      position: relative;
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      will-change: transform;
+    }
+    .boot-book-wrap.is-boing {
+      animation: bootBoing 0.48s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #appBootSplash.is-ready .boot-book-wrap {
+      transform: translateY(-6px) scale(1.08);
+    }
+    .boot-book {
+      position: relative;
+      width: 118px;
+      height: 78px;
+      perspective: 680px;
+      transform-style: preserve-3d;
+      animation: bootFloat 2.4s ease-in-out infinite;
+    }
+    .boot-cover {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px 10px 12px 12px;
+      background: linear-gradient(145deg, #3b82f6 0%, #2563eb 48%, #4f46e5 100%);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.54),
+        inset 0 -3px 0 rgba(15, 23, 42, 0.22),
+        0 14px 26px -8px rgba(37, 99, 235, 0.42);
+    }
+    .boot-cover::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 50%;
+      width: 10px;
+      transform: translateX(-50%);
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.24), rgba(255, 255, 255, 0.16) 50%, rgba(15, 23, 42, 0.24));
+    }
+    .boot-page-static {
+      position: absolute;
+      top: 5px;
+      width: 52px;
+      height: 66px;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f6ff 100%);
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.12);
+    }
+    html.dark .boot-page-static {
+      background: linear-gradient(180deg, #e2ecff 0%, #cbd9f6 100%);
+    }
+    .boot-page-static::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 12px;
+      bottom: 12px;
+      background: repeating-linear-gradient(
+        180deg,
+        rgba(37, 99, 235, 0.20) 0px,
+        rgba(37, 99, 235, 0.20) 3px,
+        transparent 3px,
+        transparent 9px
+      );
+      border-radius: 2px;
+    }
+    .boot-page-left {
+      left: 6px;
+      border-radius: 5px 2px 2px 5px;
+      box-shadow: inset -6px 0 8px -5px rgba(30, 58, 138, 0.22), 0 2px 4px rgba(15, 23, 42, 0.12);
+    }
+    .boot-page-right {
+      right: 6px;
+      border-radius: 2px 5px 5px 2px;
+      box-shadow: inset 6px 0 8px -5px rgba(30, 58, 138, 0.22), 0 2px 4px rgba(15, 23, 42, 0.12);
+    }
+    .boot-leaf {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      width: 52px;
+      height: 66px;
+      border-radius: 2px 5px 5px 2px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, #e8f0ff 0%, #ffffff 22%, #f5f9ff 100%);
+      box-shadow: 0 2px 8px rgba(30, 64, 175, 0.14);
+      will-change: transform;
+      animation: bootFlipPage 1.8s cubic-bezier(0.42, 0.04, 0.34, 1) infinite;
+    }
+    html.dark .boot-leaf {
+      background: linear-gradient(90deg, #c6d7fb 0%, #eef4ff 26%, #d9e6ff 100%);
+    }
+    .boot-leaf::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 12px;
+      bottom: 14px;
+      background: repeating-linear-gradient(
+        180deg,
+        rgba(37, 99, 235, 0.24) 0px,
+        rgba(37, 99, 235, 0.24) 3px,
+        transparent 3px,
+        transparent 9px
+      );
+      border-radius: 2px;
+    }
+    .boot-leaf-1 { animation-delay: 0s; }
+    .boot-leaf-2 { animation-delay: -0.6s; }
+    .boot-leaf-3 { animation-delay: -1.2s; }
+
+    /* 书脊底部的晶透“校”字微章（独立于 3D 翻页图层之外，永不被 90° 立起的书页穿插） */
+    .boot-crest {
+      position: absolute;
+      left: 50%;
+      bottom: -11px;
+      z-index: 6;
+      width: 28px;
+      height: 28px;
+      margin-left: -14px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 56%, #4f46e5 100%);
+      color: #fff;
+      font-size: 13.5px;
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 14px 30px rgba(21, 94, 239, 0.26);
-      margin-bottom: 14px;
+      animation: bootCrestFloat 2.4s ease-in-out infinite;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 0 2.5px rgba(255, 255, 255, 0.94),
+        0 6px 14px rgba(37, 99, 235, 0.38);
     }
+    @keyframes bootCrestFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    html.dark .boot-crest {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 0 0 2.5px rgba(15, 23, 42, 0.92),
+        0 6px 16px rgba(56, 189, 248, 0.36);
+    }
+
+    /* 点击彩蛋迸发的小星花 */
+    .boot-spark {
+      position: absolute;
+      left: 50%;
+      top: 56%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: bootSparkFly 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* 品牌标题与流光进度胶囊 */
     .boot-title {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      margin: 0 0 12px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      margin: 2px 0 4px;
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 65%, #4f46e5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
-    .boot-bar {
-      width: min(210px, 60vw);
-      height: 4px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      overflow: hidden;
+    html.dark .boot-title {
+      background: linear-gradient(135deg, #ffffff 0%, #93c5fd 65%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .boot-sub {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      color: #64748b;
+      margin: 0 0 16px;
+    }
+    html.dark .boot-sub { color: #94a3b8; }
+
+    .boot-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: min(252px, 100%);
       margin-bottom: 10px;
     }
+    .boot-bar {
+      position: relative;
+      flex: 1 1 auto;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.22);
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
     html.dark .boot-bar {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.12);
     }
     .boot-bar > i {
+      position: relative;
       display: block;
-      width: 28%;
+      width: 24%;
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #60a5fa, #2563eb, #155eef);
-      transition: width 0.28s cubic-bezier(.22, 1, .36, 1);
+      background: linear-gradient(90deg, #38bdf8 0%, #2563eb 55%, #4f46e5 100%);
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.45);
+      transition: width 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow: hidden;
     }
+    .boot-bar > i::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+      transform: translateX(-100%);
+      animation: bootGlint 1.35s ease-in-out infinite;
+    }
+    .boot-pct {
+      flex: 0 0 36px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #2563eb;
+    }
+    html.dark .boot-pct { color: #60a5fa; }
+
     .boot-status {
       font-size: 13px;
-      color: #64748b;
+      font-weight: 500;
+      color: #475569;
       text-align: center;
       line-height: 1.5;
+      min-height: 20px;
+      transition: opacity 0.2s ease;
     }
-    html.dark .boot-status {
+    html.dark .boot-status { color: #cbd5e1; }
+
+    .boot-hint {
+      margin-top: 8px;
+      font-size: 11.5px;
       color: #94a3b8;
+      letter-spacing: 0.3px;
+      transition: color 0.2s ease, transform 0.2s ease;
     }
+    html.dark .boot-hint { color: #64748b; }
+
     .boot-retry {
-      margin-top: 16px;
-      padding: 9px 20px;
+      margin-top: 14px;
+      padding: 10px 24px;
       border-radius: 999px;
       border: 0;
-      background: #155eef;
+      background: linear-gradient(135deg, #3b82f6, #2563eb 58%, #4f46e5);
       color: #fff;
       font-size: 13.5px;
       font-weight: 600;
+      box-shadow: 0 10px 22px -6px rgba(37, 99, 235, 0.45);
       cursor: pointer;
       display: none;
     }
     #appBootSplash.is-error .boot-retry {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+    }
+    #appBootSplash.is-error .boot-leaf,
+    #appBootSplash.is-error .boot-chip {
+      animation-play-state: paused;
+    }
+    #appBootSplash.is-error .boot-bar > i {
+      background: linear-gradient(90deg, #f59e0b, #ea580c);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+
+    @keyframes bootOrbDriftA {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(34px, 22px) scale(1.1); }
+    }
+    @keyframes bootOrbDriftB {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-28px, -24px) scale(1.08); }
+    }
+    @keyframes bootFloat {
+      0%, 100% { transform: translateY(0) rotateX(10deg); }
+      50% { transform: translateY(-7px) rotateX(13deg); }
+    }
+    @keyframes bootShadowPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+      50% { transform: translateX(-50%) scale(0.84); opacity: 0.45; }
+    }
+    @keyframes bootFlipPage {
+      0% { transform: rotateY(0deg) translateZ(1px); opacity: 0.96; }
+      14% { transform: rotateY(-18deg) translateZ(2px); opacity: 1; }
+      50% { transform: rotateY(-92deg) translateZ(3px); opacity: 0.94; }
+      86% { transform: rotateY(-165deg) translateZ(2px); opacity: 0.98; }
+      100% { transform: rotateY(-180deg) translateZ(1px); opacity: 0.9; }
+    }
+    @keyframes bootPopBubble {
+      0% {
+        opacity: 0;
+        transform: translate(0, 12px) scale(0.32) rotate(0deg);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(calc(var(--bx) * 0.45), calc(var(--by) * 0.42)) scale(1.08) rotate(var(--rot));
+      }
+      45% {
+        opacity: 1;
+        transform: translate(calc(var(--bx) * 0.82), calc(var(--by) * 0.78)) scale(0.98) rotate(calc(var(--rot) * -0.5));
+      }
+      76% {
+        opacity: 0.78;
+        transform: translate(var(--bx), var(--by)) scale(0.88) rotate(var(--rot));
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(var(--bx) * 1.08), calc(var(--by) - 18px)) scale(0.55) rotate(var(--rot));
+      }
+    }
+    @keyframes bootGlint {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(220%); }
+    }
+    @keyframes bootBoing {
+      0% { transform: scale(1); }
+      28% { transform: scale(1.12, 0.9) translateY(3px); }
+      58% { transform: scale(0.94, 1.08) translateY(-10px); }
+      80% { transform: scale(1.03, 0.98) translateY(-1px); }
+      100% { transform: scale(1); }
+    }
+    @keyframes bootReadyRipple {
+      0% { transform: translate(-50%, -50%) scale(0.45); opacity: 0.9; }
+      100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+    }
+    @keyframes bootSparkFly {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0); opacity: 0; }
+    }
+
+    /* 移动端自适应紧凑聚焦 + 轻量背景保满帧 */
+    @media (max-width: 760px) {
+      .boot-orb-b { display: none; }
+      .boot-orb-a {
+        width: 240px;
+        height: 240px;
+        left: calc(50% - 120px);
+        top: calc(50% - 180px);
+        filter: blur(48px);
+        opacity: 0.36;
+      }
+      .boot-card {
+        width: min(320px, calc(100vw - 36px));
+        padding: 22px 18px 18px;
+        border-radius: 26px;
+      }
+      .boot-stage {
+        width: 150px;
+        height: 138px;
+        padding-bottom: 20px;
+      }
+      .boot-book {
+        width: 102px;
+        height: 68px;
+      }
+      .boot-page-static,
+      .boot-leaf {
+        width: 45px;
+        height: 58px;
+        top: 4px;
+      }
+      .boot-page-left { left: 5px; }
+      .boot-page-right { right: 5px; }
+      .boot-chip {
+        width: 26px;
+        height: 26px;
+        margin-left: -13px;
+        bottom: 58px;
+      }
+      .boot-chip svg { width: 13px; height: 13px; }
+      .boot-chip.c-sched { --bx: -38px; --by: -62px; }
+      .boot-chip.c-notice { --bx: 38px; --by: -58px; }
+      .boot-chip.c-todo { --bx: -18px; --by: -72px; }
+      .boot-chip.c-rule { --bx: 20px; --by: -70px; }
+      .boot-chip.c-ai { --bx: 0px; --by: -80px; }
+      .boot-title { font-size: 20px; }
+      .boot-progress-row { width: min(224px, 100%); }
+    }
+    @media (max-width: 360px) {
+      .boot-sub { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .boot-orb, .boot-book, .boot-crest, .boot-shadow, .boot-leaf, .boot-chip, .boot-bar > i::after {
+        animation: none !important;
+      }
+      .boot-chip.c-ai {
+        opacity: 1;
+        transform: translate(0, -68px) scale(1);
+      }
     }
   </style>
   <script>
     (function () {
       try {
+        window.__XZ_BOOT_TS__ = Date.now();
         var root = document.documentElement;
         root.classList.add("app-booting");
         if (window.AndroidBridge && window.AndroidBridge.getSafeTopDp) {
@@ -159,17 +688,78 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.125" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.126" fetchpriority="high">
 </head>
 <body>
 
 <div id="appBootSplash" role="status" aria-live="polite">
-  <div class="boot-logo">校</div>
-  <h2 class="boot-title">校务智理</h2>
-  <div class="boot-bar"><i id="appBootBarFill"></i></div>
-  <div id="appBootStatus" class="boot-status">正在连接服务并同步数据…</div>
-  <button type="button" id="appBootRetryBtn" class="boot-retry">重新加载</button>
+  <div class="boot-aurora" aria-hidden="true">
+    <span class="boot-orb boot-orb-a"></span>
+    <span class="boot-orb boot-orb-b"></span>
+  </div>
+  <div class="boot-card">
+    <div id="appBootStage" class="boot-stage" title="轻点书本试试">
+      <div class="boot-ripple" aria-hidden="true"></div>
+      <div class="boot-bubbles" aria-hidden="true">
+        <span class="boot-chip c-sched"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3.2v3.2M16 3.2v3.2M3.5 10h17"/></svg></span>
+        <span class="boot-chip c-notice"><svg viewBox="0 0 24 24"><path d="M5.5 16c1.2-1.4 1.7-2.6 1.7-6a4.8 4.8 0 0 1 9.6 0c0 3.4.5 4.6 1.7 6z"/><path d="M9.8 18.8a2.2 2.2 0 0 0 4.4 0"/></svg></span>
+        <span class="boot-chip c-todo"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m8.5 12.2 2.4 2.5 4.8-5.1"/></svg></span>
+        <span class="boot-chip c-rule"><svg viewBox="0 0 24 24"><path d="M12 6.5C9.8 4.9 6.7 4.6 4.6 5.2v12.5c2.1-.6 5.2-.3 7.4 1.3 2.2-1.6 5.3-1.9 7.4-1.3V5.2c-2.1-.6-5.2-.3-7.4 1.3z"/><path d="M12 6.5v12.5"/></svg></span>
+        <span class="boot-chip c-ai"><svg viewBox="0 0 24 24"><path d="M12 3.2 14.3 9.7 20.8 12l-6.5 2.3L12 20.8l-2.3-6.5L3.2 12l6.5-2.3z"/></svg></span>
+      </div>
+      <div id="appBootBookWrap" class="boot-book-wrap" aria-hidden="true">
+        <div class="boot-book">
+          <div class="boot-cover"></div>
+          <div class="boot-page-static boot-page-left"></div>
+          <div class="boot-page-static boot-page-right"></div>
+          <div class="boot-leaf boot-leaf-1"></div>
+          <div class="boot-leaf boot-leaf-2"></div>
+          <div class="boot-leaf boot-leaf-3"></div>
+        </div>
+        <div class="boot-crest">校</div>
+      </div>
+      <div class="boot-shadow" aria-hidden="true"></div>
+    </div>
+    <h2 class="boot-title">校务智理</h2>
+    <p class="boot-sub">校园事务智能服务平台</p>
+    <div class="boot-progress-row">
+      <div class="boot-bar"><i id="appBootBarFill"></i></div>
+      <span id="appBootPct" class="boot-pct">24%</span>
+    </div>
+    <div id="appBootStatus" class="boot-status">正在翻阅 126 份校园规章…</div>
+    <div id="appBootHint" class="boot-hint">轻点书本试试 ✨</div>
+    <button type="button" id="appBootRetryBtn" class="boot-retry">重新连接</button>
+  </div>
 </div>
+<script>
+  (function () {
+    var stage = document.getElementById("appBootStage");
+    var wrap = document.getElementById("appBootBookWrap");
+    var hint = document.getElementById("appBootHint");
+    if (!stage || !wrap) return;
+    var taps = 0;
+    var notes = ["灵感 +1 ✨", "126 份校规已记牢 📘", "课表与待办同步中 📅", "指南 AI 随时待命 ✦", "今天也要元气满满 ⚡"];
+    var colors = ["#38bdf8", "#3b82f6", "#6366f1", "#10b981", "#f59e0b", "#a855f7", "#06b6d4"];
+    stage.addEventListener("click", function () {
+      taps += 1;
+      wrap.classList.remove("is-boing");
+      void wrap.offsetWidth;
+      wrap.classList.add("is-boing");
+      if (hint) hint.textContent = notes[(taps - 1) % notes.length];
+      for (var i = 0; i < 7; i++) {
+        var sp = document.createElement("span");
+        sp.className = "boot-spark";
+        var ang = (Math.PI * 2 * i) / 7 + (Math.random() * 0.45 - 0.22);
+        var dist = 36 + Math.random() * 28;
+        sp.style.setProperty("--sx", Math.round(Math.cos(ang) * dist) + "px");
+        sp.style.setProperty("--sy", Math.round(Math.sin(ang) * dist - 14) + "px");
+        sp.style.background = colors[i % colors.length];
+        stage.appendChild(sp);
+        setTimeout(function (node) { return function () { node.remove(); }; }(sp), 620);
+      }
+    });
+  })();
+</script>
 
 <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -1440,7 +2030,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.125"></script>
+<script src="app.js?v=1.126"></script>
 
 
 </body>

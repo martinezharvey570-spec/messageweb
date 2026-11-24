@@ -782,7 +782,7 @@ async function enter(isBoot = false) {
     try { token = localStorage.getItem("xz_token") || ""; } catch {}
   }
   if (isBoot && !boot_gate_done) {
-    set_boot_progress(45, "正在翻阅 126 份校园规章并验证身份…", false);
+    set_boot_progress(45, "正在翻阅 127 份校园规章并验证身份…", false);
   }
   const me_req = api("/me");
   const data_req = Promise.all([api("/notices"), api("/tasks")]);
@@ -8511,7 +8511,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
       const spots = Array.isArray(data?.blind_spots) ? data.blind_spots : [];
       if (!spots.length) {
-        blindEl.innerHTML = `<div class="gov-empty muted">${ico("check-square", "ico-xs")} 当前暂无待补充规定的问题，现有 ${Number(data?.total_docs_count || kb_total || 126)} 份校规制度已覆盖近期咨询。</div>`;
+        blindEl.innerHTML = `<div class="gov-empty muted">${ico("check-square", "ico-xs")} 当前暂无待补充规定的问题，现有 ${Number(data?.total_docs_count || kb_total || 127)} 份校规制度已覆盖近期咨询。</div>`;
       } else {
         blindEl.innerHTML = spots.map((s, idx) => `
           <div class="gov-spot-row">

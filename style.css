@@ -1,4 +1,4 @@
-/* 校务智理 · style.css v1.130（级联安全瘦身重构 + 四级强下挖液态玻璃设计语言单一真相源） */
+/* 校务智理 · style.css v1.131（纯净无色四级液态玻璃设计语言 + 级联安全瘦身重构） */
 :root {
   --blue: #155eef;
   --blue-hover: #004eeb;
@@ -33,7 +33,29 @@
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
-html.dark body,
+html.dark body {
+  --blue: #3b82f6;
+  --blue-hover: #2563eb;
+  --blue-light: rgba(59, 130, 246, 0.15);
+  --blue-border: rgba(59, 130, 246, 0.35);
+  --purple: #a78bfa;
+  --purple-light: rgba(139, 92, 246, 0.16);
+  --purple-border: rgba(139, 92, 246, 0.36);
+  --subtle: #667085;
+  --line: #1f2937;
+  --border: #374151;
+  --bg: #0b1120;
+  --card: #111827;
+  --glass-card: rgba(17, 24, 39, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --surface: #1e293b;
+  --header-bg: rgba(17, 24, 39, 0.82);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.55);
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2398a2b3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
 body.dark {
   --blue: #3b82f6;
   --blue-hover: #2563eb;
@@ -87,13 +109,13 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 button {
-  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  transition: transform 0.16s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.16s ease, border-color 0.18s ease;
 }
 input,
 textarea,
 select {
   touch-action: manipulation;
-  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  transition: transform 0.16s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.16s ease, border-color 0.18s ease;
 }
 select {
   appearance: none;
@@ -340,16 +362,9 @@ label {
   justify-self: center;
   background: transparent;
   border: 0;
-  padding: 2px 8px;
-  min-height: auto;
   color: var(--blue);
   font-size: 13px;
   font-weight: 600;
-  border-radius: 6px;
-}
-.demo-login-link:hover {
-  background: var(--blue-light);
-  text-decoration: underline;
 }
 .hint {
   font-size: 12px;
@@ -6470,7 +6485,6 @@ html.dark #docDialog .doc-mobile-hero-meta .tag {
   border-color: #e2e8f0 !important;
   color: #666666 !important;
 }
-html.dark #knowledgeGrid .doc-index,
 html.dark #docDialog .doc-index {
   background: rgba(255, 255, 255, .06) !important;
   border-color: var(--line) !important;
@@ -8114,9 +8128,6 @@ html.dark .sched-field select {
   border-color: var(--blue-border);
   background: var(--blue-light);
 }
-.sched-sub-card.is-accent {
-  border-color: var(--blue-border);
-}
 .sched-sub-card .ico {
   width: 20px;
   height: 20px;
@@ -8667,10 +8678,6 @@ body {
 .home-sched-strip {
   border-radius: 999px !important;
 }
-.home-sched-strip {
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-}
 body.on-ai-page .messages {
   background: transparent !important;
 }
@@ -8906,11 +8913,6 @@ html.dark #schedulePage .sched-hero.empty {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.78) 0%, rgba(17, 24, 39, 0.82) 100%) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
-html.dark .sched-matrix-card {
-  background: rgba(17, 24, 39, 0.74) !important;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 32px -6px rgba(0, 0, 0, 0.42) !important;
-}
 .sched-d-right-panel {
   border-radius: 22px !important;
   padding: 16px !important;
@@ -8984,11 +8986,6 @@ html.dark #schedulePage .sched-week-stepper {
   border: 1px solid rgba(255, 255, 255, 0.86) !important;
   box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.95), 0 10px 30px -10px rgba(15, 23, 42, 0.08) !important;
 }
-html.dark .sched-manage-card {
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 12px 34px -8px rgba(0, 0, 0, 0.45) !important;
-}
-html.dark .sched-tt-card,
 html.dark .welcome-card,
 html.dark #auth form {
   background: rgba(17, 24, 39, 0.68) !important;
@@ -9816,7 +9813,6 @@ html.dark .search-box:focus-within {
   box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.36), 0 0 0 2.5px rgba(59, 130, 246, 0.34) !important;
 }
 body::before {
-  content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
@@ -9825,13 +9821,11 @@ body::before {
 html.dark body::before {
   background: radial-gradient(50vw 44vh at 16% 14%, rgba(37, 99, 235, 0.11) 0%, transparent 72%), radial-gradient(44vw 40vh at 84% 20%, rgba(99, 102, 241, 0.09) 0%, transparent 74%), radial-gradient(50vw 44vh at 68% 86%, rgba(14, 165, 233, 0.08) 0%, transparent 72%);
 }
-.mobile-tabbar,
 dialog:not(#docDialog),
 .sched-m-sticky {
   backdrop-filter: blur(28px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(185%) !important;
 }
-html.dark .mobile-tabbar,
 html.dark dialog:not(#docDialog),
 html.dark .sched-m-sticky {
   backdrop-filter: blur(28px) saturate(180%) !important;
@@ -10139,18 +10133,6 @@ html.dark #schedDateStrip .sched-date-chip.today:not(.on) {
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
 }
-html.dark .panel,
-html.dark .welcome {
-  border: 0 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 12px 30px -8px rgba(0, 0, 0, 0.44) !important;
-}
-html.dark .stats article,
-html.dark .notice-card,
-html.dark .taskrow,
-html.dark .user-row {
-  border: 0 !important;
-}
-html.dark .sched-today-card,
 html.dark .sched-lesson {
   border: 0 !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 12px 30px -8px rgba(0, 0, 0, 0.44) !important;
@@ -10160,23 +10142,19 @@ html.dark .welcome-item {
   border: 0 !important;
 }
 html.dark .school-item,
-html.dark .sched-d-header,
 html.dark .sched-d-right-panel {
   border: 0 !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 12px 30px -8px rgba(0, 0, 0, 0.44) !important;
 }
-.mobile-tabbar,
+.mobile-tabbar {
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+}
 main > header,
 dialog:not(#docDialog) {
   border: 0 !important;
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-}
-.mobile-tabbar {
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.96), inset 0 -1px 0 rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.06), 0 16px 40px -8px rgba(15, 23, 42, 0.18) !important;
-}
-html.dark .mobile-tabbar {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.11), 0 16px 42px -8px rgba(0, 0, 0, 0.52) !important;
 }
 .authbox .tabs {
   display: grid !important;
@@ -10352,10 +10330,8 @@ html.dark .ask .ask-input-wrap {
   -webkit-backdrop-filter: blur(26px) saturate(210%) !important;
   box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.96), inset 0 -1px 0 rgba(15, 23, 42, 0.03), 0 0 0 1px rgba(255, 255, 255, 0.72), 0 12px 30px -8px rgba(15, 23, 42, 0.09) !important;
 }
-html.dark .panel,
 html.dark .sched-lesson,
 html.dark .school-item,
-html.dark .sched-d-header,
 html.dark .sched-d-right-panel {
   background: linear-gradient(155deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.62) 100%) !important;
 }
@@ -11179,13 +11155,7 @@ textarea {
 #knowledgePage #knowledgeDept:not(.xz-native-select-hidden) {
   min-height: 42px !important;
   max-width: 100%;
-  border-radius: 999px !important;
   padding: 9px 38px 9px 15px !important;
-  color: var(--ink) !important;
-  background-color: rgba(255,255,255,.78) !important;
-  background-image: linear-gradient(180deg,rgba(255,255,255,.96),rgba(237,243,253,.82)) !important;
-  border: 1px solid rgba(59,130,246,.18) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.96), 0 4px 12px rgba(15,23,42,.055) !important;
   backdrop-filter: blur(18px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(185%) !important;
   outline: none;
@@ -11196,15 +11166,6 @@ textarea {
 #knowledgePage #knowledgeDept:not(.xz-native-select-hidden):focus-visible {
   border-color: rgba(37,99,235,.58) !important;
   box-shadow: 0 0 0 3px rgba(37,99,235,.14), inset 0 1px 0 rgba(255,255,255,.96) !important;
-}
-html.dark #noticesPage #category:not(.xz-native-select-hidden),
-html.dark #tasksPage #taskFilter:not(.xz-native-select-hidden),
-html.dark #knowledgePage #knowledgeDept:not(.xz-native-select-hidden) {
-  color: var(--ink) !important;
-  background-color: rgba(23,34,54,.88) !important;
-  background-image: linear-gradient(180deg,rgba(51,65,85,.90),rgba(30,41,59,.88)) !important;
-  border-color: rgba(148,163,184,.22) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 4px 12px rgba(0,0,0,.22) !important;
 }
 .mini-chips button,
 .quick-tags button,
@@ -11288,9 +11249,6 @@ body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai {
   white-space: normal !important;
   overflow-wrap: anywhere !important;
   word-break: normal !important;
-}
-html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai {
-  border-color: #35445b !important;
 }
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai :where(p, ul, ol, blockquote, table, pre, img, svg, video) {
   max-width: 100%;
@@ -11885,12 +11843,9 @@ dialog:not(#docDialog) {
 html.dark dialog:not(#docDialog) {
   background: linear-gradient(160deg, rgba(24, 33, 52, 0.96) 0%, rgba(15, 23, 42, 0.92) 100%) !important;
 }
-.mobile-tabbar,
 .sched-m-sticky {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.91) 0%, rgba(244, 248, 255, 0.85) 100%) !important;
 }
-html.dark .mobile-tabbar,
-html.dark main > header,
 html.dark .sched-m-sticky {
   background: linear-gradient(180deg, rgba(24, 33, 52, 0.91) 0%, rgba(15, 23, 42, 0.85) 100%) !important;
 }
@@ -12118,23 +12073,16 @@ html.dark .sched-wg > .sched-m-head:first-child {
 }
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
-  border: 0 !important;
   border-radius: 4px 20px 20px 20px !important;
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.91) 0%, rgba(242, 247, 255, 0.84) 100%) !important;
   color: var(--ink) !important;
-  backdrop-filter: blur(26px) saturate(195%) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(195%) !important;
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 0 rgba(15, 23, 42, 0.03), 0 0 0 1px rgba(15, 23, 42, 0.06), 0 12px 30px -8px rgba(15, 23, 42, 0.08) !important;
   contain: none !important;
   overflow: visible !important;
 }
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
-  background: linear-gradient(155deg, rgba(28, 39, 58, 0.90) 0%, rgba(15, 23, 42, 0.84) 100%) !important;
   color: var(--ink) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 14px 34px -10px rgba(0, 0, 0, 0.45) !important;
 }
 body.on-ai-page #messages > .bubble-wrap.msg-user > .bubble.msg-user,
 body.on-ai-page #messages > .bubble-wrap.user > .bubble.user {
@@ -12554,10 +12502,6 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-html.dark .sched-manage-card,
-html.dark .sched-today-card {
-  background: linear-gradient(155deg, rgba(22, 31, 48, 0.74) 0%, rgba(15, 23, 42, 0.64) 100%) !important;
-}
 .sched-clist-item {
   padding: 10px 12px !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 255, 0.88) 100%) !important;
@@ -12580,14 +12524,6 @@ html.dark .sched-link-btn {
   background: linear-gradient(180deg, rgba(37, 99, 235, 0.24) 0%, rgba(30, 58, 138, 0.18) 100%) !important;
   color: #93c5fd !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(96, 165, 250, 0.26) !important;
-}
-.sched-sub-card.is-accent {
-  background: radial-gradient(110% 90% at 12% 0%, rgba(255, 255, 255, 0.86) 0%, transparent 56%), radial-gradient(80% 80% at 92% 88%, rgba(99, 102, 241, 0.08) 0%, transparent 60%), linear-gradient(135deg, rgba(240, 246, 255, 0.88) 0%, rgba(255, 255, 255, 0.76) 100%) !important;
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), 0 0 0 1px rgba(37, 99, 235, 0.14), 0 8px 22px -6px rgba(37, 99, 235, 0.12) !important;
-}
-html.dark .sched-sub-card.is-accent {
-  background: radial-gradient(110% 90% at 12% 0%, rgba(96, 165, 250, 0.18) 0%, transparent 56%), linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(96, 165, 250, 0.22), 0 8px 24px -6px rgba(0, 0, 0, 0.40) !important;
 }
 .sched-weeks-head {
   flex-wrap: wrap !important;
@@ -13071,20 +13007,6 @@ html.dark .sched-ai-refine-row input {
 .knowledge-card {
   border: 0 !important;
 }
-html.dark .welcome,
-html.dark .panel,
-html.dark .stats article,
-html.dark .notice-card,
-html.dark .knowledge-card,
-html.dark .sched-d-header,
-html.dark .sched-today-card,
-html.dark .sched-matrix-card,
-html.dark .sched-manage-card,
-html.dark .sched-tt-card,
-html.dark #messages .bubble.msg-ai {
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-}
 .stats article,
 .notice-card,
 .knowledge-card {
@@ -13101,9 +13023,6 @@ html.dark #messages .bubble.msg-ai {
   position: relative;
   overflow: hidden;
 }
-html.dark .welcome {
-  background: radial-gradient(88% 140% at 88% 14%, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.06) 50%, transparent 84%), linear-gradient(135deg, rgba(26, 39, 64, 0.88) 0%, rgba(19, 30, 52, 0.85) 55%, rgba(15, 24, 44, 0.87) 100%) !important;
-}
 .welcome::before {
   display: none !important;
   content: none !important;
@@ -13111,15 +13030,6 @@ html.dark .welcome {
 .welcome .date {
   background: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
-}
-.home-sched-strip {
-  background: radial-gradient(110% 85% at 12% 0%, rgba(255, 255, 255, 0.94) 0%, transparent 54%), linear-gradient(125deg, rgba(235, 244, 255, 0.92) 0%, rgba(244, 249, 255, 0.88) 100%) !important;
-  border: 0 !important;
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(37, 99, 235, 0.14), 0 0 0 1px rgba(37, 99, 235, 0.20), 0 2px 5px rgba(37, 99, 235, 0.06), 0 8px 20px -8px rgba(37, 99, 235, 0.14) !important;
-}
-html.dark .home-sched-strip {
-  background: radial-gradient(110% 85% at 12% 0%, rgba(147, 197, 253, 0.20) 0%, transparent 54%), linear-gradient(125deg, rgba(23, 42, 82, 0.84) 0%, rgba(17, 30, 58, 0.80) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.24), inset 0 -1px 0 rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(96, 165, 250, 0.30), 0 10px 26px -8px rgba(0, 0, 0, 0.50) !important;
 }
 .stats article strong,
 .stats article b {
@@ -13147,19 +13057,6 @@ html.dark .welcome-item > span {
 html.dark .quick-item:hover {
   background: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l2-shadow-hover) !important;
-}
-#sidebar,
-main > header {
-  background: var(--pearl-l3-bg) !important;
-  backdrop-filter: blur(20px) saturate(185%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
-}
-html.dark #sidebar,
-html.dark main > header {
-  backdrop-filter: blur(22px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
-  border-color: rgba(148, 197, 255, 0.12) !important;
 }
 
 @media (max-width: 960px) {
@@ -13728,15 +13625,8 @@ html.dark #auth .auth-theme-btn {
     display: grid !important;
     grid-template-columns: minmax(410px, 520px) minmax(380px, 440px) !important;
     justify-content: center !important;
-    align-content: center !important;
-    align-items: stretch !important;
     gap: clamp(22px, 2.6vw, 30px) !important;
-    min-height: 100dvh !important;
     padding: clamp(28px, 4vw, 56px) !important;
-    background: radial-gradient(64% 46% at 18% 8%, rgba(56, 189, 248, 0.13) 0%, transparent 60%), radial-gradient(50% 42% at 86% 12%, rgba(96, 165, 250, 0.09) 0%, transparent 58%), linear-gradient(180deg, #ecf4fe 0%, #f4f7fc 48%, #f5f7fa 100%) !important;
-  }
-  html.dark #auth.auth:not(.hide) {
-    background: radial-gradient(62% 44% at 18% 8%, rgba(59, 130, 246, 0.18) 0%, transparent 60%), radial-gradient(48% 40% at 86% 14%, rgba(56, 189, 248, 0.09) 0%, transparent 56%), linear-gradient(180deg, #0b1324 0%, #09101e 50%, #080d18 100%) !important;
   }
   #auth.auth:not(.hide) .hero {
     position: relative;
@@ -13751,17 +13641,11 @@ html.dark #auth .auth-theme-btn {
     flex-direction: column !important;
     justify-content: space-between !important;
     gap: 24px !important;
-    background: radial-gradient(96% 110% at 88% 10%, rgba(186, 230, 253, 0.42) 0%, rgba(219, 234, 254, 0.16) 50%, transparent 80%), linear-gradient(148deg, rgba(255, 255, 255, 0.90) 0%, rgba(242, 248, 255, 0.84) 55%, rgba(232, 243, 255, 0.86) 100%) !important;
-    backdrop-filter: blur(22px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
     border: 0 !important;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(37, 99, 235, 0.12), 0 0 0 1px rgba(37, 99, 235, 0.16), 0 4px 12px rgba(15, 23, 42, 0.05), 0 22px 48px -18px rgba(37, 99, 235, 0.16) !important;
     color: var(--ink) !important;
     overflow: hidden;
   }
   html.dark #auth.auth:not(.hide) .hero {
-    background: radial-gradient(96% 110% at 88% 10%, rgba(59, 130, 246, 0.24) 0%, rgba(37, 99, 235, 0.08) 52%, transparent 82%), linear-gradient(148deg, rgba(24, 38, 66, 0.86) 0%, rgba(16, 26, 48, 0.84) 56%, rgba(13, 22, 42, 0.88) 100%) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.24), inset 0 -1px 0 rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(147, 197, 253, 0.20), 0 24px 54px -16px rgba(0, 0, 0, 0.56) !important;
     color: #f1f5f9 !important;
   }
   #auth .hero-top {
@@ -13822,14 +13706,9 @@ html.dark #auth .auth-theme-btn {
     margin: 0 !important;
     padding: 12px 14px !important;
     border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.78) !important;
-    border: 0 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.98), 0 0 0 1px rgba(15, 23, 42, 0.07), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
     color: var(--ink) !important;
   }
   html.dark #auth.auth:not(.hide) .hero-list p {
-    background: rgba(15, 23, 42, 0.56) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.14), 0 0 0 1px rgba(148, 197, 255, 0.12) !important;
     color: #e2e8f0 !important;
   }
   #auth.auth:not(.hide) .hero-list p .ico {
@@ -13929,11 +13808,9 @@ html.dark #auth .auth-theme-btn {
     flex-direction: column !important;
     justify-content: center !important;
     gap: 16px !important;
-    background: var(--pearl-l4-bg) !important;
     backdrop-filter: blur(26px) saturate(195%) !important;
     -webkit-backdrop-filter: blur(26px) saturate(195%) !important;
     border: 0 !important;
-    box-shadow: var(--pearl-l4-shadow) !important;
   }
   #auth.auth:not(.hide) .authbox h2 {
     margin: 4px 0 0 !important;
@@ -14368,24 +14245,11 @@ body {
   --ink: #0b1220;
   --muted: #475569;
 }
-html.dark {
-  --ink: #f1f5f9;
-  --muted: #94a3b8;
-}
 .knowledge-card {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 255, 0.94) 100%) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 0 0 1px rgba(15, 23, 42, 0.085), 0 2px 6px rgba(15, 23, 42, 0.04), 0 8px 20px -10px rgba(30, 58, 138, 0.08) !important;
-}
-html.dark .notice-card,
-html.dark .knowledge-card,
-html.dark .stats article,
-html.dark .taskrow,
-html.dark .user-row,
-html.dark #messages .bubble.msg-ai {
-  background: linear-gradient(155deg, rgba(22, 33, 55, 0.95) 0%, rgba(15, 23, 42, 0.93) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.16), 0 0 0 1px rgba(148, 197, 255, 0.14), 0 8px 22px -10px rgba(0, 0, 0, 0.42) !important;
 }
 svg.ico {
   shape-rendering: geometricPrecision;
@@ -17078,20 +16942,20 @@ html.dark dialog .dialoghead button {
   }
 }
 :root {
-  --pearl-canvas: radial-gradient(54vw 46vh at 14% 10%, rgba(56, 189, 248, 0.11) 0%, transparent 66%), radial-gradient(46vw 40vh at 88% 14%, rgba(99, 102, 241, 0.075) 0%, transparent 68%), radial-gradient(56vw 48vh at 74% 86%, rgba(14, 165, 233, 0.08) 0%, transparent 68%), radial-gradient(44vw 38vh at 16% 84%, rgba(251, 191, 36, 0.06) 0%, transparent 68%), linear-gradient(180deg, #edf3fb 0%, #f3f6fb 48%, #f4f6fa 100%);
-  --pearl-l1-bg: linear-gradient(180deg, rgba(148, 163, 184, 0.28) 0%, rgba(186, 198, 214, 0.34) 45%, rgba(214, 223, 234, 0.42) 100%);
-  --pearl-l1-shadow: inset 0 3px 7px rgba(15, 23, 42, 0.16), inset 0 1px 2px rgba(15, 23, 42, 0.11), inset 0 -1.5px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(15, 23, 42, 0.085), 0 1.5px 0 rgba(255, 255, 255, 0.92);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(226, 234, 244, 0.62) 0%, rgba(248, 251, 255, 0.90) 100%);
-  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(37, 99, 235, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 1), 0 0 0 2.5px rgba(37, 99, 235, 0.28), 0 6px 18px -4px rgba(37, 99, 235, 0.16);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(148, 163, 184, 0.22) 0%, rgba(203, 213, 225, 0.34) 100%);
-  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 76%), linear-gradient(164deg, rgba(255, 255, 255, 0.82) 0%, rgba(246, 250, 255, 0.72) 58%, rgba(239, 246, 255, 0.68) 100%);
-  --pearl-l2-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.99), inset 1px 0 0 rgba(255, 255, 255, 0.72), inset -1px 0 0 rgba(219, 234, 254, 0.50), inset 0 -1px 0 rgba(148, 163, 184, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.068), 0 2px 6px rgba(15, 23, 42, 0.045), 0 12px 28px -10px rgba(15, 23, 42, 0.095);
-  --pearl-l2-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 1px 0 0 rgba(191, 219, 254, 0.76), inset -1px 0 0 rgba(191, 219, 254, 0.60), inset 0 -1px 0 rgba(59, 130, 246, 0.16), 0 0 0 1px rgba(37, 99, 235, 0.24), 0 4px 10px rgba(37, 99, 235, 0.09), 0 14px 30px -10px rgba(37, 99, 235, 0.17);
-  --pearl-l3-bg: radial-gradient(120% 84% at 18% 0%, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.22) 56%, transparent 74%), linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 246, 255, 0.80) 100%);
-  --pearl-l3-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1.5px 2px rgba(148, 163, 184, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.08), 0 2px 5px rgba(15, 23, 42, 0.065), 0 8px 18px -7px rgba(15, 23, 42, 0.12);
-  --pearl-l3-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 2px rgba(59, 130, 246, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.24), 0 4px 10px rgba(37, 99, 235, 0.10), 0 12px 24px -8px rgba(37, 99, 235, 0.18);
-  --pearl-l4-bg: radial-gradient(112% 64% at 14% 0%, rgba(255, 255, 255, 0.96) 0%, transparent 56%), linear-gradient(166deg, rgba(255, 255, 255, 0.89) 0%, rgba(244, 248, 255, 0.82) 100%);
-  --pearl-l4-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(148, 163, 184, 0.20), 0 0 0 1px rgba(255, 255, 255, 0.86), 0 0 0 1.5px rgba(15, 23, 42, 0.075), 0 8px 20px rgba(15, 23, 42, 0.09), 0 28px 60px -12px rgba(15, 23, 42, 0.22);
+  --pearl-canvas: radial-gradient(84% 46% at 50% -10%, rgba(255, 255, 255, 0.88) 0%, transparent 66%), linear-gradient(180deg, #eceff3 0%, #f2f4f7 48%, #e8ecf1 100%);
+  --pearl-l1-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.25) 0%, rgba(188, 194, 204, 0.32) 46%, rgba(218, 222, 228, 0.40) 100%);
+  --pearl-l1-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.14), inset 0 1px 2px rgba(0, 0, 0, 0.10), inset 0 -1.5px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1.5px 0 rgba(255, 255, 255, 0.92);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(232, 235, 240, 0.68) 0%, rgba(255, 255, 255, 0.92) 100%);
+  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.10), inset 0 -1px 0 rgba(255, 255, 255, 1), 0 0 0 2px rgba(37, 99, 235, 0.28), 0 4px 14px -4px rgba(0, 0, 0, 0.08);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.17) 0%, rgba(203, 208, 216, 0.28) 100%);
+  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0) 76%), linear-gradient(166deg, rgba(255, 255, 255, 0.84) 0%, rgba(248, 249, 251, 0.74) 58%, rgba(242, 244, 247, 0.70) 100%);
+  --pearl-l2-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.99), inset 1px 0 0 rgba(255, 255, 255, 0.74), inset -1px 0 0 rgba(255, 255, 255, 0.48), inset 0 -1px 0 rgba(0, 0, 0, 0.055), 0 0 0 1px rgba(0, 0, 0, 0.065), 0 2px 6px rgba(0, 0, 0, 0.04), 0 12px 28px -10px rgba(0, 0, 0, 0.09);
+  --pearl-l2-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 1px 0 0 rgba(255, 255, 255, 0.86), inset -1px 0 0 rgba(255, 255, 255, 0.64), inset 0 -1px 0 rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.11), 0 4px 10px rgba(0, 0, 0, 0.065), 0 14px 32px -10px rgba(0, 0, 0, 0.13);
+  --pearl-l3-bg: radial-gradient(120% 84% at 18% 0%, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.22) 56%, transparent 74%), linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 246, 249, 0.84) 100%);
+  --pearl-l3-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1.5px 2px rgba(0, 0, 0, 0.075), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.055), 0 8px 18px -7px rgba(0, 0, 0, 0.11);
+  --pearl-l3-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 2px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.13), 0 4px 10px rgba(0, 0, 0, 0.075), 0 12px 24px -8px rgba(0, 0, 0, 0.14);
+  --pearl-l4-bg: radial-gradient(112% 64% at 14% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 56%), linear-gradient(166deg, rgba(255, 255, 255, 0.90) 0%, rgba(246, 248, 250, 0.84) 100%);
+  --pearl-l4-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(0, 0, 0, 0.065), 0 0 0 1px rgba(255, 255, 255, 0.86), 0 0 0 1.5px rgba(0, 0, 0, 0.075), 0 8px 20px rgba(0, 0, 0, 0.08), 0 28px 60px -12px rgba(0, 0, 0, 0.20);
   --r-circle: 50%;
   --r-pill: 999px;
   --r-field: 999px;
@@ -17101,24 +16965,33 @@ html.dark dialog .dialoghead button {
 }
 html.dark,
 html.dark body {
-  --pearl-canvas: radial-gradient(54vw 44vh at 14% 12%, rgba(37, 99, 235, 0.16) 0%, transparent 66%), radial-gradient(46vw 40vh at 86% 18%, rgba(99, 102, 241, 0.11) 0%, transparent 68%), radial-gradient(52vw 46vh at 70% 86%, rgba(14, 165, 233, 0.10) 0%, transparent 68%), linear-gradient(180deg, #0b1324 0%, #09101e 48%, #070c17 100%);
-  --pearl-l1-bg: linear-gradient(180deg, rgba(3, 6, 15, 0.84) 0%, rgba(9, 15, 30, 0.72) 55%, rgba(15, 23, 42, 0.62) 100%);
-  --pearl-l1-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.68), inset 0 1px 2px rgba(0, 0, 0, 0.50), inset 0 -1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(148, 197, 255, 0.12), 0 1px 0 rgba(255, 255, 255, 0.08);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(10, 18, 34, 0.90) 0%, rgba(22, 35, 60, 0.84) 100%);
-  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.50), inset 0 -1px 0 rgba(186, 230, 253, 0.24), 0 0 0 2.5px rgba(96, 165, 250, 0.44), 0 6px 20px -4px rgba(37, 99, 235, 0.30);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(6, 10, 20, 0.60) 0%, rgba(15, 23, 42, 0.48) 100%);
-  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(186, 230, 253, 0.10) 0%, transparent 74%), linear-gradient(164deg, rgba(24, 36, 58, 0.76) 0%, rgba(15, 24, 44, 0.68) 100%);
-  --pearl-l2-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.24), inset 1px 0 0 rgba(147, 197, 253, 0.15), inset -1px 0 0 rgba(147, 197, 253, 0.10), inset 0 -1px 0 rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(148, 197, 255, 0.14), 0 3px 8px rgba(0, 0, 0, 0.30), 0 14px 32px -10px rgba(0, 0, 0, 0.50);
-  --pearl-l2-shadow-hover: inset 0 1px 0 rgba(224, 242, 254, 0.32), inset 1px 0 0 rgba(147, 197, 253, 0.26), inset -1px 0 0 rgba(147, 197, 253, 0.20), 0 0 0 1px rgba(96, 165, 250, 0.36), 0 16px 36px -10px rgba(0, 0, 0, 0.58);
-  --pearl-l3-bg: radial-gradient(118% 82% at 16% 0%, rgba(186, 230, 253, 0.18) 0%, transparent 56%), linear-gradient(180deg, rgba(32, 47, 74, 0.88) 0%, rgba(18, 29, 50, 0.82) 100%);
-  --pearl-l3-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.28), inset 0 -1.5px 2px rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(148, 197, 255, 0.18), 0 3px 10px rgba(0, 0, 0, 0.36), 0 12px 28px -8px rgba(0, 0, 0, 0.56);
-  --pearl-l3-shadow-hover: inset 0 1px 0 rgba(224, 242, 254, 0.36), inset 0 -1px 2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(96, 165, 250, 0.40), 0 6px 18px rgba(0, 0, 0, 0.44);
-  --pearl-l4-bg: radial-gradient(112% 62% at 14% 0%, rgba(186, 230, 253, 0.16) 0%, transparent 54%), linear-gradient(166deg, rgba(20, 31, 52, 0.90) 0%, rgba(11, 18, 33, 0.85) 100%);
-  --pearl-l4-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(148, 197, 255, 0.20), 0 26px 60px -12px rgba(0, 0, 0, 0.72);
+  --ink: #f1f5f9;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  color: #f1f5f9;
+  --pearl-canvas: radial-gradient(78% 42% at 50% -8%, rgba(255, 255, 255, 0.045) 0%, transparent 62%), linear-gradient(180deg, #11141b 0%, #0d1016 50%, #090b10 100%);
+  --pearl-l1-bg: linear-gradient(180deg, rgba(4, 6, 10, 0.84) 0%, rgba(12, 15, 21, 0.72) 55%, rgba(18, 22, 30, 0.62) 100%);
+  --pearl-l1-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.68), inset 0 1px 2px rgba(0, 0, 0, 0.50), inset 0 -1px 0 rgba(255, 255, 255, 0.13), 0 0 0 1px rgba(255, 255, 255, 0.09), 0 1px 0 rgba(255, 255, 255, 0.06);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(12, 15, 22, 0.90) 0%, rgba(24, 28, 38, 0.84) 100%);
+  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.52), inset 0 -1px 0 rgba(255, 255, 255, 0.18), 0 0 0 2px rgba(96, 165, 250, 0.42), 0 6px 18px -4px rgba(0, 0, 0, 0.40);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(7, 9, 14, 0.58) 0%, rgba(16, 19, 26, 0.46) 100%);
+  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(255, 255, 255, 0.065) 0%, transparent 74%), linear-gradient(166deg, rgba(30, 34, 43, 0.78) 0%, rgba(20, 23, 31, 0.72) 100%);
+  --pearl-l2-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 1px 0 0 rgba(255, 255, 255, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.05), inset 0 -1px 0 rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 3px 8px rgba(0, 0, 0, 0.30), 0 14px 32px -10px rgba(0, 0, 0, 0.52);
+  --pearl-l2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 1px 0 0 rgba(255, 255, 255, 0.12), inset -1px 0 0 rgba(255, 255, 255, 0.09), 0 0 0 1px rgba(255, 255, 255, 0.18), 0 16px 36px -10px rgba(0, 0, 0, 0.62);
+  --pearl-l3-bg: radial-gradient(118% 82% at 16% 0%, rgba(255, 255, 255, 0.11) 0%, transparent 56%), linear-gradient(180deg, rgba(42, 47, 58, 0.90) 0%, rgba(26, 30, 38, 0.84) 100%);
+  --pearl-l3-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1.5px 2px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.13), 0 3px 10px rgba(0, 0, 0, 0.36), 0 12px 28px -8px rgba(0, 0, 0, 0.56);
+  --pearl-l3-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 2px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.22), 0 6px 18px rgba(0, 0, 0, 0.48);
+  --pearl-l4-bg: radial-gradient(112% 62% at 14% 0%, rgba(255, 255, 255, 0.10) 0%, transparent 54%), linear-gradient(166deg, rgba(26, 30, 39, 0.92) 0%, rgba(16, 19, 26, 0.88) 100%);
+  --pearl-l4-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 0 rgba(0, 0, 0, 0.52), 0 0 0 1px rgba(255, 255, 255, 0.14), 0 26px 60px -12px rgba(0, 0, 0, 0.74);
 }
 body {
   background-image: var(--pearl-canvas) !important;
   background-attachment: fixed;
+}
+body::before,
+html.dark body::before {
+  display: none !important;
+  content: none !important;
 }
 .search-box,
 .school-search-wrap,
@@ -17128,8 +17001,8 @@ body {
   border-radius: var(--r-pill) !important;
   border: 0 !important;
   background: var(--pearl-l1-bg) !important;
-  backdrop-filter: blur(16px) saturate(175%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(175%) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   box-shadow: var(--pearl-l1-shadow) !important;
   color: var(--ink) !important;
   transition: background 0.22s ease, box-shadow 0.22s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
@@ -17163,7 +17036,7 @@ html.dark .school-search-wrap input:focus {
   border-radius: var(--r-pill) !important;
   border: 0 !important;
   background-color: transparent !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
   background-repeat: no-repeat, no-repeat !important;
   background-position: 14px center, 0 0 !important;
   background-size: 16px 16px, 100% 100% !important;
@@ -17176,29 +17049,48 @@ html.dark .school-search-wrap input:focus {
 }
 html.dark #globalSearchDialog #globalSearchInput,
 html.dark #globalSearchDialog #globalSearchInput:hover {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
 }
 html.dark #globalSearchDialog #globalSearchInput:focus {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-focus-bg) !important;
 }
 
 @media (min-width: 761px) {
+  main > header .header-right {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
   main > header #globalSearchBtn.global-search-trigger,
   html.dark main > header #globalSearchBtn.global-search-trigger {
+    width: auto !important;
+    min-width: 248px !important;
+    max-width: 300px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 8px 0 14px !important;
+    justify-content: space-between !important;
     background: var(--pearl-l1-bg) !important;
     box-shadow: var(--pearl-l1-shadow) !important;
     border: 0 !important;
     border-radius: var(--r-pill) !important;
     color: var(--muted) !important;
-    backdrop-filter: blur(14px) saturate(175%) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(175%) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
     transform: none !important;
+  }
+  main > header #globalSearchBtn.global-search-trigger .gs-label {
+    flex: 1 1 auto !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   main > header #globalSearchBtn.global-search-trigger:hover,
   html.dark main > header #globalSearchBtn.global-search-trigger:hover {
     background: var(--pearl-l1-focus-bg) !important;
     box-shadow: var(--pearl-l1-focus-shadow) !important;
-    color: var(--blue) !important;
+    color: var(--ink) !important;
     transform: none !important;
   }
   main > header #globalSearchBtn.global-search-trigger:active,
@@ -17207,11 +17099,64 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
   }
   main > header #globalSearchBtn.global-search-trigger .gs-kbd {
     background: var(--pearl-l3-bg) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
   }
   html.dark main > header #globalSearchBtn.global-search-trigger .gs-kbd {
-    background: rgba(30, 44, 70, 0.92) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.22), 0 0 0 1px rgba(148, 197, 255, 0.18) !important;
+    background: rgba(44, 49, 60, 0.92) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
+  }
+  main > header #themeToggle {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+  }
+  main > header #userProfileBtn {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 3px 12px 3px 4px !important;
+    gap: 8px !important;
+    border: 0 !important;
+    background: var(--pearl-l3-bg) !important;
+    box-shadow: var(--pearl-l3-shadow) !important;
+    border-radius: var(--r-pill) !important;
+  }
+  main > header #userProfileBtn #avatar {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 12.5px !important;
+  }
+  main > header #userProfileBtn > div {
+    line-height: 1.15 !important;
+  }
+  main > header #userProfileBtn > div b {
+    font-size: 12.5px !important;
+  }
+  main > header #userProfileBtn > div small {
+    font-size: 10.5px !important;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1120px) {
+  main > header #globalSearchBtn.global-search-trigger {
+    min-width: 196px !important;
+  }
+  main > header #userProfileBtn {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+  main > header #userProfileBtn > div {
+    display: none !important;
+  }
+  main > header #userProfileBtn #avatar {
+    width: 34px !important;
+    height: 34px !important;
   }
 }
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput),
@@ -17263,6 +17208,12 @@ html.dark .campus-tool-page .ct-inline-form .xz-date-trigger {
 #auth.auth:not(.hide) .authbox .input-group {
   border-radius: var(--r-pill) !important;
 }
+#academicPage .elig-grid input,
+#academicPage .elig-grid select,
+#academicPage .elig-grid .xz-select-trigger {
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput):focus,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) select:focus,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-select.open .xz-select-trigger,
@@ -17290,13 +17241,38 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-date-wrap:has(.xz-cal-pop.o
   background: var(--pearl-l1-focus-bg) !important;
   box-shadow: var(--pearl-l1-focus-shadow) !important;
 }
+#profileDialog .prof-label-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+#profileDialog .prof-lock-badge {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.055);
+  color: var(--muted);
+}
+html.dark #profileDialog .prof-lock-badge {
+  background: rgba(255, 255, 255, 0.09);
+  color: #94a3b8;
+}
 #profileDialog input:disabled,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:disabled,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) select:disabled {
   background: var(--pearl-l1-disabled-bg) !important;
   color: var(--muted) !important;
-  opacity: 0.80 !important;
+  opacity: 0.72 !important;
   cursor: not-allowed !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.86), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+}
+html.dark #profileDialog input:disabled,
+html.dark dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:disabled {
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.07) !important;
 }
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) textarea,
 .campus-tool-page #noticeParserText,
@@ -17345,6 +17321,7 @@ html.dark #academicTabs {
   box-shadow: var(--pearl-l1-shadow) !important;
 }
 .welcome,
+.home-sched-strip,
 .panel,
 .stats article,
 .notice-card,
@@ -17357,7 +17334,10 @@ html.dark #academicTabs {
 .sched-matrix-card,
 .sched-manage-card,
 .sched-tt-card,
+.sched-sub-card.is-accent,
 #messages .bubble.msg-ai,
+body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
+body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 #analyticsPage .panel,
 #analyticsPage .stats article,
 #analyticsPage .stat-ring-box,
@@ -17371,6 +17351,23 @@ html.dark #academicTabs {
 .campus-tool-page .ct-card,
 .campus-tool-page .ct-kpi,
 .campus-tool-page .ct-list,
+html.dark .welcome,
+html.dark .home-sched-strip,
+html.dark .panel,
+html.dark .stats article,
+html.dark .notice-card,
+html.dark .knowledge-card,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark .sched-d-header,
+html.dark .sched-today-card,
+html.dark .sched-matrix-card,
+html.dark .sched-manage-card,
+html.dark .sched-tt-card,
+html.dark #messages .bubble.msg-ai,
+html.dark .sched-sub-card.is-accent,
+html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
+html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 html.dark #analyticsPage .panel,
 html.dark #analyticsPage .stats article,
 html.dark #analyticsPage .stat-ring-box,
@@ -17387,8 +17384,8 @@ html.dark .campus-tool-page .ct-list,
 html.dark #knowledgeGrid .knowledge-card,
 html.dark #knowledgeGrid .knowledge-card:last-child {
   background: var(--pearl-l2-bg) !important;
-  backdrop-filter: blur(22px) saturate(195%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(195%) !important;
+  backdrop-filter: blur(22px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l2-shadow) !important;
 }
@@ -17398,6 +17395,32 @@ html.dark #knowledgeGrid {
   border: 0 !important;
   box-shadow: none !important;
 }
+#knowledgeGrid .knowledge-card h3 {
+  color: var(--ink) !important;
+}
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark .welcome h1,
+html.dark .panelhead h3,
+html.dark .stats article b,
+html.dark .stats article strong,
+html.dark .notice-card h3,
+html.dark .knowledge-card h3 {
+  color: #f1f5f9 !important;
+}
+html.dark .doc-index,
+html.dark #knowledgeGrid .doc-index,
+html.dark .kb-meta,
+html.dark .knowledge-card small.muted {
+  color: #cbd5e1 !important;
+}
+html.dark .doc-index,
+html.dark #knowledgeGrid .doc-index {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
 
 @media (hover: hover) {
   .stats article:hover,
@@ -17406,8 +17429,26 @@ html.dark #knowledgeGrid {
   .sched-lesson:hover,
   .sched-clist-item:hover {
     transform: translateY(-2px) !important;
+    background: var(--pearl-l2-bg) !important;
     box-shadow: var(--pearl-l2-shadow-hover) !important;
   }
+}
+#sidebar,
+main > header {
+  background: var(--pearl-l3-bg) !important;
+  backdrop-filter: blur(22px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+  border-color: rgba(0, 0, 0, 0.065) !important;
+}
+html.dark #sidebar,
+html.dark main > header {
+  background: var(--pearl-l3-bg) !important;
+  backdrop-filter: blur(22px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+}
+html.dark #sidebar,
+html.dark main > header {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 .outline:not(.icon-only):not(.primary):not(.danger),
 .secondary:not(.primary):not(.danger),
@@ -17416,12 +17457,16 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary,
 .pill-btn:not(.active),
 .toolbar select,
 .toolbar .xz-select-trigger,
+#noticesPage #category:not(.xz-native-select-hidden),
+#tasksPage #taskFilter:not(.xz-native-select-hidden),
+#knowledgePage #knowledgeDept:not(.xz-native-select-hidden),
 .user-row select,
 .user-row .xz-select-trigger,
 #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]),
 #aiPage .chat-top-actions button:not(.primary):not(.danger),
 .notice-actions button:not(.primary):not(.danger):not(.icon-only),
 .kb-actions button:not(.primary):not(.danger),
+.knowledge-card .kb-actions button:not(.primary):not(.danger),
 .taskrow button:not(.primary):not(.danger):not(.task-del-btn),
 .user-row button:not(.primary):not(.danger),
 .suggestions button,
@@ -17434,15 +17479,21 @@ html.dark .sched-btn-ghost,
 html.dark .pill-btn:not(.active),
 html.dark .toolbar select,
 html.dark .toolbar .xz-select-trigger,
+html.dark #noticesPage #category:not(.xz-native-select-hidden),
+html.dark #tasksPage #taskFilter:not(.xz-native-select-hidden),
+html.dark #knowledgePage #knowledgeDept:not(.xz-native-select-hidden),
 html.dark .user-row select,
 html.dark .user-row .xz-select-trigger,
 html.dark #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]),
 html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger),
+html.dark .knowledge-card .kb-actions button:not(.primary):not(.danger),
 html.dark .ai-agent-pill,
 html.dark #messages .bubble-tools button:not(.is-high) {
   border-radius: var(--r-pill) !important;
   border: 0 !important;
   background: var(--pearl-l3-bg) !important;
+  background-color: transparent !important;
+  background-image: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
   color: var(--ink) !important;
   transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
@@ -17460,21 +17511,15 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   .user-row .xz-select-trigger:hover,
   #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]):hover,
   #aiPage .chat-top-actions button:not(.primary):not(.danger):hover,
+  .knowledge-card .kb-actions button:not(.primary):not(.danger):hover,
   .suggestions button:hover,
   .ai-agent-pill:hover,
   #messages .bubble-tools button:not(.is-high):hover {
     background: var(--pearl-l3-bg) !important;
     box-shadow: var(--pearl-l3-shadow-hover) !important;
-    color: var(--blue) !important;
+    color: var(--ink) !important;
     transform: translateY(-1px);
   }
-}
-.pill-btn:not(.active):hover {
-  background: var(--pearl-l3-bg) !important;
-  color: var(--blue) !important;
-}
-html.dark .pill-btn:not(.active):hover {
-  color: #93c5fd !important;
 }
 #homePage .quick,
 .quick-item,
@@ -17505,6 +17550,7 @@ dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 #docDialog #closeDocDialog,
 #globalSearchDialog #closeGlobalSearchDlg,
 #docDialog .doc-m-btn:not(.is-ai),
+#docBackTopBtn,
 #aiPage #askAttachBtn,
 .notice-actions button.icon-only:not(.danger),
 .task-del-btn:not(.danger),
@@ -17514,12 +17560,23 @@ html.dark #desktopSidebarToggle.desktop-rail-toggle,
 html.dark dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 html.dark #docDialog #closeDocDialog,
 html.dark #globalSearchDialog #closeGlobalSearchDlg,
-html.dark #docDialog .doc-m-btn:not(.is-ai) {
+html.dark #docDialog .doc-m-btn:not(.is-ai),
+html.dark #docBackTopBtn {
   border-radius: var(--r-circle) !important;
   border: 0 !important;
   background: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
   color: var(--ink) !important;
+}
+#docBackTopBtn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 0 !important;
+  aspect-ratio: 1 / 1 !important;
 }
 
 @media (max-width: 760px) {
@@ -17579,6 +17636,7 @@ dialog.task-dialog,
 .xz-cal-pop,
 .ask-attach-pop,
 .doc-m-pop,
+.mobile-tabbar,
 body.on-ai-page .ask .ask-input-wrap,
 .scroll-bottom-btn,
 body #toast.toast,
@@ -17589,12 +17647,13 @@ html.dark .xz-select-menu,
 html.dark .xz-cal-pop,
 html.dark .ask-attach-pop,
 html.dark .doc-m-pop,
+html.dark .mobile-tabbar,
 html.dark body.on-ai-page .ask .ask-input-wrap,
 html.dark .scroll-bottom-btn,
 html.dark body #toast.toast {
   background: var(--pearl-l4-bg) !important;
-  backdrop-filter: blur(30px) saturate(205%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(205%) !important;
+  backdrop-filter: blur(30px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l4-shadow) !important;
 }
@@ -17603,12 +17662,12 @@ body #toast.toast {
   border-radius: var(--r-pill) !important;
 }
 dialog::backdrop {
-  background: rgba(15, 23, 42, 0.30) !important;
+  background: rgba(15, 23, 42, 0.28) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
 }
 html.dark dialog::backdrop {
-  background: rgba(2, 6, 23, 0.58) !important;
+  background: rgba(0, 0, 0, 0.60) !important;
 }
 dialog button:focus:not(:focus-visible),
 #docDialog .doc-font-group button:focus:not(:focus-visible) {
@@ -17617,4 +17676,140 @@ dialog button:focus:not(:focus-visible),
 #xzNativeSettingsDlg::before {
   display: none !important;
   content: none !important;
+}
+
+@media (min-width: 901px) {
+  #auth.auth:not(.hide),
+  html.dark #auth.auth:not(.hide) {
+    background: var(--pearl-canvas) !important;
+    min-height: 100dvh !important;
+    align-content: center !important;
+    align-items: stretch !important;
+  }
+  #auth.auth:not(.hide) .hero,
+  html.dark #auth.auth:not(.hide) .hero {
+    background: var(--pearl-l2-bg) !important;
+    box-shadow: var(--pearl-l2-shadow) !important;
+    backdrop-filter: blur(24px) saturate(155%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(155%) !important;
+  }
+  #auth.auth:not(.hide) .hero-list p,
+  html.dark #auth.auth:not(.hide) .hero-list p {
+    background: var(--pearl-l3-bg) !important;
+    box-shadow: var(--pearl-l3-shadow) !important;
+    border: 0 !important;
+  }
+  #auth.auth:not(.hide) .authbox,
+  html.dark #auth.auth:not(.hide) .authbox {
+    background: var(--pearl-l4-bg) !important;
+    box-shadow: var(--pearl-l4-shadow) !important;
+  }
+  #auth .auth-theme-btn {
+    position: fixed !important;
+    top: 24px !important;
+    right: 24px !important;
+    z-index: 40 !important;
+  }
+}
+.demo-login-link {
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  border-radius: var(--r-pill) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+.demo-login-link:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  text-decoration: none !important;
+}
+html.dark .demo-login-link:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+@media (min-width: 761px) {
+  main {
+    margin-left: 240px;
+  }
+  body.sidebar-collapsed main {
+    margin-left: 72px;
+  }
+}
+
+@media (min-width: 961px) {
+  #homePage .cols {
+    align-items: stretch !important;
+  }
+  #homePage .cols > .panel {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+.task-controls {
+  margin-bottom: 14px !important;
+}
+
+@media (min-width: 961px) {
+  body.on-ai-page #messages > .bubble-wrap.msg-ai:has(.welcome-bubble) {
+    align-self: center !important;
+    width: 100% !important;
+    max-width: min(92%, 860px) !important;
+  }
+  body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+body.on-ai-page #messages {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
+}
+.sched-today-card .sched-lesson b,
+.sched-clist-item b {
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.35 !important;
+}
+
+@media (max-width: 600px) {
+  #homePage .stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  #homePage .stats article {
+    padding: 13px 14px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    gap: 11px !important;
+  }
+  #homePage .stats article > div {
+    min-width: 0;
+  }
+  #homePage .stats article small {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+  #homePage .stats article strong,
+  #homePage .stats article b {
+    font-size: 20px !important;
+    line-height: 1.2 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .sched-week-chip {
+    padding-bottom: 9px !important;
+  }
 }

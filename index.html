@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.130" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.131" fetchpriority="high">
 </head>
 <body>
 
@@ -936,7 +936,7 @@
       <div class="header-right">
         <button type="button" id="globalSearchBtn" class="global-search-trigger" title="全局聚合搜索（Ctrl + K）" aria-label="全局搜索">
           <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
-          <span class="gs-label">搜索校务…</span>
+          <span class="gs-label">搜索校务、制度或课表…</span>
           <kbd class="gs-kbd">Ctrl K</kbd>
         </button>
         <button type="button" id="themeToggle" class="icon-btn" title="切换深色/浅色模式"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg></button>
@@ -1244,7 +1244,7 @@
 
         <div class="toolbar">
           <div class="search-box">
-            <input id="knowledgeSearch" placeholder="搜索制度名称、办事流程或电话（如：缓考、转专业、图书馆、校园网、医保、三方协议）…">
+            <input id="knowledgeSearch" placeholder="搜索制度名称、流程或电话（如：缓考、转专业）">
             <button type="button" id="clearKnowledgeSearch" class="clear-btn hide" title="清空搜索"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
           </div>
           <select id="knowledgeDept">
@@ -1846,7 +1846,7 @@
       <div><h2>账号与密码设置</h2><small>修改显示姓名或更新登录密码</small></div>
       <button type="button" id="closeProfileDialog"><svg class="ico ico-close" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
-    <label>用户名<input id="profUsername" disabled></label>
+    <label class="prof-readonly-label"><span class="prof-label-row">用户名 <em class="prof-lock-badge">不可修改</em></span><input id="profUsername" disabled></label>
     <label>显示姓名<input id="profDisplayName" required maxlength="60" placeholder="请输入您的显示姓名"></label>
     <label>当前密码（修改密码时必填）<input id="profCurrentPwd" type="password" autocomplete="current-password" placeholder="不修改密码请留空"></label>
     <label>新密码（至少 8 位）<input id="profNewPwd" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="不修改密码请留空"></label>
@@ -2030,7 +2030,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.130"></script>
+<script src="app.js?v=1.131"></script>
 
 
 </body>

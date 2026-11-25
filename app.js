@@ -408,6 +408,9 @@ $("logout").onclick = () => {
   document.body.classList.remove("on-ai-page");
   $("app").classList.add("hide");
   $("auth").classList.remove("hide");
+  if ($("username")) $("username").value = "";
+  if ($("password")) $("password").value = "";
+  if ($("displayName")) $("displayName").value = "";
   sync_theme_root(document.documentElement.classList.contains("dark"));
   auth_mode("login");
 };
@@ -679,6 +682,10 @@ function go(p) {
   if (p === "academic" && typeof window.init_academic_page === "function") window.init_academic_page();
   if (p === "guide" && typeof window.init_guide_page === "function") window.init_guide_page();
   if (p === "schedtools" && typeof window.init_schedtools_page === "function") window.init_schedtools_page();
+  if (typeof window.sync_nav_sliders === "function") {
+    requestAnimationFrame(() => window.sync_nav_sliders());
+    setTimeout(() => window.sync_nav_sliders(), 60);
+  }
   if (p === "users") load_users();
   if (p === "analytics") load_stats();
 }
@@ -784,11 +791,8 @@ async function enter(isBoot = false) {
   if (isBoot && !boot_gate_done) {
     set_boot_progress(45, "正在翻阅 127 份校园规章并验证身份…", false);
   }
-  const me_req = api("/me");
-  const data_req = Promise.all([api("/notices"), api("/tasks")]);
-  data_req.catch(() => {});
   try {
-    me = await me_req;
+    me = await api("/me");
   } catch (e) {
     if (e.status === 401 || e.status === 403) {
       token = "";
@@ -829,6 +833,7 @@ async function enter(isBoot = false) {
       : Promise.resolve();
     const ai_req = Promise.race([check_ai(), new Promise(r => setTimeout(r, 4000))]).catch(() => {});
 
+    const data_req = Promise.all([api("/notices"), api("/tasks")]);
     const [[n, t]] = await Promise.all([data_req, sched_req, ai_req, wait_assets_ready()]);
     notices = Array.isArray(n) ? n : [];
     tasks = Array.isArray(t) ? t : [];
@@ -7138,28 +7143,45 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     }
   };
 
+  const paintSpotlightItems = items => {
+    if (!bodyEl) return;
+    spItems = items;
+    spActiveIdx = 0;
+    let lastGroup = "";
+    bodyEl.innerHTML = items.map((it, idx) => {
+      const grp = it.group !== lastGroup ? `<div class="spotlight-group">${esc(it.group)}</div>` : "";
+      lastGroup = it.group;
+      const modCls = it.mod ? ` mod-${it.mod}` : "";
+      return `${grp}<button type="button" class="spotlight-item${idx === 0 ? " is-active" : ""}" data-sp-idx="${idx}">
+        <span class="spotlight-ico${modCls}">${ico(it.icon)}</span>
+        <span class="spotlight-text"><b>${esc(it.title)}</b><small>${esc(it.sub || "")}</small></span>
+        <span class="spotlight-go">↵</span>
+      </button>`;
+    }).join("");
+  };
+
   const renderSpotlight = async rawQ => {
     if (!bodyEl) return;
     const reqSeq = ++spReqSeq;
     const q = String(rawQ || "").trim();
     const ql = q.toLowerCase();
-    const items = [];
-
-    if (!q) {
-      items.push(
-        { group: "快捷入口", mod: "ai", icon: "ai-brand", title: "咨询校务指南 AI", sub: "服务全国高校 · 校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
-        { group: "快捷入口", mod: "schedule", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
-        { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份规章制度与校园服务指南`, run: () => go("knowledge") },
-        { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
-        { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") },
-        { group: "效率工具", mod: "ai", icon: "sparkles", title: "群通知与截图一键拆解", sub: "粘贴班级群消息或上传聊天截图，自动生成待办与考试日程", run: () => window.open_notice_parser?.() },
-        { group: "效率工具", mod: "notices", icon: "award", title: "奖助学金与评优资格自查", sub: "核对国家奖学金、励志奖学金、助学金与学位授予条件", run: () => window.open_eligibility_dialog?.() },
-        { group: "效率工具", mod: "home", icon: "clipboard", title: "校园办事向导与文书生成", sub: "材料清单核对、流程指引与一键导出 Word 申请表", run: () => window.open_guide_wizard?.() },
-        { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业绩点 (GPA) 计算", sub: "计算平均学分绩点与加权平均分，核对学士学位要求", run: () => window.open_gpa_calc?.() },
-        { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
-      );
-    } else {
-      // 0) 校园办事向导（高频事务 + 关联制度原文）
+    const buildItems = kbList => {
+      const items = [];
+      if (!q) {
+        items.push(
+          { group: "快捷入口", mod: "ai", icon: "ai-brand", title: "咨询校务指南 AI", sub: "服务全国高校 · 校规问答、课表查询与办事指南", run: () => { go("ai"); setTimeout(() => $("question")?.focus(), 120); } },
+          { group: "快捷入口", mod: "schedule", icon: "calendar", title: "打开超级课表", sub: "查看本周课程与 AI 导课表工作台", run: () => go("schedule") },
+          { group: "快捷入口", mod: "knowledge", icon: "book", title: "浏览校规制度库", sub: `查阅 ${kb_total_text()} 份规章制度与校园服务指南`, run: () => go("knowledge") },
+          { group: "快捷入口", mod: "notices", icon: "bell", title: "查看校园通知公告", sub: "最新教务与学工通知动态", run: () => go("notices") },
+          { group: "快捷入口", mod: "tasks", icon: "check-square", title: "管理我的待办", sub: "查看未完成事项与进度", run: () => go("tasks") },
+          { group: "效率工具", mod: "ai", icon: "sparkles", title: "群通知与截图一键拆解", sub: "粘贴班级群消息或上传聊天截图，自动生成待办与考试日程", run: () => window.open_notice_parser?.() },
+          { group: "效率工具", mod: "notices", icon: "award", title: "奖助学金与评优资格自查", sub: "核对国家奖学金、励志奖学金、助学金与学位授予条件", run: () => window.open_eligibility_dialog?.() },
+          { group: "效率工具", mod: "home", icon: "clipboard", title: "校园办事向导与文书生成", sub: "材料清单核对、流程指引与一键导出 Word 申请表", run: () => window.open_guide_wizard?.() },
+          { group: "效率工具", mod: "knowledge", icon: "gauge", title: "学业绩点 (GPA) 计算", sub: "计算平均学分绩点与加权平均分，核对学士学位要求", run: () => window.open_gpa_calc?.() },
+          { group: "效率工具", mod: "schedule", icon: "clock", title: "超级课表助手（倒计时 · 空档 · 导出日历）", sub: "考试倒计时、本周空闲时段与 .ics 手机日历导出", run: () => window.open_sched_tools?.("exams") }
+        );
+        return { items, seenDocTitles: new Set() };
+      }
       const guideHits = (Array.isArray(window.CAMPUS_GUIDES) ? window.CAMPUS_GUIDES : []).filter(g => {
         const hay = `${g.name || ""} ${g.dept || ""} ${g.docTitle || ""} ${g.docFormTitle || ""} ${(g.materials || []).join(" ")}`.toLowerCase();
         return hay.includes(ql);
@@ -7175,8 +7197,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         });
       });
 
-      // 1) 校规制度库（标题/摘要匹配 + 关联向导制度 + 后端全文检索兜底）
-      const kbList = await ensureKbCatalogLoaded();
       const seenDocTitles = new Set();
       const pushKbDoc = d => {
         if (!d || !d.title || seenDocTitles.has(d.title)) return;
@@ -7190,23 +7210,16 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           run: () => open_doc_reader(d.title)
         });
       };
-      kbList.filter(d => {
+      (Array.isArray(kbList) ? kbList : []).filter(d => {
         const hay = `${d.title || ""} ${d.dept || ""} ${d.category || ""} ${d.preview || ""}`.toLowerCase();
         return hay.includes(ql);
-      }).slice(0, 5).forEach(pushKbDoc);
+      }).slice(0, 6).forEach(pushKbDoc);
       guideHits.forEach(g => {
-        if (seenDocTitles.size >= 5 || !g.docTitle) return;
-        const found = kbList.find(d => d.title === g.docTitle) || { title: g.docTitle, dept: g.dept, category: "核心校规依据" };
+        if (seenDocTitles.size >= 6 || !g.docTitle) return;
+        const found = (Array.isArray(kbList) ? kbList : []).find(d => d.title === g.docTitle) || { title: g.docTitle, dept: g.dept, category: "核心校规依据" };
         pushKbDoc(found);
       });
-      if (seenDocTitles.size < 3 && ql.length >= 2) {
-        try {
-          const remoteKb = await api("/knowledge?q=" + encodeURIComponent(q));
-          (Array.isArray(remoteKb?.docs) ? remoteKb.docs : []).slice(0, 5).forEach(pushKbDoc);
-        } catch {}
-      }
 
-      // 2) 通知公告
       (Array.isArray(notices) ? notices : []).filter(n =>
         `${n.title || ""} ${n.body || ""} ${n.category || ""}`.toLowerCase().includes(ql)
       ).slice(0, 4).forEach(n => {
@@ -7218,15 +7231,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           sub: `${n.category || "通知"}${n.deadline ? " · 截止 " + n.deadline : ""}`,
           run: () => {
             go("notices");
-            if ($("noticeSearch")) {
-              $("noticeSearch").value = q;
-              $("noticeSearch").dispatchEvent(new Event("input"));
+            const ns = $("search");
+            if (ns) {
+              ns.value = q;
+              ns.dispatchEvent(new Event("input"));
             }
           }
         });
       });
 
-      // 3) 个人课表
       (Array.isArray(schedState?.courses) ? schedState.courses : []).filter(c =>
         `${c.name || ""} ${c.room || ""} ${c.teacher || ""}`.toLowerCase().includes(ql)
       ).slice(0, 4).forEach(c => {
@@ -7240,7 +7253,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         });
       });
 
-      // 4) 我的待办
       (Array.isArray(tasks) ? tasks : []).filter(t =>
         String(t.title || "").toLowerCase().includes(ql)
       ).slice(0, 4).forEach(t => {
@@ -7254,7 +7266,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         });
       });
 
-      // 5) 直问 AI
       items.push({
         group: "校务指南 AI",
         mod: "ai",
@@ -7271,23 +7282,38 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
           }
         }
       });
+      return { items, seenDocTitles };
+    };
+
+    // 1. 立即同步渲染本地命中结果（0ms 响应，绝不卡死在默认菜单）
+    const cachedKb = (Array.isArray(all_knowledge_docs_cache) && all_knowledge_docs_cache.length)
+      ? all_knowledge_docs_cache
+      : (Array.isArray(knowledge_docs) ? knowledge_docs : []);
+    const first = buildItems(cachedKb);
+    paintSpotlightItems(first.items);
+
+    if (!q) return;
+
+    // 2. 异步补全目录与后端全文检索并平滑刷新
+    let mergedKb = cachedKb;
+    if (!mergedKb.length) {
+      mergedKb = await ensureKbCatalogLoaded();
     }
-
     if (reqSeq !== spReqSeq) return;
-    spItems = items;
-    spActiveIdx = 0;
-
-    let lastGroup = "";
-    bodyEl.innerHTML = items.map((it, idx) => {
-      const grp = it.group !== lastGroup ? `<div class="spotlight-group">${esc(it.group)}</div>` : "";
-      lastGroup = it.group;
-      const modCls = it.mod ? ` mod-${it.mod}` : "";
-      return `${grp}<button type="button" class="spotlight-item${idx === 0 ? " is-active" : ""}" data-sp-idx="${idx}">
-        <span class="spotlight-ico${modCls}">${ico(it.icon)}</span>
-        <span class="spotlight-text"><b>${esc(it.title)}</b><small>${esc(it.sub || "")}</small></span>
-        <span class="spotlight-go">↵</span>
-      </button>`;
-    }).join("");
+    if (first.seenDocTitles.size < 3 && ql.length >= 2) {
+      try {
+        const remoteKb = await api("/knowledge?q=" + encodeURIComponent(q));
+        const remoteDocs = Array.isArray(remoteKb?.docs) ? remoteKb.docs : [];
+        if (remoteDocs.length) {
+          const map = new Map();
+          [...remoteDocs, ...mergedKb].forEach(d => { if (d && d.title && !map.has(d.title)) map.set(d.title, d); });
+          mergedKb = Array.from(map.values());
+        }
+      } catch {}
+    }
+    if (reqSeq !== spReqSeq) return;
+    const second = buildItems(mergedKb);
+    paintSpotlightItems(second.items);
   };
 
   const syncActiveRow = () => {
@@ -7319,12 +7345,21 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   dlg?.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
   let spTimer = 0;
-  inp?.addEventListener("input", () => {
+  const triggerSpotlightQuery = () => {
     clearTimeout(spTimer);
-    spTimer = setTimeout(() => renderSpotlight(inp.value), 90);
-  });
+    spTimer = setTimeout(() => renderSpotlight(inp?.value || ""), 50);
+  };
+  inp?.addEventListener("input", triggerSpotlightQuery);
+  inp?.addEventListener("compositionend", triggerSpotlightQuery);
+  inp?.addEventListener("search", triggerSpotlightQuery);
 
   inp?.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      dlg?.close();
+      return;
+    }
     if (!spItems.length) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -7337,6 +7372,12 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     } else if (e.key === "Enter") {
       e.preventDefault();
       runSpotlightItem(spActiveIdx);
+    }
+  });
+  dlg?.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      dlg.close();
     }
   });
 
@@ -8744,6 +8785,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if (t === "elig") {
       syncGpaToEligibility();
       renderEligibility();
+    }
+    if (typeof window.sync_nav_sliders === "function") {
+      requestAnimationFrame(() => window.sync_nav_sliders());
+      setTimeout(() => window.sync_nav_sliders(), 45);
     }
   };
 

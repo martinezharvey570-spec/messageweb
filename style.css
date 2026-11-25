@@ -17778,33 +17778,65 @@ body.on-ai-page #messages {
 }
 
 @media (max-width: 600px) {
-  #homePage .stats {
+  #homePage .stats,
+  #homePage .stats.stats-4 {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: 1fr !important;
+    align-items: stretch !important;
     gap: 10px !important;
   }
-  #homePage .stats article {
-    padding: 13px 14px !important;
-    flex-direction: row !important;
+  #homePage .stats article,
+  #homePage .stats.stats-4 article {
+    display: grid !important;
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    align-content: center !important;
+    justify-items: start !important;
     text-align: left !important;
-    gap: 11px !important;
+    gap: 1px 11px !important;
+    padding: 13px 14px !important;
+    min-height: 70px !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
   }
-  #homePage .stats article > div {
-    min-width: 0;
+  #homePage .stats article span,
+  #homePage .stats.stats-4 article span {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
   }
-  #homePage .stats article small {
+  #homePage .stats article span .ico,
+  #homePage .stats.stats-4 article span .ico {
+    width: 17px !important;
+    height: 17px !important;
+  }
+  #homePage .stats article small,
+  #homePage .stats.stats-4 article small {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     font-size: 12px !important;
+    line-height: 1.25 !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
   }
   #homePage .stats article strong,
-  #homePage .stats article b {
+  #homePage .stats article b,
+  #homePage .stats.stats-4 article b {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
     font-size: 20px !important;
-    line-height: 1.2 !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
   }
 }
-
 @media (max-width: 760px) {
   .wrap {
     padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;

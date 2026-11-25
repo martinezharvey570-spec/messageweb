@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcut_ai"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_ai_short"
+        android:shortcutLongLabel="@string/shortcut_ai_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="edu.xawl.xiaowuzhili"
+            android:targetClass="edu.xawl.xiaowuzhili.MainActivity">
+            <extra android:name="target_page" android:value="ai" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_schedule"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_schedule_short"
+        android:shortcutLongLabel="@string/shortcut_schedule_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="edu.xawl.xiaowuzhili"
+            android:targetClass="edu.xawl.xiaowuzhili.MainActivity">
+            <extra android:name="target_page" android:value="schedule" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_tasks"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_tasks_short"
+        android:shortcutLongLabel="@string/shortcut_tasks_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="edu.xawl.xiaowuzhili"
+            android:targetClass="edu.xawl.xiaowuzhili.MainActivity">
+            <extra android:name="target_page" android:value="tasks" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_knowledge"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_knowledge_short"
+        android:shortcutLongLabel="@string/shortcut_knowledge_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="edu.xawl.xiaowuzhili"
+            android:targetClass="edu.xawl.xiaowuzhili.MainActivity">
+            <extra android:name="target_page" android:value="knowledge" />
+        </intent>
+    </shortcut>
+</shortcuts>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#1677FF</color>
+    <color name="brand_primary">#1677FF</color>
+    <color name="brand_dark">#0B1120</color>
+    <color name="widget_ink">#0F172A</color>
+    <color name="widget_sub">#475569</color>
+    <color name="widget_muted">#64748B</color>
+    <color name="widget_accent">#2563EB</color>
+    <color name="widget_divider">#160F172A</color>
+</resources>

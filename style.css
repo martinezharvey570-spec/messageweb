@@ -9677,7 +9677,7 @@ dialog:not(#docDialog) textarea {
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
   box-shadow: inset 0 1.5px 4px rgba(15, 23, 42, 0.06) !important;
 }
-html.dark html.dark dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
+html.dark dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]),
 html.dark dialog:not(#docDialog) select,
 html.dark dialog:not(#docDialog) textarea,
 html.dark #docDialog .doc-font-group,
@@ -17055,17 +17055,19 @@ html.dark .spotlight-head {
   padding: 0 16px 0 38px !important;
   border-radius: 999px !important;
   border: 0 !important;
-  background-color: var(--pearl-l1-bg) !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: 14px center !important;
-  background-size: 16px 16px !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: 14px center, 0 0 !important;
+  background-size: 16px 16px, 100% 100% !important;
   box-shadow: var(--pearl-l1-shadow) !important;
   font-size: 14px !important;
 }
 html.dark #globalSearchDialog #globalSearchInput {
-  background-color: rgba(15, 23, 42, 0.72) !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
 }
 #globalSearchDialog #closeGlobalSearchDlg {
   width: 36px !important;
@@ -19579,3 +19581,695 @@ html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger) {
 
 
 
+
+
+/* ============================================================================
+   v1.128 全站四级光学纵深与几何大一统宪章（Pearl Liquid Glass Design System）
+   ----------------------------------------------------------------------------
+   统一光源：正上方 12 点冷天光斜射，所有界面元素严格归属四级物理高度：
+     Layer 0 (Canvas)   : 纯净冰蓝白 / 深海蓝环境天光画布
+     Layer 1 (Recessed) : -2.5px 下挖凹陷毛玻璃槽（所有输入框 / 宽搜索栏 / 分段轨道 / 进度底槽）
+     Layer 2 (Surface)  :  0px   平铺承托玻璃面（主面板 / 内容卡片 / 统计卡 / 工具箱卡片 / AI 回复）
+     Layer 3 (Raised)   : +2.5px 上凸交互玻璃件（主/次/危险按钮 / 正圆图标钮 / 工具栏下拉 / 选中滑块 / 快捷入口）
+     Layer 4 (Overlay)  : +12px  顶层晶透悬浮层（全站所有弹窗 / 下拉菜单 / 日历 / 移动底栏 / AI输入舱 / Toast）
+   ============================================================================ */
+
+/* ---- 0. 四级光学变量单一真相源（强化 Layer 1 下挖凹陷纵深，拉开 4 级层次落差） ---- */
+:root {
+  /* Layer 1: 明显下挖毛玻璃凹槽（上壁深内影 + 冷灰蓝磨砂槽底 + 下唇亮反光边） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(196, 212, 232, 0.56) 0%, rgba(224, 235, 248, 0.72) 50%, rgba(240, 246, 253, 0.86) 100%);
+  --pearl-l1-shadow:
+    inset 0 2.5px 6px rgba(15, 23, 42, 0.13),
+    inset 0 1px 2px rgba(15, 23, 42, 0.08),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(15, 23, 42, 0.09);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(232, 241, 252, 0.82) 0%, rgba(255, 255, 255, 0.96) 100%);
+  --pearl-l1-focus-shadow:
+    inset 0 1.5px 4px rgba(37, 99, 235, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 1),
+    0 0 0 2.5px rgba(37, 99, 235, 0.28),
+    0 6px 18px -4px rgba(37, 99, 235, 0.16);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(203, 213, 225, 0.42) 0%, rgba(226, 232, 240, 0.56) 100%);
+
+  /* Layer 2: 温润稳重的冰蓝白内容承载面 */
+  --pearl-l2-bg:
+    radial-gradient(130% 95% at 15% 0%, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0) 78%),
+    linear-gradient(168deg, rgba(255, 255, 255, 0.93) 0%, rgba(248, 251, 255, 0.88) 58%, rgba(243, 248, 255, 0.86) 100%);
+  --pearl-l2-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(219, 234, 254, 0.65),
+    inset -1px 0 0 rgba(219, 234, 254, 0.45),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.20),
+    0 0 0 1px rgba(15, 23, 42, 0.075),
+    0 1px 3px rgba(15, 23, 42, 0.045),
+    0 8px 20px -8px rgba(15, 23, 42, 0.08);
+  --pearl-l2-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(147, 197, 253, 0.72),
+    inset -1px 0 0 rgba(147, 197, 253, 0.56),
+    inset 0 -1px 0 rgba(59, 130, 246, 0.16),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 3px 8px rgba(37, 99, 235, 0.09),
+    0 12px 26px -10px rgba(37, 99, 235, 0.16);
+
+  /* Layer 3: 上凸珍珠白液态玻璃交互件（明确高光顶面 + 底部厚度 + 外投影） */
+  --pearl-l3-bg:
+    radial-gradient(118% 82% at 18% 0%, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.18) 54%, transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 248, 255, 0.86) 100%);
+  --pearl-l3-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(148, 163, 184, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.085),
+    0 2px 5px rgba(15, 23, 42, 0.065),
+    0 8px 18px -7px rgba(15, 23, 42, 0.12);
+  --pearl-l3-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px rgba(59, 130, 246, 0.18),
+    0 0 0 1px rgba(37, 99, 235, 0.24),
+    0 4px 10px rgba(37, 99, 235, 0.10),
+    0 12px 24px -8px rgba(37, 99, 235, 0.18);
+
+  /* Layer 4: 顶层高空晶透悬浮层（高遮罩平衡 + 长距离弥散投影） */
+  --pearl-l4-bg:
+    radial-gradient(110% 60% at 14% 0%, rgba(255, 255, 255, 0.99) 0%, transparent 52%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 249, 255, 0.93) 100%);
+  --pearl-l4-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(148, 163, 184, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.10),
+    0 6px 16px rgba(15, 23, 42, 0.09),
+    0 26px 56px -12px rgba(15, 23, 42, 0.22);
+
+  /* 几何圆角宪章 */
+  --r-circle: 50%;
+  --r-pill: 999px;
+  --r-field: 14px;
+  --r-textarea: 16px;
+  --r-card: 20px;
+  --r-modal: 24px;
+}
+
+html.dark,
+html.dark body {
+  /* Layer 1 暗黑：深邃海蓝凹槽 + 明显上壁暗影 + 下唇冷蓝反光 */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(4, 8, 18, 0.84) 0%, rgba(10, 17, 32, 0.72) 55%, rgba(15, 24, 44, 0.62) 100%);
+  --pearl-l1-shadow:
+    inset 0 2.5px 7px rgba(0, 0, 0, 0.64),
+    inset 0 1px 2px rgba(0, 0, 0, 0.46),
+    inset 0 -1px 0 rgba(186, 230, 253, 0.17),
+    0 0 0 1px rgba(148, 197, 255, 0.13);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(10, 18, 34, 0.90) 0%, rgba(22, 35, 60, 0.84) 100%);
+  --pearl-l1-focus-shadow:
+    inset 0 1.5px 5px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(186, 230, 253, 0.24),
+    0 0 0 2.5px rgba(96, 165, 250, 0.42),
+    0 6px 20px -4px rgba(37, 99, 235, 0.30);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(8, 13, 24, 0.58) 0%, rgba(15, 23, 42, 0.46) 100%);
+
+  /* Layer 2 暗黑 */
+  --pearl-l2-bg:
+    radial-gradient(130% 95% at 14% 0%, rgba(186, 230, 253, 0.085) 0%, transparent 76%),
+    linear-gradient(168deg, rgba(24, 36, 58, 0.88) 0%, rgba(16, 25, 45, 0.84) 100%);
+  --pearl-l2-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.22),
+    inset 1px 0 0 rgba(147, 197, 253, 0.14),
+    inset -1px 0 0 rgba(147, 197, 253, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.46),
+    0 0 0 1px rgba(148, 197, 255, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.30),
+    0 12px 28px -10px rgba(0, 0, 0, 0.48);
+  --pearl-l2-shadow-hover:
+    inset 0 1px 0 rgba(224, 242, 254, 0.30),
+    inset 1px 0 0 rgba(147, 197, 253, 0.26),
+    inset -1px 0 0 rgba(147, 197, 253, 0.20),
+    0 0 0 1px rgba(96, 165, 250, 0.36),
+    0 16px 36px -10px rgba(0, 0, 0, 0.56);
+
+  /* Layer 3 暗黑 */
+  --pearl-l3-bg:
+    radial-gradient(118% 82% at 16% 0%, rgba(186, 230, 253, 0.16) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(30, 44, 70, 0.92) 0%, rgba(18, 28, 48, 0.88) 100%);
+  --pearl-l3-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.26),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.46),
+    0 0 0 1px rgba(148, 197, 255, 0.18),
+    0 3px 10px rgba(0, 0, 0, 0.36),
+    0 12px 28px -8px rgba(0, 0, 0, 0.56);
+  --pearl-l3-shadow-hover:
+    inset 0 1px 0 rgba(224, 242, 254, 0.34),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(96, 165, 250, 0.38),
+    0 6px 18px rgba(0, 0, 0, 0.44);
+
+  /* Layer 4 暗黑 */
+  --pearl-l4-bg:
+    radial-gradient(110% 60% at 14% 0%, rgba(186, 230, 253, 0.14) 0%, transparent 52%),
+    linear-gradient(170deg, rgba(22, 33, 55, 0.96) 0%, rgba(12, 19, 34, 0.94) 100%);
+  --pearl-l4-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.26),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(148, 197, 255, 0.19),
+    0 24px 58px -12px rgba(0, 0, 0, 0.70);
+}
+
+/* ============================================================================
+   【Layer 1：下挖凹陷毛玻璃槽】全站唯一真源
+   ============================================================================ */
+
+/* 1.1 全站所有搜索栏（999px 整条下挖毛玻璃胶囊，零框中框） */
+.search-box,
+.school-search-wrap,
+#schoolDialog .school-search-wrap,
+#taskSearch.mini-input,
+.task-controls .mini-input {
+  border-radius: var(--r-pill) !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  color: var(--ink) !important;
+  transition: background 0.22s ease, box-shadow 0.22s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+.search-box:focus-within,
+.school-search-wrap:focus-within,
+#schoolDialog .school-search-wrap:focus-within,
+#taskSearch.mini-input:focus,
+.task-controls .mini-input:focus {
+  background: var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+.search-box input,
+.search-box input:focus,
+.school-search-wrap input,
+.school-search-wrap input:focus,
+#schoolDialog .school-search-wrap input,
+#schoolDialog .school-search-wrap input:focus,
+html.dark .search-box input,
+html.dark .search-box input:focus,
+html.dark .school-search-wrap input,
+html.dark .school-search-wrap input:focus {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+}
+
+/* 聚合搜索弹窗内输入框 #globalSearchInput：图标 + Layer 1 下挖渐变叠加 */
+#globalSearchDialog #globalSearchInput,
+#globalSearchDialog #globalSearchInput:hover {
+  border-radius: var(--r-pill) !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: 14px center, 0 0 !important;
+  background-size: 16px 16px, 100% 100% !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  color: var(--ink) !important;
+}
+#globalSearchDialog #globalSearchInput:focus {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+html.dark #globalSearchDialog #globalSearchInput,
+html.dark #globalSearchDialog #globalSearchInput:hover {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
+}
+html.dark #globalSearchDialog #globalSearchInput:focus {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-focus-bg) !important;
+}
+
+/* 1.2 边界铁律：桌面端顶栏搜索栏 #globalSearchBtn 回归 Layer 1 下挖凹槽（移动端仍保持 Layer 3 正圆按钮） */
+@media (min-width: 761px) {
+  main > header #globalSearchBtn.global-search-trigger,
+  html.dark main > header #globalSearchBtn.global-search-trigger {
+    background: var(--pearl-l1-bg) !important;
+    box-shadow: var(--pearl-l1-shadow) !important;
+    border: 0 !important;
+    border-radius: var(--r-pill) !important;
+    color: var(--muted) !important;
+    backdrop-filter: blur(14px) saturate(175%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(175%) !important;
+    transform: none !important;
+  }
+  main > header #globalSearchBtn.global-search-trigger:hover,
+  html.dark main > header #globalSearchBtn.global-search-trigger:hover {
+    background: var(--pearl-l1-focus-bg) !important;
+    box-shadow: var(--pearl-l1-focus-shadow) !important;
+    color: var(--blue) !important;
+    transform: none !important;
+  }
+  main > header #globalSearchBtn.global-search-trigger:active,
+  html.dark main > header #globalSearchBtn.global-search-trigger:active {
+    transform: scale(0.985) !important;
+  }
+  main > header #globalSearchBtn.global-search-trigger .gs-kbd {
+    background: var(--pearl-l3-bg) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 0 0 1px rgba(15, 23, 42, 0.08),
+      0 1px 3px rgba(15, 23, 42, 0.08) !important;
+  }
+  html.dark main > header #globalSearchBtn.global-search-trigger .gs-kbd {
+    background: rgba(30, 44, 70, 0.92) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.20),
+      0 0 0 1px rgba(148, 197, 255, 0.18) !important;
+  }
+}
+
+/* 1.3 全站弹窗内表单输入框 / 下拉槽 / 日期槽（含 #profileDialog 修改姓名与密码，严格 14px 柔润下挖凹槽） */
+dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput),
+dialog:not(#docDialog) select,
+dialog:not(#docDialog) .xz-select-trigger,
+dialog:not(#docDialog) .xz-date-trigger,
+#profileDialog input,
+#auth .authbox input:not([type="checkbox"]):not([type="radio"]),
+.sched-field input:not([type="checkbox"]):not([type="radio"]),
+.sched-field select,
+.sched-field .xz-select-trigger,
+.sched-field .xz-date-trigger {
+  border-radius: var(--r-field) !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  color: var(--ink) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  outline: none !important;
+  transition: background 0.2s ease, box-shadow 0.2s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+dialog:not(#docDialog) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput):focus,
+dialog:not(#docDialog) select:focus,
+dialog:not(#docDialog) .xz-select.open .xz-select-trigger,
+dialog:not(#docDialog) .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger,
+#profileDialog input:focus,
+#auth .authbox input:not([type="checkbox"]):not([type="radio"]):focus,
+.sched-field input:not([type="checkbox"]):not([type="radio"]):focus,
+.sched-field select:focus,
+.sched-field .xz-select.open .xz-select-trigger,
+.sched-field .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger {
+  background: var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+/* 禁用态凹槽（如 #profUsername）：保留同源下挖凹槽，克制降饱和，消除生硬死灰 */
+#profileDialog input:disabled,
+dialog:not(#docDialog) input:disabled,
+dialog:not(#docDialog) select:disabled {
+  background: var(--pearl-l1-disabled-bg) !important;
+  color: var(--muted) !important;
+  opacity: 0.78 !important;
+  cursor: not-allowed !important;
+}
+
+/* 1.4 页面内单行录入条与表单录入上下文（待办录入 / 学业 GPA 与奖助 / 考试倒计时）：999px 同排下挖凹槽 */
+#addTaskForm input:not([type="checkbox"]):not([type="radio"]),
+#addTaskForm .xz-date-trigger,
+#newTaskTitle,
+#academicPage .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+#academicPage .elig-grid select,
+#academicPage .elig-grid .xz-select-trigger,
+.campus-tool-page .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+.campus-tool-page .elig-grid select,
+.campus-tool-page .elig-grid .xz-select-trigger,
+.campus-tool-page .ct-inline-form input:not([type="checkbox"]):not([type="radio"]),
+.campus-tool-page .ct-inline-form .xz-date-trigger,
+html.dark #academicPage .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+html.dark #academicPage .elig-grid select,
+html.dark #academicPage .elig-grid .xz-select-trigger,
+html.dark .campus-tool-page .elig-grid input:not([type="checkbox"]):not([type="radio"]),
+html.dark .campus-tool-page .elig-grid .xz-select-trigger,
+html.dark .campus-tool-page .ct-inline-form input:not([type="checkbox"]):not([type="radio"]),
+html.dark .campus-tool-page .ct-inline-form .xz-date-trigger {
+  border-radius: var(--r-pill) !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  color: var(--ink) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  outline: none !important;
+  transition: background 0.2s ease, box-shadow 0.2s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+#addTaskForm input:not([type="checkbox"]):not([type="radio"]):focus,
+#addTaskForm .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger,
+#newTaskTitle:focus,
+#academicPage .elig-grid input:focus,
+#academicPage .elig-grid .xz-select.open .xz-select-trigger,
+.campus-tool-page .elig-grid input:focus,
+.campus-tool-page .elig-grid .xz-select.open .xz-select-trigger,
+.campus-tool-page .ct-inline-form input:focus,
+.campus-tool-page .ct-inline-form .xz-date-wrap:has(.xz-cal-pop.open) .xz-date-trigger {
+  background: var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+
+/* 1.5 全站多行文本域 textarea（通知正文 / 群通知拆解 / 新增校规 / AI 导课表）：16px 下挖毛玻璃凹槽 */
+dialog:not(#docDialog) textarea,
+.campus-tool-page #noticeParserText,
+.campus-tool-page textarea,
+.np-custom-form textarea,
+html.dark dialog:not(#docDialog) textarea,
+html.dark .campus-tool-page #noticeParserText,
+html.dark .campus-tool-page textarea {
+  border-radius: var(--r-textarea) !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  color: var(--ink) !important;
+  outline: none !important;
+  transition: background 0.2s ease, box-shadow 0.2s cubic-bezier(0.32, 0.72, 0.25, 1) !important;
+}
+dialog:not(#docDialog) textarea:focus,
+.campus-tool-page #noticeParserText:focus,
+.campus-tool-page textarea:focus,
+.np-custom-form textarea:focus {
+  background: var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+
+/* 1.6 全站分段控制底槽 & 进度条底槽（纠正 v1.127 .doc-font-group 误升 Layer 3，统一为 Layer 1 下挖滑槽） */
+.ai-seg,
+.sched-d-seg,
+.sched-m-seg,
+#schedToolsTabs,
+#academicTabs,
+#schedulePage .sched-week-stepper,
+#docDialog .doc-font-group,
+.doc-m-font-seg,
+.authbox .tabs,
+.progress-track,
+.stat-bar-track,
+.gov-bar-track,
+html.dark #docDialog .doc-font-group,
+html.dark .doc-m-font-seg,
+html.dark .ai-seg,
+html.dark .sched-d-seg,
+html.dark .sched-m-seg,
+html.dark #schedToolsTabs,
+html.dark #academicTabs {
+  border-radius: var(--r-pill) !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+}
+
+/* ============================================================================
+   【Layer 2：平铺承托玻璃面】全站页面与工具箱/统计页全面回归冰蓝白玻璃
+   ============================================================================ */
+
+.welcome,
+.panel,
+.stats article,
+.notice-card,
+#knowledgeGrid .knowledge-card,
+#knowledgeGrid .knowledge-card:last-child,
+.taskrow,
+.user-row,
+.sched-d-header,
+.sched-today-card,
+.sched-matrix-card,
+.sched-manage-card,
+.sched-tt-card,
+#messages .bubble.msg-ai,
+#analyticsPage .panel,
+#analyticsPage .stats article,
+#analyticsPage .stat-ring-box,
+#analyticsPage .stat-metric,
+#analyticsPage .stat-bars,
+#analyticsPage .gov-topic-row,
+#analyticsPage .gov-spot-row,
+#analyticsPage .gov-empty,
+.campus-tool-page .panel,
+.campus-tool-page .elig-form-card,
+.campus-tool-page .ct-card,
+.campus-tool-page .ct-kpi,
+.campus-tool-page .ct-list,
+html.dark #analyticsPage .panel,
+html.dark #analyticsPage .stats article,
+html.dark #analyticsPage .stat-ring-box,
+html.dark #analyticsPage .stat-metric,
+html.dark #analyticsPage .stat-bars,
+html.dark #analyticsPage .gov-topic-row,
+html.dark #analyticsPage .gov-spot-row,
+html.dark #analyticsPage .gov-empty,
+html.dark .campus-tool-page .panel,
+html.dark .campus-tool-page .elig-form-card,
+html.dark .campus-tool-page .ct-card,
+html.dark .campus-tool-page .ct-kpi,
+html.dark .campus-tool-page .ct-list,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark #knowledgeGrid .knowledge-card:last-child {
+  background: var(--pearl-l2-bg) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+}
+/* 保持 #knowledgeGrid 透明无底板，杜绝白角割裂 */
+#knowledgeGrid,
+html.dark #knowledgeGrid {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+/* 仅可点击内容卡片在 hover 时微抬反馈，静态容器大面板保持沉稳 */
+@media (hover: hover) {
+  .stats article:hover,
+  .notice-card:hover,
+  #knowledgeGrid .knowledge-card:hover,
+  .sched-lesson:hover,
+  .sched-clist-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--pearl-l2-shadow-hover) !important;
+  }
+}
+
+/* ============================================================================
+   【Layer 3：上凸交互玻璃件】次级按钮 / 工具栏下拉 / 快捷入口 / 正圆图标钮大一统
+   ============================================================================ */
+
+/* 3.1 全站次级胶囊按钮 & 工具栏下拉触发器（与左侧 Layer 1 搜索栏形成“一凹一凸”清晰主次） */
+.outline:not(.icon-only):not(.primary):not(.danger),
+.secondary:not(.primary):not(.danger),
+dialog:not(#docDialog) .actions button.secondary,
+.sched-btn-ghost,
+.pill-btn:not(.active),
+.toolbar select,
+.toolbar .xz-select-trigger,
+.user-row select,
+.user-row .xz-select-trigger,
+#docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]),
+#aiPage .chat-top-actions button:not(.primary):not(.danger),
+.notice-actions button:not(.primary):not(.danger):not(.icon-only),
+.kb-actions button:not(.primary):not(.danger),
+.taskrow button:not(.primary):not(.danger):not(.task-del-btn),
+.user-row button:not(.primary):not(.danger),
+.suggestions button,
+.ai-agent-pill,
+#messages .bubble-tools button:not(.is-high),
+html.dark .outline:not(.icon-only):not(.primary):not(.danger),
+html.dark .secondary:not(.primary):not(.danger),
+html.dark dialog:not(#docDialog) .actions button.secondary,
+html.dark .sched-btn-ghost,
+html.dark .pill-btn:not(.active),
+html.dark .toolbar .xz-select-trigger,
+html.dark .user-row .xz-select-trigger,
+html.dark #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]),
+html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger),
+html.dark .ai-agent-pill,
+html.dark #messages .bubble-tools button:not(.is-high) {
+  border-radius: var(--r-pill) !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+}
+@media (hover: hover) {
+  .outline:not(.icon-only):not(.primary):not(.danger):hover,
+  .secondary:not(.primary):not(.danger):hover,
+  dialog:not(#docDialog) .actions button.secondary:hover,
+  .sched-btn-ghost:hover,
+  .pill-btn:not(.active):hover,
+  .toolbar .xz-select-trigger:hover,
+  .user-row .xz-select-trigger:hover,
+  #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]):hover,
+  #aiPage .chat-top-actions button:not(.primary):not(.danger):hover,
+  .suggestions button:hover,
+  .ai-agent-pill:hover,
+  #messages .bubble-tools button:not(.is-high):hover {
+    background: var(--pearl-l3-bg) !important;
+    box-shadow: var(--pearl-l3-shadow-hover) !important;
+    color: var(--blue) !important;
+    transform: translateY(-1px);
+  }
+}
+/* 恢复未选中筛选胶囊 hover 时的文字可读性（覆盖 v1.117 误把 .pill-btn:hover 刷成蓝底） */
+.pill-btn:not(.active):hover {
+  background: var(--pearl-l3-bg) !important;
+  color: var(--blue) !important;
+}
+html.dark .pill-btn:not(.active):hover {
+  color: #93c5fd !important;
+}
+
+/* 3.2 可点击功能入口磁贴（移出 Layer 1 凹陷阴影，回归轻凸 Layer 3 交互实体） */
+#homePage .quick,
+.quick-item,
+.home-tool-tile,
+#messages .welcome-item,
+html.dark #homePage .quick,
+html.dark .quick-item,
+html.dark .home-tool-tile,
+html.dark #messages .welcome-item {
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  transition: transform 0.18s var(--lg-spring), box-shadow 0.18s ease, background 0.18s ease !important;
+}
+@media (hover: hover) {
+  #homePage .quick:hover,
+  .quick-item:hover,
+  .home-tool-tile:hover,
+  #messages .welcome-item:hover {
+    transform: translateY(-1.5px) !important;
+    box-shadow: var(--pearl-l3-shadow-hover) !important;
+  }
+}
+
+/* 3.3 全站纯图标正圆功能按钮（1:1 严苛正圆 + Layer 3 珍珠上凸） */
+main > header #menu,
+#desktopSidebarToggle.desktop-rail-toggle,
+dialog .dialoghead button,
+#docDialog #closeDocDialog,
+#globalSearchDialog #closeGlobalSearchDlg,
+#docDialog .doc-m-btn:not(.is-ai),
+#aiPage #askAttachBtn,
+.notice-actions button.icon-only:not(.danger),
+.task-del-btn:not(.danger),
+.sug-nav-btn,
+html.dark main > header #menu,
+html.dark #desktopSidebarToggle.desktop-rail-toggle,
+html.dark dialog .dialoghead button,
+html.dark #docDialog #closeDocDialog,
+html.dark #globalSearchDialog #closeGlobalSearchDlg,
+html.dark #docDialog .doc-m-btn:not(.is-ai) {
+  border-radius: var(--r-circle) !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+}
+/* 移动端顶栏 #menu 与 #globalSearchBtn 双正圆 100% 镜像一致 */
+@media (max-width: 760px) {
+  main > header #menu,
+  main > header #globalSearchBtn,
+  main > header #globalSearchBtn.global-search-trigger,
+  html.dark main > header #menu,
+  html.dark main > header #globalSearchBtn,
+  html.dark main > header #globalSearchBtn.global-search-trigger {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: var(--r-circle) !important;
+    border: 0 !important;
+    background: var(--pearl-l3-bg) !important;
+    box-shadow: var(--pearl-l3-shadow) !important;
+    color: var(--ink) !important;
+  }
+}
+
+/* 3.4 分段滑槽内部选中态滑块（明确浮起于 Layer 1 凹槽之上） */
+#docDialog .doc-font-group button:not(.active),
+.doc-m-font-seg button:not(.active) {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+#docDialog .doc-font-group button.active,
+.doc-m-font-seg button.active,
+.authbox .tabs button.selected {
+  border: 0 !important;
+  border-radius: var(--r-pill) !important;
+  background:
+    radial-gradient(125% 95% at 24% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 64%),
+    linear-gradient(150deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.24),
+    inset 0 -2px 4px rgba(15, 23, 42, 0.16),
+    0 3px 10px -2px rgba(37, 99, 235, 0.36) !important;
+}
+
+/* ============================================================================
+   【Layer 4：顶层晶透悬浮层】全站全部弹窗 / 弹层 / 悬浮舱 100% 补齐闭环
+   ============================================================================ */
+
+dialog,
+dialog:not(#docDialog),
+dialog.task-dialog,
+#profileDialog,
+#dialog,
+#editTaskDialog,
+#aiTodoDialog,
+#docDialog,
+#schoolDialog,
+#uiConfirmDialog,
+#uiPromptDialog,
+#scheduleCourseDialog,
+#scheduleTimetableDialog,
+#scheduleAiImportDialog,
+#globalSearchDialog,
+#customDocDialog,
+.xz-select-menu,
+.xz-cal-pop,
+.ask-attach-pop,
+.doc-m-pop,
+body.on-ai-page .ask .ask-input-wrap,
+.scroll-bottom-btn,
+body #toast.toast,
+html.dark dialog,
+html.dark dialog:not(#docDialog),
+html.dark #profileDialog,
+html.dark .xz-select-menu,
+html.dark .xz-cal-pop,
+html.dark .ask-attach-pop,
+html.dark .doc-m-pop,
+html.dark body.on-ai-page .ask .ask-input-wrap,
+html.dark .scroll-bottom-btn,
+html.dark body #toast.toast {
+  background: var(--pearl-l4-bg) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l4-shadow) !important;
+}
+body #toast.toast {
+  color: var(--ink) !important;
+  border-radius: var(--r-pill) !important;
+}
+dialog::backdrop {
+  background: rgba(15, 23, 42, 0.32) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+html.dark dialog::backdrop {
+  background: rgba(2, 6, 23, 0.56) !important;
+}
+/* 消除浏览器 showModal() 自动聚焦首位按钮时绘制的杂散蓝框（保留键盘 :focus-visible 无障碍指示） */
+dialog button:focus:not(:focus-visible),
+#docDialog .doc-font-group button:focus:not(:focus-visible) {
+  outline: none !important;
+}

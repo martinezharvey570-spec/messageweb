@@ -19596,20 +19596,19 @@ html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger) {
 
 /* ---- 0. 四级光学变量单一真相源（强化 Layer 1 下挖凹陷纵深，拉开 4 级层次落差） ---- */
 :root {
-  /* Layer 1: 明显下挖毛玻璃凹槽（上壁深内影 + 冷灰蓝磨砂槽底 + 下唇亮反光边） */
-  --pearl-l1-bg: linear-gradient(180deg, rgba(196, 212, 232, 0.56) 0%, rgba(224, 235, 248, 0.72) 50%, rgba(240, 246, 253, 0.86) 100%);
+  /* Layer 1: 经典通透淡灰下挖毛玻璃槽（回归 v1.063/v1.080 纯净中性淡灰，轻盈清晰、绝不发脏发蓝） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(203, 213, 225, 0.34) 0%, rgba(226, 232, 240, 0.46) 52%, rgba(241, 245, 249, 0.58) 100%);
   --pearl-l1-shadow:
-    inset 0 2.5px 6px rgba(15, 23, 42, 0.13),
-    inset 0 1px 2px rgba(15, 23, 42, 0.08),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.98),
-    0 0 0 1px rgba(15, 23, 42, 0.09);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(232, 241, 252, 0.82) 0%, rgba(255, 255, 255, 0.96) 100%);
+    inset 0 2px 5px rgba(15, 23, 42, 0.085),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(15, 23, 42, 0.07);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(241, 245, 249, 0.74) 0%, rgba(255, 255, 255, 0.92) 100%);
   --pearl-l1-focus-shadow:
-    inset 0 1.5px 4px rgba(37, 99, 235, 0.12),
-    inset 0 -1px 0 rgba(255, 255, 255, 1),
-    0 0 0 2.5px rgba(37, 99, 235, 0.28),
-    0 6px 18px -4px rgba(37, 99, 235, 0.16);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(203, 213, 225, 0.42) 0%, rgba(226, 232, 240, 0.56) 100%);
+    inset 0 1px 3px rgba(37, 99, 235, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 2.5px rgba(37, 99, 235, 0.24),
+    0 6px 18px -4px rgba(37, 99, 235, 0.14);
+  --pearl-l1-disabled-bg: rgba(226, 232, 240, 0.42);
 
   /* Layer 2: 温润稳重的冰蓝白内容承载面 */
   --pearl-l2-bg:
@@ -19671,20 +19670,18 @@ html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger) {
 
 html.dark,
 html.dark body {
-  /* Layer 1 暗黑：深邃海蓝凹槽 + 明显上壁暗影 + 下唇冷蓝反光 */
-  --pearl-l1-bg: linear-gradient(180deg, rgba(4, 8, 18, 0.84) 0%, rgba(10, 17, 32, 0.72) 55%, rgba(15, 24, 44, 0.62) 100%);
+  /* Layer 1 暗黑：经典清透深灰蓝凹槽（与 v1.080 一致） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(9, 14, 26, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%);
   --pearl-l1-shadow:
-    inset 0 2.5px 7px rgba(0, 0, 0, 0.64),
-    inset 0 1px 2px rgba(0, 0, 0, 0.46),
-    inset 0 -1px 0 rgba(186, 230, 253, 0.17),
-    0 0 0 1px rgba(148, 197, 255, 0.13);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(10, 18, 34, 0.90) 0%, rgba(22, 35, 60, 0.84) 100%);
+    inset 0 2px 6px rgba(0, 0, 0, 0.48),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.10);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(15, 23, 42, 0.76) 0%, rgba(30, 41, 59, 0.72) 100%);
   --pearl-l1-focus-shadow:
-    inset 0 1.5px 5px rgba(0, 0, 0, 0.48),
-    inset 0 -1px 0 rgba(186, 230, 253, 0.24),
-    0 0 0 2.5px rgba(96, 165, 250, 0.42),
-    0 6px 20px -4px rgba(37, 99, 235, 0.30);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(8, 13, 24, 0.58) 0%, rgba(15, 23, 42, 0.46) 100%);
+    inset 0 1px 4px rgba(0, 0, 0, 0.36),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 2.5px rgba(59, 130, 246, 0.34);
+  --pearl-l1-disabled-bg: rgba(15, 23, 42, 0.40);
 
   /* Layer 2 暗黑 */
   --pearl-l2-bg:
@@ -20217,8 +20214,8 @@ html.dark #docDialog .doc-m-btn:not(.is-ai) {
    【Layer 4：顶层晶透悬浮层】全站全部弹窗 / 弹层 / 悬浮舱 100% 补齐闭环
    ============================================================================ */
 
-dialog,
-dialog:not(#docDialog),
+dialog:not(#xzNativeSettingsDlg),
+dialog:not(#docDialog):not(#xzNativeSettingsDlg),
 dialog.task-dialog,
 #profileDialog,
 #dialog,
@@ -20240,8 +20237,8 @@ dialog.task-dialog,
 body.on-ai-page .ask .ask-input-wrap,
 .scroll-bottom-btn,
 body #toast.toast,
-html.dark dialog,
-html.dark dialog:not(#docDialog),
+html.dark dialog:not(#xzNativeSettingsDlg),
+html.dark dialog:not(#docDialog):not(#xzNativeSettingsDlg),
 html.dark #profileDialog,
 html.dark .xz-select-menu,
 html.dark .xz-cal-pop,
@@ -20272,4 +20269,9 @@ html.dark dialog::backdrop {
 dialog button:focus:not(:focus-visible),
 #docDialog .doc-font-group button:focus:not(:focus-visible) {
   outline: none !important;
+}
+/* 确保安卓端注入的原生设置浮层 #xzNativeSettingsDlg 免疫站点全局 dialog::before 拖拽条 */
+#xzNativeSettingsDlg::before {
+  display: none !important;
+  content: none !important;
 }

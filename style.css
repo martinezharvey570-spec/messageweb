@@ -16941,21 +16941,101 @@ html.dark dialog .dialoghead button {
     margin: 0 !important;
   }
 }
+
+/* ============================================================================
+   v1.133 校务智理 · 白色流光玻璃设计语言单一真相源（White Luminous Glass）
+   ----------------------------------------------------------------------------
+   视觉核心：
+   - Layer 0（淡灰工作室基底）：纯净清透淡银灰底色（无彩色光斑），反衬上方纯白流光玻璃。
+   - Layer 1（下挖毛玻璃孔）：中性磨砂深下挖凹槽（双段顶内影 + 底唇亮白反光 + blur），
+     统一覆盖搜索栏、输入框、滑槽与【侧边栏预选中（Hover / Focus）】状态。
+   - Layer 2（白色流光玻璃卡片）：高白度半透明透光白玻璃 + 128° 斜向流光光泽带 +
+     双层纯白内折光切边；全站所有一级卡片统一 22px 圆角与同一套光学参数。
+   - Layer 3（纯白流光凸起按钮/胶囊）：更白更润的纯白流光实体凸起件，收编所有漏网按钮、
+     筛选胶囊、常见事务芯片、日期徽章与课表状态胶囊。
+   - Layer 4（高空纯白流光浮层）：高透高光白玻璃弹窗、底栏与输入舱。
+   ============================================================================ */
+
 :root {
-  --pearl-canvas: radial-gradient(84% 46% at 50% -10%, rgba(255, 255, 255, 0.88) 0%, transparent 66%), linear-gradient(180deg, #eceff3 0%, #f2f4f7 48%, #e8ecf1 100%);
-  --pearl-l1-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.25) 0%, rgba(188, 194, 204, 0.32) 46%, rgba(218, 222, 228, 0.40) 100%);
-  --pearl-l1-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.14), inset 0 1px 2px rgba(0, 0, 0, 0.10), inset 0 -1.5px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1.5px 0 rgba(255, 255, 255, 0.92);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(232, 235, 240, 0.68) 0%, rgba(255, 255, 255, 0.92) 100%);
-  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.10), inset 0 -1px 0 rgba(255, 255, 255, 1), 0 0 0 2px rgba(37, 99, 235, 0.28), 0 4px 14px -4px rgba(0, 0, 0, 0.08);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.17) 0%, rgba(203, 208, 216, 0.28) 100%);
-  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0) 76%), linear-gradient(166deg, rgba(255, 255, 255, 0.84) 0%, rgba(248, 249, 251, 0.74) 58%, rgba(242, 244, 247, 0.70) 100%);
-  --pearl-l2-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.99), inset 1px 0 0 rgba(255, 255, 255, 0.74), inset -1px 0 0 rgba(255, 255, 255, 0.48), inset 0 -1px 0 rgba(0, 0, 0, 0.055), 0 0 0 1px rgba(0, 0, 0, 0.065), 0 2px 6px rgba(0, 0, 0, 0.04), 0 12px 28px -10px rgba(0, 0, 0, 0.09);
-  --pearl-l2-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 1px 0 0 rgba(255, 255, 255, 0.86), inset -1px 0 0 rgba(255, 255, 255, 0.64), inset 0 -1px 0 rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.11), 0 4px 10px rgba(0, 0, 0, 0.065), 0 14px 32px -10px rgba(0, 0, 0, 0.13);
-  --pearl-l3-bg: radial-gradient(120% 84% at 18% 0%, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.22) 56%, transparent 74%), linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 246, 249, 0.84) 100%);
-  --pearl-l3-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1.5px 2px rgba(0, 0, 0, 0.075), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.055), 0 8px 18px -7px rgba(0, 0, 0, 0.11);
-  --pearl-l3-shadow-hover: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 2px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.13), 0 4px 10px rgba(0, 0, 0, 0.075), 0 12px 24px -8px rgba(0, 0, 0, 0.14);
-  --pearl-l4-bg: radial-gradient(112% 64% at 14% 0%, rgba(255, 255, 255, 0.98) 0%, transparent 56%), linear-gradient(166deg, rgba(255, 255, 255, 0.90) 0%, rgba(246, 248, 250, 0.84) 100%);
-  --pearl-l4-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(0, 0, 0, 0.065), 0 0 0 1px rgba(255, 255, 255, 0.86), 0 0 0 1.5px rgba(0, 0, 0, 0.075), 0 8px 20px rgba(0, 0, 0, 0.08), 0 28px 60px -12px rgba(0, 0, 0, 0.20);
+  /* Layer 0: 经典清透淡灰玻璃基底（无彩色光斑，专门衬托白色流光玻璃卡片的洁白通透） */
+  --pearl-canvas:
+    radial-gradient(88% 48% at 50% -10%, rgba(255, 255, 255, 0.72) 0%, transparent 66%),
+    linear-gradient(180deg, #e7ebf0 0%, #edf0f5 48%, #e4e8ee 100%);
+
+  /* Layer 1: 纯中性深磨砂灰下挖毛玻璃孔（搜索栏、输入框、滑槽、侧栏预选中 Hover 共用真源） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(132, 140, 152, 0.25) 0%, rgba(176, 183, 194, 0.30) 46%, rgba(214, 219, 226, 0.38) 100%);
+  --pearl-l1-shadow:
+    inset 0 3px 7px rgba(15, 23, 42, 0.14),
+    inset 0 1px 2px rgba(15, 23, 42, 0.10),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 1.5px 0 rgba(255, 255, 255, 0.94);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(235, 238, 243, 0.72) 0%, rgba(255, 255, 255, 0.96) 100%);
+  --pearl-l1-focus-shadow:
+    inset 0 2px 5px rgba(15, 23, 42, 0.09),
+    inset 0 -1px 0 rgba(255, 255, 255, 1),
+    0 0 0 2px rgba(37, 99, 235, 0.26),
+    0 4px 14px -4px rgba(15, 23, 42, 0.07);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.17) 0%, rgba(206, 211, 218, 0.28) 100%);
+
+  /* Layer 2: 白色流光玻璃卡片（高白度半透 + 128° 斜向白色流光带 + 双层纯白晶边） */
+  --pearl-l2-bg:
+    linear-gradient(128deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.76) 28%, rgba(255, 255, 255, 0.97) 54%, rgba(255, 255, 255, 0.82) 78%, rgba(255, 255, 255, 0.96) 100%),
+    radial-gradient(118% 76% at 12% 0%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.56) 46%, rgba(255, 255, 255, 0) 76%),
+    rgba(255, 255, 255, 0.84);
+  --pearl-l2-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1.5px 0 0 rgba(255, 255, 255, 0.96),
+    inset -1.5px 0 0 rgba(255, 255, 255, 0.80),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.72),
+    0 0 0 1px rgba(255, 255, 255, 0.90),
+    0 0 0 1.5px rgba(15, 23, 42, 0.052),
+    0 3px 8px rgba(15, 23, 42, 0.032),
+    0 14px 30px -10px rgba(15, 23, 42, 0.085);
+  --pearl-l2-shadow-hover:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1.5px 0 0 rgba(255, 255, 255, 1),
+    inset -1.5px 0 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.80),
+    0 0 0 1px rgba(255, 255, 255, 0.96),
+    0 0 0 1.5px rgba(15, 23, 42, 0.085),
+    0 6px 14px rgba(15, 23, 42, 0.052),
+    0 18px 36px -10px rgba(15, 23, 42, 0.115);
+
+  /* Layer 3: 更白、更通透的纯白流光凸起按钮与胶囊 */
+  --pearl-l3-bg:
+    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 44%, rgba(255, 255, 255, 0.99) 76%, rgba(253, 254, 255, 0.93) 100%),
+    radial-gradient(110% 80% at 18% 0%, rgba(255, 255, 255, 1) 0%, transparent 72%);
+  --pearl-l3-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.94),
+    inset 0 -1.5px 2px rgba(15, 23, 42, 0.048),
+    0 0 0 1px rgba(255, 255, 255, 0.94),
+    0 0 0 1.5px rgba(15, 23, 42, 0.062),
+    0 3px 7px rgba(15, 23, 42, 0.042),
+    0 8px 18px -6px rgba(15, 23, 42, 0.088);
+  --pearl-l3-shadow-hover:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px rgba(15, 23, 42, 0.065),
+    0 0 0 1px rgba(255, 255, 255, 1),
+    0 0 0 1.5px rgba(15, 23, 42, 0.10),
+    0 5px 12px rgba(15, 23, 42, 0.06),
+    0 12px 24px -7px rgba(15, 23, 42, 0.115);
+
+  /* Layer 4: 高空纯白流光浮层（弹窗 / 底栏 / 输入舱 / 下拉菜单） */
+  --pearl-l4-bg:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.88) 46%, rgba(255, 255, 255, 0.97) 100%),
+    radial-gradient(112% 64% at 14% 0%, rgba(255, 255, 255, 1) 0%, transparent 58%);
+  --pearl-l4-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1.5px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.94),
+    0 0 0 1.5px rgba(15, 23, 42, 0.068),
+    0 10px 24px rgba(15, 23, 42, 0.075),
+    0 28px 60px -12px rgba(15, 23, 42, 0.18);
+
   --r-circle: 50%;
   --r-pill: 999px;
   --r-field: 999px;
@@ -16963,27 +17043,81 @@ html.dark dialog .dialoghead button {
   --r-card: 22px;
   --r-modal: 26px;
 }
+
 html.dark,
 html.dark body {
   --ink: #f1f5f9;
   --ink-secondary: #cbd5e1;
   --muted: #94a3b8;
   color: #f1f5f9;
-  --pearl-canvas: radial-gradient(78% 42% at 50% -8%, rgba(255, 255, 255, 0.045) 0%, transparent 62%), linear-gradient(180deg, #11141b 0%, #0d1016 50%, #090b10 100%);
+  /* Layer 0 暗黑：纯净深烟灰黑玻璃基底（零彩色光斑） */
+  --pearl-canvas:
+    radial-gradient(78% 42% at 50% -8%, rgba(255, 255, 255, 0.05) 0%, transparent 62%),
+    linear-gradient(180deg, #10131a 0%, #0c0f15 50%, #080a0f 100%);
+
+  /* Layer 1 暗黑：纯净深墨下挖毛玻璃凹槽 */
   --pearl-l1-bg: linear-gradient(180deg, rgba(4, 6, 10, 0.84) 0%, rgba(12, 15, 21, 0.72) 55%, rgba(18, 22, 30, 0.62) 100%);
-  --pearl-l1-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.68), inset 0 1px 2px rgba(0, 0, 0, 0.50), inset 0 -1px 0 rgba(255, 255, 255, 0.13), 0 0 0 1px rgba(255, 255, 255, 0.09), 0 1px 0 rgba(255, 255, 255, 0.06);
+  --pearl-l1-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.68),
+    inset 0 1px 2px rgba(0, 0, 0, 0.50),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   --pearl-l1-focus-bg: linear-gradient(180deg, rgba(12, 15, 22, 0.90) 0%, rgba(24, 28, 38, 0.84) 100%);
-  --pearl-l1-focus-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.52), inset 0 -1px 0 rgba(255, 255, 255, 0.18), 0 0 0 2px rgba(96, 165, 250, 0.42), 0 6px 18px -4px rgba(0, 0, 0, 0.40);
+  --pearl-l1-focus-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 2px rgba(96, 165, 250, 0.42),
+    0 6px 18px -4px rgba(0, 0, 0, 0.40);
   --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(7, 9, 14, 0.58) 0%, rgba(16, 19, 26, 0.46) 100%);
-  --pearl-l2-bg: radial-gradient(130% 95% at 14% 0%, rgba(255, 255, 255, 0.065) 0%, transparent 74%), linear-gradient(166deg, rgba(30, 34, 43, 0.78) 0%, rgba(20, 23, 31, 0.72) 100%);
-  --pearl-l2-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 1px 0 0 rgba(255, 255, 255, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.05), inset 0 -1px 0 rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 3px 8px rgba(0, 0, 0, 0.30), 0 14px 32px -10px rgba(0, 0, 0, 0.52);
-  --pearl-l2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 1px 0 0 rgba(255, 255, 255, 0.12), inset -1px 0 0 rgba(255, 255, 255, 0.09), 0 0 0 1px rgba(255, 255, 255, 0.18), 0 16px 36px -10px rgba(0, 0, 0, 0.62);
-  --pearl-l3-bg: radial-gradient(118% 82% at 16% 0%, rgba(255, 255, 255, 0.11) 0%, transparent 56%), linear-gradient(180deg, rgba(42, 47, 58, 0.90) 0%, rgba(26, 30, 38, 0.84) 100%);
-  --pearl-l3-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1.5px 2px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.13), 0 3px 10px rgba(0, 0, 0, 0.36), 0 12px 28px -8px rgba(0, 0, 0, 0.56);
-  --pearl-l3-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 2px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.22), 0 6px 18px rgba(0, 0, 0, 0.48);
-  --pearl-l4-bg: radial-gradient(112% 62% at 14% 0%, rgba(255, 255, 255, 0.10) 0%, transparent 54%), linear-gradient(166deg, rgba(26, 30, 39, 0.92) 0%, rgba(16, 19, 26, 0.88) 100%);
-  --pearl-l4-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 0 rgba(0, 0, 0, 0.52), 0 0 0 1px rgba(255, 255, 255, 0.14), 0 26px 60px -12px rgba(0, 0, 0, 0.74);
+
+  /* Layer 2 暗黑：银白流光黑曜石玻璃卡片 */
+  --pearl-l2-bg:
+    linear-gradient(128deg, rgba(255, 255, 255, 0.095) 0%, rgba(255, 255, 255, 0.02) 34%, rgba(255, 255, 255, 0.065) 62%, rgba(255, 255, 255, 0.015) 100%),
+    linear-gradient(166deg, rgba(32, 36, 46, 0.80) 0%, rgba(20, 23, 31, 0.74) 100%);
+  --pearl-l2-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 1px 0 0 rgba(255, 255, 255, 0.11),
+    inset -1px 0 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 3px 8px rgba(0, 0, 0, 0.30),
+    0 14px 32px -10px rgba(0, 0, 0, 0.52);
+  --pearl-l2-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
+    inset 1px 0 0 rgba(255, 255, 255, 0.16),
+    inset -1px 0 0 rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.20),
+    0 16px 36px -10px rgba(0, 0, 0, 0.62);
+
+  /* Layer 3 暗黑：银白流光烟灰上凸件 */
+  --pearl-l3-bg:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.03) 48%, rgba(255, 255, 255, 0.08) 100%),
+    linear-gradient(180deg, rgba(44, 49, 60, 0.90) 0%, rgba(28, 32, 41, 0.85) 100%);
+  --pearl-l3-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 3px 10px rgba(0, 0, 0, 0.36),
+    0 12px 28px -8px rgba(0, 0, 0, 0.56);
+  --pearl-l3-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.44),
+    0 0 0 1px rgba(255, 255, 255, 0.24),
+    0 6px 18px rgba(0, 0, 0, 0.48);
+
+  /* Layer 4 暗黑：银白流光烟黑浮层 */
+  --pearl-l4-bg:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.02) 52%, rgba(255, 255, 255, 0.06) 100%),
+    linear-gradient(166deg, rgba(26, 30, 39, 0.93) 0%, rgba(16, 19, 26, 0.89) 100%);
+  --pearl-l4-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 26px 60px -12px rgba(0, 0, 0, 0.74);
 }
+
+/* ---- Layer 0: 纯净无色淡灰玻璃基底 ---- */
 body {
   background-image: var(--pearl-canvas) !important;
   background-attachment: fixed;
@@ -16993,6 +17127,89 @@ html.dark body::before {
   display: none !important;
   content: none !important;
 }
+
+/* ============================================================================
+   【Layer 1：纯中性深磨砂灰下挖毛玻璃孔】搜索栏 / 输入框 / 滑槽 / 侧栏预选中
+   ============================================================================ */
+
+/* 侧边栏「预选中（Hover / Focus）」专项：与搜索栏 100% 同源的向内下挖毛玻璃孔（含 .lg-slide-host 高优先级覆盖） */
+#sidebar .nav:not(.active):hover,
+#sidebar.lg-slide-host > .nav:not(.active):hover,
+#sidebar .nav:not(.active):focus-visible,
+#sidebar.lg-slide-host > .nav:not(.active):focus-visible,
+#sidebar .sidebottom button:hover,
+body.sidebar-collapsed #sidebar .nav:not(.active):hover,
+body.sidebar-collapsed #sidebar.lg-slide-host > .nav:not(.active):hover,
+html.dark #sidebar .nav:not(.active):hover,
+html.dark #sidebar.lg-slide-host > .nav:not(.active):hover,
+html.dark #sidebar .nav:not(.active):focus-visible,
+html.dark #sidebar.lg-slide-host > .nav:not(.active):focus-visible,
+html.dark #sidebar .sidebottom button:hover,
+html.dark body.sidebar-collapsed #sidebar .nav:not(.active):hover,
+html.dark body.sidebar-collapsed #sidebar.lg-slide-host > .nav:not(.active):hover {
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  border: 0 !important;
+  border-radius: var(--r-pill) !important;
+  color: var(--ink) !important;
+  transform: none !important;
+}
+#sidebar .nav:not(.active):active,
+#sidebar.lg-slide-host > .nav:not(.active):active,
+html.dark #sidebar .nav:not(.active):active,
+html.dark #sidebar.lg-slide-host > .nav:not(.active):active {
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  transform: scale(0.985) !important;
+}
+
+/* 侧边栏「已选中」滑块：洁白流光透光晶态（与未选中悬停的灰色下挖毛玻璃孔形成一凹一亮层次） */
+.lg-slide-pill.is-nav-glass {
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 48%, rgba(255, 255, 255, 0.98) 100%) !important;
+  backdrop-filter: blur(22px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 3px 10px -2px rgba(37, 99, 235, 0.14),
+    0 2px 5px rgba(15, 23, 42, 0.04) !important;
+}
+html.dark .lg-slide-pill.is-nav-glass {
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 52%, rgba(255, 255, 255, 0.09) 100%),
+    linear-gradient(160deg, rgba(37, 99, 235, 0.34) 0%, rgba(29, 78, 216, 0.22) 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
+    0 0 0 1px rgba(96, 165, 250, 0.40),
+    0 6px 16px -4px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark #sidebar .nav.active {
+  color: #e0f2fe !important;
+}
+#sidebar:not(.lg-has-slider) .nav.active {
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 48%, rgba(255, 255, 255, 0.98) 100%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 3px 10px -2px rgba(37, 99, 235, 0.14) !important;
+}
+html.dark #sidebar:not(.lg-has-slider) .nav.active {
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 52%, rgba(255, 255, 255, 0.12) 100%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.26) 0%, rgba(37, 99, 235, 0.16) 100%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.34),
+    0 0 0 1px rgba(147, 197, 253, 0.34) !important;
+}
+
 .search-box,
 .school-search-wrap,
 #schoolDialog .school-search-wrap,
@@ -17031,12 +17248,15 @@ html.dark .school-search-wrap input:focus {
   border-radius: 0 !important;
   outline: none !important;
 }
+
 #globalSearchDialog #globalSearchInput,
 #globalSearchDialog #globalSearchInput:hover {
   border-radius: var(--r-pill) !important;
   border: 0 !important;
   background-color: transparent !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
   background-repeat: no-repeat, no-repeat !important;
   background-position: 14px center, 0 0 !important;
   background-size: 16px 16px, 100% 100% !important;
@@ -17044,17 +17264,24 @@ html.dark .school-search-wrap input:focus {
   color: var(--ink) !important;
 }
 #globalSearchDialog #globalSearchInput:focus {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-focus-bg) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-focus-bg) !important;
   box-shadow: var(--pearl-l1-focus-shadow) !important;
 }
 html.dark #globalSearchDialog #globalSearchInput,
 html.dark #globalSearchDialog #globalSearchInput:hover {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-bg) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-bg) !important;
 }
 html.dark #globalSearchDialog #globalSearchInput:focus {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"), var(--pearl-l1-focus-bg) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"),
+    var(--pearl-l1-focus-bg) !important;
 }
 
+/* 桌面端顶栏：统一 38px 基线 + 放宽搜索槽（250px）+ 中屏头像纯圆 */
 @media (min-width: 761px) {
   main > header .header-right {
     display: inline-flex !important;
@@ -17099,7 +17326,7 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
   }
   main > header #globalSearchBtn.global-search-trigger .gs-kbd {
     background: var(--pearl-l3-bg) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 0 0 1px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05) !important;
   }
   html.dark main > header #globalSearchBtn.global-search-trigger .gs-kbd {
     background: rgba(44, 49, 60, 0.92) !important;
@@ -17138,7 +17365,6 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
     font-size: 10.5px !important;
   }
 }
-
 @media (min-width: 761px) and (max-width: 1120px) {
   main > header #globalSearchBtn.global-search-trigger {
     min-width: 196px !important;
@@ -17159,6 +17385,8 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
     height: 34px !important;
   }
 }
+
+/* 全站单行表单输入框 / 表单下拉槽 / 表单日期槽：999px 饱满中性灰下挖孔 */
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput),
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) select,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-select-trigger,
@@ -17241,6 +17469,7 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-date-wrap:has(.xz-cal-pop.o
   background: var(--pearl-l1-focus-bg) !important;
   box-shadow: var(--pearl-l1-focus-shadow) !important;
 }
+
 #profileDialog .prof-label-row {
   display: inline-flex;
   align-items: center;
@@ -17254,7 +17483,7 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-date-wrap:has(.xz-cal-pop.o
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.055);
+  background: rgba(15, 23, 42, 0.055);
   color: var(--muted);
 }
 html.dark #profileDialog .prof-lock-badge {
@@ -17268,12 +17497,14 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) select:disabled {
   color: var(--muted) !important;
   opacity: 0.72 !important;
   cursor: not-allowed !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.86), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.88), 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
 }
 html.dark #profileDialog input:disabled,
 html.dark dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:disabled {
   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.07) !important;
 }
+
+/* 全站多行文本域 textarea：18px 纯中性灰下挖孔 */
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) textarea,
 .campus-tool-page #noticeParserText,
 .campus-tool-page textarea,
@@ -17296,6 +17527,8 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) textarea:focus,
   background: var(--pearl-l1-focus-bg) !important;
   box-shadow: var(--pearl-l1-focus-shadow) !important;
 }
+
+/* 全站分段滑槽 & 进度底轨 */
 .ai-seg,
 .sched-d-seg,
 .sched-m-seg,
@@ -17320,6 +17553,11 @@ html.dark #academicTabs {
   background: var(--pearl-l1-bg) !important;
   box-shadow: var(--pearl-l1-shadow) !important;
 }
+
+/* ============================================================================
+   【Layer 2：白色流光玻璃卡片大一统】统一更白、更透光、同族圆角与流光高光边
+   ============================================================================ */
+
 .welcome,
 .home-sched-strip,
 .panel,
@@ -17327,68 +17565,86 @@ html.dark #academicTabs {
 .notice-card,
 #knowledgeGrid .knowledge-card,
 #knowledgeGrid .knowledge-card:last-child,
-.taskrow,
-.user-row,
 .sched-d-header,
 .sched-today-card,
 .sched-matrix-card,
 .sched-manage-card,
 .sched-tt-card,
-.sched-sub-card.is-accent,
+#schedulePage .sched-hero,
 #messages .bubble.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 #analyticsPage .panel,
 #analyticsPage .stats article,
-#analyticsPage .stat-ring-box,
-#analyticsPage .stat-metric,
-#analyticsPage .stat-bars,
-#analyticsPage .gov-topic-row,
-#analyticsPage .gov-spot-row,
-#analyticsPage .gov-empty,
 .campus-tool-page .panel,
 .campus-tool-page .elig-form-card,
 .campus-tool-page .ct-card,
-.campus-tool-page .ct-kpi,
-.campus-tool-page .ct-list,
 html.dark .welcome,
 html.dark .home-sched-strip,
 html.dark .panel,
 html.dark .stats article,
 html.dark .notice-card,
 html.dark .knowledge-card,
-html.dark .taskrow,
-html.dark .user-row,
 html.dark .sched-d-header,
 html.dark .sched-today-card,
 html.dark .sched-matrix-card,
 html.dark .sched-manage-card,
 html.dark .sched-tt-card,
+html.dark #schedulePage .sched-hero,
 html.dark #messages .bubble.msg-ai,
-html.dark .sched-sub-card.is-accent,
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 html.dark #analyticsPage .panel,
 html.dark #analyticsPage .stats article,
+html.dark .campus-tool-page .panel,
+html.dark .campus-tool-page .elig-form-card,
+html.dark .campus-tool-page .ct-card,
+html.dark #knowledgeGrid .knowledge-card,
+html.dark #knowledgeGrid .knowledge-card:last-child {
+  border-radius: var(--r-card) !important;
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(26px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+}
+
+/* 同族紧凑行卡与分析子卡：共享完全一致的白色流光玻璃材质，20px 协调圆角 */
+.taskrow,
+.user-row,
+.sched-sub-card.is-accent,
+#analyticsPage .stat-ring-box,
+#analyticsPage .stat-metric,
+#analyticsPage .stat-bars,
+#analyticsPage .gov-topic-row,
+#analyticsPage .gov-spot-row,
+#analyticsPage .gov-empty,
+.campus-tool-page .ct-kpi,
+.campus-tool-page .ct-list,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark .sched-sub-card.is-accent,
 html.dark #analyticsPage .stat-ring-box,
 html.dark #analyticsPage .stat-metric,
 html.dark #analyticsPage .stat-bars,
 html.dark #analyticsPage .gov-topic-row,
 html.dark #analyticsPage .gov-spot-row,
 html.dark #analyticsPage .gov-empty,
-html.dark .campus-tool-page .panel,
-html.dark .campus-tool-page .elig-form-card,
-html.dark .campus-tool-page .ct-card,
 html.dark .campus-tool-page .ct-kpi,
-html.dark .campus-tool-page .ct-list,
-html.dark #knowledgeGrid .knowledge-card,
-html.dark #knowledgeGrid .knowledge-card:last-child {
+html.dark .campus-tool-page .ct-list {
+  border-radius: 20px !important;
   background: var(--pearl-l2-bg) !important;
-  backdrop-filter: blur(22px) saturate(155%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+  backdrop-filter: blur(26px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l2-shadow) !important;
 }
+
+/* 首页课表条补齐舒展内边距，与上下白色流光卡完全融为一体 */
+.home-sched-strip {
+  padding: 12px 16px !important;
+}
+
 #knowledgeGrid,
 html.dark #knowledgeGrid {
   background: transparent !important;
@@ -17421,9 +17677,9 @@ html.dark #knowledgeGrid .doc-index {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
-
 @media (hover: hover) {
   .stats article:hover,
+  .home-sched-strip:hover,
   .notice-card:hover,
   #knowledgeGrid .knowledge-card:hover,
   .sched-lesson:hover,
@@ -17433,28 +17689,39 @@ html.dark #knowledgeGrid .doc-index {
     box-shadow: var(--pearl-l2-shadow-hover) !important;
   }
 }
+
+/* ============================================================================
+   【Layer 3：更白的纯白流光凸起玻璃按钮 & 胶囊】全量收编（含常见事务芯片/筛选胶囊/徽章）
+   ============================================================================ */
+
 #sidebar,
-main > header {
-  background: var(--pearl-l3-bg) !important;
-  backdrop-filter: blur(22px) saturate(155%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
-  border-color: rgba(0, 0, 0, 0.065) !important;
-}
+main > header,
 html.dark #sidebar,
 html.dark main > header {
   background: var(--pearl-l3-bg) !important;
-  backdrop-filter: blur(22px) saturate(155%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+  backdrop-filter: blur(26px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+  border-color: rgba(15, 23, 42, 0.055) !important;
 }
 html.dark #sidebar,
 html.dark main > header {
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
+
 .outline:not(.icon-only):not(.primary):not(.danger),
 .secondary:not(.primary):not(.danger),
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary,
 .sched-btn-ghost,
 .pill-btn:not(.active),
+.filter-chip:not(.active),
+.filter-chips button:not(.active),
+.toolbar .pill:not(.active),
+#knowledgePills .pill:not(.active),
+.mini-chips button:not(.active),
+.quick-tags button:not(.active),
+.welcome .date,
+.home-sched-pill,
+.panelhead .link,
 .toolbar select,
 .toolbar .xz-select-trigger,
 #noticesPage #category:not(.xz-native-select-hidden),
@@ -17477,6 +17744,15 @@ html.dark .secondary:not(.primary):not(.danger),
 html.dark dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary,
 html.dark .sched-btn-ghost,
 html.dark .pill-btn:not(.active),
+html.dark .filter-chip:not(.active),
+html.dark .filter-chips button:not(.active),
+html.dark .toolbar .pill:not(.active),
+html.dark #knowledgePills .pill:not(.active),
+html.dark .mini-chips button:not(.active),
+html.dark .quick-tags button:not(.active),
+html.dark .welcome .date,
+html.dark .home-sched-pill,
+html.dark .panelhead .link,
 html.dark .toolbar select,
 html.dark .toolbar .xz-select-trigger,
 html.dark #noticesPage #category:not(.xz-native-select-hidden),
@@ -17498,6 +17774,16 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   color: var(--ink) !important;
   transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
 }
+/* 保留功能链接/状态胶囊的品牌蓝文字可读性，同时载体完全纯白流光化 */
+.panelhead .link,
+.home-sched-pill {
+  color: var(--blue) !important;
+  padding: 6px 14px !important;
+}
+html.dark .panelhead .link,
+html.dark .home-sched-pill {
+  color: #93c5fd !important;
+}
 
 @media (hover: hover) {
   .outline:not(.icon-only):not(.primary):not(.danger):hover,
@@ -17505,6 +17791,13 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary:hover,
   .sched-btn-ghost:hover,
   .pill-btn:not(.active):hover,
+  .filter-chip:not(.active):hover,
+  .filter-chips button:not(.active):hover,
+  .toolbar .pill:not(.active):hover,
+  #knowledgePills .pill:not(.active):hover,
+  .mini-chips button:not(.active):hover,
+  .quick-tags button:not(.active):hover,
+  .panelhead .link:hover,
   .toolbar select:hover,
   .toolbar .xz-select-trigger:hover,
   .user-row select:hover,
@@ -17516,11 +17809,12 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   .ai-agent-pill:hover,
   #messages .bubble-tools button:not(.is-high):hover {
     background: var(--pearl-l3-bg) !important;
+    background-image: var(--pearl-l3-bg) !important;
     box-shadow: var(--pearl-l3-shadow-hover) !important;
-    color: var(--ink) !important;
     transform: translateY(-1px);
   }
 }
+
 #homePage .quick,
 .quick-item,
 .home-tool-tile,
@@ -17534,7 +17828,6 @@ html.dark #messages .welcome-item {
   box-shadow: var(--pearl-l3-shadow) !important;
   transition: transform 0.18s var(--lg-spring), box-shadow 0.18s ease, background 0.18s ease !important;
 }
-
 @media (hover: hover) {
   #homePage .quick:hover,
   .quick-item:hover,
@@ -17544,6 +17837,7 @@ html.dark #messages .welcome-item {
     box-shadow: var(--pearl-l3-shadow-hover) !important;
   }
 }
+
 main > header #menu,
 #desktopSidebarToggle.desktop-rail-toggle,
 dialog:not(#xzNativeSettingsDlg) .dialoghead button,
@@ -17578,7 +17872,6 @@ html.dark #docBackTopBtn {
   padding: 0 !important;
   aspect-ratio: 1 / 1 !important;
 }
-
 @media (max-width: 760px) {
   main > header #menu,
   main > header #globalSearchBtn,
@@ -17601,6 +17894,7 @@ html.dark #docBackTopBtn {
     color: var(--ink) !important;
   }
 }
+
 #docDialog .doc-font-group button:not(.active),
 .doc-m-font-seg button:not(.active) {
   background: transparent !important;
@@ -17612,10 +17906,20 @@ html.dark #docBackTopBtn {
 .authbox .tabs button.selected {
   border: 0 !important;
   border-radius: var(--r-pill) !important;
-  background: radial-gradient(125% 95% at 24% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 64%), linear-gradient(150deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
+  background:
+    radial-gradient(125% 95% at 24% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 64%),
+    linear-gradient(150deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
   color: #ffffff !important;
-  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.24), inset 0 -2px 4px rgba(15, 23, 42, 0.16), 0 3px 10px -2px rgba(37, 99, 235, 0.36) !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.24),
+    inset 0 -2px 4px rgba(15, 23, 42, 0.16),
+    0 3px 10px -2px rgba(37, 99, 235, 0.36) !important;
 }
+
+/* ============================================================================
+   【Layer 4：高空纯白流光浮层】全站 13 弹窗 / 弹层 / 悬浮底栏 / 输入舱
+   ============================================================================ */
+
 dialog:not(#xzNativeSettingsDlg),
 dialog:not(#docDialog):not(#xzNativeSettingsDlg),
 dialog.task-dialog,
@@ -17652,8 +17956,8 @@ html.dark body.on-ai-page .ask .ask-input-wrap,
 html.dark .scroll-bottom-btn,
 html.dark body #toast.toast {
   background: var(--pearl-l4-bg) !important;
-  backdrop-filter: blur(30px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
+  backdrop-filter: blur(32px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(165%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l4-shadow) !important;
 }
@@ -17662,7 +17966,7 @@ body #toast.toast {
   border-radius: var(--r-pill) !important;
 }
 dialog::backdrop {
-  background: rgba(15, 23, 42, 0.28) !important;
+  background: rgba(15, 23, 42, 0.24) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
 }
@@ -17678,6 +17982,10 @@ dialog button:focus:not(:focus-visible),
   content: none !important;
 }
 
+/* ============================================================================
+   【桌面端 + 移动端细节融洽度精修（继承 v1.131/v1.132 全部验证修复）】
+   ============================================================================ */
+
 @media (min-width: 901px) {
   #auth.auth:not(.hide),
   html.dark #auth.auth:not(.hide) {
@@ -17688,10 +17996,11 @@ dialog button:focus:not(:focus-visible),
   }
   #auth.auth:not(.hide) .hero,
   html.dark #auth.auth:not(.hide) .hero {
+    border-radius: var(--r-card) !important;
     background: var(--pearl-l2-bg) !important;
     box-shadow: var(--pearl-l2-shadow) !important;
-    backdrop-filter: blur(24px) saturate(155%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(155%) !important;
+    backdrop-filter: blur(26px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
   }
   #auth.auth:not(.hide) .hero-list p,
   html.dark #auth.auth:not(.hide) .hero-list p {
@@ -17722,7 +18031,7 @@ dialog button:focus:not(:focus-visible),
   text-decoration: none !important;
 }
 .demo-login-link:hover {
-  background: rgba(0, 0, 0, 0.05) !important;
+  background: rgba(15, 23, 42, 0.05) !important;
   text-decoration: none !important;
 }
 html.dark .demo-login-link:hover {
@@ -17737,7 +18046,6 @@ html.dark .demo-login-link:hover {
     margin-left: 72px;
   }
 }
-
 @media (min-width: 961px) {
   #homePage .cols {
     align-items: stretch !important;
@@ -17748,6 +18056,7 @@ html.dark .demo-login-link:hover {
     flex-direction: column !important;
   }
 }
+
 .task-controls {
   margin-bottom: 14px !important;
 }
@@ -17767,6 +18076,7 @@ body.on-ai-page #messages {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
 }
+
 .sched-today-card .sched-lesson b,
 .sched-clist-item b {
   white-space: normal !important;
@@ -17837,6 +18147,7 @@ body.on-ai-page #messages {
     white-space: nowrap !important;
   }
 }
+
 @media (max-width: 760px) {
   .wrap {
     padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;

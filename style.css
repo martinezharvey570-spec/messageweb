@@ -17602,12 +17602,13 @@ html.dark #academicTabs {
 #knowledgeGrid .knowledge-card,
 #knowledgeGrid .knowledge-card:last-child,
 .sched-d-header,
-.sched-d-dstrip,
+.sched-d-right-panel,
 .sched-today-card,
 .sched-matrix-card,
 .sched-manage-card,
 .sched-tt-card,
 #schedulePage .sched-hero,
+#schedulePage .sched-hero.empty,
 #messages .bubble.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
@@ -17622,12 +17623,13 @@ html.dark .stats article,
 html.dark .notice-card,
 html.dark .knowledge-card,
 html.dark .sched-d-header,
-html.dark .sched-d-dstrip,
+html.dark .sched-d-right-panel,
 html.dark .sched-today-card,
 html.dark .sched-matrix-card,
 html.dark .sched-manage-card,
 html.dark .sched-tt-card,
 html.dark #schedulePage .sched-hero,
+html.dark #schedulePage .sched-hero.empty,
 html.dark #messages .bubble.msg-ai,
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai,
 html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
@@ -17647,9 +17649,11 @@ html.dark #knowledgeGrid .knowledge-card:last-child {
 
 .taskrow,
 .user-row,
+.sched-lesson,
 .sched-sub-card.is-accent,
 html.dark .taskrow,
 html.dark .user-row,
+html.dark .sched-lesson,
 html.dark .sched-sub-card.is-accent {
   border-radius: 20px !important;
   background: var(--pearl-l2-bg) !important;
@@ -17812,6 +17816,9 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary,
 #aiSchoolBtn.ai-seg-school,
 .ai-seg-school,
 .sched-sync-badge,
+#schedulePage .sched-week-chip:not(.on),
+#schedulePage .sched-date-chip:not(.on):not(.today),
+#schedulePage .sched-m-ibtn:not(.is-primary),
 .toolbar select,
 .toolbar .xz-select-trigger,
 #noticesPage #category:not(.xz-native-select-hidden),
@@ -17846,6 +17853,9 @@ html.dark .panelhead .link,
 html.dark #aiSchoolBtn.ai-seg-school,
 html.dark .ai-seg-school,
 html.dark .sched-sync-badge,
+html.dark #schedulePage .sched-week-chip:not(.on),
+html.dark #schedulePage .sched-date-chip:not(.on):not(.today),
+html.dark #schedulePage .sched-m-ibtn:not(.is-primary),
 html.dark .toolbar select,
 html.dark .toolbar .xz-select-trigger,
 html.dark #noticesPage #category:not(.xz-native-select-hidden),
@@ -17910,6 +17920,36 @@ html.dark #gpaResetDemoBtn:hover,
 html.dark #clearDone:hover {
   color: #fca5a5 !important;
 }
+/* 待办行内删除圆钮 & 课表删除圆钮：恢复醒目的半透绯红液态玻璃危险态，避免误混为白色普通按钮 */
+.taskrow .task-del-btn,
+.sched-clist-item .del,
+html.dark .taskrow .task-del-btn,
+html.dark .sched-clist-item .del {
+  border-radius: var(--r-circle) !important;
+  border: 0 !important;
+  background:
+    radial-gradient(120% 85% at 24% 0%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.05) 46%, transparent 65%),
+    linear-gradient(160deg, #fb7185 0%, #ef4444 48%, #dc2626 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -2px 6px rgba(127, 29, 29, 0.28),
+    0 0 0 1px rgba(220, 38, 38, 0.22),
+    0 6px 16px -4px rgba(220, 38, 38, 0.32) !important;
+}
+@media (hover: hover) {
+  .taskrow .task-del-btn:hover,
+  .sched-clist-item .del:hover {
+    transform: translateY(-1px) !important;
+    filter: brightness(1.06);
+    color: #ffffff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.48),
+      inset 0 -2px 6px rgba(127, 29, 29, 0.34),
+      0 0 0 1px rgba(220, 38, 38, 0.28),
+      0 8px 20px -4px rgba(220, 38, 38, 0.42) !important;
+  }
+}
 
 @media (hover: hover) {
   .outline:not(.icon-only):not(.primary):not(.danger):hover,
@@ -17923,7 +17963,10 @@ html.dark #clearDone:hover {
   #knowledgePills .pill:not(.active):hover,
   .mini-chips button:not(.active):hover,
   .quick-tags button:not(.active):hover,
-  .panelhead .link:hover,
+  #schedulePage .sched-week-chip:not(.on):hover,
+#schedulePage .sched-date-chip:not(.on):not(.today):hover,
+#schedulePage .sched-m-ibtn:not(.is-primary):hover,
+.panelhead .link:hover,
   #aiSchoolBtn.ai-seg-school:hover,
   .toolbar select:hover,
   .toolbar .xz-select-trigger:hover,
@@ -17975,7 +18018,6 @@ dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 #aiPage #askAttachBtn,
 #aiPage #askSubmitBtn.is-idle,
 .notice-actions button.icon-only:not(.danger),
-.task-del-btn:not(.danger),
 .sug-nav-btn,
 html.dark main > header #menu,
 html.dark #desktopSidebarToggle.desktop-rail-toggle,
@@ -18113,105 +18155,18 @@ dialog button:focus:not(:focus-visible),
 }
 
 /* ============================================================================
-   【登录页（桌面 + 移动端统一清透淡灰背景 + 白色流光玻璃卡）】
+   【登录页（桌面端清透淡灰 + 双流光玻璃卡；移动端保留原版上蓝下白呼吸卡片）】
    ============================================================================ */
 
-#auth.auth:not(.hide),
-html.dark #auth.auth:not(.hide) {
-  background: var(--pearl-canvas) !important;
-}
-@media (max-width: 900px) {
-  /* 彻底消灭移动端登录页旧版大块死蓝顶栏与蓝底 overscroll，与全站清透淡灰 + 白色流光玻璃 100% 统一 */
-  html:not(.app-booting):has(#auth:not(.hide)),
-  body:not(:has(#auth.hide)):has(#auth:not(.hide)),
-  html.dark:not(.app-booting):has(#auth:not(.hide)),
-  html.dark body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
-    background: var(--pearl-canvas) !important;
-  }
-  #auth.auth:not(.hide),
-  html.dark #auth.auth:not(.hide) {
-    background: var(--pearl-canvas) !important;
-    min-height: 100dvh !important;
-    padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 14px !important;
-  }
-  #auth.auth:not(.hide) .hero,
-  html.dark #auth.auth:not(.hide) .hero {
-    width: 100% !important;
-    max-width: 440px !important;
-    margin: 0 auto !important;
-    min-height: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    padding: 4px 8px 2px !important;
-    text-align: center !important;
-    overflow: visible !important;
-  }
-  #auth.auth:not(.hide) .hero::before,
-  #auth.auth:not(.hide) .hero::after {
-    display: none !important;
-    content: none !important;
-  }
-  #auth.auth:not(.hide) .hero-top {
-    display: flex !important;
-    justify-content: center !important;
-    margin-bottom: 10px !important;
-  }
-  #auth.auth:not(.hide) .hero .logo {
-    margin: 0 auto !important;
-  }
-  #auth.auth:not(.hide) .hero h1,
-  html.dark #auth.auth:not(.hide) .hero h1 {
-    color: var(--ink) !important;
-    text-shadow: none !important;
-    font-size: 27px !important;
-    margin: 0 0 6px !important;
-  }
-  #auth.auth:not(.hide) .hero > p,
-  #auth.auth:not(.hide) .hero .hero-copy p,
-  html.dark #auth.auth:not(.hide) .hero > p,
-  html.dark #auth.auth:not(.hide) .hero .hero-copy p {
-    color: var(--muted) !important;
-    font-size: 13.5px !important;
-    line-height: 1.5 !important;
-    margin: 0 !important;
-  }
-  #auth.auth:not(.hide) .authbox,
-  html.dark #auth.auth:not(.hide) .authbox {
-    width: 100% !important;
-    max-width: 440px !important;
-    margin: 0 auto !important;
-    padding: 22px 20px 20px !important;
-    border-radius: var(--r-modal) !important;
-    background: var(--pearl-l4-bg) !important;
-    box-shadow: var(--pearl-l4-shadow) !important;
-    backdrop-filter: blur(28px) saturate(170%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
-  }
-  #auth .auth-theme-btn {
-    display: inline-flex !important;
-    position: fixed !important;
-    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
-    right: 14px !important;
-    z-index: 40 !important;
-  }
-}
 @media (min-width: 901px) {
   #auth.auth:not(.hide),
   html.dark #auth.auth:not(.hide) {
+    background: var(--pearl-canvas) !important;
     min-height: 100dvh !important;
     align-content: center !important;
     align-items: stretch !important;
   }
-  #auth.auth:not(.hide) .hero,
   #auth.auth:not(.hide) .authbox,
-  html.dark #auth.auth:not(.hide) .hero,
   html.dark #auth.auth:not(.hide) .authbox {
     border-radius: var(--r-modal) !important;
     background: var(--pearl-l4-bg) !important;
@@ -18219,11 +18174,57 @@ html.dark #auth.auth:not(.hide) {
     backdrop-filter: blur(28px) saturate(170%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
   }
-  #auth.auth:not(.hide) .hero-list p,
-  html.dark #auth.auth:not(.hide) .hero-list p {
-    background: var(--pearl-l3-bg) !important;
-    box-shadow: var(--pearl-l3-shadow) !important;
+  /* 左卡「校务智理」：方案 A 晨雾冰蓝透光流光玻璃（浅色 + 深色） */
+  #auth.auth:not(.hide) .hero {
+    border-radius: var(--r-modal) !important;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(224, 242, 254, 0.18) 72%, rgba(255, 255, 255, 0.42) 100%),
+      linear-gradient(155deg, rgba(219, 238, 255, 0.80) 0%, rgba(235, 245, 255, 0.68) 55%, rgba(208, 232, 255, 0.76) 100%) !important;
+    box-shadow:
+      inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.96),
+      inset -1px -1.5px 6px rgba(147, 197, 253, 0.34),
+      0 0 0 1px rgba(191, 219, 254, 0.85),
+      0 18px 42px -12px rgba(37, 99, 235, 0.14),
+      0 4px 12px rgba(15, 23, 42, 0.04) !important;
+    backdrop-filter: blur(28px) saturate(175%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(175%) !important;
+  }
+  html.dark #auth.auth:not(.hide) .hero {
+    border-radius: var(--r-modal) !important;
+    background:
+      linear-gradient(135deg, rgba(147, 197, 253, 0.14) 0%, rgba(147, 197, 253, 0.02) 45%, rgba(56, 189, 248, 0.08) 100%),
+      linear-gradient(155deg, rgba(24, 48, 88, 0.78) 0%, rgba(17, 33, 64, 0.72) 60%, rgba(20, 40, 76, 0.76) 100%) !important;
+    box-shadow:
+      inset 1.5px 1.5px 0 rgba(191, 219, 254, 0.22),
+      inset -1px -1.5px 6px rgba(0, 0, 0, 0.32),
+      0 0 0 1px rgba(147, 197, 253, 0.20),
+      0 20px 46px -12px rgba(0, 0, 0, 0.56) !important;
+    backdrop-filter: blur(28px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+  }
+  /* 左卡内三条功能子胶囊：同步转为冰蓝流光玻璃胶囊，层次统一而不抢字 */
+  #auth.auth:not(.hide) .hero-list p {
     border: 0 !important;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(224, 242, 254, 0.36) 100%),
+      linear-gradient(160deg, rgba(232, 245, 255, 0.78) 0%, rgba(214, 236, 255, 0.64) 100%) !important;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.96),
+      inset 0 -1px 3px rgba(147, 197, 253, 0.28),
+      0 0 0 1px rgba(147, 197, 253, 0.52),
+      0 6px 16px -4px rgba(37, 99, 235, 0.10) !important;
+    backdrop-filter: blur(18px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  }
+  html.dark #auth.auth:not(.hide) .hero-list p {
+    border: 0 !important;
+    background:
+      linear-gradient(135deg, rgba(147, 197, 253, 0.15) 0%, rgba(147, 197, 253, 0.03) 55%, rgba(56, 189, 248, 0.08) 100%),
+      linear-gradient(160deg, rgba(36, 68, 118, 0.68) 0%, rgba(25, 49, 90, 0.56) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(191, 219, 254, 0.24),
+      0 0 0 1px rgba(147, 197, 253, 0.22),
+      0 8px 18px -6px rgba(0, 0, 0, 0.44) !important;
   }
   #auth .auth-theme-btn {
     position: fixed !important;
@@ -18291,6 +18292,104 @@ body.on-ai-page #messages {
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   line-height: 1.35 !important;
+}
+
+/* ============================================================================
+   【超级课表：左右比例重衡 + 流光白内层透光度 + “今”角标零裁切 + 今日课程不挤换行】
+   ============================================================================ */
+
+@media (min-width: 961px) {
+  #schedulePage .sched-d-stage {
+    grid-template-columns: 288px minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+}
+@media (min-width: 1220px) {
+  #schedulePage .sched-d-stage {
+    grid-template-columns: 308px minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+/* 取消 .sched-d-dstrip 外层误套卡片背景，留足顶部空间防止“今”角标裁切 */
+#schedulePage .sched-d-dstrip {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  padding: 13px 2px 2px !important;
+  margin-top: 2px !important;
+  overflow: visible !important;
+}
+#schedulePage .sched-d-dstrip .sched-date-chip.today::before {
+  top: -8px !important;
+  right: 10px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  padding: 0 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 9.5px !important;
+  line-height: 1 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+}
+/* 左侧今日课程卡片内部呼吸感与多信息流（地点/教师/周次）舒展排版 */
+#schedulePage .sched-lesson {
+  gap: 10px !important;
+  padding: 12px 13px !important;
+}
+#schedulePage .sched-lesson-time {
+  flex: 0 0 50px !important;
+}
+#schedulePage .sched-lesson-info {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 3px 10px !important;
+  margin-top: 2px !important;
+}
+#schedulePage .sched-lesson-info span {
+  margin-right: 0 !important;
+}
+/* 过去时段课程不再整张卡发灰变脏，仅柔和淡化内部文字与色条，保持白色流光玻璃质感 */
+#schedulePage .sched-lesson.past {
+  opacity: 1 !important;
+}
+#schedulePage .sched-lesson.past .sched-lesson-time,
+#schedulePage .sched-lesson.past .sched-lesson-body,
+#schedulePage .sched-lesson.past .sched-lesson-bar {
+  opacity: 0.56 !important;
+}
+/* 右侧周课表矩阵表头、节次与空格子：清透无色二级内嵌玻璃统一 */
+#schedulePage .sched-m-head,
+#schedulePage .sched-m-period {
+  border-radius: 12px !important;
+  border: 0 !important;
+  background: var(--pearl-l2-inner-bg) !important;
+  box-shadow: var(--pearl-l2-inner-shadow) !important;
+}
+#schedulePage .sched-m-head.today {
+  background: rgba(219, 234, 254, 0.72) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 0 0 1px rgba(37, 99, 235, 0.22) !important;
+}
+html.dark #schedulePage .sched-m-head.today {
+  background: rgba(30, 58, 138, 0.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(96, 165, 250, 0.32) !important;
+}
+#schedulePage .sched-m-cell {
+  border-radius: 12px !important;
+  background: rgba(15, 23, 42, 0.028) !important;
+  border: 1px dashed transparent !important;
+}
+#schedulePage .sched-m-cell.today {
+  background: rgba(37, 99, 235, 0.045) !important;
+}
+html.dark #schedulePage .sched-m-cell {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+html.dark #schedulePage .sched-m-cell.today {
+  background: rgba(59, 130, 246, 0.08) !important;
 }
 
 @media (max-width: 600px) {

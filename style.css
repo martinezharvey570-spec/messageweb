@@ -16943,97 +16943,114 @@ html.dark dialog .dialoghead button {
 }
 
 /* ============================================================================
-   v1.133 校务智理 · 白色流光玻璃设计语言单一真相源（White Luminous Glass）
+   v1.134 校务智理 · 白色流光玻璃全局一致性宪章（White Luminous Glass）
    ----------------------------------------------------------------------------
    视觉核心：
-   - Layer 0（淡灰工作室基底）：纯净清透淡银灰底色（无彩色光斑），反衬上方纯白流光玻璃。
-   - Layer 1（下挖毛玻璃孔）：中性磨砂深下挖凹槽（双段顶内影 + 底唇亮白反光 + blur），
-     统一覆盖搜索栏、输入框、滑槽与【侧边栏预选中（Hover / Focus）】状态。
-   - Layer 2（白色流光玻璃卡片）：高白度半透明透光白玻璃 + 128° 斜向流光光泽带 +
-     双层纯白内折光切边；全站所有一级卡片统一 22px 圆角与同一套光学参数。
-   - Layer 3（纯白流光凸起按钮/胶囊）：更白更润的纯白流光实体凸起件，收编所有漏网按钮、
-     筛选胶囊、常见事务芯片、日期徽章与课表状态胶囊。
-   - Layer 4（高空纯白流光浮层）：高透高光白玻璃弹窗、底栏与输入舱。
+   - Layer 0（经典清透淡灰毛玻璃基底）：回归早期版本轻盈通透的淡银灰雾面（#eff2f6 → #f4f6fa），
+     彻底告别沉闷暗灰与彩色光斑。
+   - Layer 1（纯中性下挖毛玻璃孔）：明显向内凹陷的中性磨砂灰孔（搜索栏 / 输入框 / 滑槽 / 侧栏预选中 Hover）。
+   - 侧边栏 & 底栏选中态：100% 原汁原味保留用户设计的「蓝色折光液态玻璃」选中胶囊。
+   - Layer 2（安卓卡级半透明白色流光玻璃卡片）：真正的半透明白玻璃（0.60~0.88 + 135° 斜向流光丝带 +
+     blur(26px) + 纯白晶边），通透晶莹不发死白、不发暗灰，全站 12 大页面一级卡片高度统一。
+   - Layer 3（纯白流光凸起按钮 & 胶囊）：半透明高光白玻璃实体凸起件，严格遵循语义视觉逻辑。
+   - Layer 4（高空纯白流光浮层）：真正可透出底层模糊折射的高空液态玻璃弹窗、底栏与输入舱。
    ============================================================================ */
 
 :root {
-  /* Layer 0: 经典清透淡灰玻璃基底（无彩色光斑，专门衬托白色流光玻璃卡片的洁白通透） */
+  /* Layer 0: 早期经典轻盈淡灰毛玻璃基底（清透、明亮、零色偏，绝不沉闷发灰） */
   --pearl-canvas:
-    radial-gradient(88% 48% at 50% -10%, rgba(255, 255, 255, 0.72) 0%, transparent 66%),
-    linear-gradient(180deg, #e7ebf0 0%, #edf0f5 48%, #e4e8ee 100%);
+    radial-gradient(92% 52% at 50% -12%, rgba(255, 255, 255, 0.92) 0%, transparent 66%),
+    linear-gradient(168deg, #eff2f6 0%, #f4f6fa 48%, #ebeef4 100%);
 
-  /* Layer 1: 纯中性深磨砂灰下挖毛玻璃孔（搜索栏、输入框、滑槽、侧栏预选中 Hover 共用真源） */
-  --pearl-l1-bg: linear-gradient(180deg, rgba(132, 140, 152, 0.25) 0%, rgba(176, 183, 194, 0.30) 46%, rgba(214, 219, 226, 0.38) 100%);
+  /* Layer 1: 纯中性深磨砂灰下挖毛玻璃孔（搜索栏、输入框、滑槽、侧栏预选中 Hover 100% 同源） */
+  --pearl-l1-bg: linear-gradient(180deg, rgba(132, 140, 152, 0.22) 0%, rgba(178, 185, 196, 0.25) 48%, rgba(218, 223, 231, 0.34) 100%);
   --pearl-l1-shadow:
-    inset 0 3px 7px rgba(15, 23, 42, 0.14),
-    inset 0 1px 2px rgba(15, 23, 42, 0.10),
+    inset 0 3px 7px rgba(15, 23, 42, 0.13),
+    inset 0 1px 2px rgba(15, 23, 42, 0.095),
     inset 0 -1.5px 0 rgba(255, 255, 255, 0.98),
-    0 0 0 1px rgba(15, 23, 42, 0.08),
-    0 1.5px 0 rgba(255, 255, 255, 0.94);
-  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(235, 238, 243, 0.72) 0%, rgba(255, 255, 255, 0.96) 100%);
+    0 0 0 1px rgba(15, 23, 42, 0.075),
+    0 1.5px 0 rgba(255, 255, 255, 0.96);
+  --pearl-l1-focus-bg: linear-gradient(180deg, rgba(236, 240, 246, 0.72) 0%, rgba(255, 255, 255, 0.92) 100%);
   --pearl-l1-focus-shadow:
-    inset 0 2px 5px rgba(15, 23, 42, 0.09),
+    inset 0 2px 5px rgba(15, 23, 42, 0.085),
     inset 0 -1px 0 rgba(255, 255, 255, 1),
     0 0 0 2px rgba(37, 99, 235, 0.26),
-    0 4px 14px -4px rgba(15, 23, 42, 0.07);
-  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.17) 0%, rgba(206, 211, 218, 0.28) 100%);
+    0 4px 14px -4px rgba(15, 23, 42, 0.06);
+  --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(145, 152, 163, 0.15) 0%, rgba(208, 213, 221, 0.25) 100%);
 
-  /* Layer 2: 白色流光玻璃卡片（高白度半透 + 128° 斜向白色流光带 + 双层纯白晶边） */
+  /* Layer 2: 安卓卡同款半透明白色流光玻璃卡片（真正通透 0.60~0.88 + 135° 斜向白色流光丝带 + 纯白晶边） */
   --pearl-l2-bg:
-    linear-gradient(128deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.76) 28%, rgba(255, 255, 255, 0.97) 54%, rgba(255, 255, 255, 0.82) 78%, rgba(255, 255, 255, 0.96) 100%),
-    radial-gradient(118% 76% at 12% 0%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.56) 46%, rgba(255, 255, 255, 0) 76%),
-    rgba(255, 255, 255, 0.84);
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.88) 0%,
+      rgba(255, 255, 255, 0.62) 30%,
+      rgba(255, 255, 255, 0.84) 54%,
+      rgba(255, 255, 255, 0.60) 78%,
+      rgba(255, 255, 255, 0.78) 100%);
   --pearl-l2-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1.5px 0 0 rgba(255, 255, 255, 0.96),
-    inset -1.5px 0 0 rgba(255, 255, 255, 0.80),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.72),
-    0 0 0 1px rgba(255, 255, 255, 0.90),
-    0 0 0 1.5px rgba(15, 23, 42, 0.052),
-    0 3px 8px rgba(15, 23, 42, 0.032),
-    0 14px 30px -10px rgba(15, 23, 42, 0.085);
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.92),
+    inset -1px 0 0 rgba(255, 255, 255, 0.68),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.045),
+    0 0 0 1px rgba(255, 255, 255, 0.86),
+    0 0 0 1.5px rgba(15, 23, 42, 0.058),
+    0 4px 12px -2px rgba(15, 23, 42, 0.042),
+    0 14px 32px -10px rgba(15, 23, 42, 0.082);
   --pearl-l2-shadow-hover:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1.5px 0 0 rgba(255, 255, 255, 1),
-    inset -1.5px 0 0 rgba(255, 255, 255, 0.90),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.80),
-    0 0 0 1px rgba(255, 255, 255, 0.96),
-    0 0 0 1.5px rgba(15, 23, 42, 0.085),
-    0 6px 14px rgba(15, 23, 42, 0.052),
-    0 18px 36px -10px rgba(15, 23, 42, 0.115);
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.98),
+    inset -1px 0 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.065),
+    0 0 0 1px rgba(255, 255, 255, 0.94),
+    0 0 0 1.5px rgba(15, 23, 42, 0.088),
+    0 8px 20px -4px rgba(15, 23, 42, 0.068),
+    0 18px 38px -12px rgba(15, 23, 42, 0.11);
 
-  /* Layer 3: 更白、更通透的纯白流光凸起按钮与胶囊 */
+  /* Layer 2 Inner: 嵌套在白色流光大卡片内部的子块（轻盈半透，区分父子层级） */
+  --pearl-l2-inner-bg:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(244, 247, 251, 0.48) 100%);
+  --pearl-l2-inner-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.94),
+    0 0 0 1px rgba(15, 23, 42, 0.055),
+    0 2px 8px -2px rgba(15, 23, 42, 0.04);
+
+  /* Layer 3: 半透明高光白色流光上凸按钮 & 胶囊（比卡片略亮略实体，清晰浮于卡片上方） */
   --pearl-l3-bg:
-    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 44%, rgba(255, 255, 255, 0.99) 76%, rgba(253, 254, 255, 0.93) 100%),
-    radial-gradient(110% 80% at 18% 0%, rgba(255, 255, 255, 1) 0%, transparent 72%);
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.74) 40%,
+      rgba(255, 255, 255, 0.90) 72%,
+      rgba(248, 250, 253, 0.80) 100%);
   --pearl-l3-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(255, 255, 255, 0.94),
-    inset 0 -1.5px 2px rgba(15, 23, 42, 0.048),
-    0 0 0 1px rgba(255, 255, 255, 0.94),
-    0 0 0 1.5px rgba(15, 23, 42, 0.062),
-    0 3px 7px rgba(15, 23, 42, 0.042),
-    0 8px 18px -6px rgba(15, 23, 42, 0.088);
-  --pearl-l3-shadow-hover:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 2px rgba(15, 23, 42, 0.065),
-    0 0 0 1px rgba(255, 255, 255, 1),
-    0 0 0 1.5px rgba(15, 23, 42, 0.10),
-    0 5px 12px rgba(15, 23, 42, 0.06),
-    0 12px 24px -7px rgba(15, 23, 42, 0.115);
-
-  /* Layer 4: 高空纯白流光浮层（弹窗 / 底栏 / 输入舱 / 下拉菜单） */
-  --pearl-l4-bg:
-    linear-gradient(130deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.88) 46%, rgba(255, 255, 255, 0.97) 100%),
-    radial-gradient(112% 64% at 14% 0%, rgba(255, 255, 255, 1) 0%, transparent 58%);
-  --pearl-l4-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1.5px 0 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.05),
-    0 0 0 1px rgba(255, 255, 255, 0.94),
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1.5px 2px rgba(15, 23, 42, 0.055),
+    0 0 0 1px rgba(255, 255, 255, 0.90),
     0 0 0 1.5px rgba(15, 23, 42, 0.068),
-    0 10px 24px rgba(15, 23, 42, 0.075),
+    0 3px 7px rgba(15, 23, 42, 0.045),
+    0 8px 18px -6px rgba(15, 23, 42, 0.09);
+  --pearl-l3-shadow-hover:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(15, 23, 42, 0.072),
+    0 0 0 1px rgba(255, 255, 255, 0.98),
+    0 0 0 1.5px rgba(15, 23, 42, 0.11),
+    0 5px 12px rgba(15, 23, 42, 0.065),
+    0 12px 24px -7px rgba(15, 23, 42, 0.12);
+
+  /* Layer 4: 高空半透明纯白流光浮层（弹窗 / 底栏 / AI 输入舱，可透出底层模糊折射） */
+  --pearl-l4-bg:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.90) 0%,
+      rgba(255, 255, 255, 0.74) 38%,
+      rgba(255, 255, 255, 0.88) 70%,
+      rgba(250, 252, 255, 0.80) 100%);
+  --pearl-l4-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 1),
+    inset 1.5px 0 1px rgba(255, 255, 255, 0.94),
+    inset 0 -1.5px 2px rgba(15, 23, 42, 0.05),
+    0 0 0 1.5px rgba(255, 255, 255, 0.90),
+    0 0 0 2px rgba(15, 23, 42, 0.06),
+    0 10px 24px rgba(15, 23, 42, 0.08),
     0 28px 60px -12px rgba(15, 23, 42, 0.18);
 
   --r-circle: 50%;
@@ -17050,16 +17067,14 @@ html.dark body {
   --ink-secondary: #cbd5e1;
   --muted: #94a3b8;
   color: #f1f5f9;
-  /* Layer 0 暗黑：纯净深烟灰黑玻璃基底（零彩色光斑） */
   --pearl-canvas:
     radial-gradient(78% 42% at 50% -8%, rgba(255, 255, 255, 0.05) 0%, transparent 62%),
-    linear-gradient(180deg, #10131a 0%, #0c0f15 50%, #080a0f 100%);
+    linear-gradient(180deg, #10131a 0%, #0b0e14 50%, #07090e 100%);
 
-  /* Layer 1 暗黑：纯净深墨下挖毛玻璃凹槽 */
-  --pearl-l1-bg: linear-gradient(180deg, rgba(4, 6, 10, 0.84) 0%, rgba(12, 15, 21, 0.72) 55%, rgba(18, 22, 30, 0.62) 100%);
+  --pearl-l1-bg: linear-gradient(180deg, rgba(4, 6, 10, 0.85) 0%, rgba(12, 15, 21, 0.74) 55%, rgba(18, 22, 30, 0.64) 100%);
   --pearl-l1-shadow:
-    inset 0 3px 8px rgba(0, 0, 0, 0.68),
-    inset 0 1px 2px rgba(0, 0, 0, 0.50),
+    inset 0 3px 8px rgba(0, 0, 0, 0.70),
+    inset 0 1px 2px rgba(0, 0, 0, 0.52),
     inset 0 -1px 0 rgba(255, 255, 255, 0.14),
     0 0 0 1px rgba(255, 255, 255, 0.09),
     0 1px 0 rgba(255, 255, 255, 0.06);
@@ -17071,53 +17086,56 @@ html.dark body {
     0 6px 18px -4px rgba(0, 0, 0, 0.40);
   --pearl-l1-disabled-bg: linear-gradient(180deg, rgba(7, 9, 14, 0.58) 0%, rgba(16, 19, 26, 0.46) 100%);
 
-  /* Layer 2 暗黑：银白流光黑曜石玻璃卡片 */
   --pearl-l2-bg:
-    linear-gradient(128deg, rgba(255, 255, 255, 0.095) 0%, rgba(255, 255, 255, 0.02) 34%, rgba(255, 255, 255, 0.065) 62%, rgba(255, 255, 255, 0.015) 100%),
-    linear-gradient(166deg, rgba(32, 36, 46, 0.80) 0%, rgba(20, 23, 31, 0.74) 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 32%, rgba(255, 255, 255, 0.07) 58%, rgba(255, 255, 255, 0.015) 100%),
+    linear-gradient(166deg, rgba(32, 36, 46, 0.76) 0%, rgba(20, 23, 31, 0.68) 100%);
   --pearl-l2-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
-    inset 1px 0 0 rgba(255, 255, 255, 0.11),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.24),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
     inset -1px 0 0 rgba(255, 255, 255, 0.07),
     inset 0 -1px 0 rgba(0, 0, 0, 0.48),
     0 0 0 1px rgba(255, 255, 255, 0.12),
     0 3px 8px rgba(0, 0, 0, 0.30),
     0 14px 32px -10px rgba(0, 0, 0, 0.52);
   --pearl-l2-shadow-hover:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
-    inset 1px 0 0 rgba(255, 255, 255, 0.16),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
     inset -1px 0 0 rgba(255, 255, 255, 0.10),
-    0 0 0 1px rgba(255, 255, 255, 0.20),
+    0 0 0 1px rgba(255, 255, 255, 0.22),
     0 16px 36px -10px rgba(0, 0, 0, 0.62);
 
-  /* Layer 3 暗黑：银白流光烟灰上凸件 */
+  --pearl-l2-inner-bg:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.025) 100%);
+  --pearl-l2-inner-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+
   --pearl-l3-bg:
-    linear-gradient(132deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.03) 48%, rgba(255, 255, 255, 0.08) 100%),
-    linear-gradient(180deg, rgba(44, 49, 60, 0.90) 0%, rgba(28, 32, 41, 0.85) 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.035) 48%, rgba(255, 255, 255, 0.09) 100%),
+    linear-gradient(180deg, rgba(44, 49, 60, 0.88) 0%, rgba(28, 32, 41, 0.82) 100%);
   --pearl-l3-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.24),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.25),
     inset 0 -1.5px 2px rgba(0, 0, 0, 0.48),
     0 0 0 1px rgba(255, 255, 255, 0.15),
     0 3px 10px rgba(0, 0, 0, 0.36),
     0 12px 28px -8px rgba(0, 0, 0, 0.56);
   --pearl-l3-shadow-hover:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.34),
     inset 0 -1px 2px rgba(0, 0, 0, 0.44),
     0 0 0 1px rgba(255, 255, 255, 0.24),
     0 6px 18px rgba(0, 0, 0, 0.48);
 
-  /* Layer 4 暗黑：银白流光烟黑浮层 */
   --pearl-l4-bg:
-    linear-gradient(130deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.02) 52%, rgba(255, 255, 255, 0.06) 100%),
-    linear-gradient(166deg, rgba(26, 30, 39, 0.93) 0%, rgba(16, 19, 26, 0.89) 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.025) 52%, rgba(255, 255, 255, 0.07) 100%),
+    linear-gradient(166deg, rgba(26, 30, 39, 0.90) 0%, rgba(16, 19, 26, 0.85) 100%);
   --pearl-l4-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.24),
     inset 0 -1px 0 rgba(0, 0, 0, 0.52),
-    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.16),
     0 26px 60px -12px rgba(0, 0, 0, 0.74);
 }
 
-/* ---- Layer 0: 纯净无色淡灰玻璃基底 ---- */
+/* ---- Layer 0: 轻盈淡灰毛玻璃基底 ---- */
 body {
   background-image: var(--pearl-canvas) !important;
   background-attachment: fixed;
@@ -17129,10 +17147,9 @@ html.dark body::before {
 }
 
 /* ============================================================================
-   【Layer 1：纯中性深磨砂灰下挖毛玻璃孔】搜索栏 / 输入框 / 滑槽 / 侧栏预选中
+   【侧边栏 & 底栏专属双态】未选中 Hover = 下挖毛玻璃孔 ｜ 已选中 Active = 用户原版蓝色折光玻璃
    ============================================================================ */
 
-/* 侧边栏「预选中（Hover / Focus）」专项：与搜索栏 100% 同源的向内下挖毛玻璃孔（含 .lg-slide-host 高优先级覆盖） */
 #sidebar .nav:not(.active):hover,
 #sidebar.lg-slide-host > .nav:not(.active):hover,
 #sidebar .nav:not(.active):focus-visible,
@@ -17165,50 +17182,65 @@ html.dark #sidebar.lg-slide-host > .nav:not(.active):active {
   transform: scale(0.985) !important;
 }
 
-/* 侧边栏「已选中」滑块：洁白流光透光晶态（与未选中悬停的灰色下挖毛玻璃孔形成一凹一亮层次） */
+/* 100% 原汁原味恢复用户专属「蓝色折光液态玻璃」侧边栏与底栏选中态 */
 .lg-slide-pill.is-nav-glass {
   background:
-    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 48%, rgba(255, 255, 255, 0.98) 100%) !important;
-  backdrop-filter: blur(22px) saturate(165%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.10) 52%, transparent 100%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.13) 0%, rgba(37, 99, 235, 0.20) 100%) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
   border: 0 !important;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 1px 0 0 rgba(255, 255, 255, 0.95),
-    0 0 0 1px rgba(37, 99, 235, 0.22),
-    0 3px 10px -2px rgba(37, 99, 235, 0.14),
-    0 2px 5px rgba(15, 23, 42, 0.04) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.94),
+    inset 0 -1px 0 rgba(37, 99, 235, 0.16),
+    0 0 0 1px rgba(37, 99, 235, 0.26),
+    0 1px 3px rgba(37, 99, 235, 0.10),
+    0 5px 14px -4px rgba(37, 99, 235, 0.22) !important;
 }
 html.dark .lg-slide-pill.is-nav-glass {
   background:
-    linear-gradient(132deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 52%, rgba(255, 255, 255, 0.09) 100%),
-    linear-gradient(160deg, rgba(37, 99, 235, 0.34) 0%, rgba(29, 78, 216, 0.22) 100%) !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(191, 219, 254, 0.26) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.19) 100%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
-    0 0 0 1px rgba(96, 165, 250, 0.40),
-    0 6px 16px -4px rgba(0, 0, 0, 0.45) !important;
+    inset 0 1px 0 rgba(224, 242, 254, 0.34),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.34),
+    0 0 0 1px rgba(147, 197, 253, 0.36),
+    0 4px 14px -4px rgba(37, 99, 235, 0.34) !important;
 }
-html.dark #sidebar .nav.active {
-  color: #e0f2fe !important;
-}
-#sidebar:not(.lg-has-slider) .nav.active {
+#sidebar:not(.lg-slide-host) .nav.active,
+.mobile-tabbar:not(.lg-slide-host) .tab-item.active {
   background:
-    linear-gradient(132deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.88) 48%, rgba(255, 255, 255, 0.98) 100%) !important;
-  border: 0 !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.10) 52%, transparent 100%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.13) 0%, rgba(37, 99, 235, 0.20) 100%) !important;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    0 0 0 1px rgba(37, 99, 235, 0.22),
-    0 3px 10px -2px rgba(37, 99, 235, 0.14) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.94),
+    inset 0 -1px 0 rgba(37, 99, 235, 0.16),
+    0 0 0 1px rgba(37, 99, 235, 0.26),
+    0 5px 14px -4px rgba(37, 99, 235, 0.22) !important;
+  border: 0 !important;
 }
-html.dark #sidebar:not(.lg-has-slider) .nav.active {
+html.dark #sidebar:not(.lg-slide-host) .nav.active,
+html.dark .mobile-tabbar:not(.lg-slide-host) .tab-item.active {
   background:
-    linear-gradient(132deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 52%, rgba(255, 255, 255, 0.12) 100%),
-    linear-gradient(160deg, rgba(59, 130, 246, 0.26) 0%, rgba(37, 99, 235, 0.16) 100%) !important;
-  border: 0 !important;
+    radial-gradient(120% 90% at 24% 0%, rgba(191, 219, 254, 0.26) 0%, transparent 56%),
+    linear-gradient(160deg, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.19) 100%) !important;
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.34),
-    0 0 0 1px rgba(147, 197, 253, 0.34) !important;
+    inset 0 1px 0 rgba(224, 242, 254, 0.34),
+    0 0 0 1px rgba(147, 197, 253, 0.36) !important;
+  border: 0 !important;
 }
+#sidebar .nav.active,
+.mobile-tabbar .tab-item.active {
+  color: #1d4ed8 !important;
+}
+html.dark #sidebar .nav.active,
+html.dark .mobile-tabbar .tab-item.active {
+  color: #bfdbfe !important;
+}
+
+/* ============================================================================
+   【Layer 1：纯中性深磨砂灰下挖毛玻璃孔】搜索栏 / 输入框 / 文本域 / 滑槽
+   ============================================================================ */
 
 .search-box,
 .school-search-wrap,
@@ -17281,7 +17313,6 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
     var(--pearl-l1-focus-bg) !important;
 }
 
-/* 桌面端顶栏：统一 38px 基线 + 放宽搜索槽（250px）+ 中屏头像纯圆 */
 @media (min-width: 761px) {
   main > header .header-right {
     display: inline-flex !important;
@@ -17386,7 +17417,6 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
   }
 }
 
-/* 全站单行表单输入框 / 表单下拉槽 / 表单日期槽：999px 饱满中性灰下挖孔 */
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(#globalSearchInput):not(#schoolSearchInput),
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) select,
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) .xz-select-trigger,
@@ -17504,7 +17534,6 @@ html.dark dialog:not(#docDialog):not(#xzNativeSettingsDlg) input:disabled {
   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.07) !important;
 }
 
-/* 全站多行文本域 textarea：18px 纯中性灰下挖孔 */
 dialog:not(#docDialog):not(#xzNativeSettingsDlg) textarea,
 .campus-tool-page #noticeParserText,
 .campus-tool-page textarea,
@@ -17528,7 +17557,7 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) textarea:focus,
   box-shadow: var(--pearl-l1-focus-shadow) !important;
 }
 
-/* 全站分段滑槽 & 进度底轨 */
+/* 全站分段滑槽 & 进度底轨：统一 4px 呼吸内边距，杜绝蓝色滑块贴边裁切 */
 .ai-seg,
 .sched-d-seg,
 .sched-m-seg,
@@ -17553,9 +17582,16 @@ html.dark #academicTabs {
   background: var(--pearl-l1-bg) !important;
   box-shadow: var(--pearl-l1-shadow) !important;
 }
+.sched-m-seg,
+.sched-d-seg,
+#schedToolsTabs,
+#academicTabs,
+.authbox .tabs {
+  padding: 4px !important;
+}
 
 /* ============================================================================
-   【Layer 2：白色流光玻璃卡片大一统】统一更白、更透光、同族圆角与流光高光边
+   【Layer 2：安卓卡级半透明白色流光玻璃卡片大一统】全站 12 页面一级卡片 100% 统一
    ============================================================================ */
 
 .welcome,
@@ -17566,6 +17602,7 @@ html.dark #academicTabs {
 #knowledgeGrid .knowledge-card,
 #knowledgeGrid .knowledge-card:last-child,
 .sched-d-header,
+.sched-d-dstrip,
 .sched-today-card,
 .sched-matrix-card,
 .sched-manage-card,
@@ -17577,7 +17614,6 @@ body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 #analyticsPage .panel,
 #analyticsPage .stats article,
 .campus-tool-page .panel,
-.campus-tool-page .elig-form-card,
 .campus-tool-page .ct-card,
 html.dark .welcome,
 html.dark .home-sched-strip,
@@ -17586,6 +17622,7 @@ html.dark .stats article,
 html.dark .notice-card,
 html.dark .knowledge-card,
 html.dark .sched-d-header,
+html.dark .sched-d-dstrip,
 html.dark .sched-today-card,
 html.dark .sched-matrix-card,
 html.dark .sched-manage-card,
@@ -17597,7 +17634,6 @@ html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble,
 html.dark #analyticsPage .panel,
 html.dark #analyticsPage .stats article,
 html.dark .campus-tool-page .panel,
-html.dark .campus-tool-page .elig-form-card,
 html.dark .campus-tool-page .ct-card,
 html.dark #knowledgeGrid .knowledge-card,
 html.dark #knowledgeGrid .knowledge-card:last-child {
@@ -17609,42 +17645,71 @@ html.dark #knowledgeGrid .knowledge-card:last-child {
   box-shadow: var(--pearl-l2-shadow) !important;
 }
 
-/* 同族紧凑行卡与分析子卡：共享完全一致的白色流光玻璃材质，20px 协调圆角 */
 .taskrow,
 .user-row,
 .sched-sub-card.is-accent,
+html.dark .taskrow,
+html.dark .user-row,
+html.dark .sched-sub-card.is-accent {
+  border-radius: 20px !important;
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+  border: 0 !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+}
+
 #analyticsPage .stat-ring-box,
 #analyticsPage .stat-metric,
 #analyticsPage .stat-bars,
 #analyticsPage .gov-topic-row,
 #analyticsPage .gov-spot-row,
 #analyticsPage .gov-empty,
+.campus-tool-page .elig-form-card,
 .campus-tool-page .ct-kpi,
 .campus-tool-page .ct-list,
-html.dark .taskrow,
-html.dark .user-row,
-html.dark .sched-sub-card.is-accent,
+#messages .welcome-foot,
 html.dark #analyticsPage .stat-ring-box,
 html.dark #analyticsPage .stat-metric,
 html.dark #analyticsPage .stat-bars,
 html.dark #analyticsPage .gov-topic-row,
 html.dark #analyticsPage .gov-spot-row,
 html.dark #analyticsPage .gov-empty,
+html.dark .campus-tool-page .elig-form-card,
 html.dark .campus-tool-page .ct-kpi,
-html.dark .campus-tool-page .ct-list {
-  border-radius: 20px !important;
-  background: var(--pearl-l2-bg) !important;
-  backdrop-filter: blur(26px) saturate(165%) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+html.dark .campus-tool-page .ct-list,
+html.dark #messages .welcome-foot {
+  border-radius: 18px !important;
+  background: var(--pearl-l2-inner-bg) !important;
   border: 0 !important;
-  box-shadow: var(--pearl-l2-shadow) !important;
+  box-shadow: var(--pearl-l2-inner-shadow) !important;
+}
+#messages .welcome-foot {
+  border-radius: var(--r-pill) !important;
+  color: var(--ink-secondary) !important;
 }
 
-/* 首页课表条补齐舒展内边距，与上下白色流光卡完全融为一体 */
+/* AI 页顶栏、热门提问条 & 移动端课表粘性顶栏：统一洁白半透流光玻璃（告别死灰/死白块） */
+body.on-ai-page .chat-topbar,
+body.on-ai-page .suggestions-bar,
+.sched-m-sticky,
+html.dark body.on-ai-page .chat-topbar,
+html.dark body.on-ai-page .suggestions-bar,
+html.dark .sched-m-sticky {
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+  border-color: rgba(15, 23, 42, 0.055) !important;
+}
+html.dark body.on-ai-page .chat-topbar,
+html.dark body.on-ai-page .suggestions-bar,
+html.dark .sched-m-sticky {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 .home-sched-strip {
   padding: 12px 16px !important;
 }
-
 #knowledgeGrid,
 html.dark #knowledgeGrid {
   background: transparent !important;
@@ -17654,6 +17719,28 @@ html.dark #knowledgeGrid {
 #knowledgeGrid .knowledge-card h3 {
   color: var(--ink) !important;
 }
+/* 消除校规卡片内按钮与元信息粘连 */
+#knowledgeGrid .kb-actions,
+#knowledgePage .knowledge-card-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+#knowledgeGrid .kb-top {
+  gap: 8px !important;
+}
+/* 蓝底 AI 按钮内彩色星标强制转纯白高光，消除蓝底蓝标低对比度 */
+#gpaAskAiBtn .ico-star,
+button.primary .ico-star {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18)) !important;
+}
+/* 消除学业页空容器占位留白 */
+#gpaSummary:empty,
+#gpaAlertBox:empty,
+#gpaCourseList:empty {
+  display: none !important;
+}
+
 html.dark h1,
 html.dark h2,
 html.dark h3,
@@ -17691,7 +17778,7 @@ html.dark #knowledgeGrid .doc-index {
 }
 
 /* ============================================================================
-   【Layer 3：更白的纯白流光凸起玻璃按钮 & 胶囊】全量收编（含常见事务芯片/筛选胶囊/徽章）
+   【Layer 3：半透明纯白流光凸起按钮 & 胶囊】全量收编 + 同行等高对齐 + 语义逻辑分层
    ============================================================================ */
 
 #sidebar,
@@ -17722,6 +17809,9 @@ dialog:not(#docDialog):not(#xzNativeSettingsDlg) .actions button.secondary,
 .welcome .date,
 .home-sched-pill,
 .panelhead .link,
+#aiSchoolBtn.ai-seg-school,
+.ai-seg-school,
+.sched-sync-badge,
 .toolbar select,
 .toolbar .xz-select-trigger,
 #noticesPage #category:not(.xz-native-select-hidden),
@@ -17753,6 +17843,9 @@ html.dark .quick-tags button:not(.active),
 html.dark .welcome .date,
 html.dark .home-sched-pill,
 html.dark .panelhead .link,
+html.dark #aiSchoolBtn.ai-seg-school,
+html.dark .ai-seg-school,
+html.dark .sched-sync-badge,
 html.dark .toolbar select,
 html.dark .toolbar .xz-select-trigger,
 html.dark #noticesPage #category:not(.xz-native-select-hidden),
@@ -17774,7 +17867,6 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   color: var(--ink) !important;
   transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
 }
-/* 保留功能链接/状态胶囊的品牌蓝文字可读性，同时载体完全纯白流光化 */
 .panelhead .link,
 .home-sched-pill {
   color: var(--blue) !important;
@@ -17783,6 +17875,40 @@ html.dark #messages .bubble-tools button:not(.is-high) {
 html.dark .panelhead .link,
 html.dark .home-sched-pill {
   color: #93c5fd !important;
+}
+
+.ct-foot-actions {
+  align-items: center !important;
+}
+.ct-foot-actions button,
+.ct-inline-form button.primary {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+#addTaskForm input:not([type="checkbox"]):not([type="radio"]),
+#addTaskForm .xz-date-trigger,
+#addTaskForm button.primary {
+  height: 42px !important;
+  min-height: 42px !important;
+}
+#gpaResetDemoBtn:hover,
+#clearDone:hover,
+html.dark #gpaResetDemoBtn:hover,
+html.dark #clearDone:hover {
+  color: #dc2626 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.96),
+    0 0 0 1.5px rgba(220, 38, 38, 0.28),
+    0 6px 16px -4px rgba(220, 38, 38, 0.18) !important;
+}
+html.dark #gpaResetDemoBtn:hover,
+html.dark #clearDone:hover {
+  color: #fca5a5 !important;
 }
 
 @media (hover: hover) {
@@ -17798,6 +17924,7 @@ html.dark .home-sched-pill {
   .mini-chips button:not(.active):hover,
   .quick-tags button:not(.active):hover,
   .panelhead .link:hover,
+  #aiSchoolBtn.ai-seg-school:hover,
   .toolbar select:hover,
   .toolbar .xz-select-trigger:hover,
   .user-row select:hover,
@@ -17846,6 +17973,7 @@ dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 #docDialog .doc-m-btn:not(.is-ai),
 #docBackTopBtn,
 #aiPage #askAttachBtn,
+#aiPage #askSubmitBtn.is-idle,
 .notice-actions button.icon-only:not(.danger),
 .task-del-btn:not(.danger),
 .sug-nav-btn,
@@ -17855,7 +17983,9 @@ html.dark dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 html.dark #docDialog #closeDocDialog,
 html.dark #globalSearchDialog #closeGlobalSearchDlg,
 html.dark #docDialog .doc-m-btn:not(.is-ai),
-html.dark #docBackTopBtn {
+html.dark #docBackTopBtn,
+html.dark #aiPage #askAttachBtn,
+html.dark #aiPage #askSubmitBtn.is-idle {
   border-radius: var(--r-circle) !important;
   border: 0 !important;
   background: var(--pearl-l3-bg) !important;
@@ -17917,7 +18047,7 @@ html.dark #docBackTopBtn {
 }
 
 /* ============================================================================
-   【Layer 4：高空纯白流光浮层】全站 13 弹窗 / 弹层 / 悬浮底栏 / 输入舱
+   【Layer 4：高空半透明纯白流光浮层】13 弹窗 / 弹层 / 悬浮底栏 / AI 输入舱
    ============================================================================ */
 
 dialog:not(#xzNativeSettingsDlg),
@@ -17956,8 +18086,8 @@ html.dark body.on-ai-page .ask .ask-input-wrap,
 html.dark .scroll-bottom-btn,
 html.dark body #toast.toast {
   background: var(--pearl-l4-bg) !important;
-  backdrop-filter: blur(32px) saturate(165%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(165%) !important;
+  backdrop-filter: blur(30px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(175%) !important;
   border: 0 !important;
   box-shadow: var(--pearl-l4-shadow) !important;
 }
@@ -17966,7 +18096,7 @@ body #toast.toast {
   border-radius: var(--r-pill) !important;
 }
 dialog::backdrop {
-  background: rgba(15, 23, 42, 0.24) !important;
+  background: rgba(15, 23, 42, 0.22) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
 }
@@ -17983,35 +18113,117 @@ dialog button:focus:not(:focus-visible),
 }
 
 /* ============================================================================
-   【桌面端 + 移动端细节融洽度精修（继承 v1.131/v1.132 全部验证修复）】
+   【登录页（桌面 + 移动端统一清透淡灰背景 + 白色流光玻璃卡）】
    ============================================================================ */
 
-@media (min-width: 901px) {
+#auth.auth:not(.hide),
+html.dark #auth.auth:not(.hide) {
+  background: var(--pearl-canvas) !important;
+}
+@media (max-width: 900px) {
+  /* 彻底消灭移动端登录页旧版大块死蓝顶栏与蓝底 overscroll，与全站清透淡灰 + 白色流光玻璃 100% 统一 */
+  html:not(.app-booting):has(#auth:not(.hide)),
+  body:not(:has(#auth.hide)):has(#auth:not(.hide)),
+  html.dark:not(.app-booting):has(#auth:not(.hide)),
+  html.dark body:not(:has(#auth.hide)):has(#auth:not(.hide)) {
+    background: var(--pearl-canvas) !important;
+  }
   #auth.auth:not(.hide),
   html.dark #auth.auth:not(.hide) {
     background: var(--pearl-canvas) !important;
+    min-height: 100dvh !important;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+  #auth.auth:not(.hide) .hero,
+  html.dark #auth.auth:not(.hide) .hero {
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 4px 8px 2px !important;
+    text-align: center !important;
+    overflow: visible !important;
+  }
+  #auth.auth:not(.hide) .hero::before,
+  #auth.auth:not(.hide) .hero::after {
+    display: none !important;
+    content: none !important;
+  }
+  #auth.auth:not(.hide) .hero-top {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 10px !important;
+  }
+  #auth.auth:not(.hide) .hero .logo {
+    margin: 0 auto !important;
+  }
+  #auth.auth:not(.hide) .hero h1,
+  html.dark #auth.auth:not(.hide) .hero h1 {
+    color: var(--ink) !important;
+    text-shadow: none !important;
+    font-size: 27px !important;
+    margin: 0 0 6px !important;
+  }
+  #auth.auth:not(.hide) .hero > p,
+  #auth.auth:not(.hide) .hero .hero-copy p,
+  html.dark #auth.auth:not(.hide) .hero > p,
+  html.dark #auth.auth:not(.hide) .hero .hero-copy p {
+    color: var(--muted) !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+  }
+  #auth.auth:not(.hide) .authbox,
+  html.dark #auth.auth:not(.hide) .authbox {
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    padding: 22px 20px 20px !important;
+    border-radius: var(--r-modal) !important;
+    background: var(--pearl-l4-bg) !important;
+    box-shadow: var(--pearl-l4-shadow) !important;
+    backdrop-filter: blur(28px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+  }
+  #auth .auth-theme-btn {
+    display: inline-flex !important;
+    position: fixed !important;
+    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    right: 14px !important;
+    z-index: 40 !important;
+  }
+}
+@media (min-width: 901px) {
+  #auth.auth:not(.hide),
+  html.dark #auth.auth:not(.hide) {
     min-height: 100dvh !important;
     align-content: center !important;
     align-items: stretch !important;
   }
   #auth.auth:not(.hide) .hero,
-  html.dark #auth.auth:not(.hide) .hero {
-    border-radius: var(--r-card) !important;
-    background: var(--pearl-l2-bg) !important;
-    box-shadow: var(--pearl-l2-shadow) !important;
-    backdrop-filter: blur(26px) saturate(165%) !important;
-    -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+  #auth.auth:not(.hide) .authbox,
+  html.dark #auth.auth:not(.hide) .hero,
+  html.dark #auth.auth:not(.hide) .authbox {
+    border-radius: var(--r-modal) !important;
+    background: var(--pearl-l4-bg) !important;
+    box-shadow: var(--pearl-l4-shadow) !important;
+    backdrop-filter: blur(28px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
   }
   #auth.auth:not(.hide) .hero-list p,
   html.dark #auth.auth:not(.hide) .hero-list p {
     background: var(--pearl-l3-bg) !important;
     box-shadow: var(--pearl-l3-shadow) !important;
     border: 0 !important;
-  }
-  #auth.auth:not(.hide) .authbox,
-  html.dark #auth.auth:not(.hide) .authbox {
-    background: var(--pearl-l4-bg) !important;
-    box-shadow: var(--pearl-l4-shadow) !important;
   }
   #auth .auth-theme-btn {
     position: fixed !important;
@@ -18038,6 +18250,10 @@ html.dark .demo-login-link:hover {
   background: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* ============================================================================
+   【桌面端 + 移动端全局排版与防裁切精修（保留 AI 聊天气泡原始左右对齐，不居中！）】
+   ============================================================================ */
+
 @media (min-width: 761px) {
   main {
     margin-left: 240px;
@@ -18061,17 +18277,7 @@ html.dark .demo-login-link:hover {
   margin-bottom: 14px !important;
 }
 
-@media (min-width: 961px) {
-  body.on-ai-page #messages > .bubble-wrap.msg-ai:has(.welcome-bubble) {
-    align-self: center !important;
-    width: 100% !important;
-    max-width: min(92%, 860px) !important;
-  }
-  body.on-ai-page #messages > .bubble-wrap.msg-ai > .welcome-bubble {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-}
+/* AI 对话滚动区顶部柔和羽化（严禁改变气泡原本的左/右对齐方向！） */
 body.on-ai-page #messages {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 100%);
@@ -18148,11 +18354,64 @@ body.on-ai-page #messages {
   }
 }
 
+/* 移动端专项细节精修（全面修复 AI 顶栏按钮粘连、横向胶囊投影裁切、欢迎卡单字孤行与底栏留白） */
 @media (max-width: 760px) {
   .wrap {
     padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .sched-week-chip {
     padding-bottom: 9px !important;
+  }
+  /* M-A: 移动端 AI 顶栏 3 个工具圆钮留出舒适间距 + 统一 36×36 正圆 */
+  #aiPage .chat-top-actions {
+    gap: 8px !important;
+  }
+  #aiPage .chat-top-actions button {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  /* M-A2: 移动端 AI 欢迎网格紧凑排版，确保四格副标题均优雅单行对齐、杜绝单字孤行 */
+  #messages .welcome-grid {
+    gap: 8px !important;
+  }
+  #messages .welcome-item {
+    padding: 10px 8px !important;
+    gap: 7px !important;
+    align-items: center !important;
+  }
+  #messages .welcome-item > span {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 9px !important;
+  }
+  #messages .welcome-item > span .ico {
+    width: 15px !important;
+    height: 15px !important;
+  }
+  #messages .welcome-item b {
+    font-size: 12.5px !important;
+  }
+  #messages .welcome-item small {
+    font-size: 10.5px !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.32 !important;
+    white-space: nowrap !important;
+  }
+  /* M-D: 横向滚动筛选胶囊行增加上下内留白与右缘柔和羽化，杜绝玻璃投影被裁切 */
+  .pill-row,
+  #knowledgePills,
+  #suggestionsTrack {
+    padding: 6px 14px 12px 4px !important;
+    margin: -6px -4px -4px !important;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 22px), transparent 100%);
   }
 }

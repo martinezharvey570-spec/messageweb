@@ -632,14 +632,26 @@ function scroll_messages_to_bottom(force = false) {
   }
 }
 
+const TOOLBOX_PAGES = new Set(["parser", "academic", "guide", "schedtools"]);
+let last_toolbox_page = "parser";
+
 function go(p) {
+  if (p === "toolbox") p = last_toolbox_page || "parser";
+  const isToolbox = TOOLBOX_PAGES.has(p);
+  if (isToolbox) last_toolbox_page = p;
   cur_page = p;
   ["home", "notices", "tasks", "ai", "knowledge", "schedule", "parser", "academic", "guide", "schedtools", "users", "analytics"].forEach(x =>
     $(`${x}Page`)?.classList.toggle("hide", x !== p)
   );
+  $("toolboxTopbar")?.classList.toggle("hide", !isToolbox);
+  $("toolboxTabs")?.querySelectorAll(".tb-tab[data-tb]").forEach(b => {
+    const on = b.dataset.tb === p;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+  });
   document.body.classList.toggle("on-ai-page", p === "ai");
   document.querySelectorAll(".nav").forEach(b =>
-    b.classList.toggle("active", b.dataset.page === p)
+    b.classList.toggle("active", b.dataset.page === p || (b.dataset.page === "toolbox" && isToolbox))
   );
   document.querySelectorAll(".tab-item").forEach(b =>
     b.classList.toggle("active", b.dataset.page === p)
@@ -5605,6 +5617,58 @@ async function compress_sched_image_slices(file) {
   let aiImportRefining = false;
 
   const SCHED_TYPES_LIST = ["理论", "实验", "上机", "线上", "体育", "其他"];
+  const schedAiDraftKey = () => `xz_sched_ai_draft_v1_${me?.id || "anon"}`;
+
+  function normalize_ai_warnings(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .map(w => {
+        if (typeof w === "string") {
+          const msg = w.trim();
+          return msg ? { type: "note", indices: [], message: msg } : null;
+        }
+        if (w && typeof w === "object") {
+          const msg = String(w.message || w.reason || w.text || "").trim();
+          return msg ? { ...w, indices: Array.isArray(w.indices) ? w.indices : [], message: msg } : null;
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }
+
+  function save_ai_import_draft() {
+    try {
+      const list = Array.isArray(pendingParsedCourses) ? pendingParsedCourses : [];
+      if (!list.length) {
+        localStorage.removeItem(schedAiDraftKey());
+        return;
+      }
+      localStorage.setItem(schedAiDraftKey(), JSON.stringify({
+        ts: Date.now(),
+        courses: list,
+        warnings: normalize_ai_warnings(pendingParsedWarnings),
+        notes: pendingParsedNotes || ""
+      }));
+    } catch {}
+  }
+
+  function load_ai_import_draft() {
+    try {
+      const raw = localStorage.getItem(schedAiDraftKey());
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      if (!d || !Array.isArray(d.courses) || !d.courses.length) return null;
+      if (d.ts && Date.now() - Number(d.ts) > 7 * 86400 * 1000) {
+        localStorage.removeItem(schedAiDraftKey());
+        return null;
+      }
+      return d;
+    } catch { return null; }
+  }
+
+  function clear_ai_import_draft() {
+    try { localStorage.removeItem(schedAiDraftKey()); } catch {}
+  }
 
   function audit_parsed_courses_client(courses) {
     const list = Array.isArray(courses) ? courses : [];
@@ -5634,11 +5698,18 @@ async function compress_sched_image_slices(file) {
 
   function update_ai_confirm_btn() {
     const btn = $("schedAiConfirmBtn");
-    if (!btn) return;
+    const runBtn = $("schedAiRunBtn");
     const count = Array.isArray(pendingParsedCourses) ? pendingParsedCourses.length : 0;
-    btn.classList.toggle("hide", count === 0);
-    const span = btn.querySelector("span");
-    if (span) span.textContent = count ? `确认导入 (${count}条)` : "确认导入课表";
+    if (btn) {
+      btn.classList.toggle("hide", count === 0);
+      const span = btn.querySelector("span");
+      if (span) span.textContent = count ? `确认导入 (${count}条)` : "确认导入课表";
+    }
+    if (runBtn) {
+      runBtn.classList.toggle("is-secondary", count > 0);
+      const rSpan = runBtn.querySelector("span");
+      if (rSpan) rSpan.textContent = count > 0 ? "重新识别" : "开始 AI 深度识别";
+    }
   }
 
   function format_picked_ai_files_label(files) {
@@ -5679,8 +5750,12 @@ async function compress_sched_image_slices(file) {
       return;
     }
 
+    const cleanWarnings = normalize_ai_warnings(pendingParsedWarnings);
+    pendingParsedWarnings = cleanWarnings;
+    save_ai_import_draft();
+
     const warnIdxSet = new Set();
-    (pendingParsedWarnings || []).forEach(w => {
+    cleanWarnings.forEach(w => {
       if (Array.isArray(w.indices)) w.indices.forEach(i => warnIdxSet.add(Number(i)));
     });
 
@@ -5692,10 +5767,10 @@ async function compress_sched_image_slices(file) {
       ? `<div class="sched-ai-wb-notes"><span>AI 备注：</span>${schedEsc(pendingParsedNotes)}</div>`
       : "";
 
-    const warnHtml = pendingParsedWarnings && pendingParsedWarnings.length
+    const warnHtml = cleanWarnings.length
       ? `<div class="sched-ai-warn-box">
-          <div class="sched-ai-warn-title">发现 ${pendingParsedWarnings.length} 处需复核提示（可点击下方条目直接修改）</div>
-          <ul>${pendingParsedWarnings.slice(0, 5).map(w => `<li>${schedEsc(w.message)}</li>`).join("")}${pendingParsedWarnings.length > 5 ? `<li>…其余 ${pendingParsedWarnings.length - 5} 处已在下方高亮标出</li>` : ""}</ul>
+          <div class="sched-ai-warn-title">发现 ${cleanWarnings.length} 处需复核提示（可点击下方条目直接修改）</div>
+          <ul>${cleanWarnings.slice(0, 5).map(w => `<li>${schedEsc(w.message)}</li>`).join("")}${cleanWarnings.length > 5 ? `<li>…其余 ${cleanWarnings.length - 5} 处已在下方高亮标出</li>` : ""}</ul>
         </div>`
       : "";
 
@@ -5772,9 +5847,12 @@ async function compress_sched_image_slices(file) {
       <div class="sched-ai-wb-head">
         <div>
           <b>识别核对工作台（共 ${list.length} 条）</b>
-          <small>点击课程可逐条修改，或在下方用自然语言让 AI 批量修正</small>
+          <small>已自动暂存草稿 · 点击课程可逐条修改，或在下方用自然语言批量修正</small>
         </div>
-        <button type="button" class="sched-ai-wb-add" data-wb-act="add">+ 补加一条</button>
+        <div class="sched-ai-wb-head-ops">
+          <button type="button" class="sched-ai-wb-add" data-wb-act="add">+ 补加一条</button>
+          <button type="button" class="sched-ai-wb-clear" data-wb-act="clear-draft">清空草稿</button>
+        </div>
       </div>
       ${notesHtml}
       ${warnHtml}
@@ -5925,6 +6003,17 @@ async function compress_sched_image_slices(file) {
         : "已清空全部识别结果，可重新识别或点击“+ 补加一条”手动录入。");
       return;
     }
+    if (act === "clear-draft") {
+      pendingParsedCourses = null;
+      pendingParsedWarnings = [];
+      pendingParsedNotes = "";
+      editingParsedIdx = -1;
+      clear_ai_import_draft();
+      render_ai_parsed_workbench();
+      set_ai_import_status("已清空暂存草稿，可重新上传文件或粘贴文字识别。");
+      toast("已清空课表识别草稿");
+      return;
+    }
     if (act === "refine") {
       run_ai_schedule_refine();
     }
@@ -5950,22 +6039,46 @@ async function compress_sched_image_slices(file) {
 
   const openAiImportModal = () => {
     pendingAiFiles = [];
-    pendingParsedCourses = null;
-    pendingParsedWarnings = [];
-    pendingParsedNotes = "";
     editingParsedIdx = -1;
     aiImportRefining = false;
-    $("schedAiPreview")?.classList.add("hide");
-    if ($("schedAiPreview")) $("schedAiPreview").innerHTML = "";
-    update_ai_confirm_btn();
     if ($("schedAiFileLabel")) $("schedAiFileLabel").textContent = format_picked_ai_files_label([]);
     if ($("schedAiPasteText")) $("schedAiPasteText").value = "";
-    set_ai_import_status("");
+
+    const savedDraft = (!Array.isArray(pendingParsedCourses) || !pendingParsedCourses.length)
+      ? load_ai_import_draft()
+      : null;
+    if (savedDraft) {
+      pendingParsedCourses = savedDraft.courses;
+      pendingParsedWarnings = normalize_ai_warnings(savedDraft.warnings);
+      pendingParsedNotes = String(savedDraft.notes || "");
+    }
+
+    if (Array.isArray(pendingParsedCourses) && pendingParsedCourses.length) {
+      render_ai_parsed_workbench();
+      set_ai_import_status(`已自动恢复上次未导入的 ${pendingParsedCourses.length} 条识别草稿，可继续核对或点“清空草稿”重写。`);
+    } else {
+      pendingParsedCourses = null;
+      pendingParsedWarnings = [];
+      pendingParsedNotes = "";
+      $("schedAiPreview")?.classList.add("hide");
+      if ($("schedAiPreview")) $("schedAiPreview").innerHTML = "";
+      update_ai_confirm_btn();
+      set_ai_import_status("");
+    }
     $("scheduleAiImportDialog")?.showModal();
   };
 
   $("schedImportImgBtn")?.addEventListener("click", openAiImportModal);
-  $("closeSchedAiImportDlg")?.addEventListener("click", () => $("scheduleAiImportDialog")?.close());
+  $("closeSchedAiImportDlg")?.addEventListener("click", () => {
+    save_ai_import_draft();
+    $("scheduleAiImportDialog")?.close();
+  });
+  $("schedAiSaveCloseBtn")?.addEventListener("click", () => {
+    const hasDraft = Array.isArray(pendingParsedCourses) && pendingParsedCourses.length > 0;
+    save_ai_import_draft();
+    $("scheduleAiImportDialog")?.close();
+    if (hasDraft) toast(`已暂存 ${pendingParsedCourses.length} 条课表草稿，下次打开可继续核对`);
+  });
   ["scheduleCourseDialog", "scheduleSettingDialog", "scheduleTimetableDialog", "scheduleAiImportDialog"].forEach(id => {
     const dlg = $(id);
     dlg?.addEventListener("click", e => {
@@ -6063,6 +6176,7 @@ async function compress_sched_image_slices(file) {
     pendingParsedWarnings = [];
     pendingParsedNotes = "";
     editingParsedIdx = -1;
+    clear_ai_import_draft();
     schedQueueSync();
     render_schedule_all();
     $("scheduleAiImportDialog")?.close();
@@ -7017,6 +7131,11 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   const setupAll = () => {
     bindSlider(document.querySelector(".mobile-tabbar"), ".tab-item", ".tab-item.active", "is-nav-glass");
     bindSlider(document.getElementById("sidebar"), ".nav", ".nav.active", "is-nav-glass");
+    bindSlider(document.getElementById("toolboxTabs"), ".tb-tab", ".tb-tab.active", "is-blue");
+    document.getElementById("toolboxTabs")?.addEventListener("click", e => {
+      const btn = e.target.closest(".tb-tab[data-tb]");
+      if (btn) go(btn.dataset.tb);
+    });
     document.querySelectorAll(".ai-seg").forEach(el => bindSlider(el, ".ai-seg-btn", ".ai-seg-btn.active", "is-blue"));
     bindSlider(document.querySelector(".sched-m-seg"), ".sched-seg-btn", ".sched-seg-btn.on", "is-blue");
     document.querySelectorAll(".sched-d-seg").forEach(el => bindSlider(el, ".sched-dseg-btn", ".sched-dseg-btn.on", "is-blue"));

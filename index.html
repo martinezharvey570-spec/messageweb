@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.137" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.138" fetchpriority="high">
 </head>
 <body>
 
@@ -911,10 +911,7 @@
     <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
     <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
     <small class="navcaption" style="margin-top:14px">智慧工具箱</small>
-    <button type="button" class="nav nav-tool nt-parse" data-page="parser" title="群通知与截图一键拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</button>
-    <button type="button" class="nav nav-tool nt-acad" data-page="academic" title="学业 GPA 与奖助资格自查"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg>学业与奖助</button>
-    <button type="button" class="nav nav-tool nt-guide" data-page="guide" title="校园办事向导与文书生成"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg>校园办事向导</button>
-    <button type="button" class="nav nav-tool nt-sched" data-page="schedtools" title="考试倒计时、本周空档与日历导出"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg>超级课表助手</button>
+    <button type="button" class="nav nav-tool nt-toolbox" data-page="toolbox" title="智慧工具箱（群通知拆解 / 学业奖助 / 办事向导 / 课表助手）"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg>智慧工具箱</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
@@ -1460,6 +1457,15 @@
         </div>
       </section>
 
+      <div id="toolboxTopbar" class="toolbox-topbar hide" role="navigation" aria-label="智慧工具箱功能切换">
+        <div class="toolbox-topbar-track" id="toolboxTabs" role="tablist">
+          <button type="button" class="tb-tab active" data-tb="parser" role="tab" aria-selected="true"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg><span>群通知拆解</span></button>
+          <button type="button" class="tb-tab" data-tb="academic" role="tab" aria-selected="false"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>学业与奖助</span></button>
+          <button type="button" class="tb-tab" data-tb="guide" role="tab" aria-selected="false"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>校园办事向导</span></button>
+          <button type="button" class="tb-tab" data-tb="schedtools" role="tab" aria-selected="false"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>超级课表助手</span></button>
+        </div>
+      </div>
+
       <section id="parserPage" class="page campus-tool-page hide">
         <div class="pagehead">
           <div>
@@ -1971,7 +1977,10 @@
     </div>
     <div id="schedAiStatus" class="sched-ai-status hide" style="margin-top:12px"></div>
     <div id="schedAiPreview" class="sched-ai-preview hide"></div>
-    <div class="sched-dlg-actions" style="margin-top:12px">
+  </div>
+  <div class="sched-ai-foot">
+    <div class="sched-dlg-actions">
+      <button type="button" id="schedAiSaveCloseBtn" class="outline sched-ai-close-btn">暂存关闭</button>
       <button type="button" id="schedAiRunBtn" class="sched-btn-primary" style="flex:1"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>开始 AI 深度识别</span></button>
       <button type="button" id="schedAiStopBtn" class="sched-btn-stop hide"><svg class="ico" aria-hidden="true"><use href="#i-stop"/></svg><span>停止导入</span></button>
       <button type="button" id="schedAiConfirmBtn" class="sched-btn-primary hide" style="flex:1"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>确认导入课表</span></button>
@@ -2030,7 +2039,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.131"></script>
+<script src="app.js?v=1.138"></script>
 
 
 </body>

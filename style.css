@@ -18015,8 +18015,6 @@ dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 #globalSearchDialog #closeGlobalSearchDlg,
 #docDialog .doc-m-btn:not(.is-ai),
 #docBackTopBtn,
-#aiPage #askAttachBtn,
-#aiPage #askSubmitBtn.is-idle,
 .notice-actions button.icon-only:not(.danger),
 .sug-nav-btn,
 html.dark main > header #menu,
@@ -18025,9 +18023,7 @@ html.dark dialog:not(#xzNativeSettingsDlg) .dialoghead button,
 html.dark #docDialog #closeDocDialog,
 html.dark #globalSearchDialog #closeGlobalSearchDlg,
 html.dark #docDialog .doc-m-btn:not(.is-ai),
-html.dark #docBackTopBtn,
-html.dark #aiPage #askAttachBtn,
-html.dark #aiPage #askSubmitBtn.is-idle {
+html.dark #docBackTopBtn {
   border-radius: var(--r-circle) !important;
   border: 0 !important;
   background: var(--pearl-l3-bg) !important;
@@ -18512,5 +18508,310 @@ html.dark #schedulePage .sched-m-cell.today {
     margin: -6px -4px -4px !important;
     -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 22px), transparent 100%);
     mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 22px), transparent 100%);
+  }
+}
+
+/* ============================================================================
+   【v1.138 Batch 1：AI 导课表防卡死三段式固定抽屉 + AI +/- 按钮复原 + 表格横滑 + 智慧工具箱 4 合 1 顶栏】
+   ============================================================================ */
+
+/* 1. AI 聊天输入舱左侧 + 与右侧 ↑ 待机按钮：恢复清爽扁平原版（彻底取消双层玻璃套娃） */
+#aiPage #askAttachBtn,
+#aiPage .ask-plus-btn {
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink-secondary) !important;
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.12s ease !important;
+}
+#aiPage #askAttachBtn:hover,
+#aiPage .ask-plus-btn:hover {
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: var(--ink) !important;
+}
+html.dark #aiPage #askAttachBtn,
+html.dark #aiPage .ask-plus-btn {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #cbd5e1 !important;
+}
+html.dark #aiPage #askAttachBtn:hover,
+html.dark #aiPage .ask-plus-btn:hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #ffffff !important;
+}
+#aiPage #askSubmitBtn.is-idle {
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: rgba(15, 23, 42, 0.075) !important;
+  box-shadow: none !important;
+  color: var(--muted) !important;
+  opacity: 0.72 !important;
+}
+#aiPage #askSubmitBtn.is-idle:hover {
+  background: rgba(15, 23, 42, 0.11) !important;
+  opacity: 0.9 !important;
+}
+html.dark #aiPage #askSubmitBtn.is-idle {
+  background: rgba(255, 255, 255, 0.11) !important;
+  box-shadow: none !important;
+  color: #94a3b8 !important;
+}
+
+/* 2. AI 气泡内 Markdown 宽表格防裁切：确保移动端左右流畅横滑 */
+#messages .bubble.msg-ai .md-table-wrap {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y !important;
+  box-sizing: border-box !important;
+  border-radius: 14px !important;
+}
+#messages .bubble.msg-ai .md-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  border-collapse: collapse !important;
+}
+#messages .bubble.msg-ai .md-table th,
+#messages .bubble.msg-ai .md-table td {
+  min-width: 64px;
+  max-width: 190px;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+/* 3. P0 恶性 Bug 根治：#scheduleAiImportDialog 三段式固定壳 + 单一滚动区（彻底消灭卡死与关闭按钮滚出） */
+#scheduleAiImportDialog[open] {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  height: min(90dvh, 840px) !important;
+  max-height: 90dvh !important;
+}
+#scheduleAiImportDialog .dialoghead {
+  flex: 0 0 auto !important;
+  padding: 16px 18px 13px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background: transparent !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+html.dark #scheduleAiImportDialog .dialoghead {
+  border-bottom-color: rgba(255, 255, 255, 0.10) !important;
+}
+#scheduleAiImportDialog .sched-ai-import-body {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+  padding: 14px 18px 18px !important;
+  margin: 0 !important;
+}
+/* 彻底取消内层 .sched-ai-preview 与 .sched-ai-wb-list 的嵌套滚动与 390px 限高，消除移动端滑动死锁 */
+#scheduleAiImportDialog .sched-ai-preview,
+#scheduleAiImportDialog .sched-ai-wb-list {
+  overflow: visible !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  overscroll-behavior: auto !important;
+}
+#scheduleAiImportDialog .sched-ai-foot {
+  flex: 0 0 auto !important;
+  padding: 11px 18px calc(13px + env(safe-area-inset-bottom, 0px)) !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background: var(--pearl-l4-bg) !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+html.dark #scheduleAiImportDialog .sched-ai-foot {
+  border-top-color: rgba(255, 255, 255, 0.10) !important;
+}
+#scheduleAiImportDialog .sched-ai-foot .sched-dlg-actions {
+  margin-top: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+#scheduleAiImportDialog .sched-ai-close-btn {
+  flex: 0 0 auto !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+#scheduleAiImportDialog #schedAiRunBtn:not(.is-secondary) .ico-star {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18)) !important;
+}
+#scheduleAiImportDialog #schedAiRunBtn.is-secondary {
+  flex: 0 0 auto !important;
+  padding: 0 13px !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+}
+#scheduleAiImportDialog #schedAiConfirmBtn {
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
+.sched-ai-wb-head-ops {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sched-ai-wb-clear {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
+  transition: background 0.15s ease;
+}
+.sched-ai-wb-clear:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+html.dark .sched-ai-wb-clear {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.16);
+}
+@media (max-width: 960px) {
+  #scheduleAiImportDialog[open] {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    height: 92dvh !important;
+    max-height: 92dvh !important;
+    border-radius: 24px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #scheduleAiImportDialog::before {
+    display: none !important;
+  }
+  #scheduleAiImportDialog .dialoghead {
+    padding: 14px 14px 11px !important;
+  }
+  #scheduleAiImportDialog .sched-ai-import-body {
+    padding: 12px 14px 16px !important;
+  }
+  #scheduleAiImportDialog .sched-ai-foot {
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* 4. 智慧工具箱 4 合 1 流光玻璃顶栏（桌面端 + 移动端统一） */
+#sidebar .nav.nt-toolbox .ico {
+  color: #6366f1;
+}
+.toolbox-topbar {
+  margin-bottom: 16px;
+  padding: 6px;
+  border-radius: var(--r-card);
+  background: var(--pearl-l2-bg);
+  backdrop-filter: blur(26px) saturate(165%);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+  box-shadow: var(--pearl-l2-shadow);
+}
+.toolbox-topbar-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: var(--pearl-l1-bg);
+  box-shadow: var(--pearl-l1-shadow);
+}
+.toolbox-topbar-track .tb-tab {
+  position: relative;
+  z-index: 2;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0 !important;
+  border-radius: var(--r-pill) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s ease, transform 0.14s ease;
+}
+.toolbox-topbar-track .tb-tab .ico {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.toolbox-topbar-track .tb-tab:not(.active):hover {
+  color: var(--ink);
+}
+.toolbox-topbar-track .tb-tab.active {
+  color: #ffffff !important;
+}
+.toolbox-topbar-track:not(.lg-slide-host) .tb-tab.active {
+  background:
+    radial-gradient(125% 95% at 24% 0%, rgba(191, 219, 254, 0.28) 0%, transparent 64%),
+    linear-gradient(150deg, #3b82f6 0%, #2563eb 54%, #1d4ed8 100%) !important;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.24),
+    0 4px 12px -2px rgba(37, 99, 235, 0.36) !important;
+}
+html.dark .toolbox-topbar-track .tb-tab:not(.active) {
+  color: #cbd5e1;
+}
+html.dark .toolbox-topbar-track .tb-tab:not(.active):hover {
+  color: #ffffff;
+}
+@media (max-width: 760px) {
+  .toolbox-topbar {
+    margin-bottom: 12px;
+    padding: 5px;
+    border-radius: 20px;
+  }
+  .toolbox-topbar-track {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 4px;
+    padding: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .toolbox-topbar-track::-webkit-scrollbar {
+    display: none;
+  }
+  .toolbox-topbar-track .tb-tab {
+    flex: 0 0 auto;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+  .toolbox-topbar-track .tb-tab .ico {
+    width: 14px;
+    height: 14px;
   }
 }

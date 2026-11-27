@@ -566,6 +566,24 @@ function sync_scroll_btn(respectLock = false) {
   if (!btn || !m) return;
   const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 140 || m.maxTop <= 64;
   btn.classList.toggle("hide", shouldHide);
+  if (!shouldHide) {
+    const askEl = $("askForm");
+    if (askEl) {
+      const aRect = askEl.getBoundingClientRect();
+      const cs = getComputedStyle(btn);
+      if (cs.position === "fixed") {
+        const vh = window.innerHeight || document.documentElement.clientHeight || 800;
+        btn.style.bottom = Math.max(96, Math.round(vh - aRect.top + 12)) + "px";
+      } else {
+        const pRect = btn.offsetParent?.getBoundingClientRect?.();
+        if (pRect) {
+          btn.style.bottom = Math.max(76, Math.round(pRect.bottom - aRect.top + 12)) + "px";
+        }
+      }
+    }
+  } else {
+    btn.style.bottom = "";
+  }
 }
 let scroll_btn_lock_until = 0;
 

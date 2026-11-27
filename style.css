@@ -16489,10 +16489,10 @@ html.dark .campus-tool-page .ct-checklist .ct-check-item {
   }
   body.on-ai-page #scrollBottomBtn,
   body.on-ai-page .scroll-bottom-btn {
-    left: auto !important;
-    right: 28px !important;
-    bottom: 102px !important;
-    transform: none !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: 92px;
+    transform: translateX(-50%) !important;
     z-index: 26 !important;
   }
 }
@@ -16550,10 +16550,10 @@ html.dark #academicPage .elig-grid input#eligGpa {
 @media (max-width: 960px) {
   body.on-ai-page #scrollBottomBtn,
   body.on-ai-page .scroll-bottom-btn {
-    left: auto !important;
-    right: 16px !important;
-    bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
-    transform: none !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: calc(146px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%) !important;
     z-index: 26 !important;
   }
 }

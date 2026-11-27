@@ -17371,30 +17371,30 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
     min-height: 38px !important;
   }
   main > header #userProfileBtn {
-    height: 38px !important;
-    min-height: 38px !important;
-    padding: 3px 12px 3px 4px !important;
-    gap: 8px !important;
+    height: auto !important;
+    min-height: 48px !important;
+    padding: 5px 18px 5px 5px !important;
+    gap: 10px !important;
     border: 0 !important;
     background: var(--pearl-l3-bg) !important;
     box-shadow: var(--pearl-l3-shadow) !important;
     border-radius: var(--r-pill) !important;
   }
   main > header #userProfileBtn #avatar {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-    font-size: 12.5px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    font-size: 14.5px !important;
   }
   main > header #userProfileBtn > div {
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
   }
   main > header #userProfileBtn > div b {
-    font-size: 12.5px !important;
+    font-size: 13px !important;
   }
   main > header #userProfileBtn > div small {
-    font-size: 10.5px !important;
+    font-size: 11px !important;
   }
 }
 @media (min-width: 761px) and (max-width: 1120px) {
@@ -17403,7 +17403,9 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
   }
   main > header #userProfileBtn {
     width: 38px !important;
+    height: 38px !important;
     min-width: 38px !important;
+    min-height: 38px !important;
     max-width: 38px !important;
     padding: 0 !important;
     justify-content: center !important;
@@ -17413,8 +17415,10 @@ html.dark #globalSearchDialog #globalSearchInput:focus {
     display: none !important;
   }
   main > header #userProfileBtn #avatar {
-    width: 34px !important;
-    height: 34px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
   }
 }
 
@@ -19370,52 +19374,46 @@ html.dark #userProfileBtn.user {
 #sidebar .navcaption.navcaption-sub {
   margin-top: 0 !important;
 }
-#sidebar .sidebottom.sidebottom-compact {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  padding-top: 10px;
+/* 侧栏底栏：100% 恢复原版左对齐「退出当前账号」，仅在窄栏收起态居中显示图标 */
+#sidebar .sidebottom {
+  margin-top: auto;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
 }
-#sidebar .sidebottom.sidebottom-compact::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 17px;
-  bottom: 7px;
-  width: 1px;
-  background: var(--line);
-  opacity: 0.7;
-  pointer-events: none;
-}
-#sidebar .sidebottom.sidebottom-compact button {
-  justify-content: center;
-  padding: 9px 8px;
-  gap: 6px;
+#sidebar .sidebottom button#logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 9px 14px;
+  gap: 8px;
   font-size: 13px;
-  border-radius: 12px;
+  font-weight: 600;
+  min-height: 38px;
+  border-radius: var(--radius-sm);
 }
-#sidebar .sidebottom.sidebottom-compact button.sb-exit:hover {
-  color: #dc2626 !important;
-  background: rgba(239, 68, 68, 0.08) !important;
+#sidebar .sidebottom button#logout:hover {
+  color: #b42318 !important;
+  background: #fef3f2 !important;
+  box-shadow: none !important;
 }
-html.dark #sidebar .sidebottom.sidebottom-compact button.sb-exit:hover {
+html.dark #sidebar .sidebottom button#logout:hover {
   color: #f87171 !important;
   background: rgba(239, 68, 68, 0.14) !important;
+  box-shadow: none !important;
 }
 @media (min-width: 761px) {
   body.sidebar-collapsed #sidebar .nav-divider {
     margin: 8px 14px;
   }
-  body.sidebar-collapsed #sidebar .sidebottom.sidebottom-compact {
-    grid-template-columns: 1fr;
-    gap: 6px;
+  body.sidebar-collapsed #sidebar .sidebottom button#logout {
+    justify-content: center;
+    padding: 0;
   }
-  body.sidebar-collapsed #sidebar .sidebottom.sidebottom-compact::before {
-    display: none;
-  }
-  body.sidebar-collapsed #sidebar .sidebottom.sidebottom-compact button span {
+  body.sidebar-collapsed #sidebar .sidebottom button#logout span {
     display: none;
   }
 }
@@ -19591,197 +19589,16 @@ html.dark .home-ai-send.is-idle {
 }
 
 /* ==========================================================================
-   v1.143 方案 A · AI 聊天界面与全站三层珍珠流光玻璃 / 黑曜石玻璃 100% 统一
-   （全量替换 v1.141：零 1px 硬边框、零突兀青色、零实心蓝块、全端默认极简收起）
+   v1.144 方案一：100% 恢复原版立体液态蓝滑动按钮（#3b82f6→#1d4ed8 + .lg-slide-pill.is-blue）
+   并保持快捷指令面板 / 核验过程条 / 导课表核对条与全站三层珍珠玻璃 100% 统一
    ========================================================================== */
 
-/* 1. 顶部对话参数栏（Pearl L2 半透玻璃层，全端默认平滑收起，点「参数」丝滑展开） */
-body.on-ai-page #aiOptionsBar.ai-options-codex {
-  background: var(--pearl-l2-bg) !important;
-  backdrop-filter: blur(24px) saturate(165%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
-  border: 0 !important;
-  box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.045) !important;
-  gap: 10px 18px !important;
-  padding: 10px 24px 12px !important;
-  flex-wrap: wrap !important;
-  max-height: 240px !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  overflow: hidden !important;
-  transition: max-height .26s cubic-bezier(.22, 1, .36, 1), opacity .2s ease, transform .24s cubic-bezier(.22, 1, .36, 1), padding .24s ease !important;
-}
-html.dark body.on-ai-page #aiOptionsBar.ai-options-codex {
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+/* 确保分段滑槽中的激活按钮文字永远 crisp 纯白，绝不覆盖底层 .lg-slide-pill.is-blue 立体液态蓝滑块 */
+#aiOptionsBar .ai-seg .ai-seg-btn.active {
+  color: #ffffff !important;
 }
 
-/* 方案 A：全端（桌面 + 手机）统一由 body.ai-panel-collapsed 收起参数条，不再误隐藏欢迎态热门提问 */
-body.on-ai-page.ai-panel-collapsed #aiOptionsBar.ai-options-codex {
-  display: flex !important;
-  max-height: 0 !important;
-  opacity: 0 !important;
-  transform: translateY(-6px) !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  box-shadow: none !important;
-  pointer-events: none !important;
-}
-
-/* 热门提问条：对话未开始时柔和展示（零硬分割线），发出第一条消息后自动收起释放视野 */
-body.on-ai-page.ai-panel-collapsed:not(.ai-has-chat) .suggestions-bar {
-  max-height: 84px !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  padding-top: 8px !important;
-  padding-bottom: 6px !important;
-  pointer-events: auto !important;
-}
-body.on-ai-page .suggestions-bar {
-  border: 0 !important;
-  box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.04) !important;
-}
-html.dark body.on-ai-page .suggestions-bar {
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.055) !important;
-}
-body.on-ai-page.ai-has-chat .suggestions-bar {
-  max-height: 0 !important;
-  opacity: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  box-shadow: none !important;
-  pointer-events: none !important;
-}
-
-/* 2. 分段控件与选中态：彻底告别高饱和油漆蓝块，改用与左侧导航激活态一致的琉璃冰蓝光晕 */
-#aiOptionsBar .ai-seg {
-  border: 0 !important;
-  background: var(--pearl-l1-bg) !important;
-  box-shadow: var(--pearl-l1-shadow) !important;
-  border-radius: 999px !important;
-  padding: 3px !important;
-  gap: 2px !important;
-}
-#aiOptionsBar .ai-seg-btn {
-  border: 0 !important;
-  border-radius: 999px !important;
-  height: 28px !important;
-  padding: 0 13px !important;
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  color: var(--ink-secondary, #475569) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  transition: background .18s ease, color .18s ease, box-shadow .18s ease !important;
-}
-#aiOptionsBar .ai-seg-btn:hover:not(.active) {
-  color: var(--ink, #0f172a) !important;
-}
-#aiOptionsBar .ai-seg-btn.active {
-  border: 0 !important;
-  background: linear-gradient(155deg, rgba(219, 234, 254, 0.92) 0%, rgba(191, 219, 254, 0.78) 100%) !important;
-  color: var(--blue, #155eef) !important;
-  font-weight: 600 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.90), 0 2px 8px -2px rgba(21, 94, 239, 0.18), 0 0 0 1px rgba(59, 130, 246, 0.16) !important;
-}
-html.dark #aiOptionsBar .ai-seg-btn {
-  color: #94a3b8 !important;
-}
-html.dark #aiOptionsBar .ai-seg-btn:hover:not(.active) {
-  color: #e2e8f0 !important;
-}
-html.dark #aiOptionsBar .ai-seg-btn.active {
-  background: linear-gradient(155deg, rgba(37, 99, 235, 0.24) 0%, rgba(29, 78, 216, 0.14) 100%) !important;
-  color: #bfdbfe !important;
-  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.18), 0 4px 12px -4px rgba(37, 99, 235, 0.32), 0 0 0 1px rgba(96, 165, 250, 0.24) !important;
-}
-
-/* 3. 资料来源开关胶囊：与右侧「西安文理学院 ›」保持 100% 同款无边框 Pearl L3 玻璃浮片（彻底消除青色与 4 种材质打架） */
-.ai-ctx-group {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-#aiOptionsBar .ai-codex-pill,
-#aiOptionsBar .ai-seg-school {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  height: 34px !important;
-  padding: 0 13px !important;
-  border-radius: 999px !important;
-  border: 0 !important;
-  background: var(--pearl-l3-bg) !important;
-  box-shadow: var(--pearl-l3-shadow) !important;
-  color: var(--ink-secondary, #475569) !important;
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  white-space: nowrap !important;
-  transition: transform .16s ease, background .18s ease, box-shadow .18s ease, color .18s ease, opacity .18s ease !important;
-}
-#aiOptionsBar .ai-seg-school {
-  color: var(--ink, #0f172a) !important;
-  font-weight: 600 !important;
-}
-#aiOptionsBar .ai-codex-pill:hover,
-#aiOptionsBar .ai-seg-school:hover {
-  transform: translateY(-1px);
-  color: var(--ink, #0f172a) !important;
-}
-/* 激活态（无论「校规库」「智能联网」「强制联网」还是「我的课表」）统一柔和冰蓝珍珠光晕，绝不出现突兀青色 */
-#aiOptionsBar .ai-codex-pill.is-on,
-#aiOptionsBar .ai-codex-pill.is-auto {
-  background: linear-gradient(155deg, rgba(239, 246, 255, 0.96) 0%, rgba(219, 234, 254, 0.84) 100%) !important;
-  color: var(--blue, #155eef) !important;
-  font-weight: 600 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.94), 0 4px 12px -4px rgba(21, 94, 239, 0.20), 0 0 0 1px rgba(59, 130, 246, 0.18) !important;
-}
-#aiOptionsBar .ai-codex-pill.is-off {
-  opacity: .64;
-}
-html.dark #aiOptionsBar .ai-codex-pill,
-html.dark #aiOptionsBar .ai-seg-school {
-  color: #94a3b8 !important;
-}
-html.dark #aiOptionsBar .ai-seg-school {
-  color: #e2e8f0 !important;
-}
-html.dark #aiOptionsBar .ai-codex-pill:hover,
-html.dark #aiOptionsBar .ai-seg-school:hover {
-  color: #f1f5f9 !important;
-}
-html.dark #aiOptionsBar .ai-codex-pill.is-on,
-html.dark #aiOptionsBar .ai-codex-pill.is-auto {
-  background: linear-gradient(155deg, rgba(37, 99, 235, 0.26) 0%, rgba(29, 78, 216, 0.16) 100%) !important;
-  color: #bfdbfe !important;
-  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.20), 0 6px 16px -6px rgba(37, 99, 235, 0.42), 0 0 0 1px rgba(96, 165, 250, 0.26) !important;
-}
-
-/* 移动端展开参数条时的整洁排布 */
-@media (max-width: 760px) {
-  body.on-ai-page #aiOptionsBar.ai-options-codex {
-    padding: 10px 14px 12px !important;
-    gap: 8px 10px !important;
-  }
-  body.on-ai-page.ai-panel-collapsed #aiOptionsBar.ai-options-codex {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  #aiOptionsBar .ai-seg-label {
-    font-size: 11.5px !important;
-  }
-  #aiOptionsBar .ai-codex-pill,
-  #aiOptionsBar .ai-seg-school {
-    height: 32px !important;
-    padding: 0 11px !important;
-    font-size: 12px !important;
-  }
-}
-
-/* 4. 快捷指令浮层（100% 沿用 + 附件弹窗同源 Pearl L2 悬浮玻璃，无等宽字体、无拉扁椭圆条） */
+/* 快捷指令浮层（沿用 + 附件弹窗同源 Pearl L2 悬浮玻璃，无等宽字体、选中态用全站原版液态蓝焦点） */
 #askForm.ask {
   position: relative;
 }
@@ -19835,13 +19652,11 @@ html.dark #aiOptionsBar .ai-codex-pill.is-auto {
 }
 #askForm.ask #aiSlashMenu .ai-slash-item:hover,
 #askForm.ask #aiSlashMenu .ai-slash-item.is-active {
-  background: linear-gradient(155deg, rgba(239, 246, 255, 0.92) 0%, rgba(219, 234, 254, 0.68) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(59, 130, 246, 0.12) !important;
+  background: rgba(37, 99, 235, 0.08) !important;
 }
 html.dark #askForm.ask #aiSlashMenu .ai-slash-item:hover,
 html.dark #askForm.ask #aiSlashMenu .ai-slash-item.is-active {
-  background: linear-gradient(155deg, rgba(37, 99, 235, 0.22) 0%, rgba(29, 78, 216, 0.14) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.16), 0 0 0 1px rgba(96, 165, 250, 0.20) !important;
+  background: rgba(59, 130, 246, 0.16) !important;
 }
 .ai-slash-ico {
   width: 32px;
@@ -19888,7 +19703,7 @@ html.dark .ai-slash-desc {
   color: #94a3b8;
 }
 
-/* 5. 回复底部「检索与核验过程」内嵌珍珠玻璃卡（去掉硬 1px 框与刺眼红绿块） */
+/* 回复底部「检索与核验过程」内嵌珍珠玻璃卡（去掉硬 1px 框与刺眼红绿块） */
 .ai-codex-trace-box {
   margin-top: 8px;
   padding: 11px 14px;
@@ -19952,7 +19767,7 @@ html.dark .ai-trace-step b { color: #93c5fd; }
 }
 html.dark .ai-trace-step span { color: #94a3b8; }
 
-/* 6. AI 导课表预览核对条（原生内嵌珍珠玻璃 + 低饱和柔光微标签） */
+/* AI 导课表预览核对条（原生内嵌珍珠玻璃 + 低饱和柔光微标签） */
 .sched-ai-health-bar {
   display: flex;
   flex-wrap: wrap;

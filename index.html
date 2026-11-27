@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.143" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.146" fetchpriority="high">
 </head>
 <body>
 
@@ -916,9 +916,8 @@
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
-    <div class="sidebottom sidebottom-compact">
-      <button id="openProfileSide" type="button" title="账号与密码设置"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>设置</span></button>
-      <button id="logout" type="button" class="sb-exit" title="退出当前账号"><svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg><span>退出</span></button>
+    <div class="sidebottom">
+      <button id="logout" type="button" title="退出当前账号"><svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg><span>退出当前账号</span></button>
     </div>
   </aside>
 
@@ -1107,43 +1106,49 @@
             </div>
             <div class="chat-top-actions">
               <button type="button" id="toggleAiStudio" class="outline ai-studio-toggle-btn" title="打开/收起 AI 一体化工具舱（通知拆解 / 学业奖助 / 办事向导 / 课表 / 待办）"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg><span>工具舱</span></button>
-              <button type="button" id="toggleAiConfig" title="展开/收起对话参数设置" class="outline config-toggle-btn"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
+              <button type="button" id="toggleAiConfig" title="收起/展开模型配置与热门提问" class="outline config-toggle-btn"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
               <button type="button" id="exportChat" class="outline" title="导出对话记录"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出</span></button>
               <button type="button" id="clearChat" class="outline" title="清空当前对话"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空</span></button>
             </div>
           </div>
 
-          <div id="aiOptionsBar" class="ai-options ai-options-codex">
-            <div class="ai-seg-group" role="group" aria-label="回答方式">
-              <span class="ai-seg-label">回答方式</span>
-              <div class="ai-seg" id="aiCodexModeSeg">
-                <button type="button" class="ai-seg-btn" data-codex-mode="fast" title="极速直答：免等待秒回，适合简单查询">极速</button>
-                <button type="button" class="ai-seg-btn active" data-codex-mode="agent" title="标准智能：简单问题自动秒回，复杂办事深度核验">标准</button>
-                <button type="button" class="ai-seg-btn" data-codex-mode="deep" title="深度推理：适合多制度对比、复杂规划与文书起草">深度</button>
+          <div id="aiOptionsBar" class="ai-options">
+            <div class="ai-seg-group" role="group" aria-label="模型选择">
+              <span class="ai-seg-label">模型</span>
+              <div class="ai-seg" data-seg-target="aiModel">
+                <button type="button" class="ai-seg-btn active" data-seg-val="deepseek-flash" title="响应快，适合日常校务咨询">Flash</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="deepseek-v4-pro" title="深度推理，适合复杂条文对比">Pro</button>
               </div>
               <select id="aiModel" class="hide" aria-hidden="true">
                 <option value="deepseek-flash" selected>Flash（快速通用）</option>
                 <option value="deepseek-v4-pro">Pro（深度推理）</option>
               </select>
+            </div>
+
+            <div class="ai-seg-group" role="group" aria-label="思考强度">
+              <span class="ai-seg-label">思考</span>
+              <div class="ai-seg" data-seg-target="aiEffort">
+                <button type="button" class="ai-seg-btn" data-seg-val="low">低</button>
+                <button type="button" class="ai-seg-btn active" data-seg-val="high">高</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="max">最高</button>
+              </div>
               <select id="aiEffort" class="hide" aria-hidden="true">
                 <option value="low">低</option>
                 <option value="high" selected>高</option>
                 <option value="max">最高</option>
               </select>
+            </div>
+
+            <div class="ai-seg-group" role="group" aria-label="深度思考">
+              <span class="ai-seg-label">深度思考</span>
+              <div class="ai-seg" data-seg-bool="aiThinking">
+                <button type="button" class="ai-seg-btn active" data-seg-val="1">开启</button>
+                <button type="button" class="ai-seg-btn" data-seg-val="0">关闭</button>
+              </div>
               <input id="aiThinking" type="checkbox" checked class="hide" aria-hidden="true">
             </div>
 
-            <div class="ai-seg-group ai-ctx-group" role="group" aria-label="资料来源与目标院校">
-              <span class="ai-seg-label">资料来源</span>
-              <button type="button" id="aiCtxKb" class="ai-codex-pill is-on" title="开启/关闭校内正式制度库检索">
-                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-book"/></svg><span>校规库</span>
-              </button>
-              <button type="button" id="aiCtxWeb" class="ai-codex-pill is-auto" data-web-mode="auto" title="点击切换联网策略：智能联网 / 强制联网 / 仅查本地">
-                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-search"/></svg><span id="aiCtxWebLabel">智能联网</span>
-              </button>
-              <button type="button" id="aiCtxWorkspace" class="ai-codex-pill" title="主动关联个人课表与待办事项">
-                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg><span>我的课表</span>
-              </button>
+            <div class="ai-seg-group" role="group" aria-label="检索高校">
               <button type="button" id="aiSchoolBtn" class="ai-seg-school" title="切换检索高校">
                 <svg class="ico" aria-hidden="true"><use href="#i-graduation"/></svg>
                 <span id="aiSchoolLabel">西安文理学院</span>
@@ -2076,7 +2081,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.143"></script>
+<script src="app.js?v=1.146"></script>
 
 
 </body>

@@ -425,10 +425,6 @@ function open_profile_modal() {
   $("profileDialog")?.showModal();
 }
 $("userProfileBtn")?.addEventListener("click", open_profile_modal);
-$("openProfileSide")?.addEventListener("click", () => {
-  sidebar_el.classList.remove("open");
-  open_profile_modal();
-});
 $("closeProfileDialog")?.addEventListener("click", () => $("profileDialog")?.close());
 $("cancelProfileDialog")?.addEventListener("click", () => $("profileDialog")?.close());
 
@@ -476,7 +472,13 @@ document.addEventListener("click", e => {
 
 // 全局快捷键 Ctrl+K / Cmd+K 由下方 Spotlight 聚合搜索弹窗统一接管
 
-// 参数面板展开/收起逻辑已统一移至下方 init_desktop_ai_panel_toggle（桌面端与手机端一致，默认极简收起）
+$("toggleAiConfig")?.addEventListener("click", () => {
+  if (window.innerWidth >= 761) return;
+  const bar = $("aiOptionsBar");
+  if (!bar) return;
+  const is_open = bar.classList.toggle("open");
+  $("toggleAiConfig").classList.toggle("added", is_open);
+});
 
 document.querySelectorAll(".nav, .tab-item").forEach(b => {
   b.onclick = () => go(b.dataset.page);
@@ -3201,18 +3203,12 @@ $("askForm").onsubmit = async e => {
 
   const run_ask = async (continue_from = "") => {
     const selSchool = typeof get_selected_school === "function" ? get_selected_school() : { n: "西安文理学院", d: "xawl.edu.cn" };
-    const codexState = typeof window.get_codex_ai_state === "function"
-      ? window.get_codex_ai_state()
-      : { mode: "agent", web_mode: "auto", context_flags: { kb: true } };
     const payload = {
       question: fullQuestion,
       ...(imgs.length ? { images: imgs } : {}),
       model: $("aiModel")?.value || "deepseek-flash",
-      mode: codexState.mode || "agent",
       thinking: $("aiThinking")?.checked !== false,
       reasoning_effort: $("aiEffort")?.value || "high",
-      ...(codexState.web_mode === "on" ? { web_search: true } : (codexState.web_mode === "off" ? { web_search: false } : {})),
-      context_flags: codexState.context_flags || { kb: true },
       school_name: selSchool.n,
       school_domain: selSchool.d || "",
       ...(continue_from ? { continue_from: continue_from.slice(-4000) } : {}),
@@ -4345,35 +4341,35 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
-/* ---- v1.143: 方案 A 极简纯净回归 — 参数栏全端默认收起，点击「参数」平滑展开 ---- */
+/* ---- v1.003 / 方案一恢复：电脑端收起/展开模型配置与热门提问记忆（默认展开、与移动端解耦） ---- */
 (function init_desktop_ai_panel_toggle() {
-  const KEY = "xz_ai_panel_expanded_v2";
+  const KEY = "xz_desktop_ai_panel_collapsed";
   const btn = $("toggleAiConfig");
-  const bar = $("aiOptionsBar");
   const syncBtnState = () => {
-    const collapsed = document.body.classList.contains("ai-panel-collapsed");
-    if (bar) bar.classList.toggle("open", !collapsed);
-    if (btn) {
+    if (!btn) return;
+    if (window.innerWidth >= 761) {
+      const collapsed = document.body.classList.contains("ai-panel-collapsed");
       btn.classList.toggle("added", !collapsed);
       btn.setAttribute("aria-expanded", String(!collapsed));
-      btn.title = collapsed ? "展开回答方式与资料来源设置" : "收起对话参数设置";
+      btn.title = collapsed ? "展开模型选择与热门提问" : "收起模型选择与热门提问";
     }
   };
   try {
-    // 方案 A：默认收起参数条，保持与全站一致的清爽通透界面；仅当用户主动展开过时记忆展开状态
-    if (localStorage.getItem(KEY) !== "1") {
+    if (localStorage.getItem(KEY) === "1") {
       document.body.classList.add("ai-panel-collapsed");
     } else {
       document.body.classList.remove("ai-panel-collapsed");
     }
   } catch {
-    document.body.classList.add("ai-panel-collapsed");
+    document.body.classList.remove("ai-panel-collapsed");
   }
   syncBtnState();
   btn?.addEventListener("click", () => {
-    const collapsed = document.body.classList.toggle("ai-panel-collapsed");
-    try { localStorage.setItem(KEY, collapsed ? "0" : "1"); } catch {}
-    syncBtnState();
+    if (window.innerWidth >= 761) {
+      const collapsed = document.body.classList.toggle("ai-panel-collapsed");
+      try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch {}
+      syncBtnState();
+    }
   });
 })();
 
@@ -9673,118 +9669,22 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   });
 })();
 
-/* ---- v1.143 校务指南 AI 对话参数与快捷指令面板（方案 A：极简珍珠玻璃统一体系） ---- */
-(function init_codex_control_cabin() {
-  const state = {
-    mode: "agent", // "fast"（极速） | "agent"（标准） | "deep"（深度）
-    effort: "high",
-    kb: true,
-    web_mode: "auto", // "auto" | "on" | "off"
-    workspace: false
-  };
-  const STORE_KEY = "xz_codex_ai_cabin_v1";
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-    if (saved && typeof saved === "object") {
-      if (["fast", "deep", "agent"].includes(saved.mode)) state.mode = saved.mode;
-      if (typeof saved.kb === "boolean") state.kb = saved.kb;
-      if (["auto", "on", "off"].includes(saved.web_mode)) state.web_mode = saved.web_mode;
-      if (typeof saved.workspace === "boolean") state.workspace = saved.workspace;
-    }
-  } catch {}
-
-  const syncEffortByMode = () => {
-    state.effort = state.mode === "fast" ? "off" : (state.mode === "deep" ? "max" : "high");
-  };
-  syncEffortByMode();
-
-  const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} };
-
-  const syncDom = () => {
-    syncEffortByMode();
-    const modelSel = $("aiModel");
-    const effortSel = $("aiEffort");
-    const thinkChk = $("aiThinking");
-    if (modelSel) modelSel.value = state.mode === "deep" ? "deepseek-v4-pro" : "deepseek-flash";
-    if (thinkChk) thinkChk.checked = state.mode !== "fast";
-    if (effortSel) effortSel.value = state.mode === "deep" ? "max" : (state.mode === "fast" ? "low" : "high");
-
-    $("aiCodexModeSeg")?.querySelectorAll("[data-codex-mode]").forEach(b => {
-      b.classList.toggle("active", b.dataset.codexMode === state.mode);
-    });
-
-    const kbBtn = $("aiCtxKb");
-    if (kbBtn) kbBtn.classList.toggle("is-on", state.kb);
-    const wsBtn = $("aiCtxWorkspace");
-    if (wsBtn) wsBtn.classList.toggle("is-on", state.workspace);
-
-    const webBtn = $("aiCtxWeb");
-    const webLbl = $("aiCtxWebLabel");
-    if (webBtn) {
-      webBtn.dataset.webMode = state.web_mode;
-      webBtn.classList.toggle("is-auto", state.web_mode === "auto");
-      webBtn.classList.toggle("is-on", state.web_mode === "on");
-      webBtn.classList.toggle("is-off", state.web_mode === "off");
-      if (webLbl) {
-        webLbl.textContent = state.web_mode === "auto" ? "智能联网" : (state.web_mode === "on" ? "强制联网" : "仅查本地");
-      }
-    }
+/* ---- v1.144 快捷指令面板（配合方案一：所有校规/联网/课表均由 AI 后台全自动判断，前端零繁琐开关） ---- */
+(function init_ai_slash_commands() {
+  const setNativeSeg = (targetId, val) => {
+    const seg = document.querySelector(`.ai-seg[data-seg-target="${targetId}"]`);
+    const btn = seg?.querySelector(`.ai-seg-btn[data-seg-val="${val}"]`);
+    if (btn) btn.click();
   };
 
-  $("aiCodexModeSeg")?.addEventListener("click", e => {
-    const btn = e.target.closest("[data-codex-mode]");
-    if (!btn) return;
-    state.mode = btn.dataset.codexMode;
-    syncDom();
-    persist();
-  });
-
-  $("aiCtxKb")?.addEventListener("click", () => {
-    state.kb = !state.kb;
-    syncDom();
-    persist();
-    toast(state.kb ? "已开启校内制度库检索" : "已暂停校内制度库检索");
-  });
-
-  $("aiCtxWeb")?.addEventListener("click", () => {
-    state.web_mode = state.web_mode === "auto" ? "on" : (state.web_mode === "on" ? "off" : "auto");
-    syncDom();
-    persist();
-    const tips = {
-      auto: "智能联网：常规校规秒查本地，最新公告自动查官网",
-      on: "强制联网：本次提问将优先联网检索核验",
-      off: "仅查本地：仅依据校内正式制度与个人数据作答"
-    };
-    toast(tips[state.web_mode]);
-  });
-
-  $("aiCtxWorkspace")?.addEventListener("click", () => {
-    state.workspace = !state.workspace;
-    syncDom();
-    persist();
-    toast(state.workspace ? "已主动关联个人课表与待办" : "已恢复按需自动读取课表");
-  });
-
-  window.get_codex_ai_state = () => ({
-    mode: state.mode,
-    effort: state.effort,
-    web_mode: state.web_mode,
-    context_flags: {
-      kb: state.kb,
-      ...(state.workspace ? { schedule: true, tasks: true } : {})
-    }
-  });
-  syncDom();
-
-  // 快捷指令面板（原生珍珠 L2 玻璃浮层，支持输入 / 或从 + 菜单一键唤出）
   const SLASH_COMMANDS = [
-    { cmd: "/查校规", label: "查校规", icon: "i-book", desc: "精准检索 117 份本校正式制度与具体条款", fill: "请结合西安文理学院正式制度，告诉我：", mode: "agent" },
-    { cmd: "/对比制度", label: "对比制度", icon: "i-sliders", desc: "横向对比两项制度或奖学金的申请条件与限制", fill: "请用清晰表格对比以下两项制度的申请条件、标准和注意事项：", mode: "deep" },
-    { cmd: "/算绩点", label: "算绩点", icon: "i-award", desc: "按本校五分制精确核算 GPA、学位余量与奖助资格", fill: "帮我按学校五分制精确核算 GPA 并评估学位和奖学金资格，并生成导入确认卡：", mode: "agent" },
-    { cmd: "/写申请书", label: "写申请书", icon: "i-edit", desc: "结合本校规定起草缓考、转专业或休学正式申请", fill: "请依据学校相关规定，帮我起草一份格式规范的申请书并附材料清单，事由如下：", mode: "deep" },
+    { cmd: "/查校规", label: "查校规", icon: "i-book", desc: "自动检索本校 117 份正式制度并必要时联网核验官网", fill: "请结合西安文理学院正式制度，告诉我：", model: "deepseek-flash" },
+    { cmd: "/对比制度", label: "对比制度", icon: "i-sliders", desc: "横向对比两项制度或奖学金的申请条件与限制", fill: "请用清晰表格对比以下两项制度的申请条件、标准和注意事项：", model: "deepseek-v4-pro" },
+    { cmd: "/算绩点", label: "算绩点", icon: "i-award", desc: "按本校五分制精确核算 GPA、学位余量与奖助资格", fill: "帮我按学校五分制精确核算 GPA 并评估学位和奖学金资格，并生成导入确认卡：" },
+    { cmd: "/写申请书", label: "写申请书", icon: "i-edit", desc: "结合本校规定起草缓考、转专业或休学正式申请", fill: "请依据学校相关规定，帮我起草一份格式规范的申请书并附材料清单，事由如下：", model: "deepseek-v4-pro" },
     { cmd: "/拆通知", label: "拆通知", icon: "i-sparkles", desc: "打开群通知拆解工具，一键提取待办与截止时间", action: () => window.open_ai_studio?.("parser") },
     { cmd: "/导课表", label: "导课表", icon: "i-calendar", desc: "打开 AI 智能导课表，支持原版 PDF、表格与截图", action: () => { go("schedule"); setTimeout(() => $("schedImportImgBtn")?.click() || $("scheduleAiImportDialog")?.showModal(), 120); } },
-    { cmd: "/查空档", label: "查空档与早八", icon: "i-clock", desc: "读取个人课表，分析本周早八分布与适合自习的空档", fill: "请读取我的个人课表，帮我分析本周课程安排、早八分布以及适合去图书馆自习的空档时段。", mode: "agent", attachWorkspace: true }
+    { cmd: "/查空档", label: "查空档与早八", icon: "i-clock", desc: "AI 自动读取个人课表，分析早八分布与自习空档", fill: "请读取我的个人课表，帮我分析本周课程安排、早八分布以及适合去图书馆自习的空档时段。" }
   ];
 
   const qEl = $("question");
@@ -9805,10 +9705,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       item.action();
       return;
     }
-    if (item.mode) state.mode = item.mode;
-    if (item.attachWorkspace) state.workspace = true;
-    syncDom();
-    persist();
+    if (item.model) setNativeSeg("aiModel", item.model);
     if (qEl) {
       qEl.value = item.fill || "";
       qEl.dispatchEvent(new Event("input", { bubbles: true }));

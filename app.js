@@ -5285,6 +5285,7 @@ function open_schedule_course_dlg(idx, prefill) {
   $("scType").value = c.type || "理论";
   $("scStart").value = String(c.start || 1);
   $("scEnd").value = String(c.end || 2);
+  ["scDay", "scType", "scStart", "scEnd"].forEach(id => { const el = $(id); if (el) sync_xz_select(el); });
   $("scWeeks").value = c.weeks || "1-" + schedState.totalWeeks;
   $("scRoom").value = c.room || "";
   $("scTeacher").value = c.teacher || "";

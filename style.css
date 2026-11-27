@@ -19716,18 +19716,20 @@ html.dark .home-ai-send.is-idle {
    并保持快捷指令面板 / 核验过程条 / 导课表核对条与全站三层珍珠玻璃 100% 统一
    ========================================================================== */
 
-/* 修复桌面端收起参数时 #aiPage .suggestions-bar 被 min-height: 46px 撑出的 46px 空白带 Bug */
+/* 修复桌面端收起参数时 #aiPage .suggestions-bar 被 min-height: 46px 撑出的 46px 空白带与残留边条 Bug */
 body.on-ai-page.ai-panel-collapsed #aiPage #aiOptionsBar,
 body.on-ai-page.ai-panel-collapsed #aiPage .suggestions-bar {
+  height: 0 !important;
   min-height: 0 !important;
   max-height: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  border-bottom-width: 0 !important;
-  border-bottom-color: transparent !important;
+  border: 0 !important;
   box-shadow: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
   overflow: hidden !important;
   pointer-events: none !important;
 }

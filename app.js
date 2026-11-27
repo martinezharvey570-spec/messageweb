@@ -8684,6 +8684,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const box = $("noticeParserResult");
     if (!box) return;
     box.classList.remove("hide");
+    $("npStudioSamplesCard")?.classList.add("hide");
     const tasksList = Array.isArray(data.tasks) ? data.tasks : [];
     const examsList = Array.isArray(data.exams) ? data.exams : [];
     const docsList = Array.isArray(data.related_docs) ? data.related_docs : [];
@@ -8770,6 +8771,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       renderNpThumbs();
       box.classList.add("hide");
       box.innerHTML = "";
+      $("npStudioSamplesCard")?.classList.remove("hide");
     });
 
     $("npCommitBtn")?.addEventListener("click", async () => {
@@ -8851,6 +8853,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     if ($("noticeParserText")) {
       $("noticeParserText").value = "【辅导员通知】@全体同学：1. 请本周五 17:00 前把《四六级报名信息核对表》与本学年《家庭经济困难认定申请表》纸质版交至明德楼 304 学工办；2. 12月18日 09:00《数据结构与算法》期末考试，地点博学楼 B204，请务必携带学生证与身份证；3. 如因病无法参加期末考试，务必在开考前提交缓考申请与二甲医院诊断证明。";
     }
+  });
+  document.querySelectorAll("#npStudioSamplesCard .np-sample-btn[data-np-sample]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const ta = $("noticeParserText");
+      if (ta) {
+        ta.value = btn.dataset.npSample || "";
+        ta.focus();
+      }
+    });
   });
   $("noticeParserStopBtn")?.addEventListener("click", () => {
     if (npAbortCtrl) {

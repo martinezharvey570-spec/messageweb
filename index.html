@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.147" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.148" fetchpriority="high">
 </head>
 <body>
 
@@ -1253,12 +1253,12 @@
             </div>
           </div>
           <div id="aiStudioTabs" class="ai-studio-tabs" role="tablist" aria-label="工具舱功能切换">
-            <button type="button" class="ai-st-tab active" data-studio-tab="parser" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg><span>通知拆解</span></button>
-            <button type="button" class="ai-st-tab" data-studio-tab="academic" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>学业奖助</span></button>
-            <button type="button" class="ai-st-tab" data-studio-tab="guide" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>办事向导</span></button>
-            <button type="button" class="ai-st-tab" data-studio-tab="schedtools" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>课表助手</span></button>
-            <button type="button" class="ai-st-tab" data-studio-tab="schedule" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>今日课表</span></button>
-            <button type="button" class="ai-st-tab" data-studio-tab="tasks" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>我的待办</span></button>
+            <button type="button" class="ai-st-tab active" data-studio-tab="parser" role="tab" title="群通知与截图拆解"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg><span>拆解</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="academic" role="tab" title="学业 GPA 与奖助自查"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>绩点</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="guide" role="tab" title="校园办事向导"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>办事</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="schedtools" role="tab" title="考试倒计时与空档助手"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>助手</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="schedule" role="tab" title="今日与本周课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>课表</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="tasks" role="tab" title="我的待办事项"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待办</span></button>
           </div>
           <div id="aiStudioBody" class="ai-studio-body">
             <div id="aiStudioMount" class="ai-studio-mount"></div>
@@ -1538,6 +1538,21 @@
               <div id="noticeParserThumbs" class="np-thumbs hide"></div>
             </div>
             <div id="noticeParserResult" class="np-result hide"></div>
+            <div id="npStudioSamplesCard" class="np-samples-card">
+              <div class="np-samples-head"><b>常用校园通知快试模板</b><small>点击自动填入并体验拆解</small></div>
+              <button type="button" class="np-sample-btn" data-np-sample="【辅导员通知】@全体同学：1. 请本周五 17:00 前把《四六级报名信息核对表》与本学年《家庭经济困难认定申请表》纸质版交至明德楼 304 学工办；2. 如需办理困难认定，请提前准备好相关证明材料。">
+                <b>四六级核对与奖助申请截止</b>
+                <small>周五 17:00 前交明德楼 304，附纸质核对表与申请表…</small>
+              </button>
+              <button type="button" class="np-sample-btn" data-np-sample="【教务处考试通知】12月18日 14:00-16:00《数据结构与算法》期末考试地点调整至博学楼 B204，请携带学生证与身份证按时赴考；如因病不能参加，务必在开考前提交缓考申请。">
+                <b>期末考试周考场与时间变更</b>
+                <small>数据结构 12 月 18 日 14:00 调至博学楼 B204，请携带双证…</small>
+              </button>
+              <button type="button" class="np-sample-btn" data-np-sample="【任课教师提醒】本周三第 3-4 节《面向对象技术与Java》实验课临时改至 S0804 实训机房1 进行，请下周五前提交第三次实验报告。">
+                <b>实验课临时调课与提交作业提醒</b>
+                <small>本周三 3-4 节面向对象实验改至 S0804 机房，下周前交报告…</small>
+              </button>
+            </div>
           </div>
         </article>
       </section>
@@ -2081,7 +2096,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.147"></script>
+<script src="app.js?v=1.148"></script>
 
 
 </body>

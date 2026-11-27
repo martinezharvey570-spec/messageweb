@@ -19050,26 +19050,23 @@ html.dark .ai-studio-head {
 }
 .ai-studio-tabs {
   flex: 0 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin: 10px 12px 6px;
+  gap: 3px;
+  overflow: visible;
+  margin: 10px 14px 8px;
   padding: 4px;
   border-radius: var(--r-pill);
   background: var(--pearl-l1-bg);
   box-shadow: var(--pearl-l1-shadow);
-  -webkit-overflow-scrolling: touch;
-}
-.ai-studio-tabs::-webkit-scrollbar {
-  display: none;
 }
 .ai-studio-tabs .ai-st-tab {
-  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
   height: 32px;
   min-height: 32px;
-  padding: 0 11px;
+  padding: 0 4px;
   border: 0 !important;
   border-radius: var(--r-pill) !important;
   background: transparent !important;
@@ -19079,14 +19076,16 @@ html.dark .ai-studio-head {
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
 }
 .ai-studio-tabs .ai-st-tab .ico {
-  width: 13.5px;
-  height: 13.5px;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 .ai-studio-tabs .ai-st-tab.active {
   background:
@@ -19100,6 +19099,22 @@ html.dark .ai-studio-head {
 html.dark .ai-studio-tabs .ai-st-tab:not(.active) {
   color: #cbd5e1;
 }
+@media (max-width: 520px) {
+  .ai-studio-tabs {
+    margin: 8px 10px 6px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .ai-studio-tabs .ai-st-tab {
+    flex-direction: column;
+    height: auto;
+    min-height: 40px;
+    padding: 4px 2px;
+    gap: 2px;
+    font-size: 10.5px;
+    line-height: 1.1;
+  }
+}
 .ai-studio-body {
   flex: 1 1 0%;
   min-height: 0;
@@ -19108,9 +19123,9 @@ html.dark .ai-studio-tabs .ai-st-tab:not(.active) {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
-  padding: 6px 12px 16px;
+  padding: 6px 14px 16px;
 }
-/* 挂载到工具舱内的工具面板去重外阴影，干净贴合抽屉内部 */
+/* 挂载到工具舱内的工具面板去重外阴影，干净贴合抽屉内部并统一上下双玻璃卡（方案二） */
 #aiStudioMount .ct-page-panel {
   background: transparent !important;
   box-shadow: none !important;
@@ -19119,7 +19134,115 @@ html.dark .ai-studio-tabs .ai-st-tab:not(.active) {
   padding: 2px 0 !important;
 }
 #aiStudioMount .ct-body {
-  padding: 4px 2px !important;
+  padding: 4px 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#aiStudioMount .np-input-panel {
+  padding: 14px !important;
+  border-radius: 20px !important;
+  background: var(--pearl-l2-inner-bg) !important;
+  box-shadow: var(--pearl-l2-inner-shadow) !important;
+  gap: 12px !important;
+}
+#aiStudioDrawer #noticeParserText {
+  min-height: 118px !important;
+  padding: 13px 15px !important;
+  border-radius: 18px !important;
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+#aiStudioDrawer #noticeParserText:focus {
+  background: var(--pearl-l1-focus-bg) !important;
+  box-shadow: var(--pearl-l1-focus-shadow) !important;
+}
+#aiStudioDrawer .np-input-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+#aiStudioDrawer .np-upload-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#aiStudioDrawer .np-upload-group button.outline {
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  border-radius: 999px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 13px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+}
+#aiStudioDrawer #noticeParserRunBtn {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 18px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+.np-samples-card {
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--pearl-l2-inner-bg);
+  box-shadow: var(--pearl-l2-inner-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.np-samples-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.np-samples-head b {
+  font-size: 13px;
+  color: var(--ink);
+}
+.np-samples-head small {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.np-sample-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 13px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.16s ease;
+}
+.np-sample-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--pearl-l3-shadow-hover, var(--pearl-l3-shadow)) !important;
+}
+.np-sample-btn b {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.np-sample-btn small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 工具舱实时课表 & 待办视图 */
@@ -19592,6 +19715,22 @@ html.dark .home-ai-send.is-idle {
    v1.144 方案一：100% 恢复原版立体液态蓝滑动按钮（#3b82f6→#1d4ed8 + .lg-slide-pill.is-blue）
    并保持快捷指令面板 / 核验过程条 / 导课表核对条与全站三层珍珠玻璃 100% 统一
    ========================================================================== */
+
+/* 修复桌面端收起参数时 #aiPage .suggestions-bar 被 min-height: 46px 撑出的 46px 空白带 Bug */
+body.on-ai-page.ai-panel-collapsed #aiPage #aiOptionsBar,
+body.on-ai-page.ai-panel-collapsed #aiPage .suggestions-bar {
+  min-height: 0 !important;
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom-width: 0 !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
 
 /* 确保分段滑槽中的激活按钮文字永远 crisp 纯白，绝不覆盖底层 .lg-slide-pill.is-blue 立体液态蓝滑块 */
 #aiOptionsBar .ai-seg .ai-seg-btn.active {

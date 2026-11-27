@@ -19591,198 +19591,311 @@ html.dark .home-ai-send.is-idle {
 }
 
 /* ==========================================================================
-   v1.141 Codex AI Control Cabin & Schedule Compiler Visual Enhancements
-   （完全沿用全站白昼微光玻璃 & 深邃黑曜石暗夜玻璃设计语言，零另起炉灶）
+   v1.143 方案 A · AI 聊天界面与全站三层珍珠流光玻璃 / 黑曜石玻璃 100% 统一
+   （全量替换 v1.141：零 1px 硬边框、零突兀青色、零实心蓝块、全端默认极简收起）
    ========================================================================== */
-.ai-options-codex {
-  gap: 8px 12px !important;
-  flex-wrap: wrap;
+
+/* 1. 顶部对话参数栏（Pearl L2 半透玻璃层，全端默认平滑收起，点「参数」丝滑展开） */
+body.on-ai-page #aiOptionsBar.ai-options-codex {
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+  border: 0 !important;
+  box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.045) !important;
+  gap: 10px 18px !important;
+  padding: 10px 24px 12px !important;
+  flex-wrap: wrap !important;
+  max-height: 240px !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  overflow: hidden !important;
+  transition: max-height .26s cubic-bezier(.22, 1, .36, 1), opacity .2s ease, transform .24s cubic-bezier(.22, 1, .36, 1), padding .24s ease !important;
 }
+html.dark body.on-ai-page #aiOptionsBar.ai-options-codex {
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 方案 A：全端（桌面 + 手机）统一由 body.ai-panel-collapsed 收起参数条，不再误隐藏欢迎态热门提问 */
+body.on-ai-page.ai-panel-collapsed #aiOptionsBar.ai-options-codex {
+  display: flex !important;
+  max-height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* 热门提问条：对话未开始时柔和展示（零硬分割线），发出第一条消息后自动收起释放视野 */
+body.on-ai-page.ai-panel-collapsed:not(.ai-has-chat) .suggestions-bar {
+  max-height: 84px !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  padding-top: 8px !important;
+  padding-bottom: 6px !important;
+  pointer-events: auto !important;
+}
+body.on-ai-page .suggestions-bar {
+  border: 0 !important;
+  box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.04) !important;
+}
+html.dark body.on-ai-page .suggestions-bar {
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+body.on-ai-page.ai-has-chat .suggestions-bar {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* 2. 分段控件与选中态：彻底告别高饱和油漆蓝块，改用与左侧导航激活态一致的琉璃冰蓝光晕 */
+#aiOptionsBar .ai-seg {
+  border: 0 !important;
+  background: var(--pearl-l1-bg) !important;
+  box-shadow: var(--pearl-l1-shadow) !important;
+  border-radius: 999px !important;
+  padding: 3px !important;
+  gap: 2px !important;
+}
+#aiOptionsBar .ai-seg-btn {
+  border: 0 !important;
+  border-radius: 999px !important;
+  height: 28px !important;
+  padding: 0 13px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: var(--ink-secondary, #475569) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease !important;
+}
+#aiOptionsBar .ai-seg-btn:hover:not(.active) {
+  color: var(--ink, #0f172a) !important;
+}
+#aiOptionsBar .ai-seg-btn.active {
+  border: 0 !important;
+  background: linear-gradient(155deg, rgba(219, 234, 254, 0.92) 0%, rgba(191, 219, 254, 0.78) 100%) !important;
+  color: var(--blue, #155eef) !important;
+  font-weight: 600 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.90), 0 2px 8px -2px rgba(21, 94, 239, 0.18), 0 0 0 1px rgba(59, 130, 246, 0.16) !important;
+}
+html.dark #aiOptionsBar .ai-seg-btn {
+  color: #94a3b8 !important;
+}
+html.dark #aiOptionsBar .ai-seg-btn:hover:not(.active) {
+  color: #e2e8f0 !important;
+}
+html.dark #aiOptionsBar .ai-seg-btn.active {
+  background: linear-gradient(155deg, rgba(37, 99, 235, 0.24) 0%, rgba(29, 78, 216, 0.14) 100%) !important;
+  color: #bfdbfe !important;
+  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.18), 0 4px 12px -4px rgba(37, 99, 235, 0.32), 0 0 0 1px rgba(96, 165, 250, 0.24) !important;
+}
+
+/* 3. 资料来源开关胶囊：与右侧「西安文理学院 ›」保持 100% 同款无边框 Pearl L3 玻璃浮片（彻底消除青色与 4 种材质打架） */
 .ai-ctx-group {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
-.ai-codex-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, .08);
-  background: rgba(255, 255, 255, .72);
-  color: var(--sub, #475569);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
-  white-space: nowrap;
+#aiOptionsBar .ai-codex-pill,
+#aiOptionsBar .ai-seg-school {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 34px !important;
+  padding: 0 13px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink-secondary, #475569) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: transform .16s ease, background .18s ease, box-shadow .18s ease, color .18s ease, opacity .18s ease !important;
 }
-.ai-codex-pill:hover {
-  background: rgba(241, 245, 249, .92);
-  color: var(--ink, #0f172a);
+#aiOptionsBar .ai-seg-school {
+  color: var(--ink, #0f172a) !important;
+  font-weight: 600 !important;
 }
-.ai-codex-pill.is-on {
-  background: rgba(21, 94, 239, .10);
-  border-color: rgba(21, 94, 239, .26);
-  color: var(--blue, #155eef);
-  font-weight: 600;
+#aiOptionsBar .ai-codex-pill:hover,
+#aiOptionsBar .ai-seg-school:hover {
+  transform: translateY(-1px);
+  color: var(--ink, #0f172a) !important;
 }
-.ai-codex-pill.is-auto {
-  background: rgba(14, 165, 233, .09);
-  border-color: rgba(14, 165, 233, .24);
-  color: #0369a1;
-  font-weight: 600;
+/* 激活态（无论「校规库」「智能联网」「强制联网」还是「我的课表」）统一柔和冰蓝珍珠光晕，绝不出现突兀青色 */
+#aiOptionsBar .ai-codex-pill.is-on,
+#aiOptionsBar .ai-codex-pill.is-auto {
+  background: linear-gradient(155deg, rgba(239, 246, 255, 0.96) 0%, rgba(219, 234, 254, 0.84) 100%) !important;
+  color: var(--blue, #155eef) !important;
+  font-weight: 600 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.94), 0 4px 12px -4px rgba(21, 94, 239, 0.20), 0 0 0 1px rgba(59, 130, 246, 0.18) !important;
 }
-.ai-codex-pill.is-off {
-  opacity: .68;
+#aiOptionsBar .ai-codex-pill.is-off {
+  opacity: .64;
 }
-html.dark .ai-codex-pill {
-  background: rgba(255, 255, 255, .04);
-  border-color: rgba(255, 255, 255, .09);
-  color: #94a3b8;
+html.dark #aiOptionsBar .ai-codex-pill,
+html.dark #aiOptionsBar .ai-seg-school {
+  color: #94a3b8 !important;
 }
-html.dark .ai-codex-pill:hover {
-  background: rgba(255, 255, 255, .08);
-  color: #e2e8f0;
+html.dark #aiOptionsBar .ai-seg-school {
+  color: #e2e8f0 !important;
 }
-html.dark .ai-codex-pill.is-on {
-  background: rgba(59, 130, 246, .16);
-  border-color: rgba(96, 165, 250, .34);
-  color: #93c5fd;
+html.dark #aiOptionsBar .ai-codex-pill:hover,
+html.dark #aiOptionsBar .ai-seg-school:hover {
+  color: #f1f5f9 !important;
 }
-html.dark .ai-codex-pill.is-auto {
-  background: rgba(56, 189, 248, .14);
-  border-color: rgba(56, 189, 248, .30);
-  color: #7dd3fc;
+html.dark #aiOptionsBar .ai-codex-pill.is-on,
+html.dark #aiOptionsBar .ai-codex-pill.is-auto {
+  background: linear-gradient(155deg, rgba(37, 99, 235, 0.26) 0%, rgba(29, 78, 216, 0.16) 100%) !important;
+  color: #bfdbfe !important;
+  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.20), 0 6px 16px -6px rgba(37, 99, 235, 0.42), 0 0 0 1px rgba(96, 165, 250, 0.26) !important;
 }
 
-/* Composer `/` Slash Trigger & Command Popover */
+/* 移动端展开参数条时的整洁排布 */
+@media (max-width: 760px) {
+  body.on-ai-page #aiOptionsBar.ai-options-codex {
+    padding: 10px 14px 12px !important;
+    gap: 8px 10px !important;
+  }
+  body.on-ai-page.ai-panel-collapsed #aiOptionsBar.ai-options-codex {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  #aiOptionsBar .ai-seg-label {
+    font-size: 11.5px !important;
+  }
+  #aiOptionsBar .ai-codex-pill,
+  #aiOptionsBar .ai-seg-school {
+    height: 32px !important;
+    padding: 0 11px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* 4. 快捷指令浮层（100% 沿用 + 附件弹窗同源 Pearl L2 悬浮玻璃，无等宽字体、无拉扁椭圆条） */
 #askForm.ask {
   position: relative;
 }
-.ask-slash-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 23, 42, .08);
-  background: rgba(248, 250, 252, .85);
-  color: var(--sub, #475569);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13.5px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
-}
-.ask-slash-btn:hover {
-  background: rgba(21, 94, 239, .10);
-  border-color: rgba(21, 94, 239, .24);
-  color: var(--blue, #155eef);
-}
-html.dark .ask-slash-btn {
-  background: rgba(255, 255, 255, .05);
-  border-color: rgba(255, 255, 255, .10);
-  color: #94a3b8;
-}
-html.dark .ask-slash-btn:hover {
-  background: rgba(59, 130, 246, .18);
-  border-color: rgba(96, 165, 250, .34);
-  color: #93c5fd;
-}
 .ai-slash-menu {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: calc(100% + 8px);
-  max-width: 560px;
-  background: rgba(255, 255, 255, .94);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(15, 23, 42, .10);
-  border-radius: 16px;
-  box-shadow: 0 14px 36px rgba(15, 23, 42, .14);
-  padding: 6px;
-  z-index: 40;
-}
-html.dark .ai-slash-menu {
-  background: rgba(10, 15, 28, .94);
-  border-color: rgba(255, 255, 255, .11);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
+  left: 16px;
+  right: 16px;
+  bottom: calc(100% + 10px);
+  max-width: 440px;
+  background: var(--pearl-l2-bg) !important;
+  backdrop-filter: blur(28px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(175%) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: var(--pearl-l2-shadow) !important;
+  padding: 8px !important;
+  z-index: 45;
 }
 .ai-slash-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 10px 6px;
-  font-size: 11.5px;
+  padding: 6px 12px 8px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--muted, #64748b);
-  border-bottom: 1px solid rgba(15, 23, 42, .06);
-  margin-bottom: 4px;
+  color: var(--ink-secondary, #475569);
+  margin-bottom: 2px;
 }
-html.dark .ai-slash-head {
-  border-bottom-color: rgba(255, 255, 255, .07);
+.ai-slash-head small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted, #94a3b8);
 }
-.ai-slash-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+#askForm.ask #aiSlashMenu .ai-slash-item {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  padding: 9px 12px !important;
+  margin: 2px 0 !important;
   border: 0 !important;
-  border-radius: 10px !important;
-  background: transparent;
-  text-align: left;
+  border-radius: 14px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left !important;
   cursor: pointer;
-  transition: background-color .14s ease;
+  transition: background .15s ease, transform .14s ease !important;
 }
-.ai-slash-item:hover,
-.ai-slash-item.is-active {
-  background: rgba(21, 94, 239, .09);
+#askForm.ask #aiSlashMenu .ai-slash-item:hover,
+#askForm.ask #aiSlashMenu .ai-slash-item.is-active {
+  background: linear-gradient(155deg, rgba(239, 246, 255, 0.92) 0%, rgba(219, 234, 254, 0.68) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(59, 130, 246, 0.12) !important;
 }
-html.dark .ai-slash-item:hover,
-html.dark .ai-slash-item.is-active {
-  background: rgba(59, 130, 246, .16);
+html.dark #askForm.ask #aiSlashMenu .ai-slash-item:hover,
+html.dark #askForm.ask #aiSlashMenu .ai-slash-item.is-active {
+  background: linear-gradient(155deg, rgba(37, 99, 235, 0.22) 0%, rgba(29, 78, 216, 0.14) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.16), 0 0 0 1px rgba(96, 165, 250, 0.20) !important;
 }
-.ai-slash-cmd {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12.5px;
-  font-weight: 700;
+.ai-slash-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--pearl-l2-inner-bg);
+  box-shadow: var(--pearl-l2-inner-shadow);
   color: var(--blue, #155eef);
-  min-width: 74px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
-html.dark .ai-slash-cmd {
+html.dark .ai-slash-ico {
   color: #93c5fd;
 }
+.ai-slash-ico .ico {
+  width: 16px;
+  height: 16px;
+}
+.ai-slash-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.ai-slash-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  line-height: 1.3;
+}
+html.dark .ai-slash-title {
+  color: #f1f5f9;
+}
 .ai-slash-desc {
-  font-size: 12.5px;
-  color: var(--sub, #475569);
+  font-size: 11.5px;
+  color: var(--muted, #64748b);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 html.dark .ai-slash-desc {
-  color: #cbd5e1;
+  color: #94a3b8;
 }
 
-/* Collapsible Codex Trace & Zero-Hallucination Grounding Box */
+/* 5. 回复底部「检索与核验过程」内嵌珍珠玻璃卡（去掉硬 1px 框与刺眼红绿块） */
 .ai-codex-trace-box {
   margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(248, 250, 252, .82);
-  border: 1px solid rgba(15, 23, 42, .07);
-}
-html.dark .ai-codex-trace-box {
-  background: rgba(255, 255, 255, .03);
-  border-color: rgba(255, 255, 255, .08);
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 0 !important;
+  background: var(--pearl-l2-inner-bg) !important;
+  box-shadow: var(--pearl-l2-inner-shadow) !important;
 }
 .ai-trace-head {
   display: flex;
@@ -19792,40 +19905,41 @@ html.dark .ai-codex-trace-box {
   font-size: 12px;
   font-weight: 600;
   color: var(--ink, #0f172a);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 html.dark .ai-trace-head { color: #e2e8f0; }
 .ai-ground-badge {
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
+  border: 0 !important;
 }
 .ai-ground-badge.is-verified {
-  background: rgba(16, 185, 129, .12);
-  color: #059669;
+  background: rgba(16, 185, 129, .10);
+  color: #047857;
 }
 .ai-ground-badge.is-partial {
-  background: rgba(245, 158, 11, .14);
+  background: rgba(245, 158, 11, .12);
   color: #b45309;
 }
 .ai-ground-badge.is-ungrounded {
-  background: rgba(239, 68, 68, .12);
-  color: #dc2626;
+  background: rgba(239, 68, 68, .10);
+  color: #b91c1c;
 }
-html.dark .ai-ground-badge.is-verified { color: #34d399; }
-html.dark .ai-ground-badge.is-partial { color: #fbbf24; }
-html.dark .ai-ground-badge.is-ungrounded { color: #f87171; }
+html.dark .ai-ground-badge.is-verified { background: rgba(16, 185, 129, .14); color: #6ee7b7; }
+html.dark .ai-ground-badge.is-partial { background: rgba(245, 158, 11, .15); color: #fcd34d; }
+html.dark .ai-ground-badge.is-ungrounded { background: rgba(239, 68, 68, .15); color: #fca5a5; }
 .ai-trace-steps {
   display: grid;
-  gap: 4px;
+  gap: 5px;
 }
 .ai-trace-step {
   display: flex;
   align-items: baseline;
   gap: 8px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.48;
 }
 .ai-trace-step b {
   color: var(--blue, #155eef);
@@ -19834,42 +19948,40 @@ html.dark .ai-ground-badge.is-ungrounded { color: #f87171; }
 }
 html.dark .ai-trace-step b { color: #93c5fd; }
 .ai-trace-step span {
-  color: var(--sub, #475569);
+  color: var(--ink-secondary, #475569);
 }
 html.dark .ai-trace-step span { color: #94a3b8; }
 
-/* Codex Schedule Compiler Health Bar & Per-Course Confidence Tags */
+/* 6. AI 导课表预览核对条（原生内嵌珍珠玻璃 + 低饱和柔光微标签） */
 .sched-ai-health-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 8px;
-  padding: 8px 10px;
+  gap: 6px 9px;
+  padding: 10px 13px;
   margin-bottom: 10px;
-  border-radius: 12px;
-  background: rgba(21, 94, 239, .05);
-  border: 1px solid rgba(21, 94, 239, .14);
+  border-radius: 16px;
+  border: 0 !important;
+  background: var(--pearl-l2-inner-bg) !important;
+  box-shadow: var(--pearl-l2-inner-shadow) !important;
   font-size: 12px;
 }
-html.dark .sched-ai-health-bar {
-  background: rgba(59, 130, 246, .10);
-  border-color: rgba(96, 165, 250, .20);
-}
 .sched-ai-health-chip {
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
   font-weight: 600;
   font-size: 11.5px;
+  border: 0 !important;
 }
-.sched-ai-health-chip.is-good { background: rgba(16, 185, 129, .14); color: #059669; }
-.sched-ai-health-chip.is-warn { background: rgba(245, 158, 11, .16); color: #b45309; }
-.sched-ai-health-chip.is-healed { background: rgba(21, 94, 239, .14); color: var(--blue, #155eef); }
-html.dark .sched-ai-health-chip.is-good { color: #34d399; }
-html.dark .sched-ai-health-chip.is-warn { color: #fbbf24; }
-html.dark .sched-ai-health-chip.is-healed { color: #93c5fd; }
+.sched-ai-health-chip.is-good { background: rgba(16, 185, 129, .10); color: #047857; }
+.sched-ai-health-chip.is-warn { background: rgba(245, 158, 11, .12); color: #b45309; }
+.sched-ai-health-chip.is-healed { background: rgba(21, 94, 239, .10); color: var(--blue, #155eef); }
+html.dark .sched-ai-health-chip.is-good { background: rgba(16, 185, 129, .14); color: #6ee7b7; }
+html.dark .sched-ai-health-chip.is-warn { background: rgba(245, 158, 11, .15); color: #fcd34d; }
+html.dark .sched-ai-health-chip.is-healed { background: rgba(59, 130, 246, .18); color: #bfdbfe; }
 .sched-ai-health-meta,
 .sched-ai-health-diff {
-  color: var(--sub, #475569);
+  color: var(--ink-secondary, #475569);
 }
 html.dark .sched-ai-health-meta,
 html.dark .sched-ai-health-diff { color: #cbd5e1; }
@@ -19877,14 +19989,37 @@ html.dark .sched-ai-health-diff { color: #cbd5e1; }
   display: inline-flex;
   align-items: center;
   margin-left: 6px;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
 }
-.sched-ai-conf-tag.is-hi { background: rgba(16, 185, 129, .12); color: #059669; }
-.sched-ai-conf-tag.is-mid { background: rgba(245, 158, 11, .14); color: #b45309; }
-.sched-ai-conf-tag.is-lo { background: rgba(239, 68, 68, .12); color: #dc2626; }
-html.dark .sched-ai-conf-tag.is-hi { color: #34d399; }
-html.dark .sched-ai-conf-tag.is-mid { color: #fbbf24; }
-html.dark .sched-ai-conf-tag.is-lo { color: #f87171; }
+.sched-ai-conf-tag.is-hi { background: rgba(16, 185, 129, .10); color: #047857; }
+.sched-ai-conf-tag.is-mid { background: rgba(245, 158, 11, .12); color: #b45309; }
+.sched-ai-conf-tag.is-lo { background: rgba(239, 68, 68, .10); color: #b91c1c; }
+html.dark .sched-ai-conf-tag.is-hi { background: rgba(16, 185, 129, .14); color: #6ee7b7; }
+html.dark .sched-ai-conf-tag.is-mid { background: rgba(245, 158, 11, .15); color: #fcd34d; }
+html.dark .sched-ai-conf-tag.is-lo { background: rgba(239, 68, 68, .15); color: #fca5a5; }
+.sched-ai-refine-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.sched-ai-refine-top label { margin: 0; }
+.sched-ai-undo-btn {
+  padding: 3px 11px;
+  border-radius: 999px;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--blue, #155eef);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sched-ai-undo-btn:hover { filter: brightness(0.98); }
+html.dark .sched-ai-undo-btn {
+  color: #93c5fd;
+}

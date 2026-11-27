@@ -476,13 +476,7 @@ document.addEventListener("click", e => {
 
 // 全局快捷键 Ctrl+K / Cmd+K 由下方 Spotlight 聚合搜索弹窗统一接管
 
-$("toggleAiConfig")?.addEventListener("click", () => {
-  if (window.innerWidth >= 761) return;
-  const bar = $("aiOptionsBar");
-  if (!bar) return;
-  const is_open = bar.classList.toggle("open");
-  $("toggleAiConfig").classList.toggle("added", is_open);
-});
+// 参数面板展开/收起逻辑已统一移至下方 init_desktop_ai_panel_toggle（桌面端与手机端一致，默认极简收起）
 
 document.querySelectorAll(".nav, .tab-item").forEach(b => {
   b.onclick = () => go(b.dataset.page);
@@ -2660,11 +2654,11 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
     ? `核验${grounding.score}%`
     : "";
   const dotHtml = confInfo ? `<i class="ai-meta-dot" aria-hidden="true"></i>` : `${ico("link", "ico-xs")}`;
-  const mainParts = [confInfo ? confInfo.text : (hasRef ? "参考依据" : "执行轨迹"), refCountText, groundText].filter(Boolean);
+  const mainParts = [confInfo ? confInfo.text : (hasRef ? "参考依据" : "检索过程"), refCountText, groundText].filter(Boolean);
   const mainLabel = mainParts.join(" · ");
 
   toggle.innerHTML = `${dotHtml}<span>${esc(mainLabel)}</span><span class="ai-meta-caret" aria-hidden="true">▾</span>`;
-  toggle.title = confInfo ? confInfo.tip : "点击展开查看 Codex 执行轨迹、核验评分与原文依据";
+  toggle.title = confInfo ? confInfo.tip : "点击展开查看检索核验过程与原文依据";
 
   const drawer = document.createElement("div");
   drawer.className = "ai-ref-drawer hide";
@@ -2678,12 +2672,12 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
     const traceEl = document.createElement("div");
     traceEl.className = "ai-codex-trace-box";
     const gBadge = (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty")
-      ? `<span class="ai-ground-badge is-${esc(grounding.status)}">零幻觉核验 ${Number(grounding.score) || 0}%</span>`
+      ? `<span class="ai-ground-badge is-${esc(grounding.status)}">依据核验 ${Number(grounding.score) || 0}%</span>`
       : "";
     const stepItems = traceSteps.map(st =>
       `<div class="ai-trace-step"><b>${esc(st.label || "")}</b><span>${esc(st.detail || "")}</span></div>`
     ).join("");
-    traceEl.innerHTML = `<div class="ai-trace-head"><span>Codex 执行轨迹</span>${gBadge}</div>${stepItems ? `<div class="ai-trace-steps">${stepItems}</div>` : ""}`;
+    traceEl.innerHTML = `<div class="ai-trace-head"><span>检索与核验过程</span>${gBadge}</div>${stepItems ? `<div class="ai-trace-steps">${stepItems}</div>` : ""}`;
     drawer.appendChild(traceEl);
   }
   if (validLinks.length) {
@@ -4351,30 +4345,35 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   });
 })();
 
-/* ---- v1.003: 电脑端收起/展开模型选择与热门提问记忆 ---- */
+/* ---- v1.143: 方案 A 极简纯净回归 — 参数栏全端默认收起，点击「参数」平滑展开 ---- */
 (function init_desktop_ai_panel_toggle() {
-  const KEY = "xz_desktop_ai_panel_collapsed";
+  const KEY = "xz_ai_panel_expanded_v2";
   const btn = $("toggleAiConfig");
+  const bar = $("aiOptionsBar");
   const syncBtnState = () => {
-    if (!btn) return;
-    if (window.innerWidth >= 761) {
-      const collapsed = document.body.classList.contains("ai-panel-collapsed");
+    const collapsed = document.body.classList.contains("ai-panel-collapsed");
+    if (bar) bar.classList.toggle("open", !collapsed);
+    if (btn) {
       btn.classList.toggle("added", !collapsed);
-      btn.title = collapsed ? "展开模型选择与热门提问" : "收起模型选择与热门提问";
+      btn.setAttribute("aria-expanded", String(!collapsed));
+      btn.title = collapsed ? "展开回答方式与资料来源设置" : "收起对话参数设置";
     }
   };
   try {
-    if (localStorage.getItem(KEY) === "1") {
+    // 方案 A：默认收起参数条，保持与全站一致的清爽通透界面；仅当用户主动展开过时记忆展开状态
+    if (localStorage.getItem(KEY) !== "1") {
       document.body.classList.add("ai-panel-collapsed");
+    } else {
+      document.body.classList.remove("ai-panel-collapsed");
     }
-  } catch {}
+  } catch {
+    document.body.classList.add("ai-panel-collapsed");
+  }
   syncBtnState();
   btn?.addEventListener("click", () => {
-    if (window.innerWidth >= 761) {
-      const collapsed = document.body.classList.toggle("ai-panel-collapsed");
-      try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch {}
-      syncBtnState();
-    }
+    const collapsed = document.body.classList.toggle("ai-panel-collapsed");
+    try { localStorage.setItem(KEY, collapsed ? "0" : "1"); } catch {}
+    syncBtnState();
   });
 })();
 
@@ -5627,8 +5626,9 @@ async function compress_sched_image_slices(file) {
       const img = new Image();
       img.onerror = () => reject(new Error("图片格式不支持"));
       img.onload = () => {
-        const renderCrop = (sx, sy, sw, sh, maxDim) => {
-          let tw = sw, th = sh;
+        const renderCrop = (sx, sy, sw, sh, maxDim, scaleUp = 1) => {
+          let tw = Math.max(1, Math.round(sw * scaleUp));
+          let th = Math.max(1, Math.round(sh * scaleUp));
           if (tw > maxDim || th > maxDim) {
             const ratio = Math.min(maxDim / tw, maxDim / th);
             tw = Math.max(1, Math.round(tw * ratio));
@@ -5644,14 +5644,22 @@ async function compress_sched_image_slices(file) {
           return canvas.toDataURL("image/jpeg", 0.92);
         };
         const iw = img.width || 1, ih = img.height || 1;
-        // 超长竖屏课表截图（高宽比 >= 2.05）：自动拆分为上下重叠高清两切片，避免底部晚课与小字被压缩模糊
-        if (ih / iw >= 2.05 && ih >= 1600) {
-          const sliceH = Math.round(ih * 0.58);
-          const topSlice = renderCrop(0, 0, iw, sliceH, 2200);
-          const bottomSlice = renderCrop(0, ih - sliceH, iw, sliceH, 2200);
+        const maxSide = Math.max(iw, ih);
+        // 低清压缩课表图（如微信/QQ 转发的 724×1024 竖图）：经真实 API 实测 2× 高清放大 + 上下重叠双切片可彻底消除假教室脑补
+        if (maxSide < 1500 && ih / iw >= 1.15 && ih >= 600) {
+          const sliceH = Math.round(ih * 0.55);
+          const topSlice = renderCrop(0, 0, iw, sliceH, 2200, 2);
+          const bottomSlice = renderCrop(0, ih - sliceH, iw, sliceH, 2200, 2);
+          resolve([topSlice, bottomSlice]);
+        } else if (ih / iw >= 1.32 && ih >= 900) {
+          // 高清 A4 竖图 / 超长手机截图：保持原分辨率上下重叠双切片
+          const sliceH = Math.round(ih * 0.56);
+          const topSlice = renderCrop(0, 0, iw, sliceH, 2200, 1);
+          const bottomSlice = renderCrop(0, ih - sliceH, iw, sliceH, 2200, 1);
           resolve([topSlice, bottomSlice]);
         } else {
-          resolve([renderCrop(0, 0, iw, ih, 2400)]);
+          const scaleUp = maxSide < 1200 ? 1.8 : 1;
+          resolve([renderCrop(0, 0, iw, ih, 2400, scaleUp)]);
         }
       };
       img.src = ev.target.result;
@@ -5698,6 +5706,7 @@ async function compress_sched_image_slices(file) {
   let pendingParsedSelfHealed = false;
   let pendingParsedWorkload = null;
   let pendingParsedDiffSummary = "";
+  let pendingRefineUndoSnapshot = null;
   let editingParsedIdx = -1;
   let aiImportRefining = false;
 
@@ -5854,8 +5863,8 @@ async function compress_sched_image_slices(file) {
 
     const healthHtml = (Number.isFinite(pendingParsedHealth) || pendingParsedWorkload || pendingParsedDiffSummary)
       ? `<div class="sched-ai-health-bar">
-          ${Number.isFinite(pendingParsedHealth) ? `<span class="sched-ai-health-chip ${pendingParsedHealth >= 85 ? "is-good" : "is-warn"}">编译体检 ${pendingParsedHealth}分</span>` : ""}
-          ${pendingParsedSelfHealed ? `<span class="sched-ai-health-chip is-healed">Codex 已自动自愈</span>` : ""}
+          ${Number.isFinite(pendingParsedHealth) ? `<span class="sched-ai-health-chip ${pendingParsedHealth >= 85 ? "is-good" : "is-warn"}">完整度 ${pendingParsedHealth} 分</span>` : ""}
+          ${pendingParsedSelfHealed ? `<span class="sched-ai-health-chip is-healed">已自动修正</span>` : ""}
           ${pendingParsedWorkload ? `<span class="sched-ai-health-meta">周 ${pendingParsedWorkload.weekly_periods || 0} 节 · 早八 ${pendingParsedWorkload.early8_count || 0} 次 · 最忙 ${schedEsc(pendingParsedWorkload.busiest_day || "无")}</span>` : ""}
           ${pendingParsedDiffSummary ? `<span class="sched-ai-health-diff">${schedEsc(pendingParsedDiffSummary)}</span>` : ""}
         </div>`
@@ -5957,9 +5966,12 @@ async function compress_sched_image_slices(file) {
       ${warnHtml}
       <div class="sched-ai-wb-list">${itemsHtml}</div>
       <div class="sched-ai-refine-bar">
-        <label for="schedAiRefineInput">AI 自然语言二次修正</label>
+        <div class="sched-ai-refine-top">
+          <label for="schedAiRefineInput">AI 自然语言二次修正</label>
+          ${pendingRefineUndoSnapshot ? `<button type="button" class="sched-ai-undo-btn" data-wb-act="undo-refine" title="恢复上次 AI 修正前的课表">撤销上次修正</button>` : ""}
+        </div>
         <div class="sched-ai-refine-row">
-          <input type="text" id="schedAiRefineInput" placeholder="如：把大学物理教室全改到明德楼B201；删掉体育；高数改成1-16周" ${aiImportRefining ? "disabled" : ""}>
+          <input type="text" id="schedAiRefineInput" placeholder="如：把下午的课都往后挪一节；删掉体育；高数改成1-16周" ${aiImportRefining ? "disabled" : ""}>
           <button type="button" id="schedAiRefineBtn" class="sched-ai-refine-btn" data-wb-act="refine" ${aiImportRefining ? "disabled" : ""}>${aiImportRefining ? "修正中…" : "AI 修正"}</button>
         </div>
       </div>`;
@@ -6026,12 +6038,13 @@ async function compress_sched_image_slices(file) {
       const res = await resp.json().catch(() => ({}));
       if (!resp.ok) throw new Error(res?.detail || res?.error || "课表修正失败，请重试");
       const updated = Array.isArray(res?.courses) ? res.courses : [];
+      pendingRefineUndoSnapshot = pendingParsedCourses.map(c => ({ ...c }));
       pendingParsedCourses = updated;
       pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(updated);
       pendingParsedHealth = Number.isFinite(Number(res?.health_score)) ? Number(res.health_score) : null;
       pendingParsedWorkload = res?.workload || null;
       const d = res?.diff;
-      pendingParsedDiffSummary = d ? `本次补丁：+${(d.added || []).length} / 改${(d.updated || []).length} / -${(d.deleted || []).length}` : "";
+      pendingParsedDiffSummary = d ? `本次补丁：+${(d.added || []).length} / 改${(d.updated || []).length} / -${(d.deleted || []).length}${res?.scope_guard_reverted ? `（已拦截 ${res.scope_guard_reverted} 处越界修改）` : ""}` : "";
       editingParsedIdx = -1;
       aiImportRefining = false;
       render_ai_parsed_workbench();
@@ -6110,11 +6123,27 @@ async function compress_sched_image_slices(file) {
       pendingParsedCourses = null;
       pendingParsedWarnings = [];
       pendingParsedNotes = "";
+      pendingParsedHealth = null;
+      pendingParsedSelfHealed = false;
+      pendingParsedWorkload = null;
+      pendingParsedDiffSummary = "";
+      pendingRefineUndoSnapshot = null;
       editingParsedIdx = -1;
       clear_ai_import_draft();
       render_ai_parsed_workbench();
       set_ai_import_status("已清空暂存草稿，可重新上传文件或粘贴文字识别。");
       toast("已清空课表识别草稿");
+      return;
+    }
+    if (act === "undo-refine") {
+      if (!Array.isArray(pendingRefineUndoSnapshot) || !pendingRefineUndoSnapshot.length) return;
+      pendingParsedCourses = pendingRefineUndoSnapshot;
+      pendingRefineUndoSnapshot = null;
+      pendingParsedDiffSummary = "已撤销上次 AI 修正";
+      pendingParsedWarnings = audit_parsed_courses_client(pendingParsedCourses);
+      render_ai_parsed_workbench();
+      set_ai_import_status(`已恢复至修正前课表（共 ${pendingParsedCourses.length} 条）`);
+      toast("已撤销上次修正");
       return;
     }
     if (act === "refine") {
@@ -6319,7 +6348,7 @@ async function compress_sched_image_slices(file) {
   }
 
   window.extract_pdf_for_schedule = async function extract_pdf_for_schedule(file) {
-    set_ai_import_status("正在加载 PDF 解析引擎…");
+    set_ai_import_status("正在加载 PDF 解析引擎（含中文字库）…");
     await load_ext_script_any([
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
       "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
@@ -6328,26 +6357,132 @@ async function compress_sched_image_slices(file) {
     const pdfjsLib = window.pdfjsLib;
     if (!pdfjsLib) throw new Error("PDF 引擎初始化失败");
     const buf = await file.arrayBuffer();
-    // 禁用跨域 Worker，彻底避免浏览器安全策略拦截
-    const pdf = await pdfjsLib.getDocument({ data: buf, disableWorker: true }).promise;
-    set_ai_import_status(`正在读取 PDF（共 ${pdf.numPages} 页）…`);
-    let fullText = "";
-    for (let i = 1; i <= Math.min(pdf.numPages, 8); i++) {
-      const page = await pdf.getPage(i);
+    // 禁用跨域 Worker 并配置 CJK CMap（解决正方教务系统导出 PDF 非嵌入中文字体空白问题！）
+    const pdf = await pdfjsLib.getDocument({
+      data: buf,
+      disableWorker: true,
+      cMapUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/",
+      cMapPacked: true,
+      standardFontDataUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/"
+    }).promise;
+    set_ai_import_status(`正在按表格版面精准提取 PDF（共 ${pdf.numPages} 页）…`);
+
+    // 1. 版面感知分列重构：按“星期一~星期日”表头横坐标把跨页课程精准归入对应星期列并自动缝合跨页折行
+    const DAYS = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "日": 7, "天": 7 };
+    const dayOf = s => { const m = String(s).replace(/\s+/g, "").match(/^(?:星期|周)([一二三四五六日天])$/); return m ? DAYS[m[1]] : 0; };
+    const pageItems = [];
+    let flatText = "";
+    const maxPages = Math.min(pdf.numPages, 8);
+    for (let p = 1; p <= maxPages; p++) {
+      const page = await pdf.getPage(p);
+      const vp = page.getViewport({ scale: 1 });
       const tc = await page.getTextContent();
       const line = tc.items.map(it => it.str).join(" ").trim();
-      if (line) fullText += line + "\n";
+      if (line) flatText += line + "\n";
+      const items = [];
+      for (const it of tc.items) {
+        const str = String(it.str || "");
+        if (!str.trim()) continue;
+        const m = pdfjsLib.Util.transform(vp.transform, it.transform);
+        const x = m[4], y = m[5], w = Number(it.width) || 0;
+        items.push({ p, s: str, x, y, cx: x + w / 2, w });
+      }
+      pageItems.push({ p, items });
     }
-    if (fullText.trim().length >= 30) {
-      return { text: fullText.trim() };
+
+    let cols = null;
+    for (const pg of pageItems) {
+      const hs = pg.items.map(i => ({ i, d: dayOf(i.s) })).filter(o => o.d);
+      if (hs.length >= 5) {
+        const ys = hs.map(o => o.i.y).sort((a, b) => a - b);
+        const mid = ys[Math.floor(ys.length / 2)];
+        const row = hs.filter(o => Math.abs(o.i.y - mid) < 16).sort((a, b) => a.d - b.d);
+        if (row.length >= 5) {
+          cols = row.map(o => ({ d: o.d, x: o.i.x, cx: o.i.cx }));
+          cols.hy = mid;
+          break;
+        }
+      }
     }
-    set_ai_import_status("检测到扫描版 PDF，正在转成高清图片识别…");
-    const page1 = await pdf.getPage(1);
-    const vp = page1.getViewport({ scale: 2.4 });
-    const canvas = document.createElement("canvas");
-    canvas.width = vp.width; canvas.height = vp.height;
-    await page1.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
-    return { image: canvas.toDataURL("image/jpeg", 0.92) };
+
+    if (cols) {
+      const gaps = [];
+      for (let k = 1; k < cols.length; k++) gaps.push(cols[k].cx - cols[k - 1].cx);
+      const colW = gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)] || 100;
+      const leftBound = cols[0].cx - colW * 0.52;
+      const rightBound = cols[cols.length - 1].cx + colW * 0.55;
+      const perDay = new Map();
+      const misc = [];
+      for (const pg of pageItems) {
+        const footerIt = pg.items.find(it => /^其他课程[：:]/.test(it.s.trim()));
+        const footerY = footerIt ? footerIt.y - 6 : 99999;
+        for (const it of pg.items) {
+          if (dayOf(it.s)) continue;
+          if (pg.p === 1 && it.y <= cols.hy + 6) continue;
+          if (it.y >= footerY || it.w > colW * 1.35) { misc.push(it); continue; }
+          if (it.x < leftBound - 10 || it.x > rightBound) continue;
+          let best = cols[0], bd = Infinity;
+          for (const c of cols) {
+            const dd = Math.abs((it.x + Math.min(it.w, colW) * 0.3) - c.cx);
+            if (dd < bd) { bd = dd; best = c; }
+          }
+          if (!perDay.has(best.d)) perDay.set(best.d, []);
+          perDay.get(best.d).push(it);
+        }
+      }
+      const nm = ["", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];
+      const out = [];
+      for (const c of cols) {
+        out.push(`【${nm[c.d]}】`);
+        const arr = (perDay.get(c.d) || []).sort((a, b) => (a.p - b.p) || (a.y - b.y) || (a.x - b.x));
+        let cur = "", prev = null;
+        for (const it of arr) {
+          const piece = it.s.replace(/\s+/g, "");
+          if (!prev) cur = piece;
+          else {
+            const samePage = it.p === prev.p;
+            const dy = samePage ? (it.y - prev.y) : 999;
+            const startsCourse = /[★☆◆■]$/.test(piece) && !/^[:：\/(（]/.test(piece);
+            const endsPrevCourse = /(?:教师[:：][\u4e00-\u9fa5]{2,4}|职称[:：][^\n/]{2,10})$/.test(cur) && !/^[\/:：]/.test(piece);
+            const pageBreakContinue = !samePage && (/^(?:\(\d+-\d+节\)|[\u4e00-\u9fa5]{1,3}\/职称)/.test(piece) || /[★☆◆■]$/.test(cur) || /教师[:：][\u4e00-\u9fa5]{1,2}$/.test(cur));
+            if (pageBreakContinue) cur += piece;
+            else if (!samePage || dy > 18 || (endsPrevCourse && dy > 6) || (startsCourse && dy > 8 && cur.includes("教师"))) {
+              if (cur) out.push(cur);
+              cur = piece;
+            } else cur += piece;
+          }
+          prev = it;
+        }
+        if (cur) out.push(cur);
+      }
+      if (misc.length) {
+        out.push("【其他说明】");
+        misc.sort((a, b) => (a.p - b.p) || (a.y - b.y) || (a.x - b.x));
+        out.push(misc.map(m => m.s.trim()).join(" "));
+      }
+      const structuredText = out.join("\n").trim();
+      if (structuredText.length >= 40) return { text: structuredText };
+    }
+
+    if (flatText.trim().length >= 30) {
+      return { text: flatText.trim() };
+    }
+    // 2. 扫描版 PDF：最多渲染前 4 页高清图（避免漏掉第 2 页！）
+    const renderCount = Math.min(pdf.numPages, 4);
+    set_ai_import_status(`检测到扫描版 PDF，正在将前 ${renderCount} 页转为高清图片识别…`);
+    const imgs = [];
+    for (let p = 1; p <= renderCount; p++) {
+      const page = await pdf.getPage(p);
+      const vp = page.getViewport({ scale: 2.2 });
+      const canvas = document.createElement("canvas");
+      canvas.width = vp.width; canvas.height = vp.height;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      imgs.push(canvas.toDataURL("image/jpeg", 0.90));
+    }
+    return { images: imgs, image: imgs[0] };
   }
 
   window.extract_xlsx_for_schedule = async function extract_xlsx_for_schedule(file) {
@@ -6469,6 +6604,10 @@ async function compress_sched_image_slices(file) {
 
       timeoutId = setTimeout(() => ctrl.abort(), 185000);
 
+      pendingParsedCourses = [];
+      pendingParsedWarnings = [];
+      pendingParsedDiffSummary = "";
+      pendingRefineUndoSnapshot = null;
       const resp = await fetch(api_base + "/schedule/parse", {
         method: "POST",
         headers: {
@@ -6503,6 +6642,14 @@ async function compress_sched_image_slices(file) {
               lastStage = ev.stage;
               const sec = Number.isFinite(ev.elapsed) ? ev.elapsed : Math.round((Date.now() - startedAt) / 1000);
               set_ai_import_status(`${lastStage}（已用时 ${sec} 秒）`);
+            } else if (ev.type === "course" && ev.course) {
+              if (!Array.isArray(pendingParsedCourses)) pendingParsedCourses = [];
+              pendingParsedCourses.push(ev.course);
+              lastStage = `已实时识别 ${pendingParsedCourses.length} 门课程：${ev.course.name || ""}`;
+              set_ai_import_status(lastStage);
+              if (pendingParsedCourses.length === 1 || pendingParsedCourses.length % 3 === 0) {
+                render_ai_parsed_workbench();
+              }
             } else if (ev.type === "result") {
               res = ev;
             } else if (ev.type === "error") {
@@ -9526,10 +9673,10 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   });
 })();
 
-/* ---- v1.141 Codex AI Control Cabin（执行模式、统一推理深度、上下文范围胶囊与 / 斜杠命令面板） ---- */
+/* ---- v1.143 校务指南 AI 对话参数与快捷指令面板（方案 A：极简珍珠玻璃统一体系） ---- */
 (function init_codex_control_cabin() {
   const state = {
-    mode: "agent",
+    mode: "agent", // "fast"（极速） | "agent"（标准） | "deep"（深度）
     effort: "high",
     kb: true,
     web_mode: "auto", // "auto" | "on" | "off"
@@ -9540,28 +9687,30 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (saved && typeof saved === "object") {
       if (["fast", "deep", "agent"].includes(saved.mode)) state.mode = saved.mode;
-      if (["off", "low", "high", "max"].includes(saved.effort)) state.effort = saved.effort;
       if (typeof saved.kb === "boolean") state.kb = saved.kb;
       if (["auto", "on", "off"].includes(saved.web_mode)) state.web_mode = saved.web_mode;
       if (typeof saved.workspace === "boolean") state.workspace = saved.workspace;
     }
   } catch {}
 
+  const syncEffortByMode = () => {
+    state.effort = state.mode === "fast" ? "off" : (state.mode === "deep" ? "max" : "high");
+  };
+  syncEffortByMode();
+
   const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} };
 
   const syncDom = () => {
+    syncEffortByMode();
     const modelSel = $("aiModel");
     const effortSel = $("aiEffort");
     const thinkChk = $("aiThinking");
     if (modelSel) modelSel.value = state.mode === "deep" ? "deepseek-v4-pro" : "deepseek-flash";
-    if (thinkChk) thinkChk.checked = state.effort !== "off";
-    if (effortSel && state.effort !== "off") effortSel.value = state.effort;
+    if (thinkChk) thinkChk.checked = state.mode !== "fast";
+    if (effortSel) effortSel.value = state.mode === "deep" ? "max" : (state.mode === "fast" ? "low" : "high");
 
     $("aiCodexModeSeg")?.querySelectorAll("[data-codex-mode]").forEach(b => {
       b.classList.toggle("active", b.dataset.codexMode === state.mode);
-    });
-    $("aiUnifiedEffortSeg")?.querySelectorAll("[data-unified-effort]").forEach(b => {
-      b.classList.toggle("active", b.dataset.unifiedEffort === state.effort);
     });
 
     const kbBtn = $("aiCtxKb");
@@ -9586,18 +9735,6 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const btn = e.target.closest("[data-codex-mode]");
     if (!btn) return;
     state.mode = btn.dataset.codexMode;
-    if (state.mode === "fast") state.effort = "off";
-    else if (state.mode === "deep" && state.effort === "off") state.effort = "high";
-    else if (state.mode === "agent" && state.effort === "off") state.effort = "high";
-    syncDom();
-    persist();
-  });
-
-  $("aiUnifiedEffortSeg")?.addEventListener("click", e => {
-    const btn = e.target.closest("[data-unified-effort]");
-    if (!btn) return;
-    state.effort = btn.dataset.unifiedEffort;
-    if (state.effort === "off" && state.mode === "deep") state.mode = "fast";
     syncDom();
     persist();
   });
@@ -9606,14 +9743,18 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     state.kb = !state.kb;
     syncDom();
     persist();
-    toast(state.kb ? "已开启本校校规库检索" : "已暂停本校校规库检索");
+    toast(state.kb ? "已开启校内制度库检索" : "已暂停校内制度库检索");
   });
 
   $("aiCtxWeb")?.addEventListener("click", () => {
     state.web_mode = state.web_mode === "auto" ? "on" : (state.web_mode === "on" ? "off" : "auto");
     syncDom();
     persist();
-    const tips = { auto: "智能联网：静态校规免联网，最新公告自动查官网", on: "强制联网：本次提问将强制联网检索核验", off: "仅查本地：完全跳过联网，仅依据校内制度与个人数据" };
+    const tips = {
+      auto: "智能联网：常规校规秒查本地，最新公告自动查官网",
+      on: "强制联网：本次提问将优先联网检索核验",
+      off: "仅查本地：仅依据校内正式制度与个人数据作答"
+    };
     toast(tips[state.web_mode]);
   });
 
@@ -9621,7 +9762,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     state.workspace = !state.workspace;
     syncDom();
     persist();
-    toast(state.workspace ? "已主动关联个人课表与待办上下文" : "已恢复按需自动读取课表与待办");
+    toast(state.workspace ? "已主动关联个人课表与待办" : "已恢复按需自动读取课表");
   });
 
   window.get_codex_ai_state = () => ({
@@ -9635,15 +9776,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   });
   syncDom();
 
-  // Codex / 斜杠指令面板
+  // 快捷指令面板（原生珍珠 L2 玻璃浮层，支持输入 / 或从 + 菜单一键唤出）
   const SLASH_COMMANDS = [
-    { cmd: "/查校规", desc: "精准检索 117 份校规与官网指南（含条文定位与零幻觉核验）", fill: "请结合西安文理学院正式制度，告诉我：", mode: "agent" },
-    { cmd: "/对比制度", desc: "横向表格对比两项校规/奖学金条件与互斥红线", fill: "请用对比表格详细对比以下两项制度的申请条件、金额/效力和关键红线：", mode: "deep" },
-    { cmd: "/算绩点", desc: "按本校五分制确定性核算 GPA、学位余量与奖学金资格", fill: "帮我按学校五分制精确核算 GPA 并评估学位和奖学金资格，并生成导入确认卡：", mode: "agent" },
-    { cmd: "/写申请书", desc: "结合本校条款起草缓考 / 转专业 / 休学 / 体测免测正式文书", fill: "请依据学校相关规定，帮我起草一份格式规范的申请书并附材料清单，事由如下：", mode: "deep" },
-    { cmd: "/拆通知", desc: "打开多模态群通知拆解器（自动识别待办、考试并查课表冲突）", action: () => window.open_ai_studio?.("parser") },
-    { cmd: "/导课表", desc: "打开 Codex AI 课表编译工作台（8项体检 + 自动自愈 + 原子修正）", action: () => { go("schedule"); setTimeout(() => $("schedAiImportBtn")?.click() || $("scheduleAiImportDialog")?.showModal(), 120); } },
-    { cmd: "/课表体检", desc: "结合我的个人课表分析早八分布、空档期与复习建议", fill: "请读取我的个人课表，帮我做一次本周课程负荷体检，指出最忙的一天和适合自习的空档时段。", mode: "agent", attachWorkspace: true }
+    { cmd: "/查校规", label: "查校规", icon: "i-book", desc: "精准检索 117 份本校正式制度与具体条款", fill: "请结合西安文理学院正式制度，告诉我：", mode: "agent" },
+    { cmd: "/对比制度", label: "对比制度", icon: "i-sliders", desc: "横向对比两项制度或奖学金的申请条件与限制", fill: "请用清晰表格对比以下两项制度的申请条件、标准和注意事项：", mode: "deep" },
+    { cmd: "/算绩点", label: "算绩点", icon: "i-award", desc: "按本校五分制精确核算 GPA、学位余量与奖助资格", fill: "帮我按学校五分制精确核算 GPA 并评估学位和奖学金资格，并生成导入确认卡：", mode: "agent" },
+    { cmd: "/写申请书", label: "写申请书", icon: "i-edit", desc: "结合本校规定起草缓考、转专业或休学正式申请", fill: "请依据学校相关规定，帮我起草一份格式规范的申请书并附材料清单，事由如下：", mode: "deep" },
+    { cmd: "/拆通知", label: "拆通知", icon: "i-sparkles", desc: "打开群通知拆解工具，一键提取待办与截止时间", action: () => window.open_ai_studio?.("parser") },
+    { cmd: "/导课表", label: "导课表", icon: "i-calendar", desc: "打开 AI 智能导课表，支持原版 PDF、表格与截图", action: () => { go("schedule"); setTimeout(() => $("schedImportImgBtn")?.click() || $("scheduleAiImportDialog")?.showModal(), 120); } },
+    { cmd: "/查空档", label: "查空档与早八", icon: "i-clock", desc: "读取个人课表，分析本周早八分布与适合自习的空档", fill: "请读取我的个人课表，帮我分析本周课程安排、早八分布以及适合去图书馆自习的空档时段。", mode: "agent", attachWorkspace: true }
   ];
 
   const qEl = $("question");
@@ -9664,10 +9805,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       item.action();
       return;
     }
-    if (item.mode) {
-      state.mode = item.mode;
-      if (state.mode === "deep" && state.effort === "off") state.effort = "high";
-    }
+    if (item.mode) state.mode = item.mode;
     if (item.attachWorkspace) state.workspace = true;
     syncDom();
     persist();
@@ -9682,14 +9820,17 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
   const renderSlashMenu = (filterText = "") => {
     if (!menuEl) return;
     const kw = String(filterText || "").replace(/^\/+/, "").trim().toLowerCase();
-    visibleCmds = SLASH_COMMANDS.filter(c => !kw || c.cmd.toLowerCase().includes(kw) || c.desc.toLowerCase().includes(kw));
+    visibleCmds = SLASH_COMMANDS.filter(c => !kw || c.cmd.toLowerCase().includes(kw) || c.label.toLowerCase().includes(kw) || c.desc.toLowerCase().includes(kw));
     if (!visibleCmds.length) { closeSlash(); return; }
     activeIdx = Math.min(activeIdx, visibleCmds.length - 1);
-    menuEl.innerHTML = `<div class="ai-slash-head"><span>Codex 快捷指令</span><small>↑↓ 选择 · Enter 确认</small></div>` +
+    menuEl.innerHTML = `<div class="ai-slash-head"><span>快捷指令</span><small>↑↓ 选择 · Enter 确认</small></div>` +
       visibleCmds.map((c, i) => `
         <button type="button" class="ai-slash-item${i === activeIdx ? " is-active" : ""}" data-slash-idx="${i}" role="option">
-          <span class="ai-slash-cmd">${esc(c.cmd)}</span>
-          <span class="ai-slash-desc">${esc(c.desc)}</span>
+          <span class="ai-slash-ico"><svg class="ico" aria-hidden="true"><use href="#${c.icon}"/></svg></span>
+          <span class="ai-slash-body">
+            <span class="ai-slash-title">${esc(c.label)}</span>
+            <span class="ai-slash-desc">${esc(c.desc)}</span>
+          </span>
         </button>
       `).join("");
     menuEl.classList.remove("hide");
@@ -9730,19 +9871,16 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     applySlashCmd(visibleCmds[Number(btn.dataset.slashIdx)]);
   });
 
-  $("askSlashBtn")?.addEventListener("click", e => {
+  $("askSlashMenuTrigger")?.addEventListener("click", e => {
     e.stopPropagation();
-    if (menuEl && !menuEl.classList.contains("hide")) {
-      closeSlash();
-    } else {
-      activeIdx = 0;
-      renderSlashMenu("");
-      qEl?.focus();
-    }
+    $("askAttachPop")?.classList.remove("open");
+    activeIdx = 0;
+    renderSlashMenu("");
+    qEl?.focus();
   });
 
   document.addEventListener("click", e => {
     if (!menuEl || menuEl.classList.contains("hide")) return;
-    if (!menuEl.contains(e.target) && e.target !== $("askSlashBtn") && e.target !== qEl) closeSlash();
+    if (!menuEl.contains(e.target) && e.target !== $("askSlashMenuTrigger") && !e.target.closest?.("#askSlashMenuTrigger") && e.target !== qEl) closeSlash();
   });
 })();

@@ -2166,6 +2166,12 @@ function format_markdown_safe(text) {
     if (h_match) {
       flush_list();
       const level = h_match[1].length;
+      const plainH = h_match[2].replace(/\*\*/g, "").trim();
+      const [hKind, hIcon] = md_section_kind(plainH);
+      if (plainH.length <= 18 && hKind !== "note") {
+        out.push(`<div class="md-section md-section-${hKind}">${ico(hIcon)}<span class="md-section-title">${esc(plainH)}</span></div>`);
+        continue;
+      }
       const content = parse_inline_markdown(h_match[2]);
       if (level <= 2) {
         out.push(`<h2 class="md-h2">${content}</h2>`);
@@ -2185,12 +2191,13 @@ function format_markdown_safe(text) {
     }
 
     const step_match = trimmed.match(
-      /^(?:[-*•]\s*)?第\s*([0-9一二三四五六七八九十]+)\s*步\s*[：:.、]?\s*(.+)$/
+      /^(?:[-*•]\s*)?(?:\*{1,2})?第\s*([0-9一二三四五六七八九十]+)\s*步(?:\*{1,2})?\s*[：:.、]?\s*(?:\*{1,2})?\s*(.+)$/
     );
     if (step_match) {
       flush_list();
+      const stepBody = step_match[2].replace(/^\*{1,2}\s*/, "");
       out.push(
-        `<div class="md-step"><i>${esc(cn_to_num(step_match[1]))}</i><div>${parse_inline_markdown(step_match[2])}</div></div>`
+        `<div class="md-step"><i>${esc(cn_to_num(step_match[1]))}</i><div>${parse_inline_markdown(stepBody)}</div></div>`
       );
       continue;
     }
@@ -2644,23 +2651,21 @@ function add_doc_chips(parent_el, titles, citations_map = {}) {
 }
 
 function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
-  const { showConf, confidence, showSrc, sources, sources_label, answer_docs, doc_citations, agent_trace, grounding } = opts;
+  const { showConf, confidence, showSrc, sources, sources_label, answer_docs, doc_citations } = opts;
   const validLinks = showSrc ? pick_sources(sources) : [];
   const docTitles = showSrc && !validLinks.length && Array.isArray(answer_docs)
     ? [...new Set(answer_docs.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
     : [];
   const hasRef = validLinks.length > 0 || docTitles.length > 0;
-  const traceSteps = Array.isArray(agent_trace?.steps) ? agent_trace.steps : [];
-  const hasTrace = traceSteps.length > 0 || (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty");
 
   const confMap = {
     high: { text: "依据充分", cls: "high", tip: "已找到与问题对应的校内文件或官网页面" },
     medium: { text: "依据有限", cls: "medium", tip: "只找到部分相关材料，具体细节以主管部门最新通知为准" },
-    low: { text: "未找到原文", cls: "low", tip: "校内文件库与官网均未检索到直接依据，以下为办理路径建议" }
+    low: { text: "参考建议", cls: "low", tip: "校内文件库与官网暂未查到直达条文，以下为通用办理建议" }
   };
   let confInfo = showConf ? confMap[confidence] : null;
   if (confInfo && confInfo.cls === "high" && !hasRef && (!sources || !sources.length)) confInfo = null;
-  if (!confInfo && !hasRef && !hasTrace) return;
+  if (!confInfo && !hasRef) return;
 
   const toggle = document.createElement("button");
   toggle.type = "button";
@@ -2670,15 +2675,12 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   const refCountText = validLinks.length
     ? `${validLinks.length}条来源`
     : (docTitles.length ? `${docTitles.length}份文件` : "");
-  const groundText = (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty")
-    ? `核验${grounding.score}%`
-    : "";
   const dotHtml = confInfo ? `<i class="ai-meta-dot" aria-hidden="true"></i>` : `${ico("link", "ico-xs")}`;
-  const mainParts = [confInfo ? confInfo.text : (hasRef ? "参考依据" : "检索过程"), refCountText, groundText].filter(Boolean);
+  const mainParts = [confInfo ? confInfo.text : "参考依据", refCountText].filter(Boolean);
   const mainLabel = mainParts.join(" · ");
 
   toggle.innerHTML = `${dotHtml}<span>${esc(mainLabel)}</span><span class="ai-meta-caret" aria-hidden="true">▾</span>`;
-  toggle.title = confInfo ? confInfo.tip : "点击展开查看检索核验过程与原文依据";
+  toggle.title = confInfo ? confInfo.tip : "点击展开查看参考原文依据";
 
   const drawer = document.createElement("div");
   drawer.className = "ai-ref-drawer hide";
@@ -2687,18 +2689,6 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
     tipEl.className = "ai-confidence " + confInfo.cls;
     tipEl.innerHTML = `<i></i><span>${confInfo.text}</span><small>${confInfo.tip}</small>`;
     drawer.appendChild(tipEl);
-  }
-  if (hasTrace) {
-    const traceEl = document.createElement("div");
-    traceEl.className = "ai-codex-trace-box";
-    const gBadge = (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty")
-      ? `<span class="ai-ground-badge is-${esc(grounding.status)}">依据核验 ${Number(grounding.score) || 0}%</span>`
-      : "";
-    const stepItems = traceSteps.map(st =>
-      `<div class="ai-trace-step"><b>${esc(st.label || "")}</b><span>${esc(st.detail || "")}</span></div>`
-    ).join("");
-    traceEl.innerHTML = `<div class="ai-trace-head"><span>检索与核验过程</span>${gBadge}</div>${stepItems ? `<div class="ai-trace-steps">${stepItems}</div>` : ""}`;
-    drawer.appendChild(traceEl);
   }
   if (validLinks.length) {
     add_sources(drawer, sources, sources_label);

@@ -1888,6 +1888,35 @@ html.dark .pill.ready {
 .ai-confidence.low i {
   background: var(--subtle);
 }
+html.dark .ai-confidence {
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #cbd5e1;
+}
+html.dark .ai-confidence small {
+  color: #94a3b8;
+}
+html.dark .ai-confidence.high {
+  border-color: rgba(52, 211, 153, 0.30);
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+html.dark .ai-confidence.high i {
+  background: #34d399;
+}
+html.dark .ai-confidence.medium {
+  border-color: rgba(251, 191, 36, 0.30);
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+}
+html.dark .ai-confidence.medium i {
+  background: #fbbf24;
+}
+html.dark .ai-confidence.low {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+}
 
 @media (max-width: 640px) {
   .ai-confidence {

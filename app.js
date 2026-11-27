@@ -1975,7 +1975,8 @@ function md_anchor(url, text) {
 }
 
 const emoji_svg_map = [
-  [/📌|📍/gu, "pin"],
+  [/📌/gu, "pin"],
+  [/📍|🏢|🏫/gu, "map-pin"],
   [/📋|📝/gu, "clipboard"],
   [/🧭|🔄/gu, "route"],
   [/⚠️?|❗|❕|🚨/gu, "alert"],
@@ -1983,12 +1984,12 @@ const emoji_svg_map = [
   [/💡/gu, "bulb"],
   [/🎯/gu, "target"],
   [/🌐|📎|🔗/gu, "link"],
-  [/📄|📑|📃/gu, "file-text"],
+  [/📄|📑|📃|🪪/gu, "file-text"],
   [/📚|📖/gu, "book"],
   [/🔍|🔎/gu, "search"],
   [/⏰|⏳|🕒/gu, "clock"],
   [/📅|🗓️?/gu, "calendar"],
-  [/🔔|📢/gu, "bell"],
+  [/🔔|📢|📞/gu, "bell"],
   [/🎓/gu, "graduation"],
   [/🏆|🥇/gu, "award"],
   [/🔑|🔒/gu, "key"],
@@ -2016,7 +2017,7 @@ function parse_inline_markdown(raw) {
   );
 
   for (const [re, iconName] of emoji_svg_map) {
-    s = s.replace(re, () => keep(ico(iconName, "ico-xs")));
+    s = s.replace(re, () => keep(ico(iconName, `ico-xs md-ico-${iconName}`)));
   }
   s = s.replace(/[\p{Extended_Pictographic}\u200d\uFE0F]+/gu, "");
 
@@ -2039,11 +2040,14 @@ function cn_to_num(s) {
 
 const md_section_kinds = [
   [/结论|依据|政策|适用|判断/, "decision", "target"],
+  [/对比|比较|算账|方案|权衡|区别/, "decision", "sliders"],
+  [/奖|助|贷|绩点|学分|学位/, "materials", "award"],
   [/材料|表单|清单|证件|附件/, "materials", "clipboard"],
   [/流程|步骤|动线|顺序|程序/, "flow", "route"],
+  [/时间|日期|节点|截止|安排/, "flow", "clock"],
   [/红线|注意|风险|警示|禁止|违规|提醒/, "warn", "alert"],
-  [/行动|待办|下一步|要做|执行/, "action", "check-square"],
-  [/确认|追问|需要你|补充|提示/, "ask", "bulb"],
+  [/行动|待办|下一步|要做|执行|兜底|备选|B计划/, "action", "check-square"],
+  [/确认|追问|需要你|补充|提示|技巧|话术/, "ask", "bulb"],
 ];
 
 function md_section_kind(title) {
@@ -2185,8 +2189,12 @@ function format_markdown_safe(text) {
 
     if (/^>\s*(.+)$/.test(trimmed)) {
       flush_list();
-      const q_content = parse_inline_markdown(trimmed.replace(/^>\s*/, ""));
-      out.push(`<blockquote class="md-quote">${q_content}</blockquote>`);
+      const rawQ = trimmed.replace(/^>\s*/, "");
+      const isWarnQ = /红线|注意|切勿|严禁|警告|缺考|作弊|处分|风险|无效/.test(rawQ);
+      const q_content = parse_inline_markdown(rawQ);
+      const hasInlineIco = /<svg class="ico/.test(q_content);
+      const qIco = hasInlineIco ? "" : ico(isWarnQ ? "alert" : "bulb", `ico-xs ${isWarnQ ? "md-ico-alert" : "md-ico-bulb"}`);
+      out.push(`<blockquote class="md-quote${isWarnQ ? " is-warn" : ""}">${qIco}<div>${q_content}</div></blockquote>`);
       continue;
     }
 

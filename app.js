@@ -506,6 +506,35 @@ document.querySelectorAll("[data-quick-ai]").forEach(b => {
   };
 });
 
+// 首页「校务指南 AI」卡片内输入条直接提问并进入完整对话
+const homeAiFormEl = $("homeAiForm");
+const homeAiInputEl = $("homeAiInput");
+const homeAiSendBtnEl = $("homeAiSendBtn");
+const syncHomeAiBtn = () => {
+  if (!homeAiInputEl || !homeAiSendBtnEl) return;
+  homeAiSendBtnEl.classList.toggle("is-idle", !homeAiInputEl.value.trim());
+};
+homeAiInputEl?.addEventListener("input", syncHomeAiBtn);
+homeAiFormEl?.addEventListener("submit", e => {
+  e.preventDefault();
+  const q = (homeAiInputEl?.value || "").trim();
+  if (!q) {
+    go("ai");
+    $("question")?.focus();
+    return;
+  }
+  homeAiInputEl.value = "";
+  syncHomeAiBtn();
+  go("ai");
+  const qBox = $("question");
+  if (qBox) {
+    qBox.value = q;
+    qBox.dispatchEvent(new Event("input", { bubbles: true }));
+    auto_resize_question();
+    $("askForm")?.requestSubmit();
+  }
+});
+
 /* ---- 消息区滚动（兼容桌面容器滚动与移动端整页自然滚动） ---- */
 function is_window_ai_scroll() {
   const msg_el = $("messages");
@@ -637,6 +666,7 @@ let last_toolbox_page = "parser";
 
 function go(p) {
   if (p === "toolbox") p = last_toolbox_page || "parser";
+  if (p !== "ai" && typeof window.close_ai_studio === "function") window.close_ai_studio(true);
   const isToolbox = TOOLBOX_PAGES.has(p);
   if (isToolbox) last_toolbox_page = p;
   cur_page = p;
@@ -656,8 +686,14 @@ function go(p) {
   document.querySelectorAll(".tab-item").forEach(b =>
     b.classList.toggle("active", b.dataset.page === p)
   );
+  const crumbGroupEl = $("crumbGroup");
+  if (crumbGroupEl) {
+    if (p === "users" || p === "analytics") crumbGroupEl.textContent = "系统管理";
+    else if (p === "ai" || isToolbox) crumbGroupEl.textContent = "智能助手";
+    else crumbGroupEl.textContent = "日常事务";
+  }
   $("crumb").textContent = {
-    home: "工作台总览",
+    home: "总览",
     notices: "通知公告",
     tasks: "我的待办",
     ai: "校务指南 AI",
@@ -669,7 +705,7 @@ function go(p) {
     schedtools: "超级课表助手",
     users: "用户管理",
     analytics: "数据统计"
-  }[p] || "工作台总览";
+  }[p] || "总览";
   sidebar_el.classList.remove("open");
   if (typeof window.close_all_date_pickers === "function") window.close_all_date_pickers();
   document.querySelectorAll(".xz-select.open").forEach(s => s.classList.remove("open"));
@@ -955,11 +991,11 @@ function render_home() {
   $("statDone").textContent = done_count;
   set_badges(pending_count);
 
+  const recentList = notices.slice(0, 3);
   $("recent").innerHTML =
-    notices
-      .slice(0, 4)
+    recentList
       .map(
-        n => `<div class="notice-row">
+        (n, idx) => `<div class="notice-row">
           <span class="bullet"></span>
           <div style="flex:1;min-width:0">
             <h4>${esc(n.title)}</h4>
@@ -968,11 +1004,29 @@ function render_home() {
               <span class="tag">${esc(n.category)}</span>
               <span>${date(n.created_at)}</span>
               ${n.deadline ? `<span>${ico("clock","ico-xs")}截止：${esc(n.deadline)}</span>` : ""}
+              <button type="button" class="notice-ai-link" data-recent-ai="${idx}" title="让校务指南 AI 解读此通知">${ico("sparkles", "ico-xs")}AI 解读</button>
             </div>
           </div>
         </div>`
       )
       .join("") || '<div class="empty">暂无通知公告</div>';
+
+  $("recent").querySelectorAll("[data-recent-ai]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = recentList[Number(btn.dataset.recentAi)];
+      if (!item) return;
+      const bodyText = String(item.body || "").replace(/\s+/g, " ").trim().slice(0, 900);
+      const prompt = `请帮我解读校内通知《${item.title}》，提取关键时间节点、办理要求、准备材料与待办事项：\n${bodyText}`;
+      go("ai");
+      const qBox = $("question");
+      if (qBox) {
+        qBox.value = prompt;
+        qBox.dispatchEvent(new Event("input", { bubbles: true }));
+        auto_resize_question();
+        $("askForm")?.requestSubmit();
+      }
+    });
+  });
 
   save_home_snap();
 }
@@ -6588,11 +6642,21 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       const allowedPages = new Set(["home", "notices", "tasks", "ai", "knowledge", "schedule", "parser", "academic", "guide", "schedtools", "users", "analytics"]);
       if (allowedPages.has(act.page)) {
         const pLabel = PAGE_LABELS[act.page] || act.page;
+        const studioPages = new Set(["parser", "academic", "guide", "schedtools", "schedule", "tasks"]);
+        const canInStudio = cur_page === "ai" && studioPages.has(act.page) && typeof window.open_ai_studio === "function";
         if (deferNavAsCard) {
-          confirmActs.push({ type: "nav_card", icon: "arrow-right", label: `前往「${pLabel}」`, btnText: "立即跳转", run: () => go(act.page) });
+          confirmActs.push({
+            type: "nav_card",
+            icon: act.page === "schedule" ? "calendar" : (act.page === "tasks" ? "check-square" : "sparkles"),
+            shortLabel: pLabel,
+            label: canInStudio ? `在工具舱打开「${pLabel}」` : `前往「${pLabel}」`,
+            btnText: canInStudio ? `同屏打开${pLabel}` : "立即跳转",
+            fullPage: canInStudio ? act.page : "",
+            run: () => (canInStudio ? window.open_ai_studio(act.page) : go(act.page))
+          });
         } else {
-          autoLogs.push(`已为你跳转至「${pLabel}」`);
-          setTimeout(() => go(act.page), 450);
+          autoLogs.push(`已为你打开「${pLabel}」`);
+          setTimeout(() => (canInStudio ? window.open_ai_studio(act.page) : go(act.page)), 360);
         }
       }
     } else if (act.type === "open_tool" && act.tool) {
@@ -6654,172 +6718,259 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     toolsEl.querySelector(".todo-action-btn")?.classList.add("hide");
   }
 
-  const cardGrid = confirmActs.length ? document.createElement("div") : null;
-  if (cardGrid) {
-    cardGrid.className = confirmActs.length >= 2 ? "ai-confirm-grid is-multi" : "ai-confirm-grid";
-  }
+  if (confirmActs.length) {
+    const hub = document.createElement("div");
+    hub.className = confirmActs.length >= 2 ? "ai-hub-card is-multi" : "ai-hub-card";
 
-  for (const act of confirmActs) {
-    const card = document.createElement("div");
-    card.className = "sched-chat-confirm ai-action-confirm-card";
-    if (act.type === "nav_card") {
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-${schedEsc(act.icon || "sparkles")}"/></svg><span>${schedEsc(act.label)}</span></div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="go">${schedEsc(act.btnText || "立即前往")}</button>
-        </div>`;
-      card.querySelector('[data-act="go"]').onclick = () => {
-        if (typeof act.run === "function") act.run();
-      };
-    } else if (act.type === "add_tasks") {
-      const previewLines = act.items.map(it =>
-        `• ${schedEsc(it.title)}${it.due_date ? "（截止 " + schedEsc(it.due_date) + "）" : ""}`
-      ).join("<br>");
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认添加 ${act.items.length} 条待办</span></div>
-        <div class="sched-chat-confirm-list">${previewLines}</div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认加入待办</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">暂不添加</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = async () => {
-        let added = 0;
-        for (const it of act.items) {
-          try {
-            await api("/tasks", {
-              method: "POST",
-              body: JSON.stringify({ title: String(it.title).trim(), due_date: String(it.due_date || "").trim() })
-            });
-            added++;
-          } catch {}
-        }
-        try {
-          tasks = await api("/tasks");
-          render_tasks();
-          render_home();
-        } catch {}
-        toast(added ? `已添加 ${added} 条待办` : "添加待办失败");
-        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已确认添加 ${added} 条待办</span></div>`;
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已忽略该待办建议"); };
-    } else if (act.type === "complete_task") {
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认完成待办：「${schedEsc(act.title || act.id)}」</span></div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认标记完成</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = async () => {
-        try {
-          await api("/tasks/" + Number(act.id), { method: "PATCH", body: JSON.stringify({ status: "completed" }) });
-          tasks = await api("/tasks");
-          render_tasks();
-          render_home();
-          toast("已标记为完成");
-          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已标记完成「${schedEsc(act.title || act.id)}」</span></div>`;
-        } catch { toast("操作失败"); }
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
-    } else if (act.type === "delete_task") {
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>待确认删除待办：「${schedEsc(act.title || act.id)}」</span></div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认删除</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = async () => {
-        try {
-          await api("/tasks/" + Number(act.id), { method: "DELETE" });
-          tasks = await api("/tasks");
-          render_tasks();
-          render_home();
-          toast("已删除待办");
-          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已删除待办「${schedEsc(act.title || act.id)}」</span></div>`;
-        } catch { toast("删除失败"); }
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
-    } else if (act.type === "schedule") {
-      const courses = Array.isArray(act.courses) ? act.courses : [];
-      const isReplace = act.mode === "replace";
-      const previewLines = courses.slice(0, 4).map(c =>
-        `• ${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节《${schedEsc(c.name)}》${c.room ? " @ " + schedEsc(c.room) : ""}`
-      ).join("<br>");
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>${isReplace ? `待确认：整套替换为 ${courses.length} 条新课程` : `待确认：更新超级课表（${courses.length ? courses.length + " 条课程" : "课表调整"}）`}</span></div>
-        ${previewLines ? `<div class="sched-chat-confirm-list">${previewLines}${courses.length > 4 ? `<br>…等共 ${courses.length} 条` : ""}</div>` : ""}
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">${isReplace ? "确认覆盖并同步" : "确认写入课表"}</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">暂不应用</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = async () => {
-        await execute_single_schedule_act(act);
-        toast("已确认更新课表并同步云端");
-        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入超级课表并同步云端</span></div>`;
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消课表修改"); };
-    } else if (act.type === "publish_notice") {
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-bell"/></svg><span>管理员公告待确认：《${schedEsc(act.title || "校园通知")}》</span></div>
-        <div class="sched-chat-confirm-list">${schedEsc(String(act.body || "").slice(0, 120))}</div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认发布全校公告</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = async () => {
-        try {
-          await api("/notices", {
-            method: "POST",
-            body: JSON.stringify({
-              title: act.title || "校园通知",
-              category: act.category || "校园通知",
-              audience: act.audience || "全体学生",
-              body: act.body || "",
-              deadline: act.deadline || ""
-            })
-          });
-          await refresh();
-          toast("公告已正式发布");
-          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已正式发布通知公告</span></div>`;
-        } catch (err) {
-          toast(err?.message || "发布失败");
-        }
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => { card.remove(); toast("已取消发布"); };
-    } else if (act.type === "import_gpa") {
-      const list = act.courses.slice(0, 12);
-      const preview = list.map(c => `• ${schedEsc(c.name)}（${Number(c.credit) || 3} 学分 · ${Number(c.score) || 0} 分）`).join("<br>");
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>待确认：导入 ${list.length} 门课程并打开 GPA 换算器</span></div>
-        <div class="sched-chat-confirm-list">${preview}</div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认导入并打开 GPA</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = () => {
-        window.invoke_campus_tool?.("import_gpa", { courses: list });
-        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已导入 ${list.length} 门课程并打开 GPA 核算</span></div>`;
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
-    } else if (act.type === "add_exams") {
-      const list = act.items.slice(0, 8);
-      const preview = list.map(it => `• ${schedEsc(it.title)}${it.date ? "（" + schedEsc(it.date) + "）" : ""}${it.place ? " @ " + schedEsc(it.place) : ""}`).join("<br>");
-      card.innerHTML = `
-        <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>待确认：加入 ${list.length} 场考试倒计时</span></div>
-        <div class="sched-chat-confirm-list">${preview}</div>
-        <div class="sched-chat-confirm-actions">
-          <button type="button" class="sched-btn-primary" data-act="confirm">确认写入考试倒计时</button>
-          <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
-        </div>`;
-      card.querySelector('[data-act="confirm"]').onclick = () => {
-        window.invoke_campus_tool?.("add_exams", { items: list });
-        card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入考试倒计时</span></div>`;
-      };
-      card.querySelector('[data-act="cancel"]').onclick = () => card.remove();
+    const getTabMeta = act => {
+      if (act.type === "add_tasks") return { icon: "check-square", text: `待办 (${act.items.length})` };
+      if (act.type === "complete_task") return { icon: "check-square", text: "完成待办" };
+      if (act.type === "delete_task") return { icon: "trash", text: "删除待办" };
+      if (act.type === "schedule") return { icon: "calendar", text: `课表${Array.isArray(act.courses) && act.courses.length ? ` (${act.courses.length})` : ""}` };
+      if (act.type === "publish_notice") return { icon: "bell", text: "发布公告" };
+      if (act.type === "import_gpa") return { icon: "gauge", text: `GPA (${act.courses.length})` };
+      if (act.type === "add_exams") return { icon: "clock", text: `考试 (${act.items.length})` };
+      return { icon: act.icon || "sparkles", text: act.shortLabel || String(act.btnText || act.label || "工具").replace(/^(立即|同屏|打开|前往)/, "").slice(0, 8) };
+    };
+
+    const tabBar = confirmActs.length >= 2 ? document.createElement("div") : null;
+    if (tabBar) {
+      tabBar.className = "ai-hub-tabs";
+      tabBar.setAttribute("role", "tablist");
+      hub.appendChild(tabBar);
     }
-    cardGrid.appendChild(card);
-  }
-  if (cardGrid && cardGrid.children.length) {
-    toolsEl.parentElement?.insertBefore(cardGrid, toolsEl.nextSibling);
+
+    const bodyHost = document.createElement("div");
+    bodyHost.className = "ai-hub-body";
+    hub.appendChild(bodyHost);
+
+    const panes = [];
+    const tabBtns = [];
+
+    const activateIdx = i => {
+      tabBtns.forEach((b, idx) => {
+        b.classList.toggle("active", idx === i);
+        b.setAttribute("aria-selected", idx === i ? "true" : "false");
+      });
+      panes.forEach((p, idx) => p.classList.toggle("hide", idx !== i));
+    };
+
+    const markTabDone = i => {
+      if (tabBtns[i]) tabBtns[i].classList.add("is-done");
+    };
+
+    confirmActs.forEach((act, idx) => {
+      if (tabBar) {
+        const meta = getTabMeta(act);
+        const tb = document.createElement("button");
+        tb.type = "button";
+        tb.className = "ai-hub-tab" + (idx === 0 ? " active" : "");
+        tb.setAttribute("role", "tab");
+        tb.setAttribute("aria-selected", idx === 0 ? "true" : "false");
+        tb.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-${schedEsc(meta.icon)}"/></svg><span>${schedEsc(meta.text)}</span>`;
+        tb.onclick = () => activateIdx(idx);
+        tabBar.appendChild(tb);
+        tabBtns.push(tb);
+      }
+
+      const card = document.createElement("div");
+      card.className = "ai-hub-pane" + (idx === 0 ? "" : " hide");
+
+      if (act.type === "nav_card") {
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-${schedEsc(act.icon || "sparkles")}"/></svg><span>${schedEsc(act.label)}</span></div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="go">${schedEsc(act.btnText || "立即打开")}</button>
+            ${act.fullPage ? `<button type="button" class="sched-btn-ghost" data-act="full">全页查看</button>` : ""}
+          </div>`;
+        card.querySelector('[data-act="go"]').onclick = () => {
+          if (typeof act.run === "function") act.run();
+        };
+        card.querySelector('[data-act="full"]')?.addEventListener("click", () => go(act.fullPage));
+      } else if (act.type === "add_tasks") {
+        const previewLines = act.items.map(it =>
+          `• ${schedEsc(it.title)}${it.due_date ? "（截止 " + schedEsc(it.due_date) + "）" : ""}`
+        ).join("<br>");
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认添加 ${act.items.length} 条待办</span></div>
+          <div class="sched-chat-confirm-list">${previewLines}</div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认加入待办</button>
+            <button type="button" class="sched-btn-ghost" data-act="open-studio">查看我的待办</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">暂不添加</button>
+          </div>`;
+        card.querySelector('[data-act="open-studio"]')?.addEventListener("click", () => window.open_ai_studio?.("tasks"));
+        card.querySelector('[data-act="confirm"]').onclick = async () => {
+          let added = 0;
+          for (const it of act.items) {
+            try {
+              await api("/tasks", {
+                method: "POST",
+                body: JSON.stringify({ title: String(it.title).trim(), due_date: String(it.due_date || "").trim() })
+              });
+              added++;
+            } catch {}
+          }
+          try {
+            tasks = await api("/tasks");
+            render_tasks();
+            render_home();
+            window.refresh_ai_studio_live?.();
+          } catch {}
+          toast(added ? `已添加 ${added} 条待办` : "添加待办失败");
+          markTabDone(idx);
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已确认添加 ${added} 条待办</span></div>`;
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已忽略该待办建议</span></div>`;
+          toast("已忽略该待办建议");
+        };
+      } else if (act.type === "complete_task") {
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>待确认完成待办：「${schedEsc(act.title || act.id)}」</span></div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认标记完成</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+          </div>`;
+        card.querySelector('[data-act="confirm"]').onclick = async () => {
+          try {
+            await api("/tasks/" + Number(act.id), { method: "PATCH", body: JSON.stringify({ status: "completed" }) });
+            tasks = await api("/tasks");
+            render_tasks();
+            render_home();
+            window.refresh_ai_studio_live?.();
+            toast("已标记为完成");
+            markTabDone(idx);
+            card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已标记完成「${schedEsc(act.title || act.id)}」</span></div>`;
+          } catch { toast("操作失败"); }
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消操作</span></div>`;
+        };
+      } else if (act.type === "delete_task") {
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>待确认删除待办：「${schedEsc(act.title || act.id)}」</span></div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认删除</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+          </div>`;
+        card.querySelector('[data-act="confirm"]').onclick = async () => {
+          try {
+            await api("/tasks/" + Number(act.id), { method: "DELETE" });
+            tasks = await api("/tasks");
+            render_tasks();
+            render_home();
+            window.refresh_ai_studio_live?.();
+            toast("已删除待办");
+            markTabDone(idx);
+            card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已删除待办「${schedEsc(act.title || act.id)}」</span></div>`;
+          } catch { toast("删除失败"); }
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消删除</span></div>`;
+        };
+      } else if (act.type === "schedule") {
+        const courses = Array.isArray(act.courses) ? act.courses : [];
+        const isReplace = act.mode === "replace";
+        const previewLines = courses.slice(0, 5).map(c =>
+          `• ${SCHED_DAY_SHORT[c.day] || ""} 第${c.start}-${c.end}节《${schedEsc(c.name)}》${c.room ? " @ " + schedEsc(c.room) : ""}`
+        ).join("<br>");
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>${isReplace ? `待确认：整套替换为 ${courses.length} 条新课程` : `待确认：更新超级课表（${courses.length ? courses.length + " 条课程" : "课表调整"}）`}</span></div>
+          ${previewLines ? `<div class="sched-chat-confirm-list">${previewLines}${courses.length > 5 ? `<br>…等共 ${courses.length} 条` : ""}</div>` : ""}
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">${isReplace ? "确认覆盖并同步" : "确认写入课表"}</button>
+            <button type="button" class="sched-btn-ghost" data-act="open-studio">同屏对照课表</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">暂不应用</button>
+          </div>`;
+        card.querySelector('[data-act="open-studio"]')?.addEventListener("click", () => window.open_ai_studio?.("schedule"));
+        card.querySelector('[data-act="confirm"]').onclick = async () => {
+          await execute_single_schedule_act(act);
+          window.refresh_ai_studio_live?.();
+          toast("已确认更新课表并同步云端");
+          markTabDone(idx);
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入超级课表并同步云端</span></div>`;
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消课表修改</span></div>`;
+          toast("已取消课表修改");
+        };
+      } else if (act.type === "publish_notice") {
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico ico-star" aria-hidden="true"><use href="#i-bell"/></svg><span>管理员公告待确认：《${schedEsc(act.title || "校园通知")}》</span></div>
+          <div class="sched-chat-confirm-list">${schedEsc(String(act.body || "").slice(0, 140))}</div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认发布全校公告</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+          </div>`;
+        card.querySelector('[data-act="confirm"]').onclick = async () => {
+          try {
+            await api("/notices", {
+              method: "POST",
+              body: JSON.stringify({
+                title: act.title || "校园通知",
+                category: act.category || "校园通知",
+                audience: act.audience || "全体学生",
+                body: act.body || "",
+                deadline: act.deadline || ""
+              })
+            });
+            await refresh();
+            toast("公告已正式发布");
+            markTabDone(idx);
+            card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已正式发布通知公告</span></div>`;
+          } catch (err) {
+            toast(err?.message || "发布失败");
+          }
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消发布</span></div>`;
+        };
+      } else if (act.type === "import_gpa") {
+        const list = act.courses.slice(0, 12);
+        const preview = list.map(c => `• ${schedEsc(c.name)}（${Number(c.credit) || 3} 学分 · ${Number(c.score) || 0} 分）`).join("<br>");
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg><span>待确认：导入 ${list.length} 门课程并同屏打开 GPA 换算</span></div>
+          <div class="sched-chat-confirm-list">${preview}</div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认导入并同屏核算</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+          </div>`;
+        card.querySelector('[data-act="confirm"]').onclick = () => {
+          window.invoke_campus_tool?.("import_gpa", { courses: list });
+          markTabDone(idx);
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已导入 ${list.length} 门课程并在工具舱打开 GPA 核算</span></div>`;
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消导入</span></div>`;
+        };
+      } else if (act.type === "add_exams") {
+        const list = act.items.slice(0, 8);
+        const preview = list.map(it => `• ${schedEsc(it.title)}${it.date ? "（" + schedEsc(it.date) + "）" : ""}${it.place ? " @ " + schedEsc(it.place) : ""}`).join("<br>");
+        card.innerHTML = `
+          <div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>待确认：加入 ${list.length} 场考试倒计时</span></div>
+          <div class="sched-chat-confirm-list">${preview}</div>
+          <div class="sched-chat-confirm-actions">
+            <button type="button" class="sched-btn-primary" data-act="confirm">确认写入并同屏查看</button>
+            <button type="button" class="sched-btn-ghost" data-act="cancel">取消</button>
+          </div>`;
+        card.querySelector('[data-act="confirm"]').onclick = () => {
+          window.invoke_campus_tool?.("add_exams", { items: list });
+          markTabDone(idx);
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>已写入考试倒计时并在工具舱打开</span></div>`;
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          card.innerHTML = `<div class="sched-chat-confirm-head"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg><span>已取消写入</span></div>`;
+        };
+      }
+
+      bodyHost.appendChild(card);
+      panes.push(card);
+    });
+
+    if (panes.length) {
+      toolsEl.parentElement?.insertBefore(hub, toolsEl.nextSibling);
+    }
   }
 }
 
@@ -8966,12 +9117,26 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     $("sidebarBackdrop")?.classList.remove("show");
 
     const t = String(tool || "").trim();
+    const stayInAiStudio = cur_page === "ai" && !payload.forceFullPage && typeof window.open_ai_studio === "function";
     if (t === "notice_parser" || t === "parser") {
-      window.open_notice_parser?.(payload.prefill || "");
+      if (stayInAiStudio) {
+        window.open_ai_studio("parser");
+        if (payload.prefill && $("noticeParserText")) $("noticeParserText").value = String(payload.prefill);
+      } else {
+        window.open_notice_parser?.(payload.prefill || "");
+      }
     } else if (t === "academic_check" || t === "gpa_calc" || t === "academic") {
-      window.open_gpa_calc?.("gpa");
+      if (stayInAiStudio) {
+        window.open_ai_studio("academic", { subTab: "gpa" });
+      } else {
+        window.open_gpa_calc?.("gpa");
+      }
     } else if (t === "eligibility") {
-      window.open_gpa_calc?.("elig");
+      if (stayInAiStudio) {
+        window.open_ai_studio("academic", { subTab: "elig" });
+      } else {
+        window.open_gpa_calc?.("elig");
+      }
       setTimeout(() => {
         if (payload.gpa !== undefined && $("eligGpa")) $("eligGpa").value = String(payload.gpa);
         if (payload.rank && $("eligRank")) $("eligRank").value = String(payload.rank);
@@ -8992,22 +9157,30 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         }))];
         localStorage.setItem(key, JSON.stringify(next));
       } catch {}
-      window.open_gpa_calc?.("gpa");
+      if (stayInAiStudio) window.open_ai_studio("academic", { subTab: "gpa" });
+      else window.open_gpa_calc?.("gpa");
       toast(`已导入 ${payload.courses.length} 门课程并核算 GPA`);
     } else if (t === "guide_wizard" || t === "guide") {
       const tab = payload.tab || "defer";
-      window.open_guide_wizard?.(tab);
+      if (stayInAiStudio) {
+        window.open_ai_studio("guide", { subTab: tab });
+      } else {
+        window.open_guide_wizard?.(tab);
+      }
       if (payload.reason) {
         setTimeout(() => {
           if ($("gwReason")) $("gwReason").value = String(payload.reason);
         }, 60);
       }
     } else if (t === "sched_tools" || t === "sched_exams" || t === "schedtools") {
-      window.open_sched_tools?.("exams");
+      if (stayInAiStudio) window.open_ai_studio("schedtools", { subTab: "exams" });
+      else window.open_sched_tools?.("exams");
     } else if (t === "sched_free") {
-      window.open_sched_tools?.("free");
+      if (stayInAiStudio) window.open_ai_studio("schedtools", { subTab: "free" });
+      else window.open_sched_tools?.("free");
     } else if (t === "sched_ics") {
-      window.open_sched_tools?.("ics");
+      if (stayInAiStudio) window.open_ai_studio("schedtools", { subTab: "ics" });
+      else window.open_sched_tools?.("ics");
     } else if (t === "add_exams" && Array.isArray(payload.items) && payload.items.length) {
       try {
         const exKey = "xz_sched_exams_" + (me?.username || "guest");
@@ -9023,8 +9196,15 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
         });
         localStorage.setItem(exKey, JSON.stringify(arr));
       } catch {}
-      window.open_sched_tools?.("exams");
+      if (stayInAiStudio) window.open_ai_studio("schedtools", { subTab: "exams" });
+      else window.open_sched_tools?.("exams");
       toast(`已添加 ${payload.items.length} 场考试倒计时`);
+    } else if (t === "schedule") {
+      if (stayInAiStudio) window.open_ai_studio("schedule");
+      else go("schedule");
+    } else if (t === "tasks") {
+      if (stayInAiStudio) window.open_ai_studio("tasks");
+      else go("tasks");
     } else if (t === "custom_kb") {
       window.open_custom_doc_dialog?.(payload);
     } else if (t === "school_picker") {
@@ -9040,5 +9220,255 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
     const tool = btn.dataset.openTool;
     const tab = btn.dataset.toolTab || "";
     window.invoke_campus_tool(tool, { tab });
+  });
+})();
+
+/* ==================== v1.139 AI 界面一体化工具舱（同屏切换全站工具 + 双向联调） ==================== */
+(function init_ai_studio_workbench() {
+  const PORTAL_MAP = {
+    parser: { pageId: "parserPage", init: () => window.init_parser_page?.() },
+    academic: { pageId: "academicPage", init: opts => { window.init_academic_page?.(); if (opts?.subTab) window.switch_academic_tab?.(opts.subTab); } },
+    guide: { pageId: "guidePage", init: opts => { window.init_guide_page?.(); if (opts?.subTab) window.render_guide_scene?.(opts.subTab); } },
+    schedtools: { pageId: "schedtoolsPage", init: opts => { window.init_schedtools_page?.(); if (opts?.subTab) { const b = $("schedToolsTabs")?.querySelector(`[data-sttab="${opts.subTab}"]`); b?.click(); } } }
+  };
+
+  let studioOpen = false;
+  let activeTab = "parser";
+  let mountedToolKey = null;
+  let mountedPanelEl = null;
+  let studioSchedDay = (new Date().getDay() || 7);
+
+  const restoreMountedPanel = () => {
+    if (!mountedToolKey || !mountedPanelEl) return;
+    const homeSec = $(PORTAL_MAP[mountedToolKey]?.pageId);
+    if (homeSec && mountedPanelEl.parentElement !== homeSec) {
+      homeSec.appendChild(mountedPanelEl);
+    }
+    mountedToolKey = null;
+    mountedPanelEl = null;
+  };
+
+  const renderStudioSchedulePane = host => {
+    const now = new Date();
+    const weekNo = typeof schedGetWeekNumber === "function"
+      ? Math.max(1, Math.min(schedState.totalWeeks || 18, schedGetWeekNumber(now, schedState.startDate) || 1))
+      : 1;
+    const dayNames = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+    const courses = typeof schedCoursesOfDay === "function" ? schedCoursesOfDay(weekNo, studioSchedDay) : [];
+    const season = typeof schedCurrentSeason === "function" ? schedCurrentSeason(now) : "winter";
+    const periods = (typeof SCHED_PERIODS !== "undefined" && SCHED_PERIODS[season]) || [];
+    const pTime = n => periods.find(p => p.n === Number(n)) || { s: `第${n}节`, e: "" };
+
+    const dayPills = [1, 2, 3, 4, 5, 6, 7].map(d =>
+      `<button type="button" class="ai-st-day-pill${d === studioSchedDay ? " active" : ""}" data-st-day="${d}">${dayNames[d]}</button>`
+    ).join("");
+
+    const listHtml = courses.length
+      ? courses.map(c => {
+          const st = pTime(c.start);
+          const ed = pTime(c.end);
+          return `<div class="ai-st-course-row">
+            <div class="ai-st-course-time"><b>${schedEsc(st.s || "")}</b><small>${schedEsc(ed.e || "")}</small></div>
+            <div class="ai-st-course-main">
+              <b>${schedEsc(c.name || "未命名课程")}</b>
+              <small>第${c.start}-${c.end}节 · ${schedEsc(c.room || "待定教室")}${c.teacher ? " · " + schedEsc(c.teacher) : ""}</small>
+            </div>
+          </div>`;
+        }).join("")
+      : `<div class="ai-st-empty">第 ${weekNo} 周 · ${dayNames[studioSchedDay]} 暂无排课</div>`;
+
+    host.innerHTML = `
+      <div class="ai-st-live-card">
+        <div class="ai-st-live-head">
+          <div><b>第 ${weekNo} 周 · ${dayNames[studioSchedDay]}课表</b><small>共 ${courses.length} 门课</small></div>
+          <div class="ai-st-live-ops">
+            <button type="button" class="outline" data-st-act="ai-import">AI 导课表</button>
+            <button type="button" class="outline" data-st-act="go-schedule">完整课表</button>
+          </div>
+        </div>
+        <div class="ai-st-day-row">${dayPills}</div>
+        <div class="ai-st-course-list">${listHtml}</div>
+      </div>`;
+
+    host.querySelectorAll("[data-st-day]").forEach(btn => {
+      btn.onclick = () => {
+        studioSchedDay = Number(btn.dataset.stDay);
+        renderStudioSchedulePane(host);
+      };
+    });
+    host.querySelector('[data-st-act="ai-import"]')?.addEventListener("click", () => $("schedImportImgBtn")?.click());
+    host.querySelector('[data-st-act="go-schedule"]')?.addEventListener("click", () => go("schedule"));
+  };
+
+  const renderStudioTasksPane = host => {
+    const list = Array.isArray(tasks) ? tasks : [];
+    const pending = list.filter(t => t.status !== "completed");
+    const done = list.filter(t => t.status === "completed");
+
+    const rowsHtml = list.length
+      ? list.slice(0, 25).map(t => `
+          <label class="ai-st-task-row${t.status === "completed" ? " is-done" : ""}">
+            <input type="checkbox" data-st-task-id="${t.id}" ${t.status === "completed" ? "checked" : ""}>
+            <div>
+              <b>${schedEsc(t.title || "")}</b>
+              ${t.due_date ? `<small>截止：${schedEsc(t.due_date)}</small>` : ""}
+            </div>
+          </label>`).join("")
+      : `<div class="ai-st-empty">当前没有待办事项，可在上方快速添加</div>`;
+
+    host.innerHTML = `
+      <div class="ai-st-live-card">
+        <div class="ai-st-live-head">
+          <div><b>我的待办清单</b><small>待处理 ${pending.length} · 已完成 ${done.length}</small></div>
+          <button type="button" class="outline" data-st-act="go-tasks">全部待办</button>
+        </div>
+        <form id="aiStudioQuickTaskForm" class="ai-st-task-form">
+          <input id="aiStudioQuickTaskInput" placeholder="快速新增一条待办…" maxlength="120" required>
+          <button type="submit" class="primary">添加</button>
+        </form>
+        <div class="ai-st-task-list">${rowsHtml}</div>
+      </div>`;
+
+    host.querySelector('[data-st-act="go-tasks"]')?.addEventListener("click", () => go("tasks"));
+    host.querySelector("#aiStudioQuickTaskForm")?.addEventListener("submit", async e => {
+      e.preventDefault();
+      const inp = host.querySelector("#aiStudioQuickTaskInput");
+      const title = String(inp?.value || "").trim();
+      if (!title) return;
+      try {
+        await api("/tasks", { method: "POST", body: JSON.stringify({ title, due_date: "" }) });
+        tasks = await api("/tasks");
+        render_tasks();
+        render_home();
+        renderStudioTasksPane(host);
+        toast("已加入待办");
+      } catch { toast("添加失败，请先登录"); }
+    });
+    host.querySelectorAll("[data-st-task-id]").forEach(cb => {
+      cb.onchange = async () => {
+        const id = Number(cb.dataset.stTaskId);
+        const status = cb.checked ? "completed" : "pending";
+        try {
+          await api("/tasks/" + id, { method: "PATCH", body: JSON.stringify({ status }) });
+          tasks = await api("/tasks");
+          render_tasks();
+          render_home();
+          renderStudioTasksPane(host);
+        } catch {
+          cb.checked = !cb.checked;
+          toast("状态更新失败");
+        }
+      };
+    });
+  };
+
+  const renderActiveStudioTab = (tab, opts = {}) => {
+    activeTab = tab || "parser";
+    $("aiStudioTabs")?.querySelectorAll(".ai-st-tab[data-studio-tab]").forEach(b => {
+      const on = b.dataset.studioTab === activeTab;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+      if (on) {
+        try { b.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" }); } catch {}
+      }
+    });
+
+    const mount = $("aiStudioMount");
+    const live = $("aiStudioLivePane");
+    if (!mount || !live) return;
+
+    restoreMountedPanel();
+
+    if (PORTAL_MAP[activeTab]) {
+      live.classList.add("hide");
+      live.innerHTML = "";
+      mount.classList.remove("hide");
+      const spec = PORTAL_MAP[activeTab];
+      const homeSec = $(spec.pageId);
+      const panel = homeSec?.querySelector(".ct-page-panel");
+      if (panel) {
+        mount.innerHTML = "";
+        mount.appendChild(panel);
+        mountedToolKey = activeTab;
+        mountedPanelEl = panel;
+      }
+      spec.init(opts);
+      requestAnimationFrame(() => window.sync_nav_sliders?.());
+    } else {
+      mount.classList.add("hide");
+      live.classList.remove("hide");
+      if (activeTab === "schedule") renderStudioSchedulePane(live);
+      else if (activeTab === "tasks") renderStudioTasksPane(live);
+    }
+  };
+
+  window.open_ai_studio = (tab = activeTab || "parser", opts = {}) => {
+    if (cur_page !== "ai") go("ai");
+    studioOpen = true;
+    $("aiWorkspace")?.classList.add("studio-open");
+    $("aiStudioDrawer")?.classList.remove("hide");
+    $("aiStudioBackdrop")?.classList.remove("hide");
+    $("toggleAiStudio")?.classList.add("is-active");
+    renderActiveStudioTab(tab, opts);
+  };
+
+  window.close_ai_studio = (silent = false) => {
+    if (!studioOpen && !mountedToolKey) return;
+    studioOpen = false;
+    restoreMountedPanel();
+    $("aiWorkspace")?.classList.remove("studio-open");
+    $("aiStudioDrawer")?.classList.add("hide");
+    $("aiStudioBackdrop")?.classList.add("hide");
+    $("toggleAiStudio")?.classList.remove("is-active");
+    if (!silent) requestAnimationFrame(() => window.sync_nav_sliders?.());
+  };
+
+  window.refresh_ai_studio_live = () => {
+    if (!studioOpen) return;
+    const live = $("aiStudioLivePane");
+    if (!live || live.classList.contains("hide")) return;
+    if (activeTab === "schedule") renderStudioSchedulePane(live);
+    else if (activeTab === "tasks") renderStudioTasksPane(live);
+  };
+
+  $("toggleAiStudio")?.addEventListener("click", () => {
+    if (studioOpen) window.close_ai_studio();
+    else window.open_ai_studio(activeTab || "parser");
+  });
+  $("closeAiStudio")?.addEventListener("click", () => window.close_ai_studio());
+  $("aiStudioBackdrop")?.addEventListener("click", () => window.close_ai_studio());
+  $("aiStudioTabs")?.addEventListener("click", e => {
+    const btn = e.target.closest(".ai-st-tab[data-studio-tab]");
+    if (btn) renderActiveStudioTab(btn.dataset.studioTab);
+  });
+
+  // 双向联调：一键把当前工具舱内容带入 AI 对话输入框
+  $("aiStudioSendToAi")?.addEventListener("click", () => {
+    let prompt = "";
+    if (activeTab === "parser") {
+      const txt = ($("noticeParserText")?.value || "").trim();
+      prompt = txt ? `请帮我解读以下群通知并提取关键办理步骤与截止时间：\n${txt.slice(0, 600)}` : "请帮我拆解一下最近需要注意的校园通知重点与待办事项。";
+    } else if (activeTab === "academic") {
+      const gpaVal = $("eligGpa")?.value || "";
+      prompt = gpaVal ? `我目前 GPA 为 ${gpaVal}，请结合西安文理学院制度帮我分析学位授予风险和可申报的奖助学金方案。` : "请结合西安文理学院规定，帮我说明 GPA 绩点计算规则与奖学金申报条件。";
+    } else if (activeTab === "guide") {
+      const activeGuide = $("guideTabs")?.querySelector(".pill-btn.active")?.textContent?.trim() || "校园事务";
+      prompt = `我想办理「${activeGuide}」，请列出最关键的材料清单、审批部门和注意事项。`;
+    } else if (activeTab === "schedtools" || activeTab === "schedule") {
+      prompt = "请结合我当前的个人课表和作息时间，帮我梳理今天与本周的课程安排和空闲时段建议。";
+    } else if (activeTab === "tasks") {
+      const pending = (Array.isArray(tasks) ? tasks : []).filter(t => t.status !== "completed");
+      prompt = pending.length
+        ? `我当前有 ${pending.length} 条未完成待办（${pending.slice(0, 4).map(t => t.title).join("、")}），请帮我按轻重缓急安排处理顺序。`
+        : "我目前待办都已清空，请提醒我本学期近期有哪些常见的教务/学工重要时间节点。";
+    }
+    const qEl = $("question");
+    if (qEl && prompt) {
+      qEl.value = prompt;
+      qEl.dispatchEvent(new Event("input", { bubbles: true }));
+      if (window.innerWidth <= 1023) window.close_ai_studio();
+      qEl.focus();
+      toast("已填入当前工具上下文，点发送即可让 AI 深度分析");
+    }
   });
 })();

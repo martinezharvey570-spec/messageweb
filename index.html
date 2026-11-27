@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.138" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.140" fetchpriority="high">
 </head>
 <body>
 
@@ -898,26 +898,27 @@
   <aside id="sidebar">
     <div class="sidebrand">
       <div class="logo">校</div>
-      <div class="sidebrand-text"><b>校务智理</b><small>校园事务工作台</small></div>
+      <div class="sidebrand-text"><b>校务智理</b><small>校园事务服务平台</small></div>
       <button type="button" id="desktopSidebarToggle" class="desktop-rail-toggle" title="收起/展开侧边栏" aria-label="收起或展开侧边栏">
         <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg>
       </button>
     </div>
-    <small class="navcaption">工作台导航</small>
-    <button class="nav active" data-page="home" title="总览工作台"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>总览工作台</button>
-    <button class="nav" data-page="notices" title="通知公告"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>通知公告</button>
-    <button class="nav" data-page="tasks" title="我的待办"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>我的待办 <em id="navTaskBadge" class="nav-badge hide">0</em></button>
-    <button class="nav" data-page="ai" title="校务指南 AI"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>校务指南 AI</button>
-    <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
+    <small class="navcaption">日常事务</small>
+    <button class="nav active" data-page="home" title="总览"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>总览</button>
     <button class="nav" data-page="schedule" title="超级课表"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>超级课表</button>
-    <small class="navcaption" style="margin-top:14px">智慧工具箱</small>
+    <button class="nav" data-page="tasks" title="我的待办"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>我的待办 <em id="navTaskBadge" class="nav-badge hide">0</em></button>
+    <button class="nav" data-page="notices" title="通知公告"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>通知公告</button>
+    <button class="nav" data-page="knowledge" title="校规制度库"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>校规制度库</button>
+    <div class="nav-divider" aria-hidden="true"></div>
+    <small class="navcaption navcaption-sub">智能助手</small>
+    <button class="nav" data-page="ai" title="校务指南 AI"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>校务指南 AI</button>
     <button type="button" class="nav nav-tool nt-toolbox" data-page="toolbox" title="智慧工具箱（群通知拆解 / 学业奖助 / 办事向导 / 课表助手）"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg>智慧工具箱</button>
     <small class="navcaption admin-only hide" style="margin-top:14px">系统管理</small>
     <button class="nav admin-only hide" data-page="users" title="用户管理"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>用户管理</button>
     <button class="nav admin-only hide" data-page="analytics" title="数据统计"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>数据统计</button>
-    <div class="sidebottom">
-      <button id="openProfileSide" type="button" title="账号与密码设置"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg>账号与密码设置</button>
-      <button id="logout" type="button" title="退出当前账号"><svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg>退出当前账号</button>
+    <div class="sidebottom sidebottom-compact">
+      <button id="openProfileSide" type="button" title="账号与密码设置"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>设置</span></button>
+      <button id="logout" type="button" class="sb-exit" title="退出当前账号"><svg class="ico" aria-hidden="true"><use href="#i-logout"/></svg><span>退出</span></button>
     </div>
   </aside>
 
@@ -926,7 +927,7 @@
       <div class="header-left">
         <button id="menu" type="button" aria-label="打开导航菜单"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
         <div class="header-titles">
-          <small>校园事务 / <b id="crumb">工作台总览</b></small>
+          <small><span id="crumbGroup">日常事务</span> / <b id="crumb">总览</b></small>
           <p id="today"></p>
         </div>
       </div>
@@ -948,7 +949,7 @@
       <section id="homePage" class="page">
         <div class="welcome">
           <div class="welcome-main">
-            <small class="blue">校务工作台</small>
+            <small class="blue">校园事务服务平台</small>
             <h1>你好，<span id="welcomeName">同学</span></h1>
             <p class="muted">欢迎进入校务智理，及时掌握校园事务动态与个人办理进度。</p>
           </div>
@@ -980,14 +981,22 @@
             </div>
             <div id="recent"></div>
           </article>
-          <article class="panel">
+          <article class="panel home-ai-panel">
             <div class="panelhead">
-              <div><h3>快捷服务</h3><small>高频校园事务直达</small></div>
+              <div><h3>校务指南 AI</h3><small>查校规、拆通知、导课表、算绩点</small></div>
+              <button type="button" class="link" data-goto="ai">进入对话 →</button>
             </div>
-            <button class="quick" data-goto="notices"><span><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>浏览通知公告</span><i>→</i></button>
-            <button class="quick" data-goto="tasks"><span><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg>管理我的待办</span><i>→</i></button>
-            <button class="quick" data-goto="ai"><span><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg>咨询校务指南 AI</span><i>→</i></button>
-            <button class="quick" data-goto="knowledge"><span><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>查阅校规制度库</span><i>→</i></button>
+            <form id="homeAiForm" class="home-ai-form">
+              <svg class="ico ico-star home-ai-ico" aria-hidden="true"><use href="#i-ai-brand"/></svg>
+              <input id="homeAiInput" type="text" placeholder="提问校规、通知、课表或办事流程…" autocomplete="off">
+              <button type="submit" id="homeAiSendBtn" class="home-ai-send is-idle" aria-label="发送给校务指南 AI">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+              </button>
+            </form>
+            <div class="home-ai-tools">
+              <button type="button" class="quick" data-open-tool="notice_parser"><span><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg>群通知拆解</span><i>→</i></button>
+              <button type="button" class="quick" data-goto="toolbox"><span><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg>智慧工具箱</span><i>→</i></button>
+            </div>
             <div class="quick-tags">
               <small class="muted">常见事务一键提问</small>
               <div class="mini-chips">
@@ -1083,6 +1092,7 @@
       </section>
 
       <section id="aiPage" class="page hide">
+        <div id="aiWorkspace" class="ai-workspace">
         <div class="chat panel">
           <div class="chat-topbar">
             <div class="chatintro">
@@ -1096,7 +1106,8 @@
               </div>
             </div>
             <div class="chat-top-actions">
-              <button type="button" id="toggleAiConfig" title="收起/展开模型配置与热门提问" class="outline config-toggle-btn" title="展开/收起模型参数"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
+              <button type="button" id="toggleAiStudio" class="outline ai-studio-toggle-btn" title="打开/收起 AI 一体化工具舱（通知拆解 / 学业奖助 / 办事向导 / 课表 / 待办）"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg><span>工具舱</span></button>
+              <button type="button" id="toggleAiConfig" title="收起/展开模型配置与热门提问" class="outline config-toggle-btn"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
               <button type="button" id="exportChat" class="outline" title="导出对话记录"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出</span></button>
               <button type="button" id="clearChat" class="outline" title="清空当前对话"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空</span></button>
             </div>
@@ -1223,6 +1234,36 @@
               </div>
             </div>
           </form>
+        </div>
+
+        <div id="aiStudioBackdrop" class="ai-studio-backdrop hide" aria-hidden="true"></div>
+        <aside id="aiStudioDrawer" class="ai-studio-drawer hide" aria-label="AI 一体化工具舱">
+          <div class="ai-studio-head">
+            <div class="ai-studio-title">
+              <svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg>
+              <div>
+                <b>AI 综合工具舱</b>
+                <small>同屏切换全站工具，无需跳离对话</small>
+              </div>
+            </div>
+            <div class="ai-studio-head-ops">
+              <button type="button" id="aiStudioSendToAi" class="outline ai-studio-ask-btn" title="将当前工具内容发给 AI 深度分析"><svg class="ico ico-star" aria-hidden="true"><use href="#i-ai-brand"/></svg><span>问 AI</span></button>
+              <button type="button" id="closeAiStudio" class="ai-studio-close-btn" aria-label="收起工具舱" title="收起工具舱"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+          </div>
+          <div id="aiStudioTabs" class="ai-studio-tabs" role="tablist" aria-label="工具舱功能切换">
+            <button type="button" class="ai-st-tab active" data-studio-tab="parser" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg><span>通知拆解</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="academic" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg><span>学业奖助</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="guide" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg><span>办事向导</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="schedtools" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-bell-alarm"/></svg><span>课表助手</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="schedule" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>今日课表</span></button>
+            <button type="button" class="ai-st-tab" data-studio-tab="tasks" role="tab"><svg class="ico" aria-hidden="true"><use href="#i-check-square"/></svg><span>我的待办</span></button>
+          </div>
+          <div id="aiStudioBody" class="ai-studio-body">
+            <div id="aiStudioMount" class="ai-studio-mount"></div>
+            <div id="aiStudioLivePane" class="ai-studio-live-pane hide"></div>
+          </div>
+        </aside>
         </div>
       </section>
 
@@ -2039,7 +2080,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.138"></script>
+<script src="app.js?v=1.140"></script>
 
 
 </body>

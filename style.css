@@ -19589,3 +19589,302 @@ html.dark .home-ai-send.is-idle {
     gap: 8px;
   }
 }
+
+/* ==========================================================================
+   v1.141 Codex AI Control Cabin & Schedule Compiler Visual Enhancements
+   （完全沿用全站白昼微光玻璃 & 深邃黑曜石暗夜玻璃设计语言，零另起炉灶）
+   ========================================================================== */
+.ai-options-codex {
+  gap: 8px 12px !important;
+  flex-wrap: wrap;
+}
+.ai-ctx-group {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ai-codex-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255, 255, 255, .72);
+  color: var(--sub, #475569);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+  white-space: nowrap;
+}
+.ai-codex-pill:hover {
+  background: rgba(241, 245, 249, .92);
+  color: var(--ink, #0f172a);
+}
+.ai-codex-pill.is-on {
+  background: rgba(21, 94, 239, .10);
+  border-color: rgba(21, 94, 239, .26);
+  color: var(--blue, #155eef);
+  font-weight: 600;
+}
+.ai-codex-pill.is-auto {
+  background: rgba(14, 165, 233, .09);
+  border-color: rgba(14, 165, 233, .24);
+  color: #0369a1;
+  font-weight: 600;
+}
+.ai-codex-pill.is-off {
+  opacity: .68;
+}
+html.dark .ai-codex-pill {
+  background: rgba(255, 255, 255, .04);
+  border-color: rgba(255, 255, 255, .09);
+  color: #94a3b8;
+}
+html.dark .ai-codex-pill:hover {
+  background: rgba(255, 255, 255, .08);
+  color: #e2e8f0;
+}
+html.dark .ai-codex-pill.is-on {
+  background: rgba(59, 130, 246, .16);
+  border-color: rgba(96, 165, 250, .34);
+  color: #93c5fd;
+}
+html.dark .ai-codex-pill.is-auto {
+  background: rgba(56, 189, 248, .14);
+  border-color: rgba(56, 189, 248, .30);
+  color: #7dd3fc;
+}
+
+/* Composer `/` Slash Trigger & Command Popover */
+#askForm.ask {
+  position: relative;
+}
+.ask-slash-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(248, 250, 252, .85);
+  color: var(--sub, #475569);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.ask-slash-btn:hover {
+  background: rgba(21, 94, 239, .10);
+  border-color: rgba(21, 94, 239, .24);
+  color: var(--blue, #155eef);
+}
+html.dark .ask-slash-btn {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .10);
+  color: #94a3b8;
+}
+html.dark .ask-slash-btn:hover {
+  background: rgba(59, 130, 246, .18);
+  border-color: rgba(96, 165, 250, .34);
+  color: #93c5fd;
+}
+.ai-slash-menu {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(100% + 8px);
+  max-width: 560px;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(15, 23, 42, .10);
+  border-radius: 16px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, .14);
+  padding: 6px;
+  z-index: 40;
+}
+html.dark .ai-slash-menu {
+  background: rgba(10, 15, 28, .94);
+  border-color: rgba(255, 255, 255, .11);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
+}
+.ai-slash-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  border-bottom: 1px solid rgba(15, 23, 42, .06);
+  margin-bottom: 4px;
+}
+html.dark .ai-slash-head {
+  border-bottom-color: rgba(255, 255, 255, .07);
+}
+.ai-slash-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .14s ease;
+}
+.ai-slash-item:hover,
+.ai-slash-item.is-active {
+  background: rgba(21, 94, 239, .09);
+}
+html.dark .ai-slash-item:hover,
+html.dark .ai-slash-item.is-active {
+  background: rgba(59, 130, 246, .16);
+}
+.ai-slash-cmd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--blue, #155eef);
+  min-width: 74px;
+  flex-shrink: 0;
+}
+html.dark .ai-slash-cmd {
+  color: #93c5fd;
+}
+.ai-slash-desc {
+  font-size: 12.5px;
+  color: var(--sub, #475569);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.dark .ai-slash-desc {
+  color: #cbd5e1;
+}
+
+/* Collapsible Codex Trace & Zero-Hallucination Grounding Box */
+.ai-codex-trace-box {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, .82);
+  border: 1px solid rgba(15, 23, 42, .07);
+}
+html.dark .ai-codex-trace-box {
+  background: rgba(255, 255, 255, .03);
+  border-color: rgba(255, 255, 255, .08);
+}
+.ai-trace-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  margin-bottom: 6px;
+}
+html.dark .ai-trace-head { color: #e2e8f0; }
+.ai-ground-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.ai-ground-badge.is-verified {
+  background: rgba(16, 185, 129, .12);
+  color: #059669;
+}
+.ai-ground-badge.is-partial {
+  background: rgba(245, 158, 11, .14);
+  color: #b45309;
+}
+.ai-ground-badge.is-ungrounded {
+  background: rgba(239, 68, 68, .12);
+  color: #dc2626;
+}
+html.dark .ai-ground-badge.is-verified { color: #34d399; }
+html.dark .ai-ground-badge.is-partial { color: #fbbf24; }
+html.dark .ai-ground-badge.is-ungrounded { color: #f87171; }
+.ai-trace-steps {
+  display: grid;
+  gap: 4px;
+}
+.ai-trace-step {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.ai-trace-step b {
+  color: var(--blue, #155eef);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+html.dark .ai-trace-step b { color: #93c5fd; }
+.ai-trace-step span {
+  color: var(--sub, #475569);
+}
+html.dark .ai-trace-step span { color: #94a3b8; }
+
+/* Codex Schedule Compiler Health Bar & Per-Course Confidence Tags */
+.sched-ai-health-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: rgba(21, 94, 239, .05);
+  border: 1px solid rgba(21, 94, 239, .14);
+  font-size: 12px;
+}
+html.dark .sched-ai-health-bar {
+  background: rgba(59, 130, 246, .10);
+  border-color: rgba(96, 165, 250, .20);
+}
+.sched-ai-health-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+.sched-ai-health-chip.is-good { background: rgba(16, 185, 129, .14); color: #059669; }
+.sched-ai-health-chip.is-warn { background: rgba(245, 158, 11, .16); color: #b45309; }
+.sched-ai-health-chip.is-healed { background: rgba(21, 94, 239, .14); color: var(--blue, #155eef); }
+html.dark .sched-ai-health-chip.is-good { color: #34d399; }
+html.dark .sched-ai-health-chip.is-warn { color: #fbbf24; }
+html.dark .sched-ai-health-chip.is-healed { color: #93c5fd; }
+.sched-ai-health-meta,
+.sched-ai-health-diff {
+  color: var(--sub, #475569);
+}
+html.dark .sched-ai-health-meta,
+html.dark .sched-ai-health-diff { color: #cbd5e1; }
+.sched-ai-conf-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.sched-ai-conf-tag.is-hi { background: rgba(16, 185, 129, .12); color: #059669; }
+.sched-ai-conf-tag.is-mid { background: rgba(245, 158, 11, .14); color: #b45309; }
+.sched-ai-conf-tag.is-lo { background: rgba(239, 68, 68, .12); color: #dc2626; }
+html.dark .sched-ai-conf-tag.is-hi { color: #34d399; }
+html.dark .sched-ai-conf-tag.is-mid { color: #fbbf24; }
+html.dark .sched-ai-conf-tag.is-lo { color: #f87171; }

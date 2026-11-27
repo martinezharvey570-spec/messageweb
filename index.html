@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.140" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.141" fetchpriority="high">
 </head>
 <body>
 
@@ -1113,12 +1113,13 @@
             </div>
           </div>
 
-          <div id="aiOptionsBar" class="ai-options">
-            <div class="ai-seg-group" role="group" aria-label="模型选择">
-              <span class="ai-seg-label">模型</span>
-              <div class="ai-seg" data-seg-target="aiModel">
-                <button type="button" class="ai-seg-btn active" data-seg-val="deepseek-flash" title="响应快，适合日常校务咨询">Flash</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="deepseek-v4-pro" title="深度推理，适合复杂条文对比">Pro</button>
+          <div id="aiOptionsBar" class="ai-options ai-options-codex">
+            <div class="ai-seg-group" role="group" aria-label="执行模式">
+              <span class="ai-seg-label">模式</span>
+              <div class="ai-seg" id="aiCodexModeSeg">
+                <button type="button" class="ai-seg-btn" data-codex-mode="fast" title="极速问答：Flash 直出，适合简单事实查询">极速</button>
+                <button type="button" class="ai-seg-btn" data-codex-mode="deep" title="深度推理：Pro 强推理，适合复杂条文对比与规划">深度</button>
+                <button type="button" class="ai-seg-btn active" data-codex-mode="agent" title="Agent 执行：检索校规 + 核算绩点 + 工作台联动">Agent</button>
               </div>
               <select id="aiModel" class="hide" aria-hidden="true">
                 <option value="deepseek-flash" selected>Flash（快速通用）</option>
@@ -1126,30 +1127,32 @@
               </select>
             </div>
 
-            <div class="ai-seg-group" role="group" aria-label="思考强度">
-              <span class="ai-seg-label">思考</span>
-              <div class="ai-seg" data-seg-target="aiEffort">
-                <button type="button" class="ai-seg-btn" data-seg-val="low">低</button>
-                <button type="button" class="ai-seg-btn active" data-seg-val="high">高</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="max">最高</button>
+            <div class="ai-seg-group" role="group" aria-label="推理深度">
+              <span class="ai-seg-label">推理</span>
+              <div class="ai-seg" id="aiUnifiedEffortSeg">
+                <button type="button" class="ai-seg-btn" data-unified-effort="off" title="关闭思维链，秒速直答">关</button>
+                <button type="button" class="ai-seg-btn" data-unified-effort="low" title="轻量思考">标准</button>
+                <button type="button" class="ai-seg-btn active" data-unified-effort="high" title="深度核验条款">深度</button>
+                <button type="button" class="ai-seg-btn" data-unified-effort="max" title="极致推演与多文件综合">极致</button>
               </div>
               <select id="aiEffort" class="hide" aria-hidden="true">
                 <option value="low">低</option>
                 <option value="high" selected>高</option>
                 <option value="max">最高</option>
               </select>
-            </div>
-
-            <div class="ai-seg-group" role="group" aria-label="深度思考">
-              <span class="ai-seg-label">深度思考</span>
-              <div class="ai-seg" data-seg-bool="aiThinking">
-                <button type="button" class="ai-seg-btn active" data-seg-val="1">开启</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="0">关闭</button>
-              </div>
               <input id="aiThinking" type="checkbox" checked class="hide" aria-hidden="true">
             </div>
 
-            <div class="ai-seg-group" role="group" aria-label="检索高校">
+            <div class="ai-seg-group ai-ctx-group" role="group" aria-label="上下文与联网控制">
+              <button type="button" id="aiCtxKb" class="ai-codex-pill is-on" title="开启/关闭本地 117 份正式校规库检索">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-book"/></svg><span>校规库</span>
+              </button>
+              <button type="button" id="aiCtxWeb" class="ai-codex-pill is-auto" data-web-mode="auto" title="点击切换联网策略：智能判断 / 强制联网 / 仅本地">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-search"/></svg><span id="aiCtxWebLabel">智能联网</span>
+              </button>
+              <button type="button" id="aiCtxWorkspace" class="ai-codex-pill" title="主动关联我的个人课表与待办事项">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-calendar"/></svg><span>课表待办</span>
+              </button>
               <button type="button" id="aiSchoolBtn" class="ai-seg-school" title="切换检索高校">
                 <svg class="ico" aria-hidden="true"><use href="#i-graduation"/></svg>
                 <span id="aiSchoolLabel">西安文理学院</span>
@@ -1213,6 +1216,7 @@
           <button type="button" id="scrollBottomBtn" class="scroll-bottom-btn hide"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-arrow-down"/></svg>回到底部</button>
 
           <form id="askForm" class="ask">
+            <div id="aiSlashMenu" class="ai-slash-menu hide" role="listbox" aria-label="快捷指令面板"></div>
             <div id="askAttachPop" class="ask-attach-pop" role="menu" aria-label="添加附件">
               <button type="button" id="askCamBtn" class="ask-attach-opt is-mobile-only"><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg><span>拍照识图</span></button>
               <button type="button" id="askImgBtn" class="ask-attach-opt"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span>选择图片</span></button>
@@ -1227,7 +1231,8 @@
                 <button type="button" id="askAttachBtn" class="ask-plus-btn" aria-label="添加图片或文件" title="添加图片或文件">
                   <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>
                 </button>
-                <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题"></textarea>
+                <button type="button" id="askSlashBtn" class="ask-slash-btn" aria-label="快捷指令" title="输入 / 调出快捷指令">/</button>
+                <textarea id="question" rows="1" maxlength="3000" placeholder="输入办事问题，或输入 / 调出快捷指令…"></textarea>
                 <button class="primary is-idle" id="askSubmitBtn" type="submit" aria-label="发送" title="发送">
                   <svg class="ico" aria-hidden="true"><use href="#i-arrow-up"/></svg>
                 </button>
@@ -2080,7 +2085,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.140"></script>
+<script src="app.js?v=1.141"></script>
 
 
 </body>

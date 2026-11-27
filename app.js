@@ -2630,12 +2630,14 @@ function add_doc_chips(parent_el, titles, citations_map = {}) {
 }
 
 function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
-  const { showConf, confidence, showSrc, sources, sources_label, answer_docs, doc_citations } = opts;
+  const { showConf, confidence, showSrc, sources, sources_label, answer_docs, doc_citations, agent_trace, grounding } = opts;
   const validLinks = showSrc ? pick_sources(sources) : [];
   const docTitles = showSrc && !validLinks.length && Array.isArray(answer_docs)
     ? [...new Set(answer_docs.map(t => String(typeof t === "string" ? t : (t?.title || t?.name || "")).trim()).filter(Boolean))].slice(0, 4)
     : [];
   const hasRef = validLinks.length > 0 || docTitles.length > 0;
+  const traceSteps = Array.isArray(agent_trace?.steps) ? agent_trace.steps : [];
+  const hasTrace = traceSteps.length > 0 || (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty");
 
   const confMap = {
     high: { text: "依据充分", cls: "high", tip: "已找到与问题对应的校内文件或官网页面" },
@@ -2644,7 +2646,7 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   };
   let confInfo = showConf ? confMap[confidence] : null;
   if (confInfo && confInfo.cls === "high" && !hasRef && (!sources || !sources.length)) confInfo = null;
-  if (!confInfo && !hasRef) return;
+  if (!confInfo && !hasRef && !hasTrace) return;
 
   const toggle = document.createElement("button");
   toggle.type = "button";
@@ -2654,13 +2656,15 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   const refCountText = validLinks.length
     ? `${validLinks.length}条来源`
     : (docTitles.length ? `${docTitles.length}份文件` : "");
+  const groundText = (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty")
+    ? `核验${grounding.score}%`
+    : "";
   const dotHtml = confInfo ? `<i class="ai-meta-dot" aria-hidden="true"></i>` : `${ico("link", "ico-xs")}`;
-  const mainLabel = confInfo && refCountText
-    ? `${confInfo.text} · ${refCountText}`
-    : (confInfo ? confInfo.text : `参考依据 · ${refCountText}`);
+  const mainParts = [confInfo ? confInfo.text : (hasRef ? "参考依据" : "执行轨迹"), refCountText, groundText].filter(Boolean);
+  const mainLabel = mainParts.join(" · ");
 
   toggle.innerHTML = `${dotHtml}<span>${esc(mainLabel)}</span><span class="ai-meta-caret" aria-hidden="true">▾</span>`;
-  toggle.title = confInfo ? confInfo.tip : "点击展开查看参考依据与原文";
+  toggle.title = confInfo ? confInfo.tip : "点击展开查看 Codex 执行轨迹、核验评分与原文依据";
 
   const drawer = document.createElement("div");
   drawer.className = "ai-ref-drawer hide";
@@ -2669,6 +2673,18 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
     tipEl.className = "ai-confidence " + confInfo.cls;
     tipEl.innerHTML = `<i></i><span>${confInfo.text}</span><small>${confInfo.tip}</small>`;
     drawer.appendChild(tipEl);
+  }
+  if (hasTrace) {
+    const traceEl = document.createElement("div");
+    traceEl.className = "ai-codex-trace-box";
+    const gBadge = (grounding && grounding.status && grounding.status !== "not_applicable" && grounding.status !== "empty")
+      ? `<span class="ai-ground-badge is-${esc(grounding.status)}">零幻觉核验 ${Number(grounding.score) || 0}%</span>`
+      : "";
+    const stepItems = traceSteps.map(st =>
+      `<div class="ai-trace-step"><b>${esc(st.label || "")}</b><span>${esc(st.detail || "")}</span></div>`
+    ).join("");
+    traceEl.innerHTML = `<div class="ai-trace-head"><span>Codex 执行轨迹</span>${gBadge}</div>${stepItems ? `<div class="ai-trace-steps">${stepItems}</div>` : ""}`;
+    drawer.appendChild(traceEl);
   }
   if (validLinks.length) {
     add_sources(drawer, sources, sources_label);
@@ -3122,6 +3138,7 @@ $("askForm").onsubmit = async e => {
   let confidence = "";
   let ui_policy = null;
   let agent_trace = null;
+  let grounding_info = null;
   let allow_write_actions = false;
   let allow_nav_actions = false;
   let follow_ups = [];
@@ -3190,15 +3207,20 @@ $("askForm").onsubmit = async e => {
 
   const run_ask = async (continue_from = "") => {
     const selSchool = typeof get_selected_school === "function" ? get_selected_school() : { n: "西安文理学院", d: "xawl.edu.cn" };
+    const codexState = typeof window.get_codex_ai_state === "function"
+      ? window.get_codex_ai_state()
+      : { mode: "agent", web_mode: "auto", context_flags: { kb: true } };
     const payload = {
       question: fullQuestion,
       ...(imgs.length ? { images: imgs } : {}),
       model: $("aiModel")?.value || "deepseek-flash",
+      mode: codexState.mode || "agent",
       thinking: $("aiThinking")?.checked !== false,
       reasoning_effort: $("aiEffort")?.value || "high",
-      web_search: true,
+      ...(codexState.web_mode === "on" ? { web_search: true } : (codexState.web_mode === "off" ? { web_search: false } : {})),
+      context_flags: codexState.context_flags || { kb: true },
       school_name: selSchool.n,
-      school_domain: selSchool.d || "", 
+      school_domain: selSchool.d || "",
       ...(continue_from ? { continue_from: continue_from.slice(-4000) } : {}),
       history: chat_history.slice(-9, -1).map(m => ({
         role: m.role === "学生" ? "user" : "assistant",
@@ -3280,6 +3302,7 @@ $("askForm").onsubmit = async e => {
           if (parsed.ui_policy && typeof parsed.ui_policy === "object") {
             ui_policy = { ...(ui_policy || {}), ...parsed.ui_policy };
           }
+          if (parsed.grounding && typeof parsed.grounding === "object") grounding_info = parsed.grounding;
           if (typeof parsed.allow_write_actions === "boolean") allow_write_actions = parsed.allow_write_actions;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           return;
@@ -3485,7 +3508,9 @@ $("askForm").onsubmit = async e => {
       sources,
       sources_label,
       answer_docs,
-      doc_citations
+      doc_citations,
+      agent_trace,
+      grounding: grounding_info
     });
     window.render_ai_agent_actions?.(wrap, suggested_actions, q, clean_saved_answer);
     if (showFu) add_follow_ups(wrap, follow_ups);
@@ -3579,7 +3604,9 @@ $("askForm").onsubmit = async e => {
       sources,
       sources_label,
       answer_docs,
-      doc_citations
+      doc_citations,
+      agent_trace,
+      grounding: grounding_info
     });
     if (showFu) add_follow_ups(wrap, follow_ups);
     toast("已停止生成，保留已输出内容");
@@ -5667,6 +5694,10 @@ async function compress_sched_image_slices(file) {
     if (activeSchedAiCtrl) stop_sched_ai_task(false);
   });
   let pendingParsedNotes = "";
+  let pendingParsedHealth = null;
+  let pendingParsedSelfHealed = false;
+  let pendingParsedWorkload = null;
+  let pendingParsedDiffSummary = "";
   let editingParsedIdx = -1;
   let aiImportRefining = false;
 
@@ -5821,6 +5852,15 @@ async function compress_sched_image_slices(file) {
       ? `<div class="sched-ai-wb-notes"><span>AI 备注：</span>${schedEsc(pendingParsedNotes)}</div>`
       : "";
 
+    const healthHtml = (Number.isFinite(pendingParsedHealth) || pendingParsedWorkload || pendingParsedDiffSummary)
+      ? `<div class="sched-ai-health-bar">
+          ${Number.isFinite(pendingParsedHealth) ? `<span class="sched-ai-health-chip ${pendingParsedHealth >= 85 ? "is-good" : "is-warn"}">编译体检 ${pendingParsedHealth}分</span>` : ""}
+          ${pendingParsedSelfHealed ? `<span class="sched-ai-health-chip is-healed">Codex 已自动自愈</span>` : ""}
+          ${pendingParsedWorkload ? `<span class="sched-ai-health-meta">周 ${pendingParsedWorkload.weekly_periods || 0} 节 · 早八 ${pendingParsedWorkload.early8_count || 0} 次 · 最忙 ${schedEsc(pendingParsedWorkload.busiest_day || "无")}</span>` : ""}
+          ${pendingParsedDiffSummary ? `<span class="sched-ai-health-diff">${schedEsc(pendingParsedDiffSummary)}</span>` : ""}
+        </div>`
+      : "";
+
     const warnHtml = cleanWarnings.length
       ? `<div class="sched-ai-warn-box">
           <div class="sched-ai-warn-title">发现 ${cleanWarnings.length} 处需复核提示（可点击下方条目直接修改）</div>
@@ -5881,11 +5921,15 @@ async function compress_sched_image_slices(file) {
           </div>
         </div>` : "";
 
+      const confNum = Number.isFinite(Number(c.confidence)) ? Number(c.confidence) : null;
+      const confBadge = confNum !== null
+        ? `<span class="sched-ai-conf-tag ${confNum >= 90 ? "is-hi" : (confNum >= 75 ? "is-mid" : "is-lo")}">${confNum}%</span>`
+        : "";
       return `<div class="sched-ai-wb-item${hasWarn ? " has-warn" : ""}${isEditing ? " is-editing" : ""}" data-wb-row="${idx}">
         <div class="sched-ai-wb-row">
           <span class="sched-ai-wb-bar" style="background:${col}"></span>
           <div class="sched-ai-wb-main" data-wb-act="edit" data-wb-idx="${idx}" title="点击编辑这条课程">
-            <div class="sched-ai-wb-name">${schedEsc(c.name)}<span class="sched-ai-wb-type">${schedEsc(c.type || "理论")}</span>${hasWarn ? `<span class="sched-ai-wb-flag">待核对</span>` : ""}</div>
+            <div class="sched-ai-wb-name">${schedEsc(c.name)}<span class="sched-ai-wb-type">${schedEsc(c.type || "理论")}</span>${confBadge}${hasWarn ? `<span class="sched-ai-wb-flag">待核对</span>` : ""}</div>
             <div class="sched-ai-wb-meta">${schedEsc(metaParts)}</div>
           </div>
           <div class="sched-ai-wb-ops">
@@ -5908,6 +5952,7 @@ async function compress_sched_image_slices(file) {
           <button type="button" class="sched-ai-wb-clear" data-wb-act="clear-draft">清空草稿</button>
         </div>
       </div>
+      ${healthHtml}
       ${notesHtml}
       ${warnHtml}
       <div class="sched-ai-wb-list">${itemsHtml}</div>
@@ -5983,6 +6028,10 @@ async function compress_sched_image_slices(file) {
       const updated = Array.isArray(res?.courses) ? res.courses : [];
       pendingParsedCourses = updated;
       pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(updated);
+      pendingParsedHealth = Number.isFinite(Number(res?.health_score)) ? Number(res.health_score) : null;
+      pendingParsedWorkload = res?.workload || null;
+      const d = res?.diff;
+      pendingParsedDiffSummary = d ? `本次补丁：+${(d.added || []).length} / 改${(d.updated || []).length} / -${(d.deleted || []).length}` : "";
       editingParsedIdx = -1;
       aiImportRefining = false;
       render_ai_parsed_workbench();
@@ -6476,6 +6525,10 @@ async function compress_sched_image_slices(file) {
       pendingParsedCourses = parsed;
       pendingParsedWarnings = Array.isArray(res?.warnings) ? res.warnings : audit_parsed_courses_client(parsed);
       pendingParsedNotes = String(res?.notes || "").trim();
+      pendingParsedHealth = Number.isFinite(Number(res?.health_score)) ? Number(res.health_score) : null;
+      pendingParsedSelfHealed = res?.self_healed === true;
+      pendingParsedWorkload = res?.workload || null;
+      pendingParsedDiffSummary = "";
       editingParsedIdx = -1;
       render_ai_parsed_workbench();
       requestAnimationFrame(() => $("schedAiPreview")?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -9470,5 +9523,226 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
       qEl.focus();
       toast("已填入当前工具上下文，点发送即可让 AI 深度分析");
     }
+  });
+})();
+
+/* ---- v1.141 Codex AI Control Cabin（执行模式、统一推理深度、上下文范围胶囊与 / 斜杠命令面板） ---- */
+(function init_codex_control_cabin() {
+  const state = {
+    mode: "agent",
+    effort: "high",
+    kb: true,
+    web_mode: "auto", // "auto" | "on" | "off"
+    workspace: false
+  };
+  const STORE_KEY = "xz_codex_ai_cabin_v1";
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved && typeof saved === "object") {
+      if (["fast", "deep", "agent"].includes(saved.mode)) state.mode = saved.mode;
+      if (["off", "low", "high", "max"].includes(saved.effort)) state.effort = saved.effort;
+      if (typeof saved.kb === "boolean") state.kb = saved.kb;
+      if (["auto", "on", "off"].includes(saved.web_mode)) state.web_mode = saved.web_mode;
+      if (typeof saved.workspace === "boolean") state.workspace = saved.workspace;
+    }
+  } catch {}
+
+  const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} };
+
+  const syncDom = () => {
+    const modelSel = $("aiModel");
+    const effortSel = $("aiEffort");
+    const thinkChk = $("aiThinking");
+    if (modelSel) modelSel.value = state.mode === "deep" ? "deepseek-v4-pro" : "deepseek-flash";
+    if (thinkChk) thinkChk.checked = state.effort !== "off";
+    if (effortSel && state.effort !== "off") effortSel.value = state.effort;
+
+    $("aiCodexModeSeg")?.querySelectorAll("[data-codex-mode]").forEach(b => {
+      b.classList.toggle("active", b.dataset.codexMode === state.mode);
+    });
+    $("aiUnifiedEffortSeg")?.querySelectorAll("[data-unified-effort]").forEach(b => {
+      b.classList.toggle("active", b.dataset.unifiedEffort === state.effort);
+    });
+
+    const kbBtn = $("aiCtxKb");
+    if (kbBtn) kbBtn.classList.toggle("is-on", state.kb);
+    const wsBtn = $("aiCtxWorkspace");
+    if (wsBtn) wsBtn.classList.toggle("is-on", state.workspace);
+
+    const webBtn = $("aiCtxWeb");
+    const webLbl = $("aiCtxWebLabel");
+    if (webBtn) {
+      webBtn.dataset.webMode = state.web_mode;
+      webBtn.classList.toggle("is-auto", state.web_mode === "auto");
+      webBtn.classList.toggle("is-on", state.web_mode === "on");
+      webBtn.classList.toggle("is-off", state.web_mode === "off");
+      if (webLbl) {
+        webLbl.textContent = state.web_mode === "auto" ? "智能联网" : (state.web_mode === "on" ? "强制联网" : "仅查本地");
+      }
+    }
+  };
+
+  $("aiCodexModeSeg")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-codex-mode]");
+    if (!btn) return;
+    state.mode = btn.dataset.codexMode;
+    if (state.mode === "fast") state.effort = "off";
+    else if (state.mode === "deep" && state.effort === "off") state.effort = "high";
+    else if (state.mode === "agent" && state.effort === "off") state.effort = "high";
+    syncDom();
+    persist();
+  });
+
+  $("aiUnifiedEffortSeg")?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-unified-effort]");
+    if (!btn) return;
+    state.effort = btn.dataset.unifiedEffort;
+    if (state.effort === "off" && state.mode === "deep") state.mode = "fast";
+    syncDom();
+    persist();
+  });
+
+  $("aiCtxKb")?.addEventListener("click", () => {
+    state.kb = !state.kb;
+    syncDom();
+    persist();
+    toast(state.kb ? "已开启本校校规库检索" : "已暂停本校校规库检索");
+  });
+
+  $("aiCtxWeb")?.addEventListener("click", () => {
+    state.web_mode = state.web_mode === "auto" ? "on" : (state.web_mode === "on" ? "off" : "auto");
+    syncDom();
+    persist();
+    const tips = { auto: "智能联网：静态校规免联网，最新公告自动查官网", on: "强制联网：本次提问将强制联网检索核验", off: "仅查本地：完全跳过联网，仅依据校内制度与个人数据" };
+    toast(tips[state.web_mode]);
+  });
+
+  $("aiCtxWorkspace")?.addEventListener("click", () => {
+    state.workspace = !state.workspace;
+    syncDom();
+    persist();
+    toast(state.workspace ? "已主动关联个人课表与待办上下文" : "已恢复按需自动读取课表与待办");
+  });
+
+  window.get_codex_ai_state = () => ({
+    mode: state.mode,
+    effort: state.effort,
+    web_mode: state.web_mode,
+    context_flags: {
+      kb: state.kb,
+      ...(state.workspace ? { schedule: true, tasks: true } : {})
+    }
+  });
+  syncDom();
+
+  // Codex / 斜杠指令面板
+  const SLASH_COMMANDS = [
+    { cmd: "/查校规", desc: "精准检索 117 份校规与官网指南（含条文定位与零幻觉核验）", fill: "请结合西安文理学院正式制度，告诉我：", mode: "agent" },
+    { cmd: "/对比制度", desc: "横向表格对比两项校规/奖学金条件与互斥红线", fill: "请用对比表格详细对比以下两项制度的申请条件、金额/效力和关键红线：", mode: "deep" },
+    { cmd: "/算绩点", desc: "按本校五分制确定性核算 GPA、学位余量与奖学金资格", fill: "帮我按学校五分制精确核算 GPA 并评估学位和奖学金资格，并生成导入确认卡：", mode: "agent" },
+    { cmd: "/写申请书", desc: "结合本校条款起草缓考 / 转专业 / 休学 / 体测免测正式文书", fill: "请依据学校相关规定，帮我起草一份格式规范的申请书并附材料清单，事由如下：", mode: "deep" },
+    { cmd: "/拆通知", desc: "打开多模态群通知拆解器（自动识别待办、考试并查课表冲突）", action: () => window.open_ai_studio?.("parser") },
+    { cmd: "/导课表", desc: "打开 Codex AI 课表编译工作台（8项体检 + 自动自愈 + 原子修正）", action: () => { go("schedule"); setTimeout(() => $("schedAiImportBtn")?.click() || $("scheduleAiImportDialog")?.showModal(), 120); } },
+    { cmd: "/课表体检", desc: "结合我的个人课表分析早八分布、空档期与复习建议", fill: "请读取我的个人课表，帮我做一次本周课程负荷体检，指出最忙的一天和适合自习的空档时段。", mode: "agent", attachWorkspace: true }
+  ];
+
+  const qEl = $("question");
+  const menuEl = $("aiSlashMenu");
+  let activeIdx = 0;
+  let visibleCmds = [];
+
+  const closeSlash = () => {
+    menuEl?.classList.add("hide");
+    visibleCmds = [];
+  };
+
+  const applySlashCmd = (item) => {
+    closeSlash();
+    if (!item) return;
+    if (typeof item.action === "function") {
+      if (qEl && qEl.value.trim().startsWith("/")) { qEl.value = ""; auto_resize_question(); }
+      item.action();
+      return;
+    }
+    if (item.mode) {
+      state.mode = item.mode;
+      if (state.mode === "deep" && state.effort === "off") state.effort = "high";
+    }
+    if (item.attachWorkspace) state.workspace = true;
+    syncDom();
+    persist();
+    if (qEl) {
+      qEl.value = item.fill || "";
+      qEl.dispatchEvent(new Event("input", { bubbles: true }));
+      auto_resize_question();
+      qEl.focus();
+    }
+  };
+
+  const renderSlashMenu = (filterText = "") => {
+    if (!menuEl) return;
+    const kw = String(filterText || "").replace(/^\/+/, "").trim().toLowerCase();
+    visibleCmds = SLASH_COMMANDS.filter(c => !kw || c.cmd.toLowerCase().includes(kw) || c.desc.toLowerCase().includes(kw));
+    if (!visibleCmds.length) { closeSlash(); return; }
+    activeIdx = Math.min(activeIdx, visibleCmds.length - 1);
+    menuEl.innerHTML = `<div class="ai-slash-head"><span>Codex 快捷指令</span><small>↑↓ 选择 · Enter 确认</small></div>` +
+      visibleCmds.map((c, i) => `
+        <button type="button" class="ai-slash-item${i === activeIdx ? " is-active" : ""}" data-slash-idx="${i}" role="option">
+          <span class="ai-slash-cmd">${esc(c.cmd)}</span>
+          <span class="ai-slash-desc">${esc(c.desc)}</span>
+        </button>
+      `).join("");
+    menuEl.classList.remove("hide");
+  };
+
+  qEl?.addEventListener("input", () => {
+    const val = qEl.value;
+    if (val.startsWith("/") && !val.includes("\n") && val.length <= 16) {
+      activeIdx = 0;
+      renderSlashMenu(val);
+    } else {
+      closeSlash();
+    }
+  });
+
+  qEl?.addEventListener("keydown", e => {
+    if (!menuEl || menuEl.classList.contains("hide") || !visibleCmds.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIdx = (activeIdx + 1) % visibleCmds.length;
+      renderSlashMenu(qEl.value);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIdx = (activeIdx - 1 + visibleCmds.length) % visibleCmds.length;
+      renderSlashMenu(qEl.value);
+    } else if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      applySlashCmd(visibleCmds[activeIdx]);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeSlash();
+    }
+  });
+
+  menuEl?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-slash-idx]");
+    if (!btn) return;
+    applySlashCmd(visibleCmds[Number(btn.dataset.slashIdx)]);
+  });
+
+  $("askSlashBtn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    if (menuEl && !menuEl.classList.contains("hide")) {
+      closeSlash();
+    } else {
+      activeIdx = 0;
+      renderSlashMenu("");
+      qEl?.focus();
+    }
+  });
+
+  document.addEventListener("click", e => {
+    if (!menuEl || menuEl.classList.contains("hide")) return;
+    if (!menuEl.contains(e.target) && e.target !== $("askSlashBtn") && e.target !== qEl) closeSlash();
   });
 })();

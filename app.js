@@ -1977,19 +1977,19 @@ function md_anchor(url, text) {
 const emoji_svg_map = [
   [/📌/gu, "pin"],
   [/📍|🏢|🏫/gu, "map-pin"],
+  [/🚑|🆘|🎯/gu, "target"],
   [/📋|📝/gu, "clipboard"],
   [/🧭|🔄/gu, "route"],
-  [/⚠️?|❗|❕|🚨/gu, "alert"],
+  [/⚠️?|❗|❕|🚨|🌡️?/gu, "alert"],
   [/✅|☑️?|✔️?/gu, "check-square"],
   [/💡/gu, "bulb"],
-  [/🎯/gu, "target"],
   [/🌐|📎|🔗/gu, "link"],
   [/📄|📑|📃|🪪/gu, "file-text"],
   [/📚|📖/gu, "book"],
   [/🔍|🔎/gu, "search"],
   [/⏰|⏳|🕒/gu, "clock"],
   [/📅|🗓️?/gu, "calendar"],
-  [/🔔|📢|📞/gu, "bell"],
+  [/🔔|📢|📞|📱|☎️/gu, "bell"],
   [/🎓/gu, "graduation"],
   [/🏆|🥇/gu, "award"],
   [/🔑|🔒/gu, "key"],
@@ -2199,7 +2199,7 @@ function format_markdown_safe(text) {
     }
 
     const step_match = trimmed.match(
-      /^(?:[-*•]\s*)?(?:\*{1,2})?第\s*([0-9一二三四五六七八九十]+)\s*步(?:\*{1,2})?\s*[：:.、]?\s*(?:\*{1,2})?\s*(.+)$/
+      /^(?:[-*•]\s*)?(?:\*{1,2})?第\s*([0-9一二三四五六七八九十]+)\s*步(?:\*{1,2})?\s*[：:.、｜|]?\s*(?:\*{1,2})?\s*(.+)$/
     );
     if (step_match) {
       flush_list();
@@ -3293,7 +3293,6 @@ $("askForm").onsubmit = async e => {
           sources_label = parsed.sources_label || "";
           confidence = parsed.confidence || "";
           if (parsed.ui_policy && typeof parsed.ui_policy === "object") ui_policy = parsed.ui_policy;
-          if (parsed.agent_trace && typeof parsed.agent_trace === "object") agent_trace = parsed.agent_trace;
           if (typeof parsed.allow_write_actions === "boolean") allow_write_actions = parsed.allow_write_actions;
           if (typeof parsed.allow_nav_actions === "boolean") allow_nav_actions = parsed.allow_nav_actions;
           if (parsed.cached === true) is_cached_hit = true;
@@ -3308,7 +3307,6 @@ $("askForm").onsubmit = async e => {
           if (parsed.ui_policy && typeof parsed.ui_policy === "object") {
             ui_policy = { ...(ui_policy || {}), ...parsed.ui_policy };
           }
-          if (parsed.grounding && typeof parsed.grounding === "object") grounding_info = parsed.grounding;
           if (typeof parsed.allow_write_actions === "boolean") allow_write_actions = parsed.allow_write_actions;
           if (Array.isArray(parsed.followups)) follow_ups = parsed.followups;
           return;
@@ -3514,9 +3512,7 @@ $("askForm").onsubmit = async e => {
       sources,
       sources_label,
       answer_docs,
-      doc_citations,
-      agent_trace,
-      grounding: grounding_info
+      doc_citations
     });
     window.render_ai_agent_actions?.(wrap, suggested_actions, q, clean_saved_answer);
     if (showFu) add_follow_ups(wrap, follow_ups);
@@ -3610,9 +3606,7 @@ $("askForm").onsubmit = async e => {
       sources,
       sources_label,
       answer_docs,
-      doc_citations,
-      agent_trace,
-      grounding: grounding_info
+      doc_citations
     });
     if (showFu) add_follow_ups(wrap, follow_ups);
     toast("已停止生成，保留已输出内容");

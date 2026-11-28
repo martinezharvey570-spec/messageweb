@@ -18606,7 +18606,8 @@ html.dark #aiPage #askSubmitBtn.is-idle {
   color: #94a3b8 !important;
 }
 
-/* 2. AI 气泡内 Markdown 宽表格防裁切：确保移动端左右流畅横滑 */
+/* 2. AI 气泡内 Markdown 宽表格防裁切：纯外框轻浮层 + 零竖线水平分割（根除双重毛刺边） */
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-table-wrap,
 #messages .bubble.msg-ai .md-table-wrap {
   display: block !important;
   width: 100% !important;
@@ -18617,18 +18618,66 @@ html.dark #aiPage #askSubmitBtn.is-idle {
   touch-action: pan-x pan-y !important;
   box-sizing: border-box !important;
   border-radius: 14px !important;
+  border: 0 !important;
+  margin: 10px 0 !important;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 249, 255, 0.56) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 0 0 1px rgba(15, 23, 42, 0.06), 0 4px 14px -4px rgba(15, 23, 42, 0.04) !important;
 }
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-table-wrap,
+html.dark #messages .bubble.msg-ai .md-table-wrap {
+  background: linear-gradient(160deg, rgba(22, 30, 46, 0.62) 0%, rgba(15, 23, 38, 0.50) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai table,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai table,
 #messages .bubble.msg-ai .md-table {
-  width: max-content !important;
+  display: table !important;
+  width: 100% !important;
   min-width: 100% !important;
   border-collapse: collapse !important;
+  margin: 0 !important;
 }
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai th,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai td,
 #messages .bubble.msg-ai .md-table th,
 #messages .bubble.msg-ai .md-table td {
-  min-width: 64px;
-  max-width: 190px;
+  min-width: 60px !important;
+  max-width: 240px !important;
+  padding: 10px 13px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
   white-space: normal !important;
   word-break: break-word !important;
+  font-size: 13px !important;
+  line-height: 1.65 !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai thead th,
+#messages .bubble.msg-ai .md-table thead th {
+  background: rgba(236, 243, 255, 0.62) !important;
+  color: var(--ink) !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.14) !important;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai thead th,
+html.dark #messages .bubble.msg-ai .md-table thead th {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.18) !important;
+}
+#messages .bubble.msg-ai .md-table tbody tr:nth-child(even) td {
+  background: rgba(248, 250, 255, 0.34);
+}
+html.dark #messages .bubble.msg-ai .md-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.022);
+}
+#messages .bubble.msg-ai .md-table tbody tr:hover td {
+  background: rgba(59, 130, 246, 0.045);
+}
+html.dark #messages .bubble.msg-ai .md-table tbody tr:hover td {
+  background: rgba(96, 165, 250, 0.065);
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai tbody tr:last-child td,
+#messages .bubble.msg-ai .md-table tbody tr:last-child td {
+  border-bottom: 0 !important;
 }
 
 /* 3. P0 恶性 Bug 根治：#scheduleAiImportDialog 三段式固定壳 + 单一滚动区（彻底消灭卡死与关闭按钮滚出） */
@@ -20082,44 +20131,79 @@ html.dark .md-copy-snippet-btn {
 }
 html.dark .md-copy-snippet-btn.is-copied { color: #34d399 !important; }
 
-/* 用户消息编辑与复制微操作栏 */
+/* 用户消息编辑与复制操作栏：与 AI 气泡底部 #messages .bubble-tools 按钮尺寸、材质与动效完全对齐 */
 .bubble-wrap.msg-user {
   align-items: flex-end;
 }
+#messages .user-msg-ops,
 .user-msg-ops {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 4px;
-  opacity: 0.72;
-  transition: opacity 0.15s ease;
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  opacity: 1 !important;
+  max-width: 100% !important;
 }
-.bubble-wrap.msg-user:hover .user-msg-ops {
-  opacity: 1;
-}
+#messages .user-msg-ops .user-msg-op-btn,
 .user-msg-op-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 0;
-  background: var(--pearl-l3-bg, rgba(255, 255, 255, 0.78));
-  box-shadow: var(--pearl-l3-shadow, 0 1px 3px rgba(15, 23, 42, 0.07));
-  color: var(--muted, #64748b);
-  font-size: 11px;
-  font-weight: 500;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 29px !important;
+  min-height: 29px !important;
+  padding: 0 11px !important;
+  gap: 4px !important;
+  border-radius: var(--r-pill, 999px) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+  background: var(--pearl-l3-bg) !important;
+  background-color: transparent !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  line-height: 1 !important;
   cursor: pointer;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.15s ease !important;
 }
+#messages .user-msg-ops .user-msg-op-btn:hover,
 .user-msg-op-btn:hover {
-  color: var(--blue, #155eef);
+  color: var(--blue) !important;
+  background: var(--pearl-l3-bg) !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow-hover) !important;
+  transform: translateY(-1px);
 }
+html.dark #messages .user-msg-ops .user-msg-op-btn,
 html.dark .user-msg-op-btn {
-  background: rgba(30, 41, 59, 0.72);
-  color: #94a3b8;
+  background: var(--pearl-l3-bg) !important;
+  background-color: transparent !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
 }
+html.dark #messages .user-msg-ops .user-msg-op-btn:hover,
 html.dark .user-msg-op-btn:hover {
-  color: #93c5fd;
+  color: #93c5fd !important;
+  box-shadow: var(--pearl-l3-shadow-hover) !important;
+}
+@media (max-width: 760px) {
+  #messages .user-msg-ops,
+  .user-msg-ops {
+    gap: 5px !important;
+    margin-top: 7px !important;
+  }
+  #messages .user-msg-ops .user-msg-op-btn,
+  .user-msg-op-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    font-size: 11.5px !important;
+    gap: 3.5px !important;
+  }
 }
 
 /* 多对话历史浮动抽屉 (Pearl L2 玻璃，fixed 防父级 overflow:hidden 裁切) */
@@ -20456,4 +20540,138 @@ body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md
   content: "" !important;
   display: none !important;
   color: transparent !important;
+}
+
+/* ==========================================================================
+   v1.164 AI 主气泡稳重可读微通透 + 引用/话术轻玻璃无竖线卡片 + 现代零竖线表对齐
+   ========================================================================== */
+#messages .bubble.msg-ai,
+body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.93) 0%, rgba(252, 253, 255, 0.87) 52%, rgba(246, 249, 255, 0.90) 100%) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+    inset 1px 0 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(15, 23, 42, 0.055),
+    0 8px 24px -8px rgba(15, 23, 42, 0.08) !important;
+}
+html.dark #messages .bubble.msg-ai,
+html.dark body.on-ai-page #messages > .bubble-wrap.msg-ai > .bubble.msg-ai {
+  background: linear-gradient(160deg, rgba(21, 29, 44, 0.91) 0%, rgba(15, 21, 34, 0.87) 100%) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 12px 30px -10px rgba(0, 0, 0, 0.65) !important;
+}
+
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote.md-quote,
+#messages .md-quote {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  margin: 10px 0 !important;
+  padding: 11px 14px 13px !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  border-radius: 15px !important;
+  background: linear-gradient(148deg, rgba(238, 245, 255, 0.56) 0%, rgba(255, 255, 255, 0.44) 100%) !important;
+  backdrop-filter: blur(12px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.90),
+    0 0 0 1px rgba(59, 130, 246, 0.11),
+    0 3px 10px -4px rgba(37, 99, 235, 0.07) !important;
+  color: var(--ink) !important;
+  font-size: 13.5px !important;
+  line-height: 1.75 !important;
+}
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote.md-quote.is-warn,
+#messages .md-quote.is-warn {
+  background: linear-gradient(148deg, rgba(254, 242, 242, 0.64) 0%, rgba(255, 255, 255, 0.46) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.90),
+    0 0 0 1px rgba(220, 38, 38, 0.12),
+    0 3px 10px -4px rgba(220, 38, 38, 0.07) !important;
+  color: #7f1d1d !important;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote.md-quote,
+html.dark #messages .md-quote {
+  background: linear-gradient(148deg, rgba(37, 99, 235, 0.13) 0%, rgba(15, 23, 42, 0.34) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px rgba(96, 165, 250, 0.18) !important;
+  color: #e2e8f0 !important;
+}
+html.dark body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai blockquote.md-quote.is-warn,
+html.dark #messages .md-quote.is-warn {
+  background: linear-gradient(148deg, rgba(239, 68, 68, 0.14) 0%, rgba(15, 23, 42, 0.34) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(248, 113, 113, 0.20) !important;
+  color: #fecaca !important;
+}
+.md-quote-head {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px;
+  min-height: 22px;
+}
+.md-quote-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+.md-quote.is-warn .md-quote-badge {
+  background: rgba(220, 38, 38, 0.09);
+  color: #b91c1c;
+}
+html.dark .md-quote-badge {
+  background: rgba(96, 165, 250, 0.16);
+  color: #93c5fd;
+}
+html.dark .md-quote.is-warn .md-quote-badge {
+  background: rgba(248, 113, 113, 0.16);
+  color: #fca5a5;
+}
+.md-quote-badge .ico {
+  width: 12px !important;
+  height: 12px !important;
+  margin-right: 0 !important;
+  flex-shrink: 0;
+}
+.md-quote-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.md-quote-head .md-copy-snippet-btn {
+  margin: 0 !important;
+  align-self: center;
+}
+body.on-ai-page #messages .md-section {
+  border-left: 0 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, rgba(241, 245, 253, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+}
+html.dark body.on-ai-page #messages .md-section {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.56) 0%, rgba(15, 23, 42, 0.36) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
 }

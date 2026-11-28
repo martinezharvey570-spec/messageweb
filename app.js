@@ -2249,15 +2249,15 @@ function format_markdown_safe(text) {
       .filter((ln, idx, arr) => ln.trim() || (idx > 0 && idx < arr.length - 1))
       .map(ln => (ln.trim() ? `<div>${parse_inline_markdown(ln)}</div>` : `<div class="md-q-gap"></div>`))
       .join("");
-    const hasInlineIco = /<svg class="ico/.test(bodyHtml);
-    const qIco = hasInlineIco ? "" : ico(isWarnQ ? "alert" : "bulb", `ico-xs ${isWarnQ ? "md-ico-alert" : "md-ico-bulb"}`);
     const isCopyable = !isWarnQ && (rawJoined.length >= 22 || /\[(?:姓名|学号|学院|课程|日期)|老师您好|尊敬的|申请人|您好/.test(rawJoined));
+    const qIco = ico(isWarnQ ? "alert" : (isCopyable ? "copy" : "bulb"), `ico-xs ${isWarnQ ? "md-ico-alert" : (isCopyable ? "md-ico-pin" : "md-ico-bulb")}`);
+    const qLabel = isWarnQ ? "注意事项" : (isCopyable ? "话术模板" : "重点提示");
     const cleanCopyTxt = rawJoined.replace(/^[“"「]+|[”"」]+$/g, "").trim();
     const copyBtn = isCopyable
       ? `<button type="button" class="md-copy-snippet-btn" data-copy-snippet="${esc(cleanCopyTxt)}" title="一键复制这段话术或模板">${ico("copy", "ico-xs")}<span>复制此段</span></button>`
       : "";
     out.push(
-      `<blockquote class="md-quote${isWarnQ ? " is-warn" : ""}${isCopyable ? " is-copyable" : ""}">${qIco}<div class="md-quote-inner">${copyBtn}${bodyHtml}</div></blockquote>`
+      `<blockquote class="md-quote${isWarnQ ? " is-warn" : ""}${isCopyable ? " is-copyable" : ""}"><div class="md-quote-head"><span class="md-quote-badge">${qIco}<span>${qLabel}</span></span>${copyBtn}</div><div class="md-quote-body">${bodyHtml}</div></blockquote>`
     );
     quote_lines = [];
   };

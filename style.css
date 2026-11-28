@@ -20100,21 +20100,26 @@ html.dark .sched-ai-undo-btn {
 }
 .md-copy-snippet-btn {
   align-self: flex-end;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  height: 29px !important;
+  min-height: 29px !important;
   margin: -2px 0 6px 8px;
-  padding: 3px 9px;
-  border-radius: 999px;
+  padding: 0 11px !important;
+  border-radius: 999px !important;
   border: 0 !important;
+  white-space: nowrap !important;
   background: var(--pearl-l3-bg, rgba(255, 255, 255, 0.85)) !important;
+  background-image: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l3-shadow, 0 1px 4px rgba(15, 23, 42, 0.08)) !important;
-  color: var(--blue, #155eef);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.3;
+  color: var(--ink, #1e293b) !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  line-height: 1 !important;
   cursor: pointer;
-  transition: transform 0.14s ease, color 0.14s ease;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.15s ease !important;
 }
 .md-copy-snippet-btn.is-pre {
   position: absolute;
@@ -20123,13 +20128,29 @@ html.dark .sched-ai-undo-btn {
   margin: 0;
   z-index: 2;
 }
-.md-copy-snippet-btn:hover { transform: translateY(-1px); }
+.md-copy-snippet-btn:hover {
+  transform: translateY(-1px);
+  color: var(--blue, #155eef) !important;
+  box-shadow: var(--pearl-l3-shadow-hover, 0 4px 12px rgba(37, 99, 235, 0.14)) !important;
+}
 .md-copy-snippet-btn.is-copied { color: #059669 !important; }
 html.dark .md-copy-snippet-btn {
-  background: rgba(30, 41, 59, 0.85) !important;
-  color: #93c5fd;
+  background: var(--pearl-l3-bg, rgba(30, 41, 59, 0.85)) !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink, #cbd5e1) !important;
 }
+html.dark .md-copy-snippet-btn:hover { color: #93c5fd !important; }
 html.dark .md-copy-snippet-btn.is-copied { color: #34d399 !important; }
+@media (max-width: 760px) {
+  .md-copy-snippet-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    font-size: 11.5px !important;
+    gap: 3.5px !important;
+  }
+}
 
 /* 用户消息编辑与复制操作栏：与 AI 气泡底部 #messages .bubble-tools 按钮尺寸、材质与动效完全对齐 */
 .bubble-wrap.msg-user {
@@ -20674,4 +20695,53 @@ body.on-ai-page #messages .md-section {
 html.dark body.on-ai-page #messages .md-section {
   background: linear-gradient(145deg, rgba(30, 41, 59, 0.56) 0%, rgba(15, 23, 42, 0.36) 100%) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ==========================================================================
+   v1.166 「猜你可能会发」与「复制此段」胶囊尺寸统一对齐 #messages .bubble-tools 按钮
+   ========================================================================== */
+#messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  height: 29px !important;
+  min-height: 29px !important;
+  padding: 0 11px !important;
+  border-radius: var(--r-pill, 999px) !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  background: var(--pearl-l3-bg) !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.15s ease !important;
+}
+#messages .followup-box:not(.knowledge-ref-box) .followup-chips button:hover {
+  color: var(--blue) !important;
+  box-shadow: var(--pearl-l3-shadow-hover) !important;
+  transform: translateY(-1px);
+}
+html.dark #messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+  background: var(--pearl-l3-bg) !important;
+  background-image: var(--pearl-l3-bg) !important;
+  box-shadow: var(--pearl-l3-shadow) !important;
+  color: var(--ink) !important;
+}
+html.dark #messages .followup-box:not(.knowledge-ref-box) .followup-chips button:hover {
+  color: #93c5fd !important;
+  box-shadow: var(--pearl-l3-shadow-hover) !important;
+}
+@media (max-width: 760px) {
+  #messages .followup-box:not(.knowledge-ref-box) .followup-chips button {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    font-size: 11.5px !important;
+    gap: 3.5px !important;
+    line-height: 1 !important;
+  }
 }

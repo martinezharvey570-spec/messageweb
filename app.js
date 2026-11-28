@@ -2244,12 +2244,13 @@ function format_markdown_safe(text) {
     if (!quote_lines.length) return;
     const rawJoined = quote_lines.join("\n").trim();
     if (!rawJoined) { quote_lines = []; return; }
-    const isWarnQ = /红线|注意|切勿|严禁|警告|缺考|作弊|处分|风险|无效/.test(rawJoined);
+    const looksLikeTemplate = /\[(?:姓名|学号|学院|专业|班级|课程|日期|时间|处分|文件号)|(?:[\[【][^\]】\n]{1,12}[\]】][^，,]{0,6}|老师|辅导员|教务处?老师)(?:您)?好|尊敬的|关于[^\n]{2,20}申请|申请人[：:]/.test(rawJoined);
+    const isWarnQ = !looksLikeTemplate && /红线|注意|切勿|严禁|警告|缺考|作弊|处分|风险|无效/.test(rawJoined);
     const bodyHtml = quote_lines
       .filter((ln, idx, arr) => ln.trim() || (idx > 0 && idx < arr.length - 1))
       .map(ln => (ln.trim() ? `<div>${parse_inline_markdown(ln)}</div>` : `<div class="md-q-gap"></div>`))
       .join("");
-    const isCopyable = !isWarnQ && (rawJoined.length >= 22 || /\[(?:姓名|学号|学院|课程|日期)|老师您好|尊敬的|申请人|您好/.test(rawJoined));
+    const isCopyable = !isWarnQ && (looksLikeTemplate || rawJoined.length >= 22);
     const qIco = ico(isWarnQ ? "alert" : (isCopyable ? "copy" : "bulb"), `ico-xs ${isWarnQ ? "md-ico-alert" : (isCopyable ? "md-ico-pin" : "md-ico-bulb")}`);
     const qLabel = isWarnQ ? "注意事项" : (isCopyable ? "话术模板" : "重点提示");
     const cleanCopyTxt = rawJoined.replace(/^[“"「]+|[”"」]+$/g, "").trim();
@@ -2425,7 +2426,17 @@ function format_markdown_safe(text) {
     }
 
     flush_list();
-    out.push(`<p class="md-p">${parse_inline_markdown(trimmed)}</p>`);
+    const unquoted = trimmed.replace(/^[“"「]+|[”"」]+$/g, "").trim();
+    const isPlainTplPara =
+      unquoted.length >= 22 &&
+      /^(?:[\[【][^\]】\n]{1,12}[\]】][^，,\n]{0,6}您好|(?:老师|辅导员|教务处?老师)(?:\/(?:老师|辅导员|导员))?(?:您)?好|尊敬的|申请人[：:]|本人[\[【]姓名[\]】]|我是[\[【]学院[\]】])/.test(unquoted) &&
+      /(?:\[[^\]\n]{1,16}\]|【[^】\n]{1,16}】|谢谢(?:您|老师)|麻烦(?:您|老师)|恳请)/.test(unquoted);
+    if (isPlainTplPara) {
+      quote_lines.push(unquoted);
+      flush_quote();
+    } else {
+      out.push(`<p class="md-p">${parse_inline_markdown(trimmed)}</p>`);
+    }
   }
 
   if (in_code_block && code_lines.length) {

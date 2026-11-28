@@ -430,8 +430,14 @@ function init_theme() {
 init_theme();
 
 function handle_toggle_theme() {
+  const root = document.documentElement;
+  root.classList.add("theme-switching");
   const is_dark = document.body.classList.toggle("dark");
   sync_theme_root(is_dark);
+  void root.offsetHeight;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => root.classList.remove("theme-switching"));
+  });
   try {
     localStorage.setItem("xz_theme", is_dark ? "dark" : "light");
   } catch {}
@@ -721,7 +727,7 @@ function sync_scroll_btn(respectLock = false) {
   const btn = $("scrollBottomBtn");
   const m = get_ai_scroll_metrics();
   if (!btn || !m) return;
-  const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 140 || m.maxTop <= 64;
+  const shouldHide = !document.body.classList.contains("on-ai-page") || m.dist < 180 || m.maxTop <= 96;
   btn.classList.toggle("hide", shouldHide);
   if (!shouldHide) {
     const askEl = $("askForm");
@@ -778,8 +784,15 @@ function scroll_to_message_anchor(targetEl) {
   sync_scroll_btn(false);
 }
 
+let ai_user_scrolled_up = false;
 const on_ai_scroll = () => {
   if (!document.body.classList.contains("on-ai-page")) return;
+  if (ai_busy) {
+    const m = get_ai_scroll_metrics();
+    if (m && m.dist > 48 && Date.now() >= scroll_btn_lock_until) {
+      ai_user_scrolled_up = true;
+    }
+  }
   sync_scroll_btn(true);
 };
 $("messages")?.addEventListener("scroll", on_ai_scroll, { passive: true });
@@ -1008,7 +1021,7 @@ async function enter(isBoot = false) {
     try { token = localStorage.getItem("xz_token") || ""; } catch {}
   }
   if (isBoot && !boot_gate_done) {
-    set_boot_progress(45, "正在翻阅 127 份校园规章并验证身份…", false);
+    set_boot_progress(45, "正在翻阅 117 份校园规章并验证身份…", false);
   }
   try {
     me = await api("/me");
@@ -3476,6 +3489,7 @@ $("askForm").onsubmit = async e => {
 
   const controller = new AbortController();
   let aborted = false;
+  ai_user_scrolled_up = false;
   set_ask_busy(true);
   ai_abort_handler = () => {
     aborted = true;
@@ -3878,7 +3892,11 @@ $("askForm").onsubmit = async e => {
       $("aiStatus").textContent = "在线";
       $("aiStatus").classList.add("ready");
     }
-    sync_scroll_btn(true);
+    if (!ai_user_scrolled_up) {
+      scroll_messages_to_bottom(true);
+    } else {
+      sync_scroll_btn(true);
+    }
   };
 
   const ask_with_continuation = async () => {
@@ -4135,6 +4153,9 @@ async function load_users() {
 
 async function load_stats() {
   try {
+    if ($("aNotices") && ($("aNotices").textContent === "0" || !$("aNotices").textContent.trim())) $("aNotices").textContent = "—";
+    if ($("aStudents") && ($("aStudents").textContent === "0" || !$("aStudents").textContent.trim())) $("aStudents").textContent = "—";
+    if ($("aCompletion") && ($("aCompletion").textContent === "0%" || !$("aCompletion").textContent.trim())) $("aCompletion").textContent = "—";
     const s = (await api("/stats")) || {};
     apply_kb_count(s.knowledge_files, s.knowledge_chunks);
 
@@ -4224,6 +4245,7 @@ const LIST_ACTION_SEL = [
 
 const notice_by_id = id => notices.find(n => String(n.id) === String(id));
 const task_by_id = id => tasks.find(t => String(t.id) === String(id));
+const in_flight_task_deletes = new Set();
 
 document.addEventListener("click", async e => {
   const target = e.target;
@@ -4338,10 +4360,14 @@ document.addEventListener("click", async e => {
   }
 
   if (d.delTask !== undefined) {
+    const tid = String(d.delTask);
+    if (el.disabled || in_flight_task_deletes.has(tid)) return;
     const t = task_by_id(d.delTask);
-    if (!(await ui_confirm(`确定删除待办“${t?.title || "此事项"}”吗？`, { title: "删除待办", danger: true }))) return;
+    in_flight_task_deletes.add(tid);
+    el.disabled = true;
     try {
-      await api("/tasks/" + d.delTask, { method: "DELETE" });
+      if (!(await ui_confirm(`确定删除待办“${t?.title || "此事项"}”吗？`, { title: "删除待办", danger: true }))) return;
+      await api("/tasks/" + tid, { method: "DELETE" });
       tasks = await api("/tasks");
       render_tasks();
       render_home();
@@ -4349,6 +4375,9 @@ document.addEventListener("click", async e => {
       toast("待办已删除");
     } catch (err) {
       toast(err.message);
+    } finally {
+      in_flight_task_deletes.delete(tid);
+      if (el.isConnected) el.disabled = false;
     }
   }
 });
@@ -4711,7 +4740,7 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
       const collapsed = document.body.classList.contains("ai-panel-collapsed");
       btn.classList.toggle("added", !collapsed);
       btn.setAttribute("aria-expanded", String(!collapsed));
-      btn.title = collapsed ? "展开模式与高校选择" : "收起模式与高校选择";
+      btn.title = collapsed ? "展开模式与热门提问" : "收起模式与热门提问";
     }
   };
   try {

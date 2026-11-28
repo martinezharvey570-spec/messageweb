@@ -13638,7 +13638,6 @@ html.dark #auth .auth-theme-btn {
 }
 
 @media (max-width: 900px) {
-  #auth .auth-theme-btn,
   #auth .hero-top,
   #auth .hero-list {
     display: none !important;
@@ -16850,7 +16849,7 @@ html.dark #knowledgeGrid .knowledge-card:hover {
 main > header #menu {
   backdrop-filter: blur(20px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
-  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease !important;
 }
 main > header #globalSearchBtn.global-search-trigger {
   background: var(--pearl-l3-bg) !important;
@@ -16859,14 +16858,14 @@ main > header #globalSearchBtn.global-search-trigger {
   backdrop-filter: blur(20px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
-  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease !important;
 }
 #desktopSidebarToggle.desktop-rail-toggle,
 #docDialog #closeDocDialog,
 #docDialog .doc-m-btn:not(.is-ai) {
   backdrop-filter: blur(20px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
-  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease !important;
 }
 dialog .dialoghead button {
   background: var(--pearl-l3-bg) !important;
@@ -16875,7 +16874,7 @@ dialog .dialoghead button {
   backdrop-filter: blur(20px) saturate(185%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(185%) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
-  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease !important;
 }
 #aiPage .chat-top-actions button:not(.primary):not(.danger) {
   backdrop-filter: blur(20px) saturate(185%) !important;
@@ -17913,6 +17912,7 @@ html.dark .user-row .xz-select-trigger,
 html.dark #docDialog #docOutlineToggle:not(.active):not([aria-expanded="true"]),
 html.dark #aiPage .chat-top-actions button:not(.primary):not(.danger),
 html.dark .knowledge-card .kb-actions button:not(.primary):not(.danger),
+html.dark .suggestions button,
 html.dark .ai-agent-pill,
 html.dark #messages .bubble-tools button:not(.is-high) {
   border-radius: var(--r-pill) !important;
@@ -17922,7 +17922,7 @@ html.dark #messages .bubble-tools button:not(.is-high) {
   background-image: var(--pearl-l3-bg) !important;
   box-shadow: var(--pearl-l3-shadow) !important;
   color: var(--ink) !important;
-  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease, color 0.16s ease, background 0.18s ease !important;
+  transition: transform 0.16s var(--lg-spring), box-shadow 0.18s ease !important;
 }
 .panelhead .link,
 .home-sched-pill {
@@ -20332,4 +20332,106 @@ html.dark .chat-top-sep {
     padding: 5px 9px !important;
     font-size: 12px !important;
   }
+}
+
+
+/* v1.159 Live Audit Fixes: atomic theme switch, mobile title fit, centered Spotlight, zero overshoot, clean school search input */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after,
+html.theme-switching #app *,
+html.theme-switching #aiPage * {
+  transition: none !important;
+  animation: none !important;
+}
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+dialog::backdrop {
+  position: fixed;
+  inset: 0;
+}
+@media (min-width: 761px) {
+  #globalSearchDialog.spotlight-dialog {
+    margin: auto !important;
+    inset: 0 !important;
+  }
+  #aiPage .ai-workspace {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  #aiPage .ai-studio-drawer {
+    box-sizing: border-box;
+    flex: 0 1 clamp(360px, 42%, 520px);
+    max-width: min(520px, 44vw);
+  }
+}
+@media (max-width: 900px) {
+  #auth .auth-theme-btn {
+    position: fixed !important;
+    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    right: 14px !important;
+    z-index: 50 !important;
+    display: inline-flex !important;
+  }
+}
+@media (max-width: 760px) {
+  #aiPage .chat-topbar {
+    gap: 5px !important;
+    padding: 8px 10px !important;
+  }
+  #aiPage .chatintro {
+    gap: 6px !important;
+  }
+  #aiPage .aiicon {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 8px !important;
+  }
+  #aiPage .aiicon .ico {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  #aiPage .chatintro-title-row {
+    gap: 5px !important;
+  }
+  #aiPage .chatintro-title-row h1 {
+    font-size: 14.5px !important;
+  }
+  #aiPage #aiStatus.pill {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+  }
+  #aiPage .chat-top-actions {
+    gap: 5px !important;
+  }
+  #aiPage .chat-top-actions button,
+  #aiPage .chat-top-actions .outline,
+  body.on-ai-page #aiPage .chat-top-actions button {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    flex: 0 0 32px !important;
+  }
+  #aiPage .chat-top-actions button .ico {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+#schoolDialog .school-dialog-box .school-search-wrap input#schoolSearchInput,
+#schoolDialog .school-dialog-box .school-search-wrap input#schoolSearchInput:hover,
+#schoolDialog .school-dialog-box .school-search-wrap input#schoolSearchInput:focus,
+#schoolDialog .school-dialog-box .school-search-wrap input#schoolSearchInput:focus-visible,
+dialog:not(#docDialog) .school-search-wrap input#schoolSearchInput {
+  border: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }

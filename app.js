@@ -184,12 +184,65 @@ function welcome_html(is_reset = false) {
   </div>`;
 }
 
-/* ---- 对话记录缓存 ---- */
-function save_chat_to_local() {
-  const slim = chat_history.slice(-30).map(m => ({
+/* ---- 多对话会话管理 & 本地缓存 (v1.155，自动兼容迁移旧版单对话) ---- */
+const chat_sessions_key_for = () => `xz_chat_sessions_v1_${me?.id || "anon"}`;
+const chat_draft_key_for = () => `xz_ai_draft_v1_${me?.id || "anon"}`;
+let active_chat_session_id = "";
+let chat_sessions_cache = [];
+
+function load_chat_sessions_meta() {
+  try {
+    const raw = localStorage.getItem(chat_sessions_key_for());
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && Array.isArray(parsed.sessions)) {
+      chat_sessions_cache = parsed.sessions.slice(0, 15);
+      active_chat_session_id = parsed.activeId || (chat_sessions_cache[0]?.id || "");
+      return;
+    }
+  } catch {}
+  chat_sessions_cache = [];
+  active_chat_session_id = "";
+  // 平滑迁移旧版单对话记录
+  try {
+    const legacyRaw = localStorage.getItem(chat_cache_key_for());
+    const legacy = legacyRaw ? JSON.parse(legacyRaw) : [];
+    if (Array.isArray(legacy) && legacy.length) {
+      const firstUser = legacy.find(m => m && (m.role === "学生" || m.role === "user"));
+      const sid = "sess_" + Date.now();
+      chat_sessions_cache = [{
+        id: sid,
+        title: String(firstUser?.content || "校务咨询记录").replace(/\s+/g, " ").trim().slice(0, 20) || "新对话",
+        updatedAt: Date.now(),
+        messages: legacy.slice(-30)
+      }];
+      active_chat_session_id = sid;
+      persist_chat_sessions_meta();
+    }
+  } catch {}
+}
+
+function persist_chat_sessions_meta() {
+  try {
+    localStorage.setItem(chat_sessions_key_for(), JSON.stringify({
+      activeId: active_chat_session_id,
+      sessions: chat_sessions_cache.slice(0, 15)
+    }));
+  } catch {
+    try {
+      chat_sessions_cache = chat_sessions_cache.slice(0, 6);
+      localStorage.setItem(chat_sessions_key_for(), JSON.stringify({
+        activeId: active_chat_session_id,
+        sessions: chat_sessions_cache
+      }));
+    } catch {}
+  }
+}
+
+function slim_chat_messages(list) {
+  return (Array.isArray(list) ? list : []).slice(-30).map(m => ({
     role: m.role,
     content: m.content,
-    reasoning: String(m.reasoning || "").slice(0, 4000),
+    reasoning: String(m.reasoning || "").slice(0, 1200),
     sources: (m.sources || []).slice(0, 5).map(s => ({
       title: s.title,
       url: s.url,
@@ -199,18 +252,106 @@ function save_chat_to_local() {
       relevance: s.relevance
     }))
   }));
+}
+
+function save_chat_to_local() {
+  const slim = slim_chat_messages(chat_history);
   try {
     localStorage.setItem(chat_cache_key_for(), JSON.stringify(slim));
   } catch {
     try { localStorage.removeItem(chat_cache_key_for()); } catch {}
   }
+  if (!slim.length) return;
+  if (!active_chat_session_id) active_chat_session_id = "sess_" + Date.now();
+  const firstUser = slim.find(m => m.role === "学生" || m.role === "user");
+  const title = String(firstUser?.content || "校务咨询").replace(/\s+/g, " ").trim().slice(0, 20) || "新对话";
+  const idx = chat_sessions_cache.findIndex(s => s.id === active_chat_session_id);
+  const entry = { id: active_chat_session_id, title, updatedAt: Date.now(), messages: slim };
+  if (idx >= 0) chat_sessions_cache.splice(idx, 1);
+  chat_sessions_cache.unshift(entry);
+  chat_sessions_cache = chat_sessions_cache.slice(0, 15);
+  persist_chat_sessions_meta();
+}
+
+function fmt_sess_time(ts) {
+  const d = new Date(Number(ts) || Date.now());
+  const diff = Date.now() - d.getTime();
+  if (diff < 120000) return "刚刚";
+  const now = new Date();
+  const pad = n => String(n).padStart(2, "0");
+  if (d.toDateString() === now.toDateString()) return `今天 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getMonth() + 1}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function render_chat_sessions_pop() {
+  const listEl = $("chatSessionsList");
+  if (!listEl) return;
+  if (!chat_sessions_cache.length) {
+    listEl.innerHTML = `<div class="chat-sess-empty">暂无历史对话，开始提问会自动保存。</div>`;
+    return;
+  }
+  listEl.innerHTML = chat_sessions_cache.map(s => {
+    const isAct = s.id === active_chat_session_id;
+    const count = Math.max(1, Math.ceil((s.messages?.length || 0) / 2));
+    return `<div class="chat-sess-item${isAct ? " is-active" : ""}" data-sess-id="${esc(s.id)}">
+      <button type="button" class="chat-sess-open" data-sess-open="${esc(s.id)}">
+        <b>${esc(s.title || "新对话")}</b>
+        <small>${fmt_sess_time(s.updatedAt)} · ${count}轮</small>
+      </button>
+      <button type="button" class="chat-sess-del" data-sess-del="${esc(s.id)}" title="删除该对话" aria-label="删除该对话">${ico("close", "ico-xs")}</button>
+    </div>`;
+  }).join("");
+}
+
+function switch_chat_session(sessId) {
+  const target = chat_sessions_cache.find(s => s.id === sessId);
+  if (!target) return;
+  active_chat_session_id = target.id;
+  persist_chat_sessions_meta();
+  const box = $("messages");
+  chat_history = [];
+  if (box) box.innerHTML = welcome_html(false);
+  (target.messages || []).forEach(item => {
+    if (!item || !item.content) return;
+    const is_user = item.role === "学生" || item.role === "user";
+    create_message(item.content, is_user ? "user" : "ai", item.sources || [], true, item.reasoning || "");
+  });
+  save_chat_to_local();
+  render_chat_sessions_pop();
+  $("chatSessionsPop")?.classList.add("hide");
+  $("chatHistoryBtn")?.setAttribute("aria-expanded", "false");
+  sync_scroll_btn(false);
+}
+
+function start_new_chat_session(showToast = true) {
+  if (ai_busy && typeof ai_abort_handler === "function") ai_abort_handler();
+  if (chat_history.length) save_chat_to_local();
+  active_chat_session_id = "sess_" + Date.now();
+  chat_history = [];
+  try { localStorage.removeItem(chat_cache_key_for()); } catch {}
+  persist_chat_sessions_meta();
+  const box = $("messages");
+  if (box) box.innerHTML = welcome_html(true);
+  render_chat_sessions_pop();
+  $("chatSessionsPop")?.classList.add("hide");
+  $("chatHistoryBtn")?.setAttribute("aria-expanded", "false");
+  sync_scroll_btn(false);
+  $("question")?.focus();
+  if (showToast) toast("已开启新对话");
 }
 
 function restore_chat_from_local() {
+  load_chat_sessions_meta();
   const box = $("messages");
   try {
-    const raw = localStorage.getItem(chat_cache_key_for());
-    const list = raw ? JSON.parse(raw) : [];
+    let list = [];
+    const activeSess = chat_sessions_cache.find(s => s.id === active_chat_session_id);
+    if (activeSess && Array.isArray(activeSess.messages) && activeSess.messages.length) {
+      list = activeSess.messages;
+    } else {
+      const raw = localStorage.getItem(chat_cache_key_for());
+      list = raw ? JSON.parse(raw) : [];
+    }
     if (!Array.isArray(list) || !list.length) {
       if (box && !box.querySelector(".bubble-wrap")) box.innerHTML = welcome_html(false);
       return;
@@ -226,12 +367,22 @@ function restore_chat_from_local() {
   } catch {
     if (box && !box.querySelector(".bubble-wrap")) box.innerHTML = welcome_html(false);
   }
+  render_chat_sessions_pop();
 }
 
 function ensure_chat_restored() {
   if (!chat_restored) {
     chat_restored = true;
     restore_chat_from_local();
+    try {
+      const savedDraft = localStorage.getItem(chat_draft_key_for());
+      const qBox = $("question");
+      if (savedDraft && qBox && !qBox.value) {
+        qBox.value = savedDraft;
+        auto_resize_question();
+        sync_ask_idle();
+      }
+    } catch {}
   }
   const box = $("messages");
   if (box && !box.querySelector(".bubble-wrap")) {
@@ -396,6 +547,8 @@ $("logout").onclick = () => {
   notices = [];
   tasks = [];
   chat_history = [];
+  active_chat_session_id = "";
+  chat_sessions_cache = [];
   chat_restored = false;
   ai_todo_draft = [];
   starred_notice_ids = new Set();
@@ -2068,6 +2221,29 @@ function format_markdown_safe(text) {
   let list_type = null;
   let list_items = [];
   let table_rows = [];
+  let quote_lines = [];
+
+  const flush_quote = () => {
+    if (!quote_lines.length) return;
+    const rawJoined = quote_lines.join("\n").trim();
+    if (!rawJoined) { quote_lines = []; return; }
+    const isWarnQ = /红线|注意|切勿|严禁|警告|缺考|作弊|处分|风险|无效/.test(rawJoined);
+    const bodyHtml = quote_lines
+      .filter((ln, idx, arr) => ln.trim() || (idx > 0 && idx < arr.length - 1))
+      .map(ln => (ln.trim() ? `<div>${parse_inline_markdown(ln)}</div>` : `<div class="md-q-gap"></div>`))
+      .join("");
+    const hasInlineIco = /<svg class="ico/.test(bodyHtml);
+    const qIco = hasInlineIco ? "" : ico(isWarnQ ? "alert" : "bulb", `ico-xs ${isWarnQ ? "md-ico-alert" : "md-ico-bulb"}`);
+    const isCopyable = !isWarnQ && (rawJoined.length >= 22 || /\[(?:姓名|学号|学院|课程|日期)|老师您好|尊敬的|申请人|您好/.test(rawJoined));
+    const cleanCopyTxt = rawJoined.replace(/^[“"「]+|[”"」]+$/g, "").trim();
+    const copyBtn = isCopyable
+      ? `<button type="button" class="md-copy-snippet-btn" data-copy-snippet="${esc(cleanCopyTxt)}" title="一键复制这段话术或模板">${ico("copy", "ico-xs")}<span>复制此段</span></button>`
+      : "";
+    out.push(
+      `<blockquote class="md-quote${isWarnQ ? " is-warn" : ""}${isCopyable ? " is-copyable" : ""}">${qIco}<div class="md-quote-inner">${copyBtn}${bodyHtml}</div></blockquote>`
+    );
+    quote_lines = [];
+  };
 
   const flush_list = () => {
     if (!list_type || !list_items.length) return;
@@ -2109,13 +2285,18 @@ function format_markdown_safe(text) {
     const trimmed = line.trim();
 
     if (trimmed.startsWith("```")) {
+      flush_quote();
       flush_list();
       flush_table();
       if (!in_code_block) {
         in_code_block = true;
         code_lines = [];
       } else {
-        out.push(`<pre class="md-pre"><code>${esc(code_lines.join("\n"))}</code></pre>`);
+        const codeTxt = code_lines.join("\n");
+        const preCopyBtn = codeTxt.trim().length >= 8
+          ? `<button type="button" class="md-copy-snippet-btn is-pre" data-copy-snippet="${esc(codeTxt)}" title="复制这段内容">${ico("copy", "ico-xs")}<span>复制</span></button>`
+          : "";
+        out.push(`<div class="md-pre-wrap">${preCopyBtn}<pre class="md-pre"><code>${esc(codeTxt)}</code></pre></div>`);
         in_code_block = false;
       }
       continue;
@@ -2125,7 +2306,17 @@ function format_markdown_safe(text) {
       continue;
     }
 
+    if (/^>\s*(.*)$/.test(trimmed)) {
+      flush_list();
+      flush_table();
+      quote_lines.push(trimmed.replace(/^>\s*/, ""));
+      continue;
+    } else if (quote_lines.length) {
+      flush_quote();
+    }
+
     if (/^\|.+\|$/.test(trimmed)) {
+      flush_quote();
       flush_list();
       table_rows.push(trimmed);
       continue;
@@ -2134,6 +2325,7 @@ function format_markdown_safe(text) {
     }
 
     if (!trimmed) {
+      flush_quote();
       flush_list();
       continue;
     }
@@ -2187,17 +2379,6 @@ function format_markdown_safe(text) {
       continue;
     }
 
-    if (/^>\s*(.+)$/.test(trimmed)) {
-      flush_list();
-      const rawQ = trimmed.replace(/^>\s*/, "");
-      const isWarnQ = /红线|注意|切勿|严禁|警告|缺考|作弊|处分|风险|无效/.test(rawQ);
-      const q_content = parse_inline_markdown(rawQ);
-      const hasInlineIco = /<svg class="ico/.test(q_content);
-      const qIco = hasInlineIco ? "" : ico(isWarnQ ? "alert" : "bulb", `ico-xs ${isWarnQ ? "md-ico-alert" : "md-ico-bulb"}`);
-      out.push(`<blockquote class="md-quote${isWarnQ ? " is-warn" : ""}">${qIco}<div>${q_content}</div></blockquote>`);
-      continue;
-    }
-
     const step_match = trimmed.match(
       /^(?:[-*•]\s*)?(?:\*{1,2})?第\s*([0-9一二三四五六七八九十]+)\s*步(?:\*{1,2})?\s*[：:.、｜|]?\s*(?:\*{1,2})?\s*(.+)$/
     );
@@ -2231,8 +2412,10 @@ function format_markdown_safe(text) {
   }
 
   if (in_code_block && code_lines.length) {
-    out.push(`<pre class="md-pre"><code>${esc(code_lines.join("\n"))}</code></pre>`);
+    const codeTxt = code_lines.join("\n");
+    out.push(`<div class="md-pre-wrap"><button type="button" class="md-copy-snippet-btn is-pre" data-copy-snippet="${esc(codeTxt)}" title="复制这段内容">${ico("copy", "ico-xs")}<span>复制</span></button><pre class="md-pre"><code>${esc(codeTxt)}</code></pre></div>`);
   }
+  flush_quote();
   flush_list();
   flush_table();
 
@@ -2829,14 +3012,30 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
   if (who === "user") {
     d.textContent = clean_text;
   } else {
-    let html = "";
-    if (reasoning && reasoning.trim()) {
-      html += `<details class="ai-reasoning"><summary>${ico("bulb", "ico-xs")}已深度思考（点击查看推理过程）</summary><div class="ai-reasoning-body">${esc(reasoning.trim())}</div></details>`;
-    }
-    html += format_markdown_safe(clean_text);
-    d.innerHTML = html;
+    // 深度思考仅在后端静默计算，前端不渲染推理过程折叠框
+    d.innerHTML = format_markdown_safe(clean_text);
   }
   wrap.appendChild(d);
+
+  if (who === "user" && clean_text) {
+    const userOps = document.createElement("div");
+    userOps.className = "user-msg-ops";
+    userOps.innerHTML = `<button type="button" class="user-msg-op-btn" data-user-edit title="修改并重新发送">${ico("edit", "ico-xs")}<span>编辑</span></button><button type="button" class="user-msg-op-btn" data-user-copy title="复制我的提问">${ico("copy", "ico-xs")}<span>复制</span></button>`;
+    userOps.querySelector("[data-user-edit]").onclick = () => {
+      const qBox = $("question");
+      if (!qBox) return;
+      qBox.value = clean_text;
+      qBox.dispatchEvent(new Event("input", { bubbles: true }));
+      auto_resize_question();
+      qBox.focus();
+      toast("已放回输入框，补充修改后可直接重发");
+    };
+    userOps.querySelector("[data-user-copy]").onclick = async () => {
+      const ok = await copy_text_safe(clean_text);
+      toast(ok ? "已复制你的提问" : "复制失败");
+    };
+    wrap.appendChild(userOps);
+  }
 
   let tools_el = null;
   if (who !== "user") {
@@ -2853,14 +3052,92 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
   return wrap;
 }
 
-$("clearChat")?.addEventListener("click", () => {
+const doClearCurrentChat = () => {
+  if (ai_busy && typeof ai_abort_handler === "function") ai_abort_handler();
   chat_history = [];
-  try {
-    localStorage.removeItem(chat_cache_key_for());
-  } catch {}
+  if (active_chat_session_id) {
+    chat_sessions_cache = chat_sessions_cache.filter(s => s.id !== active_chat_session_id);
+    active_chat_session_id = "";
+    persist_chat_sessions_meta();
+  }
+  try { localStorage.removeItem(chat_cache_key_for()); } catch {}
   $("messages").innerHTML = welcome_html(true);
+  render_chat_sessions_pop();
   sync_scroll_btn(false);
-  toast("对话记录已清空");
+  toast("当前对话已清空");
+};
+$("clearChat")?.addEventListener("click", doClearCurrentChat);
+$("chatSessClearBtn")?.addEventListener("click", () => {
+  $("chatSessionsPop")?.classList.add("hide");
+  doClearCurrentChat();
+});
+$("newChatBtn")?.addEventListener("click", () => start_new_chat_session(true));
+$("chatSessNewBtn")?.addEventListener("click", () => start_new_chat_session(true));
+$("chatSessExportBtn")?.addEventListener("click", () => {
+  $("chatSessionsPop")?.classList.add("hide");
+  $("exportChat")?.click();
+});
+$("chatHistoryBtn")?.addEventListener("click", e => {
+  e.stopPropagation();
+  const pop = $("chatSessionsPop");
+  if (!pop) return;
+  render_chat_sessions_pop();
+  const willOpen = pop.classList.contains("hide");
+  pop.classList.toggle("hide", !willOpen);
+  $("chatHistoryBtn")?.setAttribute("aria-expanded", String(willOpen));
+});
+$("chatSessionsList")?.addEventListener("click", e => {
+  const delBtn = e.target.closest("[data-sess-del]");
+  if (delBtn) {
+    e.stopPropagation();
+    const delId = delBtn.dataset.sessDel;
+    const wasActive = delId === active_chat_session_id;
+    chat_sessions_cache = chat_sessions_cache.filter(s => s.id !== delId);
+    if (wasActive) {
+      active_chat_session_id = chat_sessions_cache[0]?.id || "";
+      if (active_chat_session_id) switch_chat_session(active_chat_session_id);
+      else start_new_chat_session(false);
+    } else {
+      persist_chat_sessions_meta();
+      render_chat_sessions_pop();
+    }
+    toast("已移除该历史对话");
+    return;
+  }
+  const openBtn = e.target.closest("[data-sess-open]");
+  if (openBtn) switch_chat_session(openBtn.dataset.sessOpen);
+});
+document.addEventListener("click", e => {
+  const pop = $("chatSessionsPop");
+  if (!pop || pop.classList.contains("hide")) return;
+  if (!pop.contains(e.target) && e.target !== $("chatHistoryBtn") && !e.target.closest?.("#chatHistoryBtn")) {
+    pop.classList.add("hide");
+    $("chatHistoryBtn")?.setAttribute("aria-expanded", "false");
+  }
+});
+
+// 单段话术/模板「复制此段」全局事件委托（兼容实时流式与历史恢复）
+$("messages")?.addEventListener("click", async e => {
+  const btn = e.target.closest(".md-copy-snippet-btn");
+  if (!btn) return;
+  const txt = btn.dataset.copySnippet || "";
+  if (!txt) return;
+  const ok = await copy_text_safe(txt);
+  if (ok) {
+    const hasPlaceholder = /\[[^\]]{1,16}\]/.test(txt);
+    const span = btn.querySelector("span");
+    const prev = span?.textContent || "复制此段";
+    if (span) span.textContent = "已复制";
+    btn.classList.add("is-copied");
+    setTimeout(() => {
+      if (span) span.textContent = prev;
+      btn.classList.remove("is-copied");
+    }, 1500);
+    send_ai_feedback("copy", { answer: txt });
+    toast(hasPlaceholder ? "已复制话术，记得替换 [ ] 里的姓名或学号" : "已复制这段内容");
+  } else {
+    toast("复制失败，请长按文本复制");
+  }
 });
 
 $("exportChat")?.addEventListener("click", () => {
@@ -3122,6 +3399,7 @@ $("askForm").onsubmit = async e => {
   if (!q && imgs.length) q = "请帮我识别并解读这张图片的内容与办理要点。";
   if (!q && files.length) q = "请帮我梳理并解读所附文档的核心内容。";
   $("question").value = "";
+  try { localStorage.removeItem(chat_draft_key_for()); } catch {}
   pending_ai_images = [];
   pending_ai_files = [];
   render_ask_attachments();
@@ -3193,13 +3471,7 @@ $("askForm").onsubmit = async e => {
   const paint_bubble = (is_streaming, custom_text) => {
     let html = "";
     const text_to_show = custom_text !== undefined ? custom_text : full_answer;
-    if (full_reasoning.trim()) {
-      const summary_label =
-        !text_to_show.trim() && is_streaming
-          ? `${ico("bulb", "ico-xs")}正在深度思考并核对学校条款（点击展开）…`
-          : `${ico("bulb", "ico-xs")}已深度思考（点击查看推理过程）`;
-      html += `<details class="ai-reasoning"><summary>${summary_label}</summary><div class="ai-reasoning-body">${esc(full_reasoning.trim())}</div></details>`;
-    }
+    // 深度思考仅在后端静默推理，前端不渲染 ai-reasoning 折叠框
     const display_text = strip_meta_talk(text_to_show).trim();
     if (display_text) {
       html += format_markdown_safe(display_text);
@@ -4128,70 +4400,67 @@ $("closeSchoolDialog")?.addEventListener("click", () => $("schoolDialog")?.close
 $("schoolSearchInput")?.addEventListener("input", e => render_school_list(e.target.value));
 sync_school_ui();
 
-/* ---- 模型与思考强度分段胶囊交互逻辑 ---- */
-(function init_ai_segmented_controls() {
-  function sync_seg_ui(targetId, val) {
-    const group = document.querySelector(`.ai-seg[data-seg-target="${targetId}"]`);
-    if (!group) return;
-    group.querySelectorAll(".ai-seg-btn").forEach(b => {
-      b.classList.toggle("active", b.dataset.segVal === val);
+/* ---- 回答模式统一滑块（极速 / 智能 / 专家）+ 草稿防丢 ---- */
+(function init_ai_preset_controls() {
+  const seg = $("aiPresetSeg");
+  const modelSel = $("aiModel");
+  const effortSel = $("aiEffort");
+  const thinkChk = $("aiThinking");
+  const PRESETS = {
+    fast: { model: "deepseek-flash", effort: "low", thinking: false },
+    auto: { model: "deepseek-flash", effort: "high", thinking: true },
+    deep: { model: "deepseek-v4-pro", effort: "max", thinking: true }
+  };
+
+  function sync_preset_btn(presetKey) {
+    seg?.querySelectorAll(".ai-seg-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.preset === presetKey);
     });
   }
 
-  document.querySelectorAll(".ai-seg").forEach(seg => {
-    const targetId = seg.dataset.segTarget;
-    const sel = $(targetId);
-    if (!sel) return;
-    const storeKey = "xz_seg_" + targetId;
-    try {
-      const saved = localStorage.getItem(storeKey);
-      if (saved && [...sel.options].some(o => o.value === saved)) {
-        sel.value = saved;
-      }
-    } catch {}
-    sync_seg_ui(targetId, sel.value);
+  window.sync_ai_preset_from_native = () => {
+    if (!modelSel || !thinkChk) return;
+    const key = modelSel.value === "deepseek-v4-pro" ? "deep" : (!thinkChk.checked ? "fast" : "auto");
+    sync_preset_btn(key);
+  };
 
-    seg.querySelectorAll(".ai-seg-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const v = btn.dataset.segVal;
-        sel.value = v;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
-        sync_seg_ui(targetId, v);
-        try { localStorage.setItem(storeKey, v); } catch {}
-      });
+  function apply_preset(key, persist = true) {
+    const cfg = PRESETS[key] || PRESETS.auto;
+    if (modelSel) { modelSel.value = cfg.model; modelSel.dispatchEvent(new Event("change", { bubbles: true })); }
+    if (effortSel) { effortSel.value = cfg.effort; effortSel.dispatchEvent(new Event("change", { bubbles: true })); }
+    if (thinkChk) { thinkChk.checked = !!cfg.thinking; thinkChk.dispatchEvent(new Event("change", { bubbles: true })); }
+    sync_preset_btn(key);
+    if (persist) {
+      try { localStorage.setItem("xz_ai_preset_v1", key); } catch {}
+    }
+  }
+
+  let savedPreset = "auto";
+  try {
+    const p = localStorage.getItem("xz_ai_preset_v1");
+    if (p && PRESETS[p]) savedPreset = p;
+  } catch {}
+  apply_preset(savedPreset, false);
+
+  seg?.querySelectorAll(".ai-seg-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const k = btn.dataset.preset || "auto";
+      apply_preset(k, true);
     });
   });
-})();
 
-/* ---- 深度思考分段胶囊交互同步 ---- */
-(function init_ai_bool_segments() {
-  document.querySelectorAll(".ai-seg[data-seg-bool]").forEach(seg => {
-    const targetId = seg.dataset.segBool;
-    const chk = $(targetId);
-    if (!chk) return;
-    const storeKey = "xz_seg_" + targetId;
-    try {
-      const saved = localStorage.getItem(storeKey);
-      if (saved === "0" || saved === "1") {
-        chk.checked = saved === "1";
-      }
-    } catch {}
-    const sync = () => {
-      const val = chk.checked ? "1" : "0";
-      seg.querySelectorAll(".ai-seg-btn").forEach(b => {
-        b.classList.toggle("active", b.dataset.segVal === val);
-      });
-    };
-    sync();
-    seg.querySelectorAll(".ai-seg-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        chk.checked = btn.dataset.segVal === "1";
-        chk.dispatchEvent(new Event("change", { bubbles: true }));
-        sync();
-        try { localStorage.setItem(storeKey, chk.checked ? "1" : "0"); } catch {}
-      });
-    });
-  });
+  // 提问输入框未发送草稿自动保存（防切换/刷新丢失）
+  const qBox = $("question");
+  if (qBox) {
+    const saveDraft = debounce(() => {
+      try {
+        const v = qBox.value;
+        if (v && v.trim()) localStorage.setItem(chat_draft_key_for(), v);
+        else localStorage.removeItem(chat_draft_key_for());
+      } catch {}
+    }, 220);
+    qBox.addEventListener("input", saveDraft);
+  }
 })();
 
 /* ---- v50: 全站统一自定义弹窗 (ui_confirm / ui_prompt) 与下拉框 (enhance_selects) ---- */
@@ -4333,12 +4602,12 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
   }, 20));
 });
 
-/* ---- v56: 监听 AI 对话条数，开始聊天后自动收起热门提问条释放空间 ---- */
+/* ---- v56 / v1.155: 监听 AI 对话条数，开始聊天后自动收起热门提问条释放空间 ---- */
 (function init_ai_has_chat_observer() {
   const msgBox = $("messages");
   if (!msgBox) return;
   const sync = () => {
-    const hasUserOrAiMsg = msgBox.querySelectorAll(".msg:not(.ai-welcome-msg)").length > 0;
+    const hasUserOrAiMsg = msgBox.querySelectorAll(".bubble:not(.welcome-bubble)").length > 0;
     document.body.classList.toggle("ai-has-chat", hasUserOrAiMsg);
   };
   sync();
@@ -9719,9 +9988,12 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 /* ---- v1.144 快捷指令面板（配合方案一：所有校规/联网/课表均由 AI 后台全自动判断，前端零繁琐开关） ---- */
 (function init_ai_slash_commands() {
   const setNativeSeg = (targetId, val) => {
-    const seg = document.querySelector(`.ai-seg[data-seg-target="${targetId}"]`);
-    const btn = seg?.querySelector(`.ai-seg-btn[data-seg-val="${val}"]`);
-    if (btn) btn.click();
+    const sel = $(targetId);
+    if (sel) {
+      sel.value = val;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      window.sync_ai_preset_from_native?.();
+    }
   };
 
   const SLASH_COMMANDS = [

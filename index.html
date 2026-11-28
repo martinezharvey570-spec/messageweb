@@ -688,7 +688,7 @@
   <link rel="preconnect" href="https://api.messageweb.xyz" crossorigin>
   <link rel="dns-prefetch" href="https://api.messageweb.xyz">
 
-  <link rel="stylesheet" href="style.css?v=1.153" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=1.155" fetchpriority="high">
 </head>
 <body>
 
@@ -1105,46 +1105,43 @@
               </div>
             </div>
             <div class="chat-top-actions">
+              <button type="button" id="newChatBtn" class="outline" title="开始一段新对话"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>新对话</span></button>
+              <button type="button" id="chatHistoryBtn" class="outline" title="切换历史对话" aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg><span>历史</span></button>
               <button type="button" id="toggleAiStudio" class="outline ai-studio-toggle-btn" title="打开/收起 AI 一体化工具舱（通知拆解 / 学业奖助 / 办事向导 / 课表 / 待办）"><svg class="ico" aria-hidden="true"><use href="#i-layout-grid"/></svg><span>工具舱</span></button>
-              <button type="button" id="toggleAiConfig" title="收起/展开模型配置与热门提问" class="outline config-toggle-btn"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
-              <button type="button" id="exportChat" class="outline" title="导出对话记录"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出</span></button>
-              <button type="button" id="clearChat" class="outline" title="清空当前对话"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空</span></button>
+              <button type="button" id="toggleAiConfig" title="收起/展开模式切换与热门提问" class="outline config-toggle-btn"><svg class="ico" aria-hidden="true"><use href="#i-sliders"/></svg><span>参数</span></button>
+              <button type="button" id="exportChat" class="outline hide-sm-action" title="导出当前对话记录"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span>导出</span></button>
+              <button type="button" id="clearChat" class="outline hide-sm-action" title="清空当前对话"><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg><span>清空</span></button>
+            </div>
+            <div id="chatSessionsPop" class="chat-sessions-pop hide" role="dialog" aria-label="历史对话列表">
+              <div class="chat-sess-head">
+                <b>历史对话</b>
+                <button type="button" id="chatSessNewBtn" class="chat-sess-mini-btn"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-plus"/></svg><span>新对话</span></button>
+              </div>
+              <div id="chatSessionsList" class="chat-sess-list"></div>
+              <div class="chat-sess-foot">
+                <button type="button" id="chatSessExportBtn" class="chat-sess-foot-btn"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-download"/></svg><span>导出当前</span></button>
+                <button type="button" id="chatSessClearBtn" class="chat-sess-foot-btn is-danger"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"/></svg><span>清空当前</span></button>
+              </div>
             </div>
           </div>
 
           <div id="aiOptionsBar" class="ai-options">
-            <div class="ai-seg-group" role="group" aria-label="模型选择">
-              <span class="ai-seg-label">模型</span>
-              <div class="ai-seg" data-seg-target="aiModel">
-                <button type="button" class="ai-seg-btn active" data-seg-val="deepseek-flash" title="响应快，适合日常校务咨询">Flash</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="deepseek-v4-pro" title="深度推理，适合复杂条文对比">Pro</button>
+            <div class="ai-seg-group" role="group" aria-label="回答模式">
+              <span class="ai-seg-label">模式</span>
+              <div class="ai-seg" id="aiPresetSeg">
+                <button type="button" class="ai-seg-btn" data-preset="fast" title="日常查课、查数秒出直答">极速</button>
+                <button type="button" class="ai-seg-btn active" data-preset="auto" title="自动路由：简单题秒答，复杂冲突深度推演">智能</button>
+                <button type="button" class="ai-seg-btn" data-preset="deep" title="Pro 深度专家模式（适合复杂多条件冲突）">专家</button>
               </div>
               <select id="aiModel" class="hide" aria-hidden="true">
                 <option value="deepseek-flash" selected>Flash（快速通用）</option>
                 <option value="deepseek-v4-pro">Pro（深度推理）</option>
               </select>
-            </div>
-
-            <div class="ai-seg-group" role="group" aria-label="思考强度">
-              <span class="ai-seg-label">思考</span>
-              <div class="ai-seg" data-seg-target="aiEffort">
-                <button type="button" class="ai-seg-btn" data-seg-val="low">低</button>
-                <button type="button" class="ai-seg-btn active" data-seg-val="high">高</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="max">最高</button>
-              </div>
               <select id="aiEffort" class="hide" aria-hidden="true">
                 <option value="low">低</option>
                 <option value="high" selected>高</option>
                 <option value="max">最高</option>
               </select>
-            </div>
-
-            <div class="ai-seg-group" role="group" aria-label="深度思考">
-              <span class="ai-seg-label">深度思考</span>
-              <div class="ai-seg" data-seg-bool="aiThinking">
-                <button type="button" class="ai-seg-btn active" data-seg-val="1">开启</button>
-                <button type="button" class="ai-seg-btn" data-seg-val="0">关闭</button>
-              </div>
               <input id="aiThinking" type="checkbox" checked class="hide" aria-hidden="true">
             </div>
 
@@ -2096,7 +2093,7 @@
 
 <script src="android-bridge.js?v=1.104"></script>
 <script src="config.js?v=1.104"></script>
-<script src="app.js?v=1.153"></script>
+<script src="app.js?v=1.155"></script>
 
 
 </body>

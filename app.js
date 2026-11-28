@@ -3503,7 +3503,8 @@ $("askForm").onsubmit = async e => {
   const bubble = document.createElement("div");
   bubble.className = "bubble msg-ai";
   const want_thinking = $("aiThinking")?.checked !== false;
-  bubble.innerHTML = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}${want_thinking ? "正在开启深度思考并检索校规库" : "正在检索校规库并生成回答"}</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+  const thinking_status_html = `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}${want_thinking ? "正在开启深度思考并检索校规库" : "正在检索校规库并生成回答"}</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+  bubble.innerHTML = thinking_status_html;
   wrap.appendChild(bubble);
   $("messages").appendChild(wrap);
   scroll_to_message_anchor(userMsgEl);
@@ -3541,7 +3542,8 @@ $("askForm").onsubmit = async e => {
     if (display_text) {
       html += format_markdown_safe(display_text);
     } else if (is_streaming) {
-      html += `<div class="ai-thinking-status"><span>${ico("ai-brand", "ico-xs")}正在生成办事指引</span><span class="pulse-dots"><i></i><i></i><i></i></span></div>`;
+      if (bubble.querySelector(".ai-thinking-status")) return;
+      html += thinking_status_html;
     } else if (text_to_show.trim()) {
       html += format_markdown_safe(text_to_show.trim());
     }
@@ -3591,8 +3593,9 @@ $("askForm").onsubmit = async e => {
       reasoning_effort: $("aiEffort")?.value || "high",
       school_name: selSchool.n,
       school_domain: selSchool.d || "",
+      ...(active_chat_session_id ? { session_id: active_chat_session_id } : {}),
       ...(continue_from ? { continue_from: continue_from.slice(-4000) } : {}),
-      history: chat_history.slice(-9, -1).map(m => ({
+      history: chat_history.slice(-13, -1).map(m => ({
         role: m.role === "学生" ? "user" : "assistant",
         content: String(m.content).slice(0, 2000)
       }))

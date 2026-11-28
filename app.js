@@ -2383,6 +2383,7 @@ const hidden_meta_block_re = /<!--\s*(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\
 function strip_meta_talk(text) {
   let out = String(text || "");
   if (!out) return out;
+  out = out.replace(/\[\/?INLINE\]/gi, "");
   const savedBlocks = [];
   out = out.replace(hidden_meta_block_re, m => {
     savedBlocks.push(m);
@@ -2719,6 +2720,25 @@ function add_ai_footer_meta(wrap_el, tools_el, opts = {}) {
   wrap_el.appendChild(drawer);
 }
 
+function send_ai_feedback(signal_type, meta = {}) {
+  try {
+    if (!token) return;
+    api("/api/ai/feedback", {
+      method: "POST",
+      timeoutMs: 4000,
+      body: JSON.stringify({
+        signal_type,
+        scene: String(meta.scene || "general").slice(0, 40),
+        model_used: String(meta.model || "").slice(0, 40),
+        route_tier: String(meta.route_tier || "").slice(0, 40),
+        question: String(meta.question || "").slice(0, 120),
+        answer_preview: String(meta.answer || "").slice(0, 200),
+        note: String(meta.note || "").slice(0, 120)
+      })
+    }).catch(() => {});
+  } catch {}
+}
+
 function add_tools(wrap_el, text_getter, retry_question = "", action_opts = {}) {
   const tools = document.createElement("div");
   tools.className = "bubble-tools";
@@ -2733,6 +2753,7 @@ function add_tools(wrap_el, text_getter, retry_question = "", action_opts = {}) 
       .replace(/<!--(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)[\s\S]*?(?:(?:AGENT_ACTIONS|SCHEDULE_ACTION|UI_META)-->|$)/g, "")
       .trim();
     const ok = await copy_text_safe(text);
+    if (ok) send_ai_feedback("copy", { question: retry_question, answer: text, model: action_opts?.model });
     toast(ok ? "回答已复制到剪贴板" : "复制失败，请长按文字复制");
   };
   tools.appendChild(copy_btn);
@@ -2761,6 +2782,7 @@ function add_tools(wrap_el, text_getter, retry_question = "", action_opts = {}) 
     retry_btn.className = "bt-retry";
     retry_btn.innerHTML = `${ico("refresh", "ico-xs")}<span class="t-full">重新生成</span><span class="t-short">重试</span>`;
     retry_btn.onclick = () => {
+      send_ai_feedback("regenerate", { question: retry_question, answer: answer_text, model: action_opts?.model });
       $("question").value = retry_question;
       auto_resize_question();
       $("askForm").requestSubmit();
@@ -3166,6 +3188,7 @@ $("askForm").onsubmit = async e => {
   let continued_times = 0;
   let cut_by_timeout = false;
   let soft_error = "";
+  let meta_model = "";
 
   const paint_bubble = (is_streaming, custom_text) => {
     let html = "";
@@ -3289,6 +3312,7 @@ $("askForm").onsubmit = async e => {
         }
 
         if (parsed.type === "meta") {
+          if (parsed.model) meta_model = String(parsed.model);
           sources = parsed.sources || [];
           sources_label = parsed.sources_label || "";
           confidence = parsed.confidence || "";
@@ -3504,7 +3528,7 @@ $("askForm").onsubmit = async e => {
       reasoning: full_reasoning.trim()
     });
     save_chat_to_local();
-    const tools_el = add_tools(wrap, () => clean_saved_answer, q, { allowWrite: allow_write_actions, allowNav: allow_nav_actions });
+    const tools_el = add_tools(wrap, () => clean_saved_answer, q, { allowWrite: allow_write_actions, allowNav: allow_nav_actions, question: q, model: meta_model });
     add_ai_footer_meta(wrap, tools_el, {
       showConf,
       confidence,
@@ -6964,6 +6988,7 @@ async function apply_ai_schedule_action(rawText, toolsEl, opts = {}) {
 
     const markTabDone = i => {
       if (tabBtns[i]) tabBtns[i].classList.add("is-done");
+      send_ai_feedback("apply_action", { question: opts?.question || "", answer: txt, model: opts?.model || "", note: confirmActs[i]?.type || "" });
     };
 
     confirmActs.forEach((act, idx) => {

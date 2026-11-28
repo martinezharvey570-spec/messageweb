@@ -20435,3 +20435,25 @@ dialog:not(#docDialog) .school-search-wrap input#schoolSearchInput {
   -webkit-appearance: none !important;
   appearance: none !important;
 }
+
+/* v1.160 取消所有 AI 回复与 Markdown 无序列表句首蓝点（保留严格先后步骤 .md-ol 圆标） */
+.md-list,
+.md-content ul.md-list,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md-list {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 4px 0 8px !important;
+}
+.md-list li,
+.md-list > li,
+.md-content ul.md-list > li,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md-list > li {
+  padding-left: 0 !important;
+}
+.md-list li::marker,
+.md-content ul.md-list > li::marker,
+body.on-ai-page #messages .bubble-wrap.msg-ai > .bubble.msg-ai .md-content ul.md-list > li::marker {
+  content: "" !important;
+  display: none !important;
+  color: transparent !important;
+}

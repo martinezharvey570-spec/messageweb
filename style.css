@@ -5113,9 +5113,6 @@ html.dark .md-content .md-ol > li::before {
   body.on-ai-page .chat-topbar {
     padding: 12px 28px !important;
   }
-  body.on-ai-page.ai-has-chat .suggestions-bar {
-    display: none !important;
-  }
   body.on-ai-page .suggestions-bar {
     padding: 8px 28px !important;
   }
@@ -5341,9 +5338,6 @@ html.dark .md-content .md-ol > li::before {
 }
 
 @media (max-width: 760px) {
-  body.on-ai-page.ai-has-chat .suggestions-bar {
-    display: none !important;
-  }
   body.on-ai-page .msg.ai .msg-bubble {
     background: transparent !important;
     border: 0 !important;
@@ -13087,12 +13081,10 @@ html.dark .sched-ai-refine-row input {
   letter-spacing: -0.02em;
 }
 .stats article .stat-ico,
-.quick-item .ico,
-.welcome-item > span {
+.quick-item .ico {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 0 0 1px rgba(15, 23, 42, 0.05), 0 2px 6px -2px rgba(37, 99, 235, 0.14);
 }
-html.dark .stats article .stat-ico,
-html.dark .welcome-item > span {
+html.dark .stats article .stat-ico {
   box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.20), 0 0 0 1px rgba(148, 197, 255, 0.12), 0 3px 10px -2px rgba(0, 0, 0, 0.40);
 }
 .welcome-item {
@@ -20266,9 +20258,29 @@ html.dark .chat-sess-open small { color: #94a3b8; }
 html.dark .chat-sess-foot-btn { color: #cbd5e1; }
 html.dark .chat-sess-foot-btn.is-danger { color: #fca5a5; }
 
-/* 开始聊天后自动收起热门提问条，把垂直空间留给对话 */
-body.on-ai-page.ai-has-chat #aiPage .suggestions-bar {
-  display: none !important;
+/* v1.158 移除欢迎四格小卡片 SVG 图标外多余玻璃/色块底框，保持纯粹无底框图标 */
+#messages .welcome-item > span,
+body.on-ai-page #messages .welcome-item > span,
+body.on-ai-page .welcome-item > span,
+html.dark #messages .welcome-item > span,
+html.dark body.on-ai-page #messages .welcome-item > span {
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  padding: 2px 0 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  align-self: flex-start;
+}
+#messages .welcome-item > span .ico,
+body.on-ai-page #messages .welcome-item > span .ico {
+  width: 18px !important;
+  height: 18px !important;
 }
 
 @media (max-width: 760px) {

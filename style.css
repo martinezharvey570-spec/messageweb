@@ -20031,10 +20031,12 @@ html.dark .sched-ai-undo-btn {
 }
 
 /* ==========================================================================
-   v1.155 AI 聊天可用性升级：单段话术复制 / 用户气泡编辑重发 / 多对话历史气泡 / 开聊自动收热门提问
+   v1.156 AI 聊天可用性修复：历史对话浮窗定位防裁切 / 单段话术复制 / 用户气泡编辑重发
    ========================================================================== */
-.chattop {
+.chat-topbar {
   position: relative;
+  z-index: 45;
+  overflow: visible;
 }
 
 .md-quote.is-copyable {
@@ -20128,22 +20130,22 @@ html.dark .user-msg-op-btn:hover {
   color: #93c5fd;
 }
 
-/* 多对话历史浮动抽屉 (Pearl L2 玻璃) */
+/* 多对话历史浮动抽屉 (Pearl L2 玻璃，fixed 防父级 overflow:hidden 裁切) */
 .chat-sessions-pop {
-  position: absolute;
-  top: calc(100% + 8px);
+  position: fixed;
+  top: 64px;
   right: 14px;
-  width: min(330px, calc(100vw - 28px));
-  max-height: 410px;
+  width: min(330px, calc(100vw - 24px));
+  max-height: min(420px, calc(100dvh - 88px));
   display: flex;
   flex-direction: column;
   padding: 12px;
   border-radius: 20px;
-  background: var(--pearl-l2-bg) !important;
+  background: var(--pearl-l2-bg, rgba(255, 255, 255, 0.92)) !important;
   backdrop-filter: blur(28px) saturate(175%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(175%) !important;
-  box-shadow: var(--pearl-l2-shadow) !important;
-  z-index: 60;
+  box-shadow: var(--pearl-l2-shadow, 0 18px 48px rgba(15, 23, 42, 0.16)) !important;
+  z-index: 1200;
 }
 .chat-sess-head {
   display: flex;
@@ -20270,12 +20272,52 @@ body.on-ai-page.ai-has-chat #aiPage .suggestions-bar {
 }
 
 @media (max-width: 760px) {
+  body.on-ai-page #aiPage .chat-top-actions button.hide-sm-action,
+  #aiPage .chat-top-actions button.hide-sm-action,
   #aiPage .chat-top-actions .hide-sm-action {
     display: none !important;
   }
+  #aiPage .chat-topbar {
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+  }
+  #aiPage .chatintro {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  #aiPage .chatintro-title-row {
+    flex-wrap: nowrap !important;
+    min-width: 0 !important;
+  }
+  #aiPage .chatintro-title-row h1 {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  #aiPage .chat-top-actions {
+    flex-shrink: 0 !important;
+    gap: 6px !important;
+  }
   .chat-sessions-pop {
-    right: 8px;
-    left: 8px;
-    width: auto;
+    width: min(330px, calc(100vw - 16px));
+  }
+}
+
+/* v1.157 顶栏按钮分组分割线：会话操作组（新对话/历史/导出/清空） | 面板控制组（工具舱/参数在最右端） */
+.chat-top-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--line, rgba(15, 23, 42, 0.12));
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+html.dark .chat-top-sep {
+  background: rgba(255, 255, 255, 0.14);
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  #aiPage .chat-top-actions .outline {
+    padding: 5px 9px !important;
+    font-size: 12px !important;
   }
 }

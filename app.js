@@ -631,6 +631,10 @@ $("toggleAiConfig")?.addEventListener("click", () => {
   if (!bar) return;
   const is_open = bar.classList.toggle("open");
   $("toggleAiConfig").classList.toggle("added", is_open);
+  if (is_open) {
+    requestAnimationFrame(() => window.sync_nav_sliders?.());
+    setTimeout(() => window.sync_nav_sliders?.(), 60);
+  }
 });
 
 document.querySelectorAll(".nav, .tab-item").forEach(b => {
@@ -3046,7 +3050,6 @@ function create_message(s, who = "", sources = [], is_restoring = false, reasoni
     add_ai_footer_meta(wrap, tools_el, { showConf: false, showSrc: true, sources });
   }
 
-  $("messages")?.querySelector(".welcome-bubble")?.closest(".bubble-wrap")?.remove();
   $("messages").appendChild(wrap);
   sync_scroll_btn(true);
   return wrap;
@@ -3071,6 +3074,32 @@ $("chatSessClearBtn")?.addEventListener("click", () => {
   $("chatSessionsPop")?.classList.add("hide");
   doClearCurrentChat();
 });
+function position_chat_sessions_pop() {
+  const pop = $("chatSessionsPop");
+  const btn = $("chatHistoryBtn");
+  if (!pop) return;
+  if (pop.parentElement !== document.body) {
+    document.body.appendChild(pop);
+  }
+  const vw = window.innerWidth || document.documentElement.clientWidth || 390;
+  const vh = window.innerHeight || document.documentElement.clientHeight || 844;
+  const rect = btn ? btn.getBoundingClientRect() : null;
+  if (rect && rect.width > 0 && rect.height > 0) {
+    const top = Math.min(Math.max(12, Math.round(rect.bottom + 8)), Math.max(12, vh - 240));
+    const popW = Math.min(330, Math.max(220, vw - 24));
+    const maxRight = Math.max(12, vw - popW - 12);
+    const right = Math.min(maxRight, Math.max(12, Math.round(vw - rect.right)));
+    pop.style.top = top + "px";
+    pop.style.right = right + "px";
+    pop.style.left = "auto";
+    pop.style.maxHeight = Math.max(220, Math.min(420, vh - top - 16)) + "px";
+  } else {
+    pop.style.top = "64px";
+    pop.style.right = "12px";
+    pop.style.left = "auto";
+  }
+}
+
 $("newChatBtn")?.addEventListener("click", () => start_new_chat_session(true));
 $("chatSessNewBtn")?.addEventListener("click", () => start_new_chat_session(true));
 $("chatSessExportBtn")?.addEventListener("click", () => {
@@ -3078,13 +3107,33 @@ $("chatSessExportBtn")?.addEventListener("click", () => {
   $("exportChat")?.click();
 });
 $("chatHistoryBtn")?.addEventListener("click", e => {
+  e.preventDefault();
   e.stopPropagation();
   const pop = $("chatSessionsPop");
   if (!pop) return;
+  if (!chat_sessions_cache.length) load_chat_sessions_meta();
+  if (chat_history.length) save_chat_to_local();
   render_chat_sessions_pop();
   const willOpen = pop.classList.contains("hide");
-  pop.classList.toggle("hide", !willOpen);
+  if (willOpen) {
+    position_chat_sessions_pop();
+    pop.classList.remove("hide");
+  } else {
+    pop.classList.add("hide");
+  }
   $("chatHistoryBtn")?.setAttribute("aria-expanded", String(willOpen));
+});
+window.addEventListener("resize", () => {
+  const pop = $("chatSessionsPop");
+  if (pop && !pop.classList.contains("hide")) position_chat_sessions_pop();
+});
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  const pop = $("chatSessionsPop");
+  if (pop && !pop.classList.contains("hide")) {
+    pop.classList.add("hide");
+    $("chatHistoryBtn")?.setAttribute("aria-expanded", "false");
+  }
 });
 $("chatSessionsList")?.addEventListener("click", e => {
   const delBtn = e.target.closest("[data-sess-del]");
@@ -3405,8 +3454,10 @@ $("askForm").onsubmit = async e => {
   render_ask_attachments();
   auto_resize_question();
 
-  $("aiOptionsBar")?.classList.remove("open");
-  $("toggleAiConfig")?.classList.remove("added");
+  if (window.innerWidth < 761) {
+    $("aiOptionsBar")?.classList.remove("open");
+    $("toggleAiConfig")?.classList.remove("added");
+  }
 
   const userMsgEl = create_message(q, "user");
   if (imgs.length && userMsgEl) {
@@ -3514,11 +3565,15 @@ $("askForm").onsubmit = async e => {
 
   const run_ask = async (continue_from = "") => {
     const selSchool = typeof get_selected_school === "function" ? get_selected_school() : { n: "西安文理学院", d: "xawl.edu.cn" };
+    const reqModel = $("aiModel")?.value || "deepseek-flash";
+    const reqThink = $("aiThinking")?.checked !== false;
+    const reqMode = reqModel === "deepseek-v4-pro" ? "deep" : (!reqThink ? "fast" : "auto");
     const payload = {
       question: fullQuestion,
       ...(imgs.length ? { images: imgs } : {}),
-      model: $("aiModel")?.value || "deepseek-flash",
-      thinking: $("aiThinking")?.checked !== false,
+      model: reqModel,
+      mode: reqMode,
+      thinking: reqThink,
       reasoning_effort: $("aiEffort")?.value || "high",
       school_name: selSchool.n,
       school_domain: selSchool.d || "",
@@ -3563,7 +3618,8 @@ $("askForm").onsubmit = async e => {
       const decoder = new TextDecoder();
       let buffer = "";
       let raw_fallback = "";
-      let idle_ms = Number(window.XZ_AI_IDLE_MS) || 45000;
+      const isProInitial = ($("aiModel")?.value || "") === "deepseek-v4-pro";
+      let idle_ms = Number(window.XZ_AI_IDLE_MS) || (isProInitial ? 95000 : 45000);
 
       const process_line = line => {
         const trimmed = line.trim();
@@ -3715,7 +3771,8 @@ $("askForm").onsubmit = async e => {
         }
         const { done, value } = chunk;
         if (done) break;
-        idle_ms = Number(window.XZ_AI_IDLE_MS) || 22000;
+        const isProStream = meta_model === "deepseek-v4-pro" || ($("aiModel")?.value || "") === "deepseek-v4-pro";
+        idle_ms = Number(window.XZ_AI_IDLE_MS) || (isProStream ? 80000 : 28000);
         const chunk_text = decoder.decode(value, { stream: true });
         raw_fallback += chunk_text;
         buffer += chunk_text;
@@ -4654,7 +4711,7 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
       const collapsed = document.body.classList.contains("ai-panel-collapsed");
       btn.classList.toggle("added", !collapsed);
       btn.setAttribute("aria-expanded", String(!collapsed));
-      btn.title = collapsed ? "展开模型选择与热门提问" : "收起模型选择与热门提问";
+      btn.title = collapsed ? "展开模式与高校选择" : "收起模式与高校选择";
     }
   };
   try {
@@ -4672,6 +4729,10 @@ document.querySelectorAll("[data-goto-task]").forEach(b => {
       const collapsed = document.body.classList.toggle("ai-panel-collapsed");
       try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch {}
       syncBtnState();
+      if (!collapsed) {
+        requestAnimationFrame(() => window.sync_nav_sliders?.());
+        setTimeout(() => window.sync_nav_sliders?.(), 80);
+      }
     }
   });
 })();
